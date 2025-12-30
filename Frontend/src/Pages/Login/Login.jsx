@@ -12,7 +12,6 @@ import {
   Users, 
   UserCog,
   ShieldCheck,
-  ChevronDown,
   CheckCircle2
 } from 'lucide-react';
 
@@ -60,7 +59,6 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showRoleInfo, setShowRoleInfo] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(null);
   const navigate = useNavigate();
 
@@ -210,67 +208,6 @@ const Login = () => {
                 {loading ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
-
-            {/* Staff/Admin Role Info Toggle */}
-            <div className="mt-6">
-              <button
-                type="button"
-                onClick={() => setShowRoleInfo(!showRoleInfo)}
-                className="w-full flex items-center justify-center gap-2 text-gray-400 hover:text-white transition-all text-sm py-2"
-              >
-                <Shield className="w-4 h-4" />
-                Staff/Admin Login Info
-                <ChevronDown className={`w-4 h-4 transition-transform ${showRoleInfo ? 'rotate-180' : ''}`} />
-              </button>
-              
-              <AnimatePresence>
-                {showRoleInfo && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="mt-4 space-y-3 p-4 bg-gray-900/50 rounded-xl border border-gray-700">
-                      <p className="text-xs text-gray-500 mb-3">
-                        Admin roles are assigned by Super Admins. Use your assigned credentials to access your dashboard.
-                      </p>
-                      
-                      {/* Event Coordinator */}
-                      <div className="flex items-start gap-3 p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                        <Shield className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="font-bold text-purple-400 text-sm">Event Coordinator</p>
-                          <p className="text-xs text-gray-400 mt-1">QR scanning, attendance marking, winner selection</p>
-                        </div>
-                      </div>
-
-                      {/* Registration Admin */}
-                      <div className="flex items-start gap-3 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                        <UserCog className="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="font-bold text-yellow-400 text-sm">Registration Admin</p>
-                          <p className="text-xs text-gray-400 mt-1">Cash payment approval, on-spot registration</p>
-                        </div>
-                      </div>
-
-                      {/* Volunteer */}
-                      <div className="flex items-start gap-3 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
-                        <QrCode className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="font-bold text-green-400 text-sm">Volunteer</p>
-                          <p className="text-xs text-gray-400 mt-1">Gate pass verification, kit distribution</p>
-                        </div>
-                      </div>
-
-                      <p className="text-xs text-gray-500 mt-4 text-center">
-                        Contact your Super Admin to get role access assigned.
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
 
             <div className="mt-6 text-center">
               <p className="text-gray-500 text-sm">
