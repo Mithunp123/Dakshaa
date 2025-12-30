@@ -16,10 +16,20 @@ import {
   ChevronRight,
   Calendar,
   MapPin,
-  Clock
+  Clock,
+  Sun,
+  Moon,
+  RefreshCw
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
+import toast, { Toaster } from 'react-hot-toast';
+
+// Helper function to format UUID as Dakshaa ID (first 8 characters uppercase)
+const formatDakshaaId = (uuid) => {
+  if (!uuid) return 'N/A';
+  return `DK-${uuid.substring(0, 8).toUpperCase()}`;
+};
 
 const EventCoordinatorDashboard = () => {
   const [assignedEvents, setAssignedEvents] = useState([]);
@@ -30,12 +40,34 @@ const EventCoordinatorDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [scanning, setScanning] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [cameraId, setCameraId] = useState(null);
+  const [cameras, setCameras] = useState([]);
+  const [cameraError, setCameraError] = useState(null);
   
-  // Stats
+  // Session type for attendance
+  const [selectedSession, setSelectedSession] = useState('morning');
+  const selectedSessionRef = useRef(selectedSession);
+  const selectedEventRef = useRef(selectedEvent);
+  
+  // Keep refs in sync with state (for use in scanner callback to avoid stale closures)
+  useEffect(() => {
+    selectedSessionRef.current = selectedSession;
+    console.log('Session updated to:', selectedSession);
+  }, [selectedSession]);
+  
+  useEffect(() => {
+    selectedEventRef.current = selectedEvent;
+    console.log('Event updated to:', selectedEvent?.name || selectedEvent?.id);
+  }, [selectedEvent]);
+  
+  // Stats - now with session breakdown
   const [stats, setStats] = useState({
     registered: 0,
-    checkedIn: 0,
-    remaining: 0
+    morningCheckedIn: 0,
+    eveningCheckedIn: 0,
+    totalCheckedIn: 0,
+    morningRemaining: 0,
+    eveningRemaining: 0
   });
 
   // Winner selection
@@ -46,11 +78,38 @@ const EventCoordinatorDashboard = () => {
   });
 
   const scannerRef = useRef(null);
-  const html5QrCodeScannerRef = useRef(null);
+  const html5QrCodeRef = useRef(null);
 
   useEffect(() => {
     fetchAssignedEvents();
+    getCameras();
+    return () => {
+      stopScanning();
+    };
   }, []);
+
+  const getCameras = async () => {
+    try {
+      await navigator.mediaDevices.getUserMedia({ video: true });
+      const devices = await Html5Qrcode.getCameras();
+      setCameras(devices);
+      // Prefer back camera on mobile
+      const backCamera = devices.find(
+        (d) => d.label.toLowerCase().includes('back') ||
+               d.label.toLowerCase().includes('rear') ||
+               d.label.toLowerCase().includes('environment')
+      );
+      if (backCamera) {
+        setCameraId(backCamera.id);
+      } else if (devices.length > 0) {
+        setCameraId(devices[0].id);
+      }
+      setCameraError(null);
+    } catch (error) {
+      console.error('Error getting cameras:', error);
+      setCameraError('Camera access denied. Please enable camera permissions.');
+    }
+  };
 
   useEffect(() => {
     if (selectedEvent) {
@@ -59,14 +118,13 @@ const EventCoordinatorDashboard = () => {
 
       // Set up real-time subscription for attendance changes
       const attendanceSubscription = supabase
-        .channel(`attendance-${selectedEvent.event_id}`)
+        .channel(`attendance-${selectedEvent.event_key || selectedEvent.id}`)
         .on(
           'postgres_changes',
           {
             event: '*',
             schema: 'public',
-            table: 'attendance',
-            filter: `event_id=eq.${selectedEvent.event_id}`
+            table: 'attendance'
           },
           (payload) => {
             console.log('Attendance change detected:', payload);
@@ -78,14 +136,14 @@ const EventCoordinatorDashboard = () => {
 
       // Set up real-time subscription for registration changes
       const registrationSubscription = supabase
-        .channel(`registrations-${selectedEvent.event_id}`)
+        .channel(`registrations-${selectedEvent.id}`)
         .on(
           'postgres_changes',
           {
             event: '*',
             schema: 'public',
-            table: 'registrations',
-            filter: `event_id=eq.${selectedEvent.event_id}`
+            table: 'event_registrations_config',
+            filter: `event_id=eq.${selectedEvent.id}`
           },
           (payload) => {
             console.log('Registration change detected:', payload);
@@ -95,11 +153,10 @@ const EventCoordinatorDashboard = () => {
         )
         .subscribe();
 
-      // Polling fallback: refresh stats every 10 seconds
-      // This ensures counts update even if realtime subscription isn't working
+      // Polling fallback: refresh stats every 5 seconds for live updates
       const pollingInterval = setInterval(() => {
         fetchStats();
-      }, 10000);
+      }, 5000);
 
       // Cleanup subscriptions and interval on unmount or event change
       return () => {
@@ -192,6 +249,7 @@ const EventCoordinatorDashboard = () => {
     try {
       // Use event.id (UUID) for events_config table
       const eventId = selectedEvent.id || selectedEvent.event_id;
+      const eventKey = selectedEvent.event_key;
       
       if (!eventId) {
         console.warn('No valid event ID found');
@@ -226,22 +284,27 @@ const EventCoordinatorDashboard = () => {
         }
       }
 
-      // Fetch attendance for this event separately
+      // Fetch attendance for this event using event_key (TEXT)
       const { data: attendanceData, error: attError } = await supabase
         .from('attendance')
         .select('*')
-        .eq('event_id', eventId);
+        .eq('event_id', eventKey);
 
       if (attError) console.warn('Attendance fetch error:', attError);
 
-      // Combine registrations with profiles and attendance data
+      // Combine registrations with profiles and attendance data (using columns for sessions)
       const participantsWithAttendance = (registrations || []).map(reg => {
         const profile = profilesMap[reg.user_id] || {};
-        const attendance = (attendanceData || []).filter(att => att.user_id === reg.user_id);
+        // With column-based approach, there's only one attendance row per user/event
+        const userAttendance = (attendanceData || []).find(att => att.user_id === reg.user_id);
         return {
           ...reg,
           profiles: profile,
-          attendance: attendance
+          attendance: userAttendance ? [userAttendance] : [],
+          morningAttended: userAttendance?.morning_attended || false,
+          eveningAttended: userAttendance?.evening_attended || false,
+          morningTime: userAttendance?.morning_time,
+          eveningTime: userAttendance?.evening_time
         };
       });
 
@@ -255,7 +318,6 @@ const EventCoordinatorDashboard = () => {
     if (!selectedEvent) return;
 
     try {
-      // Use event.id (UUID) for events_config table
       const eventId = selectedEvent.id || selectedEvent.event_id;
       
       if (!eventId) {
@@ -263,138 +325,219 @@ const EventCoordinatorDashboard = () => {
         return;
       }
       
-      const { count: registered } = await supabase
-        .from('event_registrations_config')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_id', eventId)
-        .in('payment_status', ['PAID', 'completed']);
-
-      const { count: checkedIn } = await supabase
-        .from('attendance')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_id', eventId);
-
-      setStats({
-        registered: registered || 0,
-        checkedIn: checkedIn || 0,
-        remaining: (registered || 0) - (checkedIn || 0)
+      // Use RPC function for dynamic stats with session breakdown
+      const { data: statsData, error: statsError } = await supabase.rpc('get_event_stats', {
+        p_event_id: eventId
       });
+      
+      if (statsError) {
+        console.warn('Stats RPC error, falling back to direct queries:', statsError);
+        // Fallback to direct queries using column-based session tracking
+        const { count: registered } = await supabase
+          .from('event_registrations_config')
+          .select('*', { count: 'exact', head: true })
+          .eq('event_id', eventId)
+          .in('payment_status', ['PAID', 'completed']);
+
+        const eventKey = selectedEvent.event_key;
+        
+        // Count morning attendance using morning_attended column
+        const { count: morningCount } = await supabase
+          .from('attendance')
+          .select('*', { count: 'exact', head: true })
+          .eq('event_id', eventKey)
+          .eq('morning_attended', true);
+          
+        // Count evening attendance using evening_attended column
+        const { count: eveningCount } = await supabase
+          .from('attendance')
+          .select('*', { count: 'exact', head: true })
+          .eq('event_id', eventKey)
+          .eq('evening_attended', true);
+
+        setStats({
+          registered: registered || 0,
+          morningCheckedIn: morningCount || 0,
+          eveningCheckedIn: eveningCount || 0,
+          totalCheckedIn: (morningCount || 0) + (eveningCount || 0),
+          morningRemaining: (registered || 0) - (morningCount || 0),
+          eveningRemaining: (registered || 0) - (eveningCount || 0)
+        });
+      } else {
+        setStats({
+          registered: statsData.registered || 0,
+          morningCheckedIn: statsData.morning_attended || 0,
+          eveningCheckedIn: statsData.evening_attended || 0,
+          totalCheckedIn: statsData.total_attended || 0,
+          morningRemaining: statsData.morning_remaining || 0,
+          eveningRemaining: statsData.evening_remaining || 0
+        });
+      }
     } catch (error) {
       console.error('Error fetching stats:', error);
     }
   };
 
+  // Use effect to initialize scanner when scanning state becomes true
+  useEffect(() => {
+    if (scanning && !html5QrCodeRef.current?.isScanning) {
+      initializeScanner();
+    }
+  }, [scanning]);
+
   const startScanning = () => {
     setScanning(true);
     setActiveTab('scanner');
-
-    setTimeout(() => {
-      if (scannerRef.current && !html5QrCodeScannerRef.current) {
-        try {
-          const scanner = new Html5QrcodeScanner(
-            "qr-reader",
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            false
-          );
-
-          scanner.render(onScanSuccess, onScanError);
-          html5QrCodeScannerRef.current = scanner;
-        } catch (error) {
-          console.error('Scanner error:', error);
-          alert('Camera access failed. Please allow camera permissions.');
-          setScanning(false);
-        }
-      }
-    }, 100);
+    setCameraError(null);
   };
 
-  const stopScanning = () => {
-    if (html5QrCodeScannerRef.current) {
-      html5QrCodeScannerRef.current.clear();
-      html5QrCodeScannerRef.current = null;
+  const initializeScanner = async () => {
+    // Wait a brief moment for the DOM to be ready
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    const scannerElement = document.getElementById('qr-reader');
+    if (!scannerElement) {
+      console.error('Scanner element not found');
+      setCameraError('Scanner element not found. Please try again.');
+      setScanning(false);
+      return;
     }
-    setScanning(false);
+
+    try {
+      if (!html5QrCodeRef.current) {
+        html5QrCodeRef.current = new Html5Qrcode("qr-reader", { verbose: false });
+      }
+
+      // Mobile-optimized config
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const config = {
+        fps: 15,
+        qrbox: isMobile ? { width: 220, height: 220 } : { width: 280, height: 280 },
+        aspectRatio: 1.0,
+        disableFlip: false,
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true
+        }
+      };
+
+      const cameraConfig = cameraId ? cameraId : { facingMode: "environment" };
+
+      await html5QrCodeRef.current.start(
+        cameraConfig,
+        config,
+        onScanSuccess,
+        () => {} // Silent error handler
+      );
+    } catch (error) {
+      console.error('Scanner error:', error);
+      setCameraError(
+        error.message?.includes('Permission')
+          ? 'Camera permission denied. Please allow camera access.'
+          : 'Failed to start camera. Please try again.'
+      );
+      setScanning(false);
+    }
+  };
+
+  const stopScanning = async () => {
+    try {
+      if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
+        await html5QrCodeRef.current.stop();
+      }
+      setScanning(false);
+    } catch (error) {
+      console.error('Error stopping scanner:', error);
+      setScanning(false);
+    }
   };
 
   const onScanSuccess = async (decodedText) => {
+    // Use refs to get the current values (avoids stale closure from scanner callback)
+    const currentSession = selectedSessionRef.current;
+    const currentEvent = selectedEventRef.current;
     console.log('QR Scanned:', decodedText);
+    console.log('Current Session (from ref):', currentSession);
+    console.log('Current Event (from ref):', currentEvent?.name || currentEvent?.id);
     
-    // Stop scanner immediately
-    stopScanning();
+    // Vibrate on scan
+    navigator.vibrate?.(100);
+    
+    // Stop scanner temporarily to process
+    await stopScanning();
 
-    // Mark attendance
-    await markAttendance(decodedText, 'qr_scan');
+    // Mark attendance with current session and event from refs
+    await markAttendanceWithSessionAndEvent(decodedText, currentSession, currentEvent);
+    
+    // Auto-restart scanning after 1 second for quick successive scans
+    setTimeout(() => {
+      startScanning();
+    }, 1000);
   };
 
-  const onScanError = (error) => {
-    // Silent error handling
-  };
-
-  const markAttendance = async (userId, markType = 'qr_scan') => {
+  // This function uses explicit parameters to avoid closure issues
+  const markAttendanceWithSessionAndEvent = async (userId, session, event) => {
     try {
       setSubmitting(true);
       const { data: { user: coordinator } } = await supabase.auth.getUser();
 
-      // Check if user is registered for this event
-      const { data: registration, error: regError } = await supabase
-        .from('registrations')
-        .select('*, profiles!user_id(id, full_name, roll_number, college_name)')
-        .eq('user_id', userId)
-        .eq('event_id', selectedEvent.event_id)
-        .eq('payment_status', 'completed')
-        .single();
-
-      if (regError || !registration) {
-        playBuzzSound();
-        alert('❌ INVALID: User not registered for this event or payment not completed!');
-        return;
-      }
-
-      // Check if already marked
-      const { data: existingAttendance } = await supabase
-        .from('attendance')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('event_id', selectedEvent.event_id)
-        .single();
-
-      if (existingAttendance) {
-        playBuzzSound();
-        alert('⚠️ ALREADY MARKED: Attendance already recorded!');
-        return;
-      }
-
-      // Mark attendance
-      const { error: attendanceError } = await supabase
-        .from('attendance')
-        .insert({
-          user_id: userId,
-          event_id: selectedEvent.event_id,
-          marked_by: coordinator.id,
-          mark_type: markType
-        });
-
-      if (attendanceError) throw attendanceError;
-
-      playTingSound();
-      showSuccessNotification(registration.profiles.full_name);
+      // Get the event UUID from passed event (from ref)
+      const eventUuid = event?.id || event?.event_id;
+      const eventName = event?.name || 'Unknown Event';
       
-      fetchParticipants();
-      fetchStats();
+      if (!eventUuid) {
+        playBuzzSound();
+        toast.error('No event selected');
+        return;
+      }
+
+      console.log('Marking attendance:', { userId, eventUuid, eventName, session });
+
+      // Use the RPC function for marking attendance with session type
+      const { data: result, error: rpcError } = await supabase.rpc('mark_manual_attendance', {
+        p_user_id: userId,
+        p_event_uuid: eventUuid,
+        p_marked_by: coordinator.id,
+        p_session_type: session
+      });
+
+      console.log('RPC Result:', result);
+
+      if (rpcError) throw rpcError;
+
+      if (result.status === 'error') {
+        playBuzzSound();
+        toast.error(result.message, { duration: 2000, icon: '❌' });
+        return;
+      }
+
+      if (result.status === 'warning') {
+        playBuzzSound();
+        toast(result.message, { duration: 2000, icon: '⚠️', style: { background: '#fef3c7', color: '#92400e' } });
+        return;
+      }
+
+      // Success - show toast notification with the session from the result
+      playTingSound();
+      showSuccessToast(result.student_name, result.session_type || session);
+      
+      // Immediately refresh stats and participants
+      await Promise.all([fetchParticipants(), fetchStats()]);
     } catch (error) {
       console.error('Error marking attendance:', error);
       playBuzzSound();
-      alert('❌ Error: ' + error.message);
+      toast.error(error.message, { duration: 2000 });
     } finally {
       setSubmitting(false);
     }
   };
 
+  // This wrapper uses the current state for manual attendance (not from scanner callback)
+  const markAttendance = async (userId) => {
+    await markAttendanceWithSessionAndEvent(userId, selectedSession, selectedEvent);
+  };
+
   const handleManualAttendance = async (userId) => {
-    const confirmed = confirm('Mark attendance manually for this user?');
-    if (!confirmed) return;
-    
-    await markAttendance(userId, 'manual');
+    await markAttendance(userId);
   };
 
   const handleSelectWinner = async (userId, position) => {
@@ -415,7 +558,7 @@ const EventCoordinatorDashboard = () => {
       if (selectedWinners.third) winners.push({ user_id: selectedWinners.third, position: 3 });
 
       if (winners.length === 0) {
-        alert('Please select at least one winner');
+        toast.error('Please select at least one winner');
         return;
       }
 
@@ -429,17 +572,17 @@ const EventCoordinatorDashboard = () => {
 
       if (error) {
         if (error.code === '23505') {
-          alert('Winners already submitted for this event!');
+          toast.error('Winners already submitted for this event!');
         } else {
           throw error;
         }
       } else {
-        alert('✅ Winners submitted successfully! Certificates will be unlocked for winners.');
+        toast.success('Winners submitted successfully! Certificates will be unlocked.', { duration: 3000 });
         setSelectedWinners({ first: null, second: null, third: null });
       }
     } catch (error) {
       console.error('Error submitting winners:', error);
-      alert('Failed to submit winners');
+      toast.error('Failed to submit winners');
     } finally {
       setSubmitting(false);
     }
@@ -455,28 +598,34 @@ const EventCoordinatorDashboard = () => {
     audio.play().catch(() => {});
   };
 
-  const showSuccessNotification = (name) => {
-    // Show green flash notification
-    const notification = document.createElement('div');
-    notification.className = 'fixed inset-0 bg-green-500/80 z-[9999] flex items-center justify-center backdrop-blur-sm';
-    notification.innerHTML = `
-      <div class="text-center">
-        <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-          <svg class="w-20 h-20 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-          </svg>
+  // Toast notification for success (replaces full-screen notification)
+  const showSuccessToast = (name, session = 'morning') => {
+    const sessionLabel = session === 'evening' ? 'PM' : 'AM';
+    const sessionColor = session === 'evening' ? '#6366f1' : '#f59e0b';
+    
+    toast.custom((t) => (
+      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-green-500 shadow-lg rounded-2xl pointer-events-auto flex items-center p-4`}>
+        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+          <CheckCircle2 className="text-green-500" size={28} />
         </div>
-        <h2 class="text-5xl font-bold text-white mb-2">VALID</h2>
-        <p class="text-3xl text-white font-bold">${name}</p>
+        <div className="flex-1">
+          <p className="text-white font-bold text-lg">{name}</p>
+          <p className="text-white/80 text-sm flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded text-xs font-bold text-white" style={{ backgroundColor: sessionColor }}>
+              {sessionLabel}
+            </span>
+            Attendance Marked ✓
+          </p>
+        </div>
       </div>
-    `;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 2000);
+    ), { duration: 1500 });
   };
 
   const filteredParticipants = participants.filter(p =>
     p.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.profiles?.roll_number?.toLowerCase().includes(searchTerm.toLowerCase())
+    p.profiles?.roll_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.profiles?.roll_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    formatDakshaaId(p.user_id).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const attendedParticipants = participants.filter(p => p.attendance && p.attendance.length > 0);
@@ -503,6 +652,9 @@ const EventCoordinatorDashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white pb-24 md:pb-8">
+      {/* Toast notifications */}
+      <Toaster position="top-center" toastOptions={{ duration: 2000 }} />
+      
       {/* Mobile Header */}
       <div className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-xl border-b border-white/10 p-4">
         <div className="flex items-center justify-between mb-3">
@@ -532,22 +684,57 @@ const EventCoordinatorDashboard = () => {
         </select>
       </div>
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-3 gap-3 p-4">
+      {/* Session Selector */}
+      <div className="flex gap-2 px-4 py-2">
+        <button
+          onClick={() => setSelectedSession('morning')}
+          className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+            selectedSession === 'morning'
+              ? 'bg-yellow-500 text-white shadow-lg shadow-yellow-500/20'
+              : 'bg-white/5 text-gray-400 border border-white/10'
+          }`}
+        >
+          <Sun size={18} />
+          Morning
+        </button>
+        <button
+          onClick={() => setSelectedSession('evening')}
+          className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+            selectedSession === 'evening'
+              ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+              : 'bg-white/5 text-gray-400 border border-white/10'
+          }`}
+        >
+          <Moon size={18} />
+          Evening
+        </button>
+      </div>
+
+      {/* Stats Row - Now with session breakdown */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
         <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 text-center">
           <Users className="mx-auto text-blue-500 mb-2" size={24} />
           <p className="text-2xl font-bold text-blue-500">{stats.registered}</p>
           <p className="text-xs text-gray-400 uppercase">Registered</p>
         </div>
-        <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 text-center">
-          <CheckCircle2 className="mx-auto text-green-500 mb-2" size={24} />
-          <p className="text-2xl font-bold text-green-500">{stats.checkedIn}</p>
-          <p className="text-xs text-gray-400 uppercase">Checked In</p>
+        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-4 text-center">
+          <Sun className="mx-auto text-yellow-500 mb-2" size={24} />
+          <p className="text-2xl font-bold text-yellow-500">{stats.morningCheckedIn}</p>
+          <p className="text-xs text-gray-400 uppercase">Morning ✓</p>
+        </div>
+        <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-4 text-center">
+          <Moon className="mx-auto text-indigo-500 mb-2" size={24} />
+          <p className="text-2xl font-bold text-indigo-500">{stats.eveningCheckedIn}</p>
+          <p className="text-xs text-gray-400 uppercase">Evening ✓</p>
         </div>
         <div className="bg-secondary/10 border border-secondary/20 rounded-2xl p-4 text-center">
           <Clock className="mx-auto text-secondary mb-2" size={24} />
-          <p className="text-2xl font-bold text-secondary">{stats.remaining}</p>
-          <p className="text-xs text-gray-400 uppercase">Remaining</p>
+          <p className="text-2xl font-bold text-secondary">
+            {selectedSession === 'morning' ? stats.morningRemaining : stats.eveningRemaining}
+          </p>
+          <p className="text-xs text-gray-400 uppercase">
+            {selectedSession === 'morning' ? 'AM Left' : 'PM Left'}
+          </p>
         </div>
       </div>
 
@@ -586,6 +773,13 @@ const EventCoordinatorDashboard = () => {
               className="space-y-6"
             >
               <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 text-center">
+                {cameraError && (
+                  <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm">
+                    <AlertCircle className="inline mr-2" size={18} />
+                    {cameraError}
+                  </div>
+                )}
+                
                 {!scanning ? (
                   <div className="space-y-6">
                     <div className="w-32 h-32 mx-auto bg-secondary/10 rounded-[2rem] flex items-center justify-center border-4 border-secondary/20">
@@ -594,22 +788,54 @@ const EventCoordinatorDashboard = () => {
                     <div>
                       <h3 className="text-2xl font-bold mb-2">Ready to Scan</h3>
                       <p className="text-gray-400">Tap below to start QR code scanner</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Session: <span className={selectedSession === 'morning' ? 'text-yellow-500' : 'text-indigo-500'}>
+                          {selectedSession === 'morning' ? 'Morning (AM)' : 'Evening (PM)'}
+                        </span>
+                      </p>
                     </div>
                     <button
                       onClick={startScanning}
-                      className="w-full py-5 bg-secondary text-white font-bold text-lg rounded-2xl hover:bg-secondary-dark transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-3"
+                      disabled={!!cameraError}
+                      className="w-full py-5 bg-secondary text-white font-bold text-lg rounded-2xl hover:bg-secondary-dark transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Camera size={24} />
                       Start Scanning
                     </button>
+                    {cameraError && (
+                      <button
+                        onClick={getCameras}
+                        className="w-full py-3 bg-white/5 border border-white/10 text-gray-400 font-bold rounded-xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                      >
+                        <RefreshCw size={18} />
+                        Retry Camera Access
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-4">
+                    {/* Active Event & Session Indicator while scanning */}
+                    <div className="p-3 rounded-xl bg-secondary/10 border border-secondary/30 text-center">
+                      <p className="text-xs text-gray-400 uppercase mb-1">Scanning for Event</p>
+                      <p className="text-secondary font-bold text-lg">{selectedEvent?.name || 'No Event Selected'}</p>
+                    </div>
+                    <div className={`p-3 rounded-xl text-center font-bold text-sm flex items-center justify-center gap-2 ${
+                      selectedSession === 'morning' 
+                        ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' 
+                        : 'bg-indigo-500/20 text-indigo-500 border border-indigo-500/30'
+                    }`}>
+                      {selectedSession === 'morning' ? <Sun size={18} /> : <Moon size={18} />}
+                      {selectedSession === 'morning' ? 'MORNING' : 'EVENING'} Session
+                    </div>
                     <div 
                       id="qr-reader" 
                       ref={scannerRef}
-                      className="rounded-2xl overflow-hidden"
+                      className="rounded-2xl overflow-hidden bg-black min-h-[300px]"
+                      style={{ minHeight: '300px' }}
                     />
+                    <p className="text-sm text-gray-400">
+                      Point camera at QR code • Auto-scanning enabled
+                    </p>
                     <button
                       onClick={stopScanning}
                       className="w-full py-4 bg-red-500/10 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-2"
@@ -636,12 +862,18 @@ const EventCoordinatorDashboard = () => {
                         </div>
                         <div>
                           <p className="font-bold text-sm">{p.profiles?.full_name}</p>
-                          <p className="text-xs text-gray-400">{p.profiles?.roll_number}</p>
+                          <p className="text-xs text-secondary font-mono">{formatDakshaaId(p.user_id)}</p>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500">
-                        {new Date(p.attendance[0]?.marked_at).toLocaleTimeString()}
-                      </p>
+                      <div className="text-right">
+                        <div className="flex gap-1">
+                          {p.morningAttended && <span className="text-xs px-2 py-0.5 bg-yellow-500/20 text-yellow-500 rounded">AM</span>}
+                          {p.eveningAttended && <span className="text-xs px-2 py-0.5 bg-indigo-500/20 text-indigo-500 rounded">PM</span>}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {p.attendance[0]?.created_at ? new Date(p.attendance[0].created_at).toLocaleTimeString() : ''}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -658,11 +890,24 @@ const EventCoordinatorDashboard = () => {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-4"
             >
+              {/* Current Session Indicator */}
+              <div className={`p-3 rounded-xl text-center font-bold ${
+                selectedSession === 'morning' 
+                  ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' 
+                  : 'bg-indigo-500/20 text-indigo-500 border border-indigo-500/30'
+              }`}>
+                {selectedSession === 'morning' ? (
+                  <span className="flex items-center justify-center gap-2"><Sun size={18} /> Marking MORNING Session</span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2"><Moon size={18} /> Marking EVENING Session</span>
+                )}
+              </div>
+
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
                 <input
                   type="text"
-                  placeholder="Search by name or roll number..."
+                  placeholder="Search by name or Dakshaa ID..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:border-secondary transition-all"
@@ -671,22 +916,25 @@ const EventCoordinatorDashboard = () => {
 
               <div className="space-y-3">
                 {filteredParticipants.map(p => {
-                  const hasAttended = p.attendance && p.attendance.length > 0;
+                  const hasCurrentSessionAttendance = selectedSession === 'morning' ? p.morningAttended : p.eveningAttended;
+                  const hasAnyAttendance = p.morningAttended || p.eveningAttended;
                   return (
                     <div
                       key={p.id}
                       className={`p-4 rounded-2xl border ${
-                        hasAttended
+                        hasCurrentSessionAttendance
                           ? 'bg-green-500/10 border-green-500/20'
+                          : hasAnyAttendance
+                          ? 'bg-yellow-500/5 border-yellow-500/20'
                           : 'bg-white/5 border-white/10'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                            hasAttended ? 'bg-green-500/20' : 'bg-white/10'
+                            hasCurrentSessionAttendance ? 'bg-green-500/20' : 'bg-white/10'
                           }`}>
-                            {hasAttended ? (
+                            {hasCurrentSessionAttendance ? (
                               <CheckCircle2 className="text-green-500" size={24} />
                             ) : (
                               <UserCheck className="text-gray-400" size={24} />
@@ -694,16 +942,25 @@ const EventCoordinatorDashboard = () => {
                           </div>
                           <div>
                             <p className="font-bold">{p.profiles?.full_name}</p>
-                            <p className="text-xs text-gray-400">{p.profiles?.roll_number}</p>
+                            <p className="text-xs text-secondary font-mono">{formatDakshaaId(p.user_id)}</p>
+                            {/* Session badges */}
+                            <div className="flex gap-1 mt-1">
+                              {p.morningAttended && <span className="text-xs px-2 py-0.5 bg-yellow-500/20 text-yellow-500 rounded">AM ✓</span>}
+                              {p.eveningAttended && <span className="text-xs px-2 py-0.5 bg-indigo-500/20 text-indigo-500 rounded">PM ✓</span>}
+                            </div>
                           </div>
                         </div>
-                        {!hasAttended && (
+                        {!hasCurrentSessionAttendance && (
                           <button
                             onClick={() => handleManualAttendance(p.user_id)}
                             disabled={submitting}
-                            className="px-4 py-2 bg-secondary text-white rounded-xl font-bold text-sm hover:bg-secondary-dark transition-all disabled:opacity-50"
+                            className={`px-4 py-2 rounded-xl font-bold text-sm transition-all disabled:opacity-50 ${
+                              selectedSession === 'morning'
+                                ? 'bg-yellow-500 text-white hover:bg-yellow-600'
+                                : 'bg-indigo-500 text-white hover:bg-indigo-600'
+                            }`}
                           >
-                            Mark Present
+                            {selectedSession === 'morning' ? 'Mark AM' : 'Mark PM'}
                           </button>
                         )}
                       </div>
@@ -749,7 +1006,7 @@ const EventCoordinatorDashboard = () => {
                       <option value="" className="bg-slate-900">Select Winner...</option>
                       {attendedParticipants.map(p => (
                         <option key={p.user_id} value={p.user_id} className="bg-slate-900">
-                          {p.profiles?.full_name} - {p.profiles?.roll_number}
+                          {p.profiles?.full_name} - {formatDakshaaId(p.user_id)}
                         </option>
                       ))}
                     </select>

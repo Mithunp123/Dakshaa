@@ -794,3 +794,58 @@ body{
         color: black;
     }
 }
+
+/* ============================================
+   QR Scanner Styles (html5-qrcode library)
+   ============================================ */
+#qr-reader {
+    width: 100% !important;
+    border: none !important;
+    background: #000;
+}
+
+#qr-reader video {
+    width: 100% !important;
+    height: auto !important;
+    object-fit: cover;
+    border-radius: 0;
+}
+
+#qr-reader__scan_region {
+    min-height: 280px !important;
+}
+
+#qr-reader__scan_region > img {
+    display: none !important; /* Hide the default scanning icon */
+}
+
+#qr-reader__dashboard {
+    display: none !important; /* Hide the library's default dashboard */
+}
+
+#qr-reader__header_message {
+    display: none !important;
+}
+
+/* Mobile-specific QR scanner adjustments */
+@media (max-width: 640px) {
+    #qr-reader {
+        border-radius: 0 !important;
+    }
+    
+    #qr-reader video {
+        max-height: 70vh;
+    }
+    
+    #qr-reader__scan_region {
+        min-height: 250px !important;
+    }
+}
+
+/* Touch-friendly scanner controls */
+.scanner-control-btn {
+    min-width: 44px;
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}

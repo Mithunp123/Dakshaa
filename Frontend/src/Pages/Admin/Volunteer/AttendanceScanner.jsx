@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   QrCode,
@@ -15,32 +15,48 @@ import {
   Loader2,
   SwitchCamera,
   Keyboard,
-  X
+  X,
+  ChevronRight,
+  User,
+  Phone,
+  Mail,
+  Building,
+  Hash,
+  Zap,
+  Scan
 } from "lucide-react";
 import { Html5Qrcode } from "html5-qrcode";
 import { supabase } from "../../../supabase";
 
 const AttendanceScanner = () => {
-  const [events, setEvents] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  // Scanner states
   const [scanning, setScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [manualEntry, setManualEntry] = useState(false);
   const [manualId, setManualId] = useState("");
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [cameraId, setCameraId] = useState(null);
   const [cameras, setCameras] = useState([]);
+  const [cameraError, setCameraError] = useState(null);
+  
+  // User and event selection states
+  const [scannedUser, setScannedUser] = useState(null);
+  const [userEvents, setUserEvents] = useState([]);
+  const [selectedEventId, setSelectedEventId] = useState(null);
+  const [showEventSelection, setShowEventSelection] = useState(false);
+  const [markingAttendance, setMarkingAttendance] = useState(false);
 
-  const scannerRef = useRef(null);
   const html5QrCodeRef = useRef(null);
 
-  // Audio for feedback
-  const successAudio = useRef(new Audio("/success.mp3"));
-  const errorAudio = useRef(new Audio("/error.mp3"));
+  // Audio refs for feedback
+  const successAudio = useRef(null);
+  const errorAudio = useRef(null);
 
   useEffect(() => {
-    fetchActiveEvents();
+    // Initialize audio
+    successAudio.current = new Audio("/success.mp3");
+    errorAudio.current = new Audio("/error.mp3");
+    
     getCameras();
 
     return () => {
@@ -48,77 +64,77 @@ const AttendanceScanner = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (selectedEvent) {
-      fetchStats();
-    }
-  }, [selectedEvent, scanResult]);
-
   const getCameras = async () => {
     try {
+      // Request camera permission first
+      await navigator.mediaDevices.getUserMedia({ video: true });
+      
       const devices = await Html5Qrcode.getCameras();
       setCameras(devices);
-      if (devices.length > 0) {
+      
+      // Prefer back camera on mobile
+      const backCamera = devices.find(
+        (d) => d.label.toLowerCase().includes("back") || 
+               d.label.toLowerCase().includes("rear") ||
+               d.label.toLowerCase().includes("environment")
+      );
+      
+      if (backCamera) {
+        setCameraId(backCamera.id);
+      } else if (devices.length > 0) {
         setCameraId(devices[0].id);
       }
+      
+      setCameraError(null);
     } catch (error) {
       console.error("Error getting cameras:", error);
-    }
-  };
-
-  const fetchActiveEvents = async () => {
-    try {
-      const { data, error } = await supabase.rpc("get_active_events_for_scanner");
-      if (error) throw error;
-      setEvents(data || []);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchStats = async () => {
-    if (!selectedEvent) return;
-    try {
-      const { data, error } = await supabase.rpc("get_attendance_stats", {
-        p_event_id: selectedEvent.id
-      });
-      if (error) throw error;
-      setStats(data);
-    } catch (error) {
-      console.error("Error fetching stats:", error);
+      setCameraError("Camera access denied. Please enable camera permissions.");
     }
   };
 
   const startScanner = async () => {
-    if (!selectedEvent) {
-      alert("Please select an event first");
-      return;
-    }
-
     try {
+      setCameraError(null);
+      
       if (!html5QrCodeRef.current) {
-        html5QrCodeRef.current = new Html5Qrcode("qr-reader");
+        html5QrCodeRef.current = new Html5Qrcode("qr-reader", {
+          verbose: false
+        });
       }
 
+      // Mobile-optimized config
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       const config = {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0
+        fps: 15,
+        qrbox: isMobile 
+          ? { width: 220, height: 220 } 
+          : { width: 280, height: 280 },
+        aspectRatio: 1.0,
+        disableFlip: false,
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true
+        }
       };
 
+      const cameraConfig = cameraId 
+        ? cameraId 
+        : { facingMode: "environment" };
+
       await html5QrCodeRef.current.start(
-        cameraId || { facingMode: "environment" },
+        cameraConfig,
         config,
         onScanSuccess,
-        onScanError
+        () => {} // Silent error handler
       );
 
       setScanning(true);
     } catch (error) {
       console.error("Error starting scanner:", error);
-      alert("Failed to start camera. Please check permissions.");
+      setCameraError(
+        error.message.includes("Permission")
+          ? "Camera permission denied. Please allow camera access."
+          : "Failed to start camera. Please try again."
+      );
     }
   };
 
@@ -133,64 +149,144 @@ const AttendanceScanner = () => {
     }
   };
 
-  const onScanSuccess = async (decodedText) => {
-    // Temporarily stop scanning to prevent multiple scans
+  const onScanSuccess = useCallback(async (decodedText) => {
+    // Vibrate on scan
+    navigator.vibrate?.(100);
+    
+    // Stop scanner temporarily
     await stopScanner();
-    await verifyAttendance(decodedText);
-  };
+    
+    // Process the scanned user ID
+    await processScannedUser(decodedText);
+  }, []);
 
-  const onScanError = (error) => {
-    // Ignore scan errors (they happen constantly while scanning)
-  };
+  const processScannedUser = async (userId) => {
+    setLoading(true);
+    setScannedUser(null);
+    setUserEvents([]);
+    setShowEventSelection(false);
 
-  const verifyAttendance = async (userId) => {
     try {
-      const {
-        data: { user }
-      } = await supabase.auth.getUser();
+      // Get user profile
+      const { data: profileData, error: profileError } = await supabase
+        .rpc("get_user_profile_for_scanner", { p_user_id: userId });
 
-      const { data, error } = await supabase.rpc("verify_and_mark_attendance", {
+      if (profileError || profileData?.error) {
+        throw new Error(profileData?.message || "User not found");
+      }
+
+      setScannedUser(profileData);
+
+      // Get user's registered events
+      const { data: eventsData, error: eventsError } = await supabase
+        .rpc("get_user_registered_events", { p_user_id: userId });
+
+      if (eventsError) throw eventsError;
+
+      if (!eventsData || eventsData.length === 0) {
+        setScanResult({
+          status: "error",
+          message: "No registered events found for this user",
+          code: "NO_EVENTS",
+          student_name: profileData.full_name,
+          student_dept: profileData.department
+        });
+        errorAudio.current?.play().catch(() => {});
+        navigator.vibrate?.(500);
+        return;
+      }
+
+      // Filter pending events (not yet attended)
+      const pendingEvents = eventsData.filter((e) => !e.already_attended);
+      
+      setUserEvents(eventsData);
+
+      if (pendingEvents.length === 0) {
+        // All events already attended
+        setScanResult({
+          status: "warning",
+          message: "Already attended all registered events",
+          code: "ALL_ATTENDED",
+          student_name: profileData.full_name,
+          student_dept: profileData.department
+        });
+        errorAudio.current?.play().catch(() => {});
+        return;
+      } else if (pendingEvents.length === 1) {
+        // Only one pending event - mark directly
+        await markAttendance(userId, pendingEvents[0].event_id, pendingEvents[0].event_name);
+      } else {
+        // Multiple events - show selection
+        setShowEventSelection(true);
+        setSelectedEventId(null);
+      }
+    } catch (error) {
+      console.error("Error processing scan:", error);
+      setScanResult({
+        status: "error",
+        message: error.message || "Failed to process scan",
+        code: "PROCESS_ERROR"
+      });
+      errorAudio.current?.play().catch(() => {});
+      navigator.vibrate?.(500);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const markAttendance = async (userId, eventId, eventName) => {
+    setMarkingAttendance(true);
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const { data, error } = await supabase.rpc("mark_event_attendance", {
         p_user_id: userId,
-        p_event_id: selectedEvent.id,
-        p_scanned_by: user.id,
-        p_scan_location: selectedEvent.venue
+        p_event_id: eventId,
+        p_scanned_by: user?.id,
+        p_scan_location: null
       });
 
       if (error) throw error;
 
-      // Play audio and vibrate based on result
+      setScanResult({
+        ...data,
+        event_name: eventName || data.event_name
+      });
+
       if (data.status === "success") {
-        successAudio.current.play().catch(() => {});
+        successAudio.current?.play().catch(() => {});
         navigator.vibrate?.(200);
       } else {
-        errorAudio.current.play().catch(() => {});
+        errorAudio.current?.play().catch(() => {});
         navigator.vibrate?.(500);
       }
 
-      setScanResult(data);
-
-      // Auto-clear result after 4 seconds and resume scanning
-      setTimeout(() => {
-        setScanResult(null);
-        if (scanning) {
-          startScanner();
-        }
-      }, 4000);
+      setShowEventSelection(false);
     } catch (error) {
-      console.error("Error verifying attendance:", error);
+      console.error("Error marking attendance:", error);
       setScanResult({
         status: "error",
-        message: "System error. Please try again.",
-        code: "SYSTEM_ERROR"
+        message: error.message || "Failed to mark attendance",
+        code: "MARK_ERROR"
       });
+      errorAudio.current?.play().catch(() => {});
+    } finally {
+      setMarkingAttendance(false);
     }
+  };
+
+  const handleEventSelect = async (event) => {
+    if (event.already_attended) return;
+    setSelectedEventId(event.event_id);
+    await markAttendance(scannedUser.id, event.event_id, event.event_name);
   };
 
   const handleManualEntry = async () => {
     if (!manualId.trim()) return;
-    await verifyAttendance(manualId.trim());
-    setManualId("");
     setManualEntry(false);
+    await processScannedUser(manualId.trim());
+    setManualId("");
   };
 
   const switchCamera = async () => {
@@ -201,236 +297,293 @@ const AttendanceScanner = () => {
     await stopScanner();
     setCameraId(nextCamera.id);
     
-    // Small delay before restarting with new camera
     setTimeout(() => {
-      if (scanning) {
-        startScanner();
-      }
-    }, 100);
+      startScanner();
+    }, 300);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-secondary" />
-      </div>
-    );
-  }
+  const resetScanner = () => {
+    setScanResult(null);
+    setScannedUser(null);
+    setUserEvents([]);
+    setShowEventSelection(false);
+    setSelectedEventId(null);
+  };
+
+  const continueScanning = () => {
+    resetScanner();
+    startScanner();
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 p-4 md:p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
+      <div className="max-w-2xl mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
         {/* Header */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-center space-y-2"
+          className="text-center space-y-2 pt-2"
         >
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">
-            Attendance Scanner
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-secondary to-primary mb-2">
+            <Scan className="text-white" size={28} />
+          </div>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">
+            Event Scanner
           </h1>
-          <p className="text-gray-400">Scan QR codes for event check-in</p>
+          <p className="text-gray-400 text-sm sm:text-base">Scan student QR to mark attendance</p>
         </motion.div>
 
-        {/* Event Selection */}
-        {!selectedEvent ? (
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-          >
-            {events.map((event) => (
-              <motion.button
-                key={event.id}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setSelectedEvent(event)}
-                className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 text-left hover:bg-white/10 transition-all group"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-secondary to-primary flex items-center justify-center flex-shrink-0">
-                    <QrCode className="text-white" size={24} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-white text-lg group-hover:text-secondary transition-colors">
-                      {event.event_name}
-                    </h3>
-                    <div className="mt-2 space-y-1">
-                      <div className="flex items-center gap-2 text-sm text-gray-400">
-                        <MapPin size={14} />
-                        <span>{event.venue || "TBA"}</span>
-                      </div>
-                      {event.start_time && (
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
-                          <Clock size={14} />
-                          <span>
-                            {new Date(event.start_time).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit"
-                            })}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="mt-3 flex items-center gap-2">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          event.event_type === "general_entry"
-                            ? "bg-blue-500/20 text-blue-400"
-                            : event.event_type === "workshop"
-                            ? "bg-purple-500/20 text-purple-400"
-                            : event.event_type === "lunch"
-                            ? "bg-green-500/20 text-green-400"
-                            : "bg-orange-500/20 text-orange-400"
-                        }`}
-                      >
-                        {event.event_type.replace("_", " ").toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </motion.button>
-            ))}
-          </motion.div>
-        ) : (
-          <div className="space-y-6">
-            {/* Selected Event Header */}
-            <motion.div
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-white">{selectedEvent.event_name}</h2>
-                  <div className="mt-2 flex items-center gap-4 text-sm text-gray-400">
-                    <div className="flex items-center gap-2">
-                      <MapPin size={16} />
-                      <span>{selectedEvent.venue}</span>
-                    </div>
-                    {selectedEvent.start_time && (
-                      <div className="flex items-center gap-2">
-                        <Clock size={16} />
-                        <span>
-                          {new Date(selectedEvent.start_time).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit"
-                          })}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    setSelectedEvent(null);
-                    stopScanner();
-                  }}
-                  className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors"
-                >
-                  Change Event
-                </button>
+        {/* Main Scanner Card */}
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl sm:rounded-3xl overflow-hidden"
+        >
+          {/* Scanner View */}
+          {!scanning && !loading && !showEventSelection && !scanResult ? (
+            <div className="p-6 sm:p-8 text-center space-y-6">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto bg-gradient-to-br from-secondary/20 to-primary/20 rounded-3xl flex items-center justify-center">
+                <Camera className="text-secondary" size={48} />
               </div>
-
-              {/* Stats */}
-              {stats && (
-                <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-white/5 rounded-2xl p-4">
-                    <p className="text-sm text-gray-400">Registered</p>
-                    <p className="text-2xl font-bold text-white">{stats.total_registered}</p>
+              
+              {cameraError ? (
+                <div className="space-y-4">
+                  <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+                    <p className="text-red-400 text-sm">{cameraError}</p>
                   </div>
-                  <div className="bg-white/5 rounded-2xl p-4">
-                    <p className="text-sm text-gray-400">Attended</p>
-                    <p className="text-2xl font-bold text-green-400">{stats.total_attended}</p>
-                  </div>
-                  <div className="bg-white/5 rounded-2xl p-4">
-                    <p className="text-sm text-gray-400">Pending</p>
-                    <p className="text-2xl font-bold text-orange-400">{stats.pending}</p>
-                  </div>
-                  <div className="bg-white/5 rounded-2xl p-4">
-                    <p className="text-sm text-gray-400">Rate</p>
-                    <p className="text-2xl font-bold text-secondary">{stats.attendance_rate}%</p>
-                  </div>
+                  <button
+                    onClick={getCameras}
+                    className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors flex items-center gap-2 mx-auto"
+                  >
+                    <RefreshCw size={18} />
+                    <span>Retry</span>
+                  </button>
                 </div>
-              )}
-            </motion.div>
-
-            {/* Scanner Area */}
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8"
-            >
-              {!scanning ? (
-                <div className="text-center space-y-6">
-                  <div className="w-32 h-32 mx-auto bg-gradient-to-br from-secondary/20 to-primary/20 rounded-3xl flex items-center justify-center">
-                    <Camera className="text-secondary" size={64} />
-                  </div>
+              ) : (
+                <>
                   <div>
-                    <h3 className="text-xl font-bold text-white mb-2">Ready to Scan</h3>
-                    <p className="text-gray-400">
-                      Click the button below to start scanning QR codes
+                    <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Ready to Scan</h3>
+                    <p className="text-gray-400 text-sm sm:text-base">
+                      Point your camera at the student's QR code
                     </p>
                   </div>
+                  
                   <div className="flex flex-col items-center gap-3">
                     <button
                       onClick={startScanner}
-                      className="px-8 py-4 bg-gradient-to-r from-secondary to-primary rounded-2xl font-bold text-white hover:shadow-2xl hover:shadow-secondary/50 transition-all"
+                      className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-secondary to-primary rounded-xl sm:rounded-2xl font-bold text-white hover:shadow-2xl hover:shadow-secondary/50 transition-all text-base sm:text-lg touch-manipulation"
                     >
                       Start Camera
                     </button>
                     <button
                       onClick={() => setManualEntry(true)}
-                      className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors flex items-center gap-2"
+                      className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors flex items-center gap-2 touch-manipulation"
                     >
                       <Keyboard size={20} />
                       <span>Manual Entry</span>
                     </button>
                   </div>
+                </>
+              )}
+            </div>
+          ) : scanning ? (
+            <div className="relative">
+              {/* QR Reader Container */}
+              <div 
+                id="qr-reader" 
+                className="w-full aspect-square max-h-[70vh]"
+                style={{ 
+                  minHeight: '280px',
+                  background: '#000'
+                }}
+              />
+              
+              {/* Scanning Overlay */}
+              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                <div className="w-56 h-56 sm:w-64 sm:h-64 border-2 border-secondary rounded-2xl relative">
+                  <div className="absolute -top-1 -left-1 w-8 h-8 border-t-4 border-l-4 border-secondary rounded-tl-lg" />
+                  <div className="absolute -top-1 -right-1 w-8 h-8 border-t-4 border-r-4 border-secondary rounded-tr-lg" />
+                  <div className="absolute -bottom-1 -left-1 w-8 h-8 border-b-4 border-l-4 border-secondary rounded-bl-lg" />
+                  <div className="absolute -bottom-1 -right-1 w-8 h-8 border-b-4 border-r-4 border-secondary rounded-br-lg" />
+                  
+                  {/* Scanning line animation */}
+                  <motion.div 
+                    className="absolute left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-secondary to-transparent"
+                    animate={{ top: ["10%", "90%", "10%"] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  />
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* Camera View */}
-                  <div className="relative">
-                    <div
-                      id="qr-reader"
-                      className="rounded-2xl overflow-hidden"
-                      style={{ maxWidth: "100%" }}
-                    ></div>
-                    <div className="absolute top-4 right-4 flex gap-2">
-                      {cameras.length > 1 && (
-                        <button
-                          onClick={switchCamera}
-                          className="p-3 bg-black/50 backdrop-blur-xl rounded-xl hover:bg-black/70 transition-colors"
-                        >
-                          <SwitchCamera className="text-white" size={20} />
-                        </button>
+              </div>
+
+              {/* Camera Controls */}
+              <div className="absolute top-4 right-4 flex gap-2">
+                {cameras.length > 1 && (
+                  <button
+                    onClick={switchCamera}
+                    className="p-3 bg-black/60 backdrop-blur rounded-xl hover:bg-black/80 transition-colors touch-manipulation"
+                    aria-label="Switch camera"
+                  >
+                    <SwitchCamera className="text-white" size={22} />
+                  </button>
+                )}
+              </div>
+
+              {/* Bottom Controls */}
+              <div className="absolute bottom-4 left-4 right-4 flex justify-center gap-3">
+                <button
+                  onClick={stopScanner}
+                  className="px-5 py-3 bg-red-500/80 backdrop-blur rounded-xl transition-colors flex items-center gap-2 font-medium touch-manipulation"
+                >
+                  <CameraOff size={18} />
+                  <span>Stop</span>
+                </button>
+                <button
+                  onClick={() => {
+                    stopScanner();
+                    setManualEntry(true);
+                  }}
+                  className="px-5 py-3 bg-black/60 backdrop-blur rounded-xl transition-colors flex items-center gap-2 touch-manipulation"
+                >
+                  <Keyboard size={18} />
+                  <span>Manual</span>
+                </button>
+              </div>
+            </div>
+          ) : loading ? (
+            <div className="p-8 sm:p-12 text-center">
+              <Loader2 className="w-12 h-12 sm:w-16 sm:h-16 animate-spin text-secondary mx-auto mb-4" />
+              <p className="text-gray-400">Processing scan...</p>
+            </div>
+          ) : null}
+        </motion.div>
+
+        {/* Event Selection Modal */}
+        <AnimatePresence>
+          {showEventSelection && scannedUser && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-50"
+              onClick={() => {
+                setShowEventSelection(false);
+                resetScanner();
+              }}
+            >
+              <motion.div
+                initial={{ y: 100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 100, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full sm:max-w-lg max-h-[90vh] bg-gray-900 border border-white/10 rounded-t-3xl sm:rounded-3xl overflow-hidden"
+              >
+                {/* User Header */}
+                <div className="bg-gradient-to-r from-secondary/20 to-primary/20 p-4 sm:p-6 border-b border-white/10">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-secondary to-primary flex items-center justify-center flex-shrink-0">
+                      <User className="text-white" size={28} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg sm:text-xl font-bold text-white truncate">
+                        {scannedUser.full_name}
+                      </h3>
+                      <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
+                        <Building size={14} />
+                        <span className="truncate">{scannedUser.department || "N/A"}</span>
+                      </div>
+                      {scannedUser.roll_no && (
+                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                          <Hash size={14} />
+                          <span>{scannedUser.roll_no}</span>
+                        </div>
                       )}
                     </div>
                   </div>
+                </div>
 
-                  {/* Controls */}
-                  <div className="flex justify-center gap-3">
-                    <button
-                      onClick={stopScanner}
-                      className="px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 rounded-xl transition-colors flex items-center gap-2"
-                    >
-                      <CameraOff size={20} />
-                      <span>Stop Scanning</span>
-                    </button>
-                    <button
-                      onClick={() => setManualEntry(true)}
-                      className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors flex items-center gap-2"
-                    >
-                      <Keyboard size={20} />
-                      <span>Manual Entry</span>
-                    </button>
+                {/* Events List */}
+                <div className="p-4 sm:p-6">
+                  <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                    Select Event to Mark Attendance
+                  </h4>
+                  
+                  <div className="space-y-2 max-h-[50vh] overflow-y-auto scrollbar-hide">
+                    {userEvents.map((event) => (
+                      <motion.button
+                        key={event.event_id}
+                        whileHover={{ scale: event.already_attended ? 1 : 1.01 }}
+                        whileTap={{ scale: event.already_attended ? 1 : 0.98 }}
+                        onClick={() => handleEventSelect(event)}
+                        disabled={event.already_attended || markingAttendance}
+                        className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-4 touch-manipulation ${
+                          event.already_attended
+                            ? "bg-gray-800/50 opacity-60 cursor-not-allowed"
+                            : selectedEventId === event.event_id
+                            ? "bg-secondary/20 border-2 border-secondary"
+                            : "bg-white/5 hover:bg-white/10 border border-white/10"
+                        }`}
+                      >
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                          event.already_attended 
+                            ? "bg-green-500/20" 
+                            : "bg-gradient-to-br from-secondary/30 to-primary/30"
+                        }`}>
+                          {event.already_attended ? (
+                            <CheckCircle2 className="text-green-400" size={20} />
+                          ) : (
+                            <Calendar className="text-secondary" size={20} />
+                          )}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-white truncate">
+                            {event.event_name}
+                          </p>
+                          <div className="flex items-center gap-3 text-xs text-gray-400 mt-1">
+                            {event.venue && (
+                              <span className="flex items-center gap-1">
+                                <MapPin size={12} />
+                                {event.venue}
+                              </span>
+                            )}
+                            {event.start_time && (
+                              <span className="flex items-center gap-1">
+                                <Clock size={12} />
+                                {event.start_time}
+                              </span>
+                            )}
+                          </div>
+                          {event.already_attended && (
+                            <p className="text-xs text-green-400 mt-1">
+                              ✓ Attended at {new Date(event.attendance_time).toLocaleTimeString()}
+                            </p>
+                          )}
+                        </div>
+                        
+                        {!event.already_attended && (
+                          <ChevronRight className="text-gray-500 flex-shrink-0" size={20} />
+                        )}
+                      </motion.button>
+                    ))}
                   </div>
                 </div>
-              )}
+
+                {/* Footer */}
+                <div className="p-4 border-t border-white/10 safe-area-bottom">
+                  <button
+                    onClick={() => {
+                      setShowEventSelection(false);
+                      resetScanner();
+                    }}
+                    className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors font-semibold touch-manipulation"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </motion.div>
             </motion.div>
-          </div>
-        )}
+          )}
+        </AnimatePresence>
 
         {/* Result Modal */}
         <AnimatePresence>
@@ -440,14 +593,13 @@ const AttendanceScanner = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-              onClick={() => setScanResult(null)}
+              onClick={() => {}}
             >
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.8, opacity: 0 }}
-                onClick={(e) => e.stopPropagation()}
-                className={`max-w-md w-full rounded-3xl p-8 text-center space-y-6 ${
+                className={`max-w-md w-full rounded-3xl p-6 sm:p-8 text-center space-y-5 ${
                   scanResult.status === "success"
                     ? "bg-gradient-to-br from-green-500/20 to-green-600/20 border-2 border-green-500"
                     : scanResult.status === "warning"
@@ -463,24 +615,24 @@ const AttendanceScanner = () => {
                   className="flex justify-center"
                 >
                   {scanResult.status === "success" ? (
-                    <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center">
-                      <CheckCircle2 className="text-white" size={48} />
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-green-500 rounded-full flex items-center justify-center">
+                      <CheckCircle2 className="text-white" size={40} />
                     </div>
                   ) : scanResult.status === "warning" ? (
-                    <div className="w-24 h-24 bg-orange-500 rounded-full flex items-center justify-center">
-                      <AlertTriangle className="text-white" size={48} />
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-orange-500 rounded-full flex items-center justify-center">
+                      <AlertTriangle className="text-white" size={40} />
                     </div>
                   ) : (
-                    <div className="w-24 h-24 bg-red-500 rounded-full flex items-center justify-center">
-                      <XCircle className="text-white" size={48} />
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-red-500 rounded-full flex items-center justify-center">
+                      <XCircle className="text-white" size={40} />
                     </div>
                   )}
                 </motion.div>
 
-                {/* Message */}
+                {/* Status */}
                 <div className="space-y-2">
                   <h3
-                    className={`text-3xl font-bold ${
+                    className={`text-2xl sm:text-3xl font-bold ${
                       scanResult.status === "success"
                         ? "text-green-400"
                         : scanResult.status === "warning"
@@ -489,50 +641,73 @@ const AttendanceScanner = () => {
                     }`}
                   >
                     {scanResult.status === "success"
-                      ? "Access Granted"
+                      ? "Success!"
                       : scanResult.status === "warning"
-                      ? "Already Scanned"
-                      : "Access Denied"}
+                      ? "Already Done"
+                      : "Error"}
                   </h3>
-                  <p className="text-gray-300 text-lg">{scanResult.message}</p>
+                  <p className="text-gray-300 text-sm sm:text-base">{scanResult.message}</p>
                 </div>
 
-                {/* Student Details */}
-                {scanResult.student_name && (
-                  <div className="bg-white/10 rounded-2xl p-6 space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-400">Student Name</p>
-                      <p className="text-xl font-bold text-white">{scanResult.student_name}</p>
-                    </div>
+                {/* Student & Event Details */}
+                {(scanResult.student_name || scanResult.event_name) && (
+                  <div className="bg-white/10 rounded-2xl p-4 sm:p-5 space-y-3 text-left">
+                    {scanResult.student_name && (
+                      <div className="flex items-center gap-3">
+                        <User className="text-gray-400 flex-shrink-0" size={18} />
+                        <div>
+                          <p className="text-xs text-gray-400">Student</p>
+                          <p className="font-semibold text-white">{scanResult.student_name}</p>
+                        </div>
+                      </div>
+                    )}
                     {scanResult.student_dept && (
-                      <div>
-                        <p className="text-sm text-gray-400">Department</p>
-                        <p className="font-semibold text-white">{scanResult.student_dept}</p>
+                      <div className="flex items-center gap-3">
+                        <Building className="text-gray-400 flex-shrink-0" size={18} />
+                        <div>
+                          <p className="text-xs text-gray-400">Department</p>
+                          <p className="font-semibold text-white">{scanResult.student_dept}</p>
+                        </div>
                       </div>
                     )}
                     {scanResult.student_roll_no && (
-                      <div>
-                        <p className="text-sm text-gray-400">Roll Number</p>
-                        <p className="font-semibold text-white">{scanResult.student_roll_no}</p>
+                      <div className="flex items-center gap-3">
+                        <Hash className="text-gray-400 flex-shrink-0" size={18} />
+                        <div>
+                          <p className="text-xs text-gray-400">Roll No</p>
+                          <p className="font-semibold text-white">{scanResult.student_roll_no}</p>
+                        </div>
+                      </div>
+                    )}
+                    {scanResult.event_name && (
+                      <div className="flex items-center gap-3 pt-2 border-t border-white/10">
+                        <Calendar className="text-secondary flex-shrink-0" size={18} />
+                        <div>
+                          <p className="text-xs text-gray-400">Event</p>
+                          <p className="font-semibold text-secondary">{scanResult.event_name}</p>
+                        </div>
                       </div>
                     )}
                     {scanResult.first_entry_time && (
-                      <div>
-                        <p className="text-sm text-gray-400">First Entry Time</p>
-                        <p className="font-semibold text-orange-400">
-                          {new Date(scanResult.first_entry_time).toLocaleTimeString()}
-                        </p>
+                      <div className="flex items-center gap-3">
+                        <Clock className="text-orange-400 flex-shrink-0" size={18} />
+                        <div>
+                          <p className="text-xs text-gray-400">First Entry</p>
+                          <p className="font-semibold text-orange-400">
+                            {new Date(scanResult.first_entry_time).toLocaleTimeString()}
+                          </p>
+                        </div>
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* Close Button */}
+                {/* Action Button */}
                 <button
-                  onClick={() => setScanResult(null)}
-                  className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors font-semibold"
+                  onClick={continueScanning}
+                  className="w-full py-3.5 bg-white/10 hover:bg-white/20 rounded-xl transition-colors font-semibold touch-manipulation"
                 >
-                  Continue Scanning
+                  Scan Next
                 </button>
               </motion.div>
             </motion.div>
@@ -546,21 +721,21 @@ const AttendanceScanner = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-50"
               onClick={() => setManualEntry(false)}
             >
               <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 50, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="max-w-md w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8"
+                className="w-full sm:max-w-md bg-gray-900 border border-white/10 rounded-t-3xl sm:rounded-3xl p-6 sm:p-8"
               >
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-bold text-white">Manual Entry</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-white">Manual Entry</h3>
                   <button
                     onClick={() => setManualEntry(false)}
-                    className="p-2 hover:bg-white/10 rounded-xl transition-colors"
+                    className="p-2 hover:bg-white/10 rounded-xl transition-colors touch-manipulation"
                   >
                     <X className="text-white" size={24} />
                   </button>
@@ -577,19 +752,25 @@ const AttendanceScanner = () => {
                       onChange={(e) => setManualId(e.target.value)}
                       onKeyPress={(e) => e.key === "Enter" && handleManualEntry()}
                       placeholder="UUID or Roll Number"
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-secondary"
+                      className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-secondary text-base touch-manipulation"
                       autoFocus
                     />
                   </div>
 
                   <button
                     onClick={handleManualEntry}
-                    disabled={!manualId.trim()}
-                    className="w-full py-3 bg-gradient-to-r from-secondary to-primary rounded-xl font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-2xl hover:shadow-secondary/50 transition-all"
+                    disabled={!manualId.trim() || loading}
+                    className="w-full py-3.5 bg-gradient-to-r from-secondary to-primary rounded-xl font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all touch-manipulation"
                   >
-                    Verify Entry
+                    {loading ? (
+                      <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                    ) : (
+                      "Verify & Continue"
+                    )}
                   </button>
                 </div>
+                
+                <div className="safe-area-bottom" />
               </motion.div>
             </motion.div>
           )}
