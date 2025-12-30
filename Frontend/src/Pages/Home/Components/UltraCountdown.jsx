@@ -135,18 +135,12 @@ const UltraCountdown = () => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Calculate next January 1st at 12:00 AM
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    let targetDate = new Date(`January 1, ${currentYear + 1} 00:00:00`);
-    
-    // If we're past Jan 1 of current year, target next year
-    if (now > targetDate) {
-      targetDate = new Date(`January 1, ${currentYear + 2} 00:00:00`);
-    }
-    
+    // Event registration ends on February 10, 2026
+    const targetDate = new Date('February 10, 2026 23:59:59');
     const targetTime = targetDate.getTime();
-    const startTime = new Date(`January 1, ${currentYear} 00:00:00`).getTime();
+    
+    // Start date for progress calculation (e.g., when registrations opened)
+    const startTime = new Date('December 1, 2025 00:00:00').getTime();
     const totalDuration = targetTime - startTime;
 
     const interval = setInterval(() => {
