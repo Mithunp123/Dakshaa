@@ -179,14 +179,10 @@ const EventCoordinatorDashboard = () => {
         .eq('id', user.id)
         .single();
       
-      const isAdminOrCoordinator = profile?.role === 'super_admin' || profile?.role === 'event_coordinator';
-
-      // Get all active events from events_config
-      // For coordinators/admins, we show all events (they can manage any)
-      // For specific assignments, we filter later
       let events = [];
       
-      if (isAdminOrCoordinator) {
+      // Super admins can see all events
+      if (profile?.role === 'super_admin') {
         const { data: allEvents, error: eventsError } = await supabase
           .from('events_config')
           .select('*')
@@ -194,6 +190,43 @@ const EventCoordinatorDashboard = () => {
         
         if (eventsError) throw eventsError;
         events = allEvents || [];
+      } else if (profile?.role === 'event_coordinator') {
+        // Coordinators ONLY see their assigned events
+        const { data: coords, error: coordError } = await supabase
+          .from('event_coordinators')
+          .select('event_id')
+          .eq('user_id', user.id);
+        
+        if (coordError) throw coordError;
+        
+        const assignedEventIds = coords?.map(c => c.event_id) || [];
+        
+        if (assignedEventIds.length > 0) {
+          // Check if event_ids are UUIDs or text event_keys
+          const isUUID = assignedEventIds[0]?.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+          
+          let eventsError, assignedEvents;
+          if (isUUID) {
+            // Query by UUID id
+            const result = await supabase
+              .from('events_config')
+              .select('*')
+              .in('id', assignedEventIds);
+            eventsError = result.error;
+            assignedEvents = result.data;
+          } else {
+            // Query by text event_key
+            const result = await supabase
+              .from('events_config')
+              .select('*')
+              .in('event_key', assignedEventIds);
+            eventsError = result.error;
+            assignedEvents = result.data;
+          }
+          
+          if (eventsError) throw eventsError;
+          events = assignedEvents || [];
+        }
       }
       
       // If no events found, return early
@@ -408,8 +441,9 @@ const EventCoordinatorDashboard = () => {
         html5QrCodeRef.current = new Html5Qrcode("qr-reader", { verbose: false });
       }
 
-      // Mobile-optimized config
+      // Detect device type
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      
       const config = {
         fps: 15,
         qrbox: isMobile ? { width: 220, height: 220 } : { width: 280, height: 280 },
@@ -420,7 +454,24 @@ const EventCoordinatorDashboard = () => {
         }
       };
 
-      const cameraConfig = cameraId ? cameraId : { facingMode: "environment" };
+      // For desktop, try to use any available camera
+      // For mobile, prefer back camera (environment)
+      let cameraConfig;
+      if (cameraId) {
+        // User selected a specific camera
+        cameraConfig = cameraId;
+      } else if (isMobile) {
+        // Mobile: prefer back camera
+        cameraConfig = { facingMode: "environment" };
+      } else if (cameras.length > 0) {
+        // Desktop: use first available camera
+        cameraConfig = cameras[0].id;
+      } else {
+        // Fallback: let browser choose
+        cameraConfig = { facingMode: "user" };
+      }
+
+      console.log('Starting camera with config:', cameraConfig);
 
       await html5QrCodeRef.current.start(
         cameraConfig,
@@ -430,11 +481,35 @@ const EventCoordinatorDashboard = () => {
       );
     } catch (error) {
       console.error('Scanner error:', error);
-      setCameraError(
-        error.message?.includes('Permission')
-          ? 'Camera permission denied. Please allow camera access.'
-          : 'Failed to start camera. Please try again.'
-      );
+      
+      // Provide more helpful error messages
+      let errorMessage = 'Failed to start camera. ';
+      if (error.message?.includes('Permission')) {
+        errorMessage = 'Camera permission denied. Please allow camera access in your browser settings.';
+      } else if (error.message?.includes('NotFoundError') || error.message?.includes('not found')) {
+        errorMessage = 'No camera found. Please connect a camera or use a device with a camera.';
+      } else if (error.message?.includes('NotReadableError') || error.message?.includes('in use')) {
+        errorMessage = 'Camera is in use by another application. Please close other apps using the camera.';
+      } else if (error.message?.includes('OverconstrainedError')) {
+        errorMessage = 'Camera does not support the requested settings. Trying with default settings...';
+        // Try again with simpler config
+        try {
+          await html5QrCodeRef.current.start(
+            { facingMode: "user" },
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            onScanSuccess,
+            () => {}
+          );
+          setCameraError(null);
+          return;
+        } catch (retryError) {
+          errorMessage = 'Failed to start camera. Please try a different browser or device.';
+        }
+      } else {
+        errorMessage += error.message || 'Please try again or use a different browser.';
+      }
+      
+      setCameraError(errorMessage);
       setScanning(false);
     }
   };

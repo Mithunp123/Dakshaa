@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Download } from "lucide-react";
@@ -7,7 +7,9 @@ import Daksha from "../../../assets/DaKshaa.png";
 import UltraCountdown from "./UltraCountdown";
 import RegisterAni from "../../../assets/registerani.gif";
 import brochure from "../../../assets/brochure.pdf";
-import RobotHero from "./RobotHero";
+
+// Lazy load the 3D component
+const RobotHero = lazy(() => import("./RobotHero"));
 
 // Enhanced Glowing Text Animation
 const glowAnimation = {
@@ -132,7 +134,7 @@ const HexPattern = () => {
   );
 };
 
-// Animated Cyber Button with enhanced effects
+// Animated Cyber Button with enhance effects
 const CyberButton = ({ children, onClick, variant = "primary", className = "" }) => {
   const baseStyles = "relative px-8 py-3 font-orbitron text-sm tracking-wider uppercase overflow-hidden group cursor-pointer";
 
@@ -596,7 +598,9 @@ const UltraHeroSection = () => {
             perspective: "1000px",
           }}
         >
-          <RobotHero />
+          <Suspense fallback={<div className="w-full h-[500px] flex items-center justify-center text-sky-400">Loading Model...</div>}>
+            <RobotHero />
+          </Suspense>
         </motion.div>
 
         {/* Tech circle overlay */}

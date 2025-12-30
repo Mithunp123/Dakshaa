@@ -1,5 +1,11 @@
 import { supabase } from "../supabase";
 
+// Helper function to check if a string is a valid UUID
+const isValidUUID = (str) => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+};
+
 export const supabaseService = {
   // Fetch all active events
   async getEvents() {
@@ -22,18 +28,47 @@ export const supabaseService = {
   },
 
   // Register for events (Individual or Combo)
+  // Handles both UUID ids and text event_keys
   async registerEvents(userId, eventIds, comboId = null, paymentId = null) {
     try {
-      // First check if user is already registered for any of these events
+      // Separate UUIDs from text event_keys
+      const uuids = eventIds.filter(id => isValidUUID(id));
+      const eventKeys = eventIds.filter(id => !isValidUUID(id));
+
+      // Convert event_keys to UUIDs by looking up in events_config
+      let resolvedUUIDs = [...uuids];
+      
+      if (eventKeys.length > 0) {
+        const { data: keyLookup } = await supabase
+          .from("events_config")
+          .select("id, event_key")
+          .in("event_key", eventKeys);
+        
+        if (keyLookup) {
+          const keyToUUID = {};
+          keyLookup.forEach(e => { keyToUUID[e.event_key] = e.id; });
+          eventKeys.forEach(key => {
+            if (keyToUUID[key]) {
+              resolvedUUIDs.push(keyToUUID[key]);
+            }
+          });
+        }
+      }
+
+      if (resolvedUUIDs.length === 0) {
+        throw new Error("No valid events found to register");
+      }
+
+      // Check if user is already registered for any of these events
       const { data: existingRegs } = await supabase
         .from("event_registrations_config")
         .select("event_id")
         .eq("user_id", userId)
-        .in("event_id", eventIds);
+        .in("event_id", resolvedUUIDs);
 
       // Filter out already registered events
       const alreadyRegistered = existingRegs?.map((r) => r.event_id) || [];
-      const newEventIds = eventIds.filter(
+      const newEventIds = resolvedUUIDs.filter(
         (id) => !alreadyRegistered.includes(id)
       );
 

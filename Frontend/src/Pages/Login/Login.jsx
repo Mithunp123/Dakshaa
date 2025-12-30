@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../../supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -61,6 +61,10 @@ const Login = () => {
   const [error, setError] = useState(null);
   const [loginSuccess, setLoginSuccess] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get return URL from state (passed from event registration)
+  const returnTo = location.state?.returnTo;
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -116,7 +120,8 @@ const Login = () => {
         } else if (role === 'volunteer') {
           navigate('/volunteer');
         } else {
-          navigate('/');
+          // For students, check if there's a return URL (from event registration)
+          navigate(returnTo || '/');
         }
       }, 1500);
     }

@@ -73,10 +73,116 @@ import Culturals2 from "../../../assets/HORMONICS/INSTRUMENT.png";
 import Culturals3 from "../../../assets/HORMONICS/GROUP.png";
 import Culturals4 from "../../../assets/HORMONICS/SOLO DANCE.png";
 import Culturals5 from "../../../assets/HORMONICS/short flim.png";
+import { supabase } from "../../../supabase";
+import { EVENTS_DATA } from "../../../data/events";
 
 const EventDetails = () => {
-  const { eventId } = useParams(); // Get the dynamic parameter from the URL
+  const { eventId: rawEventId } = useParams(); // Get the dynamic parameter from the URL
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Check authentication status
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Map new database event IDs to old EventDetails IDs
+  const eventIdMap = {
+    // Technical Events - Database ID -> Old ID
+    'tech-cse': 'technical-event-1',
+    'tech-it': 'technical-event-2',
+    'tech-vlsi': 'technical-event-3',
+    'tech-mct': 'technical-event-4',
+    'tech-csbs': 'technical-event-5',
+    'tech-ece': 'technical-event-6',
+    'tech-food': 'technical-event-7',
+    'tech-mech': 'technical-event-8',
+    'tech-aiml': 'technical-event-9',
+    'tech-civil': 'technical-event-10',
+    'tech-project-expo': 'technical-event-11',
+    'tech-textile': 'technical-event-12',
+    'tech-biotech': 'technical-event-13',
+    'tech-poster': 'technical-event-14',
+    'tech-eee': 'technical-event-15',
+    // Non-Technical Events
+    'nontech-cse': 'non-technical-event-1',
+    'nontech-it': 'non-technical-event-2',
+    'nontech-eee': 'non-technical-event-3',
+    'nontech-vlsi': 'non-technical-event-4',
+    'nontech-biotech': 'non-technical-event-5',
+    'nontech-mct': 'non-technical-event-6',
+    'nontech-csbs': 'non-technical-event-7',
+    'nontech-food': 'non-technical-event-8',
+    'nontech-mech': 'non-technical-event-9',
+    'nontech-ece': 'non-technical-event-10',
+    'nontech-civil': 'non-technical-event-11',
+    'nontech-textile': 'non-technical-event-12',
+    // Cultural Events
+    'cultural-musical': 'culturals-event-1',
+    'cultural-instrument': 'culturals-event-2',
+    'cultural-group-dance': 'culturals-event-3',
+    'cultural-solo-dance': 'culturals-event-4',
+    'cultural-short-film': 'culturals-event-5',
+    // Workshop Events
+    'workshop-aids': 'workshop-event-1',
+    'workshop-aiml': 'workshop-event-2',
+    'workshop-biotech': 'workshop-event-3',
+    'workshop-civil': 'workshop-event-4',
+    'workshop-csbs': 'workshop-event-5',
+    'workshop-cse': 'workshop-event-6',
+    'workshop-ece': 'workshop-event-7',
+    'workshop-eee': 'workshop-event-8',
+    'workshop-ft': 'workshop-event-9',
+    'workshop-it': 'workshop-event-10',
+    'workshop-mct': 'workshop-event-11',
+    'workshop-mech': 'workshop-event-12',
+    'workshop-textile': 'workshop-event-13',
+    'workshop-vlsi': 'workshop-event-14',
+  };
+
+  // Reverse map for getting database ID from old ID
+  const reverseEventIdMap = Object.fromEntries(
+    Object.entries(eventIdMap).map(([key, value]) => [value, key])
+  );
+
+  // Get the correct eventId (handle both old and new IDs)
+  const eventId = eventIdMap[rawEventId] || rawEventId;
+  
+  // Get the database event ID for registration
+  const databaseEventId = reverseEventIdMap[eventId] || rawEventId;
+
+  // Get event price from EVENTS_DATA
+  const getEventPrice = () => {
+    const dbId = databaseEventId;
+    for (const category of Object.values(EVENTS_DATA)) {
+      const event = category.find(e => e.id === dbId);
+      if (event) return event.price;
+    }
+    return null;
+  };
+
+  // Handle registration click
+  const handleRegisterClick = () => {
+    if (!user) {
+      // Not logged in - redirect to login with return URL
+      navigate('/login', { state: { returnTo: `/event/${rawEventId}` } });
+      return;
+    }
+    // Logged in - redirect to registration page with event pre-selected
+    navigate('/register-events', { state: { selectedEventId: databaseEventId } });
+  };
 
   const eventDetails = {
     // Technical Events
@@ -2591,34 +2697,14 @@ const EventDetails = () => {
     eventId.startsWith("non-technical-event");
   const isCultural = eventId.startsWith("culturals-event");
 
-  let registrationFee = "";
-  if (eventId === "culturals-event-3") {
-    registrationFee = "Rs. 600";
-  } else if (eventId === "technical-event-3") {
-    registrationFee = "Rs. 300";
-  } else if (eventId === "technical-event-17") {
-    registrationFee = "Rs. 300";
-  } else if (eventId === "technical-event-8") {
-    registrationFee = "Rs. 300";
-  } else if (eventId === "technical-event-10") {
-    registrationFee = "Rs. 250";
-  } else if (eventId === "technical-event-1") {
-    registrationFee = "Rs. 250";
-  } else if (eventId === "technical-event-20") {
-    registrationFee = "Rs. 300";
-  } else if (eventId === "technical-event-17") {
-    registrationFee = "Rs. 300";
-  } else if (eventId === "technical-event-19") {
-    registrationFee = "Rs. 300";
-  } else if (eventId.startsWith("technical-event")) {
-    registrationFee = "Rs. 250";
-  } else if (eventId.startsWith("culturals")) {
-    registrationFee = "Rs. 150";
-  } else if (eventId.startsWith("workshop")) {
-    registrationFee = "Rs. 300";
-  } else if (eventId.startsWith("non-technical-event")) {
-    registrationFee = "Rs. 150";
-  }
+  // Get price from database data instead of hardcoded values
+  const eventPrice = getEventPrice();
+  const registrationFee = eventPrice !== null ? `₹${eventPrice}` : (
+    eventId.startsWith("workshop") ? "₹350" :
+    eventId.startsWith("technical-event") ? "₹100" :
+    eventId.startsWith("non-technical-event") ? "₹50" :
+    eventId.startsWith("culturals") ? "₹100" : ""
+  );
 
   return (
     <div className="p-4 md:p-10 mt-24 text-white min-h-screen">
@@ -2640,6 +2726,7 @@ const EventDetails = () => {
         {registrationFee && (
           <div className="text-center text-primary text-xl md:text-2xl font-semibold mb-4">
             Registration Fee: {registrationFee}
+            {eventPrice === 0 && <span className="ml-2 text-green-400">(FREE)</span>}
           </div>
         )}
 
@@ -2648,16 +2735,21 @@ const EventDetails = () => {
           className="mb-8 w-60 ml-12 md:w-auto block md:ml-[310px] px-6 py-3 bg-primary clip bg-opacity-70 border-2 border-primary-dark hover:bg-primary-dark transition-all text-white font-semibold text-xl md:text-2xl shadow-xl"
           whileHover={{ scale: 1.1, rotate: 2 }}
           whileTap={{ scale: 0.9 }}
-          variants={pulseAnimation} // Infinite pulsing animation
-          animate="animate" // Ensure the animation is always running
-          onClick={() => window.open(event.registrationLink, "_blank")} // Open registration link in a new tab
+          variants={pulseAnimation}
+          animate="animate"
+          onClick={handleRegisterClick}
         >
-          REGISTER NOW!
+          {user ? 'REGISTER NOW!' : 'LOGIN TO REGISTER'}
         </motion.button>
+        {!user && (
+          <p className="text-center text-yellow-400 text-sm mb-4">
+            Please login to register for this event
+          </p>
+        )}
         <motion.button
           className="mb-8 w-60 md:w-auto block mx-auto px-5 py-2 border-2 border-primary-dark hover:bg-primary-dark transition-all text-primary font-semibold text-lg md:text-lg shadow-xl"
-          variants={pulseAnimation} // Infinite pulsing animation
-          animate="animate" // Ensure the animation is always running
+          variants={pulseAnimation}
+          animate="animate"
           onClick={() => navigate("/accomodation")}
         >
           Registration For Accommodation & Food

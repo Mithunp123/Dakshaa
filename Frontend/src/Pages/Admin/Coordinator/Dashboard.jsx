@@ -98,33 +98,43 @@ const CoordinatorDashboard = () => {
       
       const assignedEventIds = coords?.map(c => c.event_id) || [];
       
-      // Fetch events from events_config
+      // Fetch events from events_config - ONLY assigned events for coordinators
       let events = [];
-      if (assignedEventIds.length > 0) {
-        const { data: configEvents } = await supabase
+      
+      // Check user role
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      
+      // Super admins can see all events, coordinators only see assigned events
+      if (profile?.role === 'super_admin') {
+        const { data: allEvents } = await supabase
           .from('events_config')
           .select('*')
-          .in('id', assignedEventIds);
+          .eq('is_open', true);
+        events = allEvents || [];
+      } else if (assignedEventIds.length > 0) {
+        // Check if event_ids are UUIDs or text event_keys
+        const isUUID = assignedEventIds[0]?.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
         
-        events = configEvents || [];
-      }
-      
-      // If no assignments, check if user is admin/coordinator and show all events
-      if (events.length === 0) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-        
-        if (profile?.role === 'super_admin' || profile?.role === 'event_coordinator') {
-          const { data: allEvents } = await supabase
+        // Coordinators only see their assigned events
+        if (isUUID) {
+          const { data: configEvents } = await supabase
             .from('events_config')
             .select('*')
-            .eq('is_open', true);
-          events = allEvents || [];
+            .in('id', assignedEventIds);
+          events = configEvents || [];
+        } else {
+          const { data: configEvents } = await supabase
+            .from('events_config')
+            .select('*')
+            .in('event_key', assignedEventIds);
+          events = configEvents || [];
         }
       }
+      // If no assignments and not super_admin, events stays empty
       
       // Fetch registration counts for each event
       const eventsWithCounts = await Promise.all(

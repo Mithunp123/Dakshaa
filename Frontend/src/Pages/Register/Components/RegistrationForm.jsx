@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Package,
@@ -23,10 +24,14 @@ import { supabase } from "../../../supabase";
 import { supabaseService } from "../../../services/supabaseService";
 
 const RegistrationForm = () => {
-  const [currentStep, setCurrentStep] = useState(1);
+  const location = useLocation();
+  const preSelectedEventId = location.state?.selectedEventId;
+  
+  const [currentStep, setCurrentStep] = useState(1); // Start at step 1, will adjust after events load
   const [registrationMode, setRegistrationMode] = useState("");
   const [selectedCombo, setSelectedCombo] = useState(null);
   const [selectedEvents, setSelectedEvents] = useState([]);
+  const [preSelectApplied, setPreSelectApplied] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
   const [events, setEvents] = useState([]);
@@ -85,6 +90,38 @@ const RegistrationForm = () => {
     loadData();
   }, [user?.id]);
 
+  // Apply pre-selection after events are loaded
+  useEffect(() => {
+    if (preSelectedEventId && events.length > 0 && !preSelectApplied) {
+      // Find the event by event_key OR by id
+      const matchedEvent = events.find(
+        (e) => e.event_key === preSelectedEventId || e.id === preSelectedEventId
+      );
+      
+      if (matchedEvent) {
+        const eventUUID = matchedEvent.id;
+        // Check if event is full
+        const isFull = matchedEvent.current_registrations >= matchedEvent.capacity;
+        const isOpen = matchedEvent.is_open !== false;
+        
+        if (!isFull && isOpen) {
+          setSelectedEvents([eventUUID]);
+          setRegistrationMode("individual");
+          setCurrentStep(2);
+        } else {
+          // Event is full or closed, just go to selection page
+          setRegistrationMode("individual");
+          setCurrentStep(2);
+        }
+      } else {
+        // Event not found, just go to selection page
+        setRegistrationMode("individual");
+        setCurrentStep(2);
+      }
+      setPreSelectApplied(true);
+    }
+  }, [preSelectedEventId, events, preSelectApplied]);
+
   // Memoized categories - prevents recalculation on every render
   const categories = useMemo(() => {
     const uniqueCategories = new Set(
@@ -109,7 +146,7 @@ const RegistrationForm = () => {
     return events.filter((event) => {
       if (event.category === "Special") return false;
 
-      const eventName = (event.event_name || "").toLowerCase();
+      const eventName = (event.name || event.event_name || "").toLowerCase();
       const eventDescription = (event.description || "").toLowerCase();
       const searchLower = searchTerm.toLowerCase();
 
@@ -157,12 +194,24 @@ const RegistrationForm = () => {
   }, []);
 
   const handleEventToggle = useCallback((eventId) => {
+    // Find the event to check if it's full
+    const event = events.find(e => e.id === eventId || e.event_id === eventId);
+    if (event) {
+      const isFull = event.current_registrations >= event.capacity;
+      const isOpen = event.is_open !== false;
+      
+      // Don't allow selecting full or closed events
+      if (isFull || !isOpen) {
+        return;
+      }
+    }
+    
     setSelectedEvents((prev) =>
       prev.includes(eventId)
         ? prev.filter((id) => id !== eventId)
         : [...prev, eventId]
     );
-  }, []);
+  }, [events]);
 
   const handleBack = useCallback(() => {
     if (currentStep === 3 && registrationMode === "combo") {
@@ -698,18 +747,25 @@ const RegistrationForm = () => {
 
                 {/* Events Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredEvents.map((event, index) => (
-                    <EventCard
-                      key={event.id || event.event_id || `event-${index}`}
-                      event={event}
-                      isSelected={selectedEvents.includes(
-                        event.id || event.event_id
-                      )}
-                      onSelect={() =>
-                        handleEventToggle(event.id || event.event_id)
-                      }
-                    />
-                  ))}
+                  {filteredEvents.map((event, index) => {
+                    const isFull = event.current_registrations >= event.capacity;
+                    const isOpen = event.is_open !== false;
+                    const isEventDisabled = isFull || !isOpen;
+                    
+                    return (
+                      <EventCard
+                        key={event.id || event.event_id || `event-${index}`}
+                        event={event}
+                        isSelected={selectedEvents.includes(
+                          event.id || event.event_id
+                        )}
+                        isDisabled={isEventDisabled}
+                        onSelect={() =>
+                          handleEventToggle(event.id || event.event_id)
+                        }
+                      />
+                    );
+                  })}
                 </div>
 
                 {filteredEvents.length === 0 && (
@@ -776,19 +832,26 @@ const RegistrationForm = () => {
                     .filter((e) =>
                       selectedCombo.event_ids?.includes(e.id || e.event_id)
                     )
-                    .map((event) => (
-                      <EventCard
-                        key={event.id || event.event_id}
-                        event={event}
-                        isSelected={selectedEvents.includes(
-                          event.id || event.event_id
-                        )}
-                        onSelect={() =>
-                          handleEventToggle(event.id || event.event_id)
-                        }
-                        showPrice={false}
-                      />
-                    ))}
+                    .map((event) => {
+                      const isFull = event.current_registrations >= event.capacity;
+                      const isOpen = event.is_open !== false;
+                      const isEventDisabled = isFull || !isOpen;
+                      
+                      return (
+                        <EventCard
+                          key={event.id || event.event_id}
+                          event={event}
+                          isSelected={selectedEvents.includes(
+                            event.id || event.event_id
+                          )}
+                          isDisabled={isEventDisabled}
+                          onSelect={() =>
+                            handleEventToggle(event.id || event.event_id)
+                          }
+                          showPrice={false}
+                        />
+                      );
+                    })}
                 </div>
               </>
             ) : (
@@ -798,7 +861,7 @@ const RegistrationForm = () => {
                     Review Your Registration
                   </h2>
                   <p className="text-gray-400">
-                    Confirm your event selections before payment
+                    Confirm your event selections to complete registration
                   </p>
                 </div>
 
@@ -939,7 +1002,7 @@ const RegistrationForm = () => {
                 </>
               ) : (
                 <>
-                  {currentStep === 3 ? "Proceed to Payment" : "Next"}
+                  {currentStep === 3 ? "Confirm Registration" : "Next"}
                   <ChevronRight size={20} />
                 </>
               )}

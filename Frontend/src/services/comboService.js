@@ -1,5 +1,41 @@
 import { supabase } from "../supabase";
 
+// Helper function to check if a string is a valid UUID
+const isValidUUID = (str) => {
+  if (!str || typeof str !== 'string') return false;
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+};
+
+// Helper function to resolve event IDs (converts event_keys to UUIDs if needed)
+const resolveEventIds = async (eventIds) => {
+  if (!eventIds || eventIds.length === 0) return [];
+  
+  const uuids = eventIds.filter(id => isValidUUID(id));
+  const eventKeys = eventIds.filter(id => !isValidUUID(id));
+  
+  let resolvedUUIDs = [...uuids];
+  
+  if (eventKeys.length > 0) {
+    const { data: keyLookup } = await supabase
+      .from("events_config")
+      .select("id, event_key")
+      .in("event_key", eventKeys);
+    
+    if (keyLookup) {
+      const keyToUUID = {};
+      keyLookup.forEach(e => { keyToUUID[e.event_key] = e.id; });
+      eventKeys.forEach(key => {
+        if (keyToUUID[key]) {
+          resolvedUUIDs.push(keyToUUID[key]);
+        }
+      });
+    }
+  }
+  
+  return resolvedUUIDs;
+};
+
 /**
  * Combo & Package Service
  * Manages event bundle packages using Explosion Strategy
@@ -455,7 +491,7 @@ const comboService = {
         const { data: availableEvents } = await supabase
           .from("events_config")
           .select("id")
-          .eq("is_active", true)
+          .eq("is_open", true)
           .limit(5);
 
         if (availableEvents && availableEvents.length > 0) {
@@ -469,6 +505,17 @@ const comboService = {
             comboName: combo.name || combo.combo_name,
           };
         }
+      }
+
+      // Resolve event IDs (convert text event_keys to UUIDs if needed)
+      eventIdsToRegister = await resolveEventIds(eventIdsToRegister);
+      
+      if (eventIdsToRegister.length === 0) {
+        return {
+          success: false,
+          error: "No valid events found to register",
+          comboName: combo.name || combo.combo_name,
+        };
       }
 
       // Fetch event names for all events being registered

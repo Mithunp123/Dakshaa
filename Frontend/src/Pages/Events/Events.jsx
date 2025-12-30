@@ -74,51 +74,63 @@ const Events = () => {
       descriptionImages: [
         {
           image: Tech1,
-          eventId: "technical-event-1",
+          eventId: "tech-cse",
+        },
+        {
+          image: Tech2,
+          eventId: "tech-it",
         },
         {
           image: Tech3,
-          eventId: "technical-event-3",
+          eventId: "tech-vlsi",
         },
         {
           image: Tech5,
-          eventId: "technical-event-5",
+          eventId: "tech-mct",
         },
         {
           image: Tech6,
-          eventId: "technical-event-6",
+          eventId: "tech-csbs",
         },
         {
           image: Tech7,
-          eventId: "technical-event-7",
+          eventId: "tech-ece",
+        },
+        {
+          image: Tech8,
+          eventId: "tech-food",
         },
         {
           image: Tech9,
-          eventId: "technical-event-10",
+          eventId: "tech-mech",
+        },
+        {
+          image: Tech11,
+          eventId: "tech-aiml",
         },
         {
           image: Tech14,
-          eventId: "technical-event-15",
-        },
-        {
-          image: Tech16,
-          eventId: "technical-event-16",
+          eventId: "tech-civil",
         },
         {
           image: Tech15,
-          eventId: "technical-event-17",
+          eventId: "tech-project-expo",
+        },
+        {
+          image: Tech16,
+          eventId: "tech-textile",
         },
         {
           image: Tech18,
-          eventId: "technical-event-18",
+          eventId: "tech-biotech",
         },
         {
           image: Tech19,
-          eventId: "technical-event-19",
+          eventId: "tech-poster",
         },
         {
           image: Tech20,
-          eventId: "technical-event-20",
+          eventId: "tech-eee",
         },
       ],
     },
@@ -129,51 +141,51 @@ const Events = () => {
       descriptionImages: [
         {
           image: NonTech12,
-          eventId: "non-technical-event-9",
+          eventId: "nontech-it",
         },
         {
           image: NonTech1,
-          eventId: "non-technical-event-1",
+          eventId: "nontech-cse",
         },
         {
           image: NonTech2,
-          eventId: "non-technical-event-2",
+          eventId: "nontech-eee",
         },
         {
           image: NonTech3,
-          eventId: "non-technical-event-3",
+          eventId: "nontech-vlsi",
         },
         {
           image: NonTech4,
-          eventId: "non-technical-event-4",
+          eventId: "nontech-biotech",
         },
         {
           image: NonTech5,
-          eventId: "non-technical-event-5",
+          eventId: "nontech-mct",
         },
         {
           image: NonTech6,
-          eventId: "non-technical-event-6",
+          eventId: "nontech-csbs",
         },
         {
           image: NonTech7,
-          eventId: "non-technical-event-7",
+          eventId: "nontech-food",
         },
         {
           image: NonTech8,
-          eventId: "non-technical-event-8",
+          eventId: "nontech-mech",
         },
         {
           image: NonTech10,
-          eventId: "non-technical-event-11",
+          eventId: "nontech-ece",
         },
         {
           image: NonTech11,
-          eventId: "non-technical-event-12",
+          eventId: "nontech-civil",
         },
         {
           image: NonTech13,
-          eventId: "non-technical-event-13",
+          eventId: "nontech-textile",
         },
       ],
     },
@@ -184,23 +196,23 @@ const Events = () => {
       descriptionImages: [
         {
           image: Culturals2,
-          eventId: "culturals-event-2",
+          eventId: "cultural-instrument",
         },
         {
           image: Culturals1,
-          eventId: "culturals-event-1",
+          eventId: "cultural-musical",
         },
         {
           image: Culturals3,
-          eventId: "culturals-event-3",
+          eventId: "cultural-group-dance",
         },
         {
           image: Culturals4,
-          eventId: "culturals-event-4",
+          eventId: "cultural-solo-dance",
         },
         {
           image: Culturals5,
-          eventId: "culturals-event-5",
+          eventId: "cultural-short-film",
         },
       ],
     },
@@ -226,59 +238,59 @@ const Events = () => {
       descriptionImages: [
         {
           image: Workshop2,
-          eventId: "workshop-2",
+          eventId: "workshop-it",
         },
         {
           image: Workshop1,
-          eventId: "workshop-1",
+          eventId: "workshop-vlsi",
         },
         {
           image: Workshop3,
-          eventId: "workshop-3",
+          eventId: "workshop-aids",
         },
         {
           image: Workshop4,
-          eventId: "workshop-4",
+          eventId: "workshop-aiml",
         },
         {
           image: Workshop5,
-          eventId: "workshop-5",
+          eventId: "workshop-csbs",
         },
         {
           image: Workshop6,
-          eventId: "workshop-6",
+          eventId: "workshop-cse",
         },
         {
           image: Workshop7,
-          eventId: "workshop-7",
+          eventId: "workshop-eee",
         },
         {
           image: Workshop8,
-          eventId: "workshop-8",
+          eventId: "workshop-biotech",
         },
         {
           image: Workshop9,
-          eventId: "workshop-9",
+          eventId: "workshop-mct",
         },
         {
           image: Workshop10,
-          eventId: "workshop-10",
+          eventId: "workshop-ece",
         },
         {
           image: Workshop11,
-          eventId: "workshop-11",
+          eventId: "workshop-ft",
         },
         {
           image: Workshop12,
-          eventId: "workshop-12",
+          eventId: "workshop-mech",
         },
         {
           image: Workshop13,
-          eventId: "workshop-13",
+          eventId: "workshop-civil",
         },
         {
           image: Workshop14,
-          eventId: "workshop-14",
+          eventId: "workshop-textile",
         },
       ],
     },

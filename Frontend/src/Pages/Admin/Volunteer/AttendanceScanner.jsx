@@ -45,6 +45,10 @@ const AttendanceScanner = () => {
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [showEventSelection, setShowEventSelection] = useState(false);
   const [markingAttendance, setMarkingAttendance] = useState(false);
+  
+  // Coordinator's assigned events
+  const [assignedEventIds, setAssignedEventIds] = useState([]);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   const html5QrCodeRef = useRef(null);
 
@@ -58,11 +62,44 @@ const AttendanceScanner = () => {
     errorAudio.current = new Audio("/error.mp3");
     
     getCameras();
+    fetchAssignedEvents();
 
     return () => {
       stopScanner();
     };
   }, []);
+
+  // Fetch coordinator's assigned events
+  const fetchAssignedEvents = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get user's profile to check role
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.role === 'super_admin') {
+        // Super admins can scan for all events
+        setIsSuperAdmin(true);
+        return;
+      }
+
+      // Get coordinator's assigned event IDs
+      const { data: coords } = await supabase
+        .from('event_coordinators')
+        .select('event_id')
+        .eq('user_id', user.id);
+
+      const eventIds = coords?.map(c => c.event_id) || [];
+      setAssignedEventIds(eventIds);
+    } catch (error) {
+      console.error("Error fetching assigned events:", error);
+    }
+  };
 
   const getCameras = async () => {
     try {
@@ -196,10 +233,41 @@ const AttendanceScanner = () => {
         return;
       }
 
+      // Filter events based on coordinator's assignments (unless super admin)
+      let filteredEventsData = eventsData;
+      if (!isSuperAdmin && assignedEventIds.length > 0) {
+        // Check if assignedEventIds are UUIDs or text event_keys
+        const isUUID = assignedEventIds[0]?.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+        
+        if (isUUID) {
+          // Compare by UUID event_id
+          filteredEventsData = eventsData.filter((e) => 
+            assignedEventIds.includes(e.event_id)
+          );
+        } else {
+          // Compare by text event_key
+          filteredEventsData = eventsData.filter((e) => 
+            assignedEventIds.includes(e.event_key)
+          );
+        }
+        
+        if (filteredEventsData.length === 0) {
+          setScanResult({
+            status: "warning",
+            message: "Student is not registered for your assigned events",
+            code: "NOT_YOUR_EVENT",
+            student_name: profileData.full_name,
+            student_dept: profileData.department
+          });
+          errorAudio.current?.play().catch(() => {});
+          return;
+        }
+      }
+
       // Filter pending events (not yet attended)
-      const pendingEvents = eventsData.filter((e) => !e.already_attended);
+      const pendingEvents = filteredEventsData.filter((e) => !e.already_attended);
       
-      setUserEvents(eventsData);
+      setUserEvents(filteredEventsData);
 
       if (pendingEvents.length === 0) {
         // All events already attended
