@@ -150,14 +150,14 @@ const Schedule = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#030014] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen min-h-screen-safe bg-[#030014] pt-20 sm:pt-24 pb-20 sm:pb-12 px-3 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8 sm:mb-16">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-secondary via-orange-400 to-secondary mb-4"
+            className="text-3xl sm:text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-secondary via-orange-400 to-secondary mb-3 sm:mb-4 font-orbitron"
           >
             Event Schedule
           </motion.h1>
@@ -165,19 +165,19 @@ const Schedule = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-gray-400 text-lg max-w-2xl mx-auto"
+            className="text-gray-400 text-sm sm:text-lg max-w-2xl mx-auto px-2"
           >
             Plan your 3-day journey through DAKSHAA T26. From skill-building workshops to high-stakes competitions.
           </motion.p>
         </div>
 
-        {/* Day Selector */}
-        <div className="flex justify-center gap-4 mb-12">
+        {/* Day Selector - Responsive */}
+        <div className="flex justify-center gap-2 sm:gap-4 mb-8 sm:mb-12 flex-wrap px-2">
           {[1, 2, 3].map((day) => (
             <button
               key={day}
               onClick={() => setActiveDay(day)}
-              className={`relative px-8 py-4 rounded-2xl font-bold transition-all duration-300 ${
+              className={`relative px-4 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold transition-all duration-300 text-sm sm:text-base min-w-[80px] sm:min-w-[100px] ${
                 activeDay === day 
                 ? 'text-white' 
                 : 'text-gray-500 hover:text-gray-300 bg-white/5 border border-white/10'
@@ -186,7 +186,7 @@ const Schedule = () => {
               {activeDay === day && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-secondary rounded-2xl shadow-[0_0_20px_rgba(249,115,22,0.4)]"
+                  className="absolute inset-0 bg-secondary rounded-xl sm:rounded-2xl shadow-[0_0_20px_rgba(249,115,22,0.4)]"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
@@ -267,23 +267,23 @@ const Schedule = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="mt-24 overflow-hidden rounded-3xl border border-white/10 bg-white/5"
+          className="mt-12 sm:mt-24 overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 mx-auto"
         >
-          <div className="p-8 border-b border-white/10">
-            <h2 className="text-2xl font-bold text-white">Event Distribution Summary</h2>
+          <div className="p-4 sm:p-8 border-b border-white/10">
+            <h2 className="text-xl sm:text-2xl font-bold text-white">Event Distribution Summary</h2>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto scrollbar-hide">
+            <table className="w-full text-left border-collapse min-w-[500px]">
               <thead>
                 <tr className="bg-white/5">
-                  <th className="p-4 text-gray-400 font-medium border-b border-white/10">Category</th>
-                  <th className="p-4 text-gray-400 font-medium border-b border-white/10 text-center">Day 1</th>
-                  <th className="p-4 text-gray-400 font-medium border-b border-white/10 text-center">Day 2</th>
-                  <th className="p-4 text-gray-400 font-medium border-b border-white/10 text-center">Day 3</th>
-                  <th className="p-4 text-gray-400 font-medium border-b border-white/10 text-center">Total</th>
+                  <th className="p-2 sm:p-4 text-gray-400 font-medium border-b border-white/10 text-xs sm:text-sm">Category</th>
+                  <th className="p-2 sm:p-4 text-gray-400 font-medium border-b border-white/10 text-center text-xs sm:text-sm">Day 1</th>
+                  <th className="p-2 sm:p-4 text-gray-400 font-medium border-b border-white/10 text-center text-xs sm:text-sm">Day 2</th>
+                  <th className="p-2 sm:p-4 text-gray-400 font-medium border-b border-white/10 text-center text-xs sm:text-sm">Day 3</th>
+                  <th className="p-2 sm:p-4 text-gray-400 font-medium border-b border-white/10 text-center text-xs sm:text-sm">Total</th>
                 </tr>
               </thead>
-              <tbody className="text-gray-300">
+              <tbody className="text-gray-300 text-xs sm:text-sm">
                 {[
                   { cat: "Workshops", d1: "5+4", d2: "5", d3: "4", total: "18" },
                   { cat: "Tech Events", d1: "5", d2: "5", d3: "4", total: "14" },

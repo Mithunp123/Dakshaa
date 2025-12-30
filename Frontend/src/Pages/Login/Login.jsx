@@ -127,11 +127,11 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
+    <div className="min-h-screen min-h-screen-safe flex items-center justify-center bg-gray-900 p-4 pt-20 pb-8">
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-gray-700"
+        className="bg-gray-800 p-5 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md border border-gray-700 mx-auto"
       >
         {/* Success State */}
         <AnimatePresence>
@@ -140,18 +140,18 @@ const Login = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
-              className="text-center py-8"
+              className="text-center py-6 sm:py-8"
             >
-              <div className={`w-20 h-20 mx-auto mb-4 rounded-full bg-${loginSuccess.info.color}-500/20 flex items-center justify-center`}>
-                <CheckCircle2 className={`w-10 h-10 text-${loginSuccess.info.color}-500`} />
+              <div className={`w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-full bg-${loginSuccess.info.color}-500/20 flex items-center justify-center`}>
+                <CheckCircle2 className={`w-8 h-8 sm:w-10 sm:h-10 text-${loginSuccess.info.color}-500`} />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Welcome, {loginSuccess.name}!</h3>
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-${loginSuccess.info.color}-500/20 border border-${loginSuccess.info.color}-500/40`}>
-                <loginSuccess.info.icon className={`w-5 h-5 text-${loginSuccess.info.color}-500`} />
-                <span className={`font-bold text-${loginSuccess.info.color}-500`}>{loginSuccess.info.label}</span>
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Welcome, {loginSuccess.name}!</h3>
+              <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-${loginSuccess.info.color}-500/20 border border-${loginSuccess.info.color}-500/40`}>
+                <loginSuccess.info.icon className={`w-4 h-4 sm:w-5 sm:h-5 text-${loginSuccess.info.color}-500`} />
+                <span className={`font-bold text-sm sm:text-base text-${loginSuccess.info.color}-500`}>{loginSuccess.info.label}</span>
               </div>
-              <p className="text-gray-400 mt-4 text-sm">Redirecting to your dashboard...</p>
-              <Loader2 className="w-6 h-6 animate-spin text-gray-500 mx-auto mt-3" />
+              <p className="text-gray-400 mt-4 text-xs sm:text-sm">Redirecting to your dashboard...</p>
+              <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-gray-500 mx-auto mt-3" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -159,12 +159,12 @@ const Login = () => {
         {/* Login Form */}
         {!loginSuccess && (
           <>
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-white">Welcome Back</h2>
-              <p className="text-gray-400 mt-2">Sign in to your DaKshaa account</p>
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white">Welcome Back</h2>
+              <p className="text-gray-400 mt-2 text-sm sm:text-base">Sign in to your DaKshaa account</p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-2">Email Address</label>
                 <div className="relative">
@@ -174,7 +174,7 @@ const Login = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-xl py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                    className="w-full bg-gray-900 border border-gray-700 rounded-xl py-3 sm:py-3.5 pl-12 pr-4 text-white text-base focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                     placeholder="student@college.edu"
                   />
                 </div>
@@ -189,7 +189,7 @@ const Login = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-xl py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                    className="w-full bg-gray-900 border border-gray-700 rounded-xl py-3 sm:py-3.5 pl-12 pr-4 text-white text-base focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                     placeholder="••••••••"
                   />
                 </div>

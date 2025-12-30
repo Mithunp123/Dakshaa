@@ -4,8 +4,45 @@ Frontend/node_modules/
 .env
 Backend/.env
 Frontend/.env
+Frontend/.env.local
+Frontend/.env.production
+Frontend/.env.production.local
 dist/
 Frontend/dist/
 .vscode/
 .DS_Store
 *.log
+
+# Firebase
+.firebase/
+.firebaserc
+firebase-debug.log
+firebase-debug.*.log
+firestore-debug.log
+ui-debug.log
+pubsub-debug.log
+database-debug.log
+*.local
+
+# Firebase Functions
+functions/node_modules/
+functions/.env
+functions/lib/
+
+# Firebase generated files
+firebase.json
+firebase-hosting-only.json
+
+# Deployment guides (optional - remove if you want to keep these)
+# FIREBASE_DEPLOYMENT_GUIDE.md
+# FREE_DEPLOYMENT_GUIDE.md
+
+# Build outputs
+public/
+*.cache
+
+# IDE
+.idea/
+*.swp
+*.swo
+

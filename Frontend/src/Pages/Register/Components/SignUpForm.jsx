@@ -146,22 +146,22 @@ const SignUpForm = () => {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-2xl mx-auto bg-gray-800/50 backdrop-blur-xl p-8 rounded-3xl border border-white/10 shadow-2xl"
+      className="max-w-2xl mx-auto bg-gray-800/50 backdrop-blur-xl p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl"
     >
 
-      <h2 className="text-3xl font-bold text-white mb-8 font-orbitron text-center">Create Your DaKshaa Account</h2>
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-6 sm:mb-8 font-orbitron text-center">Create Your DaKshaa Account</h2>
       
-      <form onSubmit={handleSignUp} className="space-y-8">
+      <form onSubmit={handleSignUp} className="space-y-6 sm:space-y-8">
         {/* Section 1: Personal Details */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <div className="flex items-center gap-2 pb-2 border-b border-white/10">
-            <User className="text-secondary w-5 h-5" />
-            <h3 className="text-xl font-semibold text-white">Section 1: Personal Details</h3>
+            <User className="text-secondary w-4 h-4 sm:w-5 sm:h-5" />
+            <h3 className="text-base sm:text-lg md:text-xl font-semibold text-white">Section 1: Personal Details</h3>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm text-gray-400 ml-1">Full Name</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            <div className="space-y-1.5 sm:space-y-2">
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Full Name</label>
               <div className="relative">
                 <input
                   required
@@ -170,20 +170,20 @@ const SignUpForm = () => {
                   placeholder="Enter name as per College ID"
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
+                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
                 />
               </div>
-              <p className="text-[10px] text-gray-500 ml-1 italic">This exact name will appear on your certificates.</p>
+              <p className="text-[9px] sm:text-[10px] text-gray-500 ml-1 italic">This exact name will appear on your certificates.</p>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm text-gray-400 ml-1">Gender</label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Gender</label>
               <select
                 required
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
-                className="w-full bg-gray-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
+                className="w-full bg-gray-900/50 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
               >
                 <option value="">Select Gender</option>
                 <option value="Male">Male</option>
@@ -192,10 +192,10 @@ const SignUpForm = () => {
               </select>
             </div>
 
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm text-gray-400 ml-1">College Name</label>
+            <div className="space-y-1.5 sm:space-y-2 md:col-span-2">
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">College Name</label>
               <div className="relative">
-                <School className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                <School className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   required
                   type="text"
@@ -203,15 +203,15 @@ const SignUpForm = () => {
                   placeholder="e.g., K.S. Rangasamy College of Technology"
                   value={formData.collegeName}
                   onChange={handleChange}
-                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
+                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm text-gray-400 ml-1">Department</label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Department</label>
               <div className="relative">
-                <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                <BookOpen className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   required
                   type="text"
@@ -219,21 +219,21 @@ const SignUpForm = () => {
                   placeholder="e.g., CSE, ECE, Mech"
                   value={formData.department}
                   onChange={handleChange}
-                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
+                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm text-gray-400 ml-1">Year of Study</label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Year of Study</label>
               <div className="relative">
-                <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                <GraduationCap className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <select
                   required
                   name="yearOfStudy"
                   value={formData.yearOfStudy}
                   onChange={handleChange}
-                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
+                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
                 >
                   <option value="">Select Year</option>
                   <option value="I Year">I Year</option>
@@ -244,8 +244,8 @@ const SignUpForm = () => {
               </div>
             </div>
 
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm text-gray-400 ml-1">Register / Roll Number</label>
+            <div className="space-y-1.5 sm:space-y-2 md:col-span-2">
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Register / Roll Number</label>
               <input
                 required
                 type="text"
@@ -253,37 +253,37 @@ const SignUpForm = () => {
                 placeholder="e.g., 7377212CS101"
                 value={formData.rollNumber}
                 onChange={handleChange}
-                className="w-full bg-gray-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
+                className="w-full bg-gray-900/50 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
               />
             </div>
 
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm text-gray-400 ml-1">Referred By (Optional)</label>
+            <div className="space-y-1.5 sm:space-y-2 md:col-span-2">
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Referred By (Optional)</label>
               <input
                 type="text"
                 name="referredBy"
                 placeholder="Enter referrer's Roll Number (e.g., 7377212CS101)"
                 value={formData.referredBy}
                 onChange={handleChange}
-                className="w-full bg-gray-900/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
+                className="w-full bg-gray-900/50 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
               />
-              <p className="text-[10px] text-gray-500 ml-1 italic">Enter the roll number of the person who referred you to earn them points!</p>
+              <p className="text-[9px] sm:text-[10px] text-gray-500 ml-1 italic">Enter the roll number of the person who referred you to earn them points!</p>
             </div>
           </div>
         </div>
 
         {/* Section 2: Contact & Login Credentials */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <div className="flex items-center gap-2 pb-2 border-b border-white/10">
-            <Mail className="text-secondary w-5 h-5" />
-            <h3 className="text-xl font-semibold text-white">Section 2: Contact & Credentials</h3>
+            <Mail className="text-secondary w-4 h-4 sm:w-5 sm:h-5" />
+            <h3 className="text-base sm:text-lg md:text-xl font-semibold text-white">Section 2: Contact & Credentials</h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm text-gray-400 ml-1">Mobile Number (WhatsApp)</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            <div className="space-y-1.5 sm:space-y-2 md:col-span-2">
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Mobile Number (WhatsApp)</label>
               <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                <Phone className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   required
                   type="tel"
@@ -291,16 +291,16 @@ const SignUpForm = () => {
                   placeholder="10-digit mobile number"
                   value={formData.mobileNumber}
                   onChange={handleChange}
-                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
+                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
                 />
               </div>
-              <p className="text-[10px] text-gray-500 ml-1 italic">Used for event updates.</p>
+              <p className="text-[9px] sm:text-[10px] text-gray-500 ml-1 italic">Used for event updates.</p>
             </div>
 
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm text-gray-400 ml-1">Email Address</label>
+            <div className="space-y-1.5 sm:space-y-2 md:col-span-2">
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Email Address</label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                <Mail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   required
                   type="email"
@@ -308,15 +308,15 @@ const SignUpForm = () => {
                   placeholder="yourname@example.com"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
+                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm text-gray-400 ml-1">Password</label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Password</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   required
                   type="password"
@@ -324,15 +324,15 @@ const SignUpForm = () => {
                   placeholder="Min 6 characters"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
+                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm text-gray-400 ml-1">Confirm Password</label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Confirm Password</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   required
                   type="password"
@@ -340,7 +340,7 @@ const SignUpForm = () => {
                   placeholder="Re-enter password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
+                  className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
                 />
               </div>
             </div>
@@ -348,7 +348,7 @@ const SignUpForm = () => {
         </div>
 
         {error && (
-          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm text-center">
+          <div className="p-3 sm:p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-xs sm:text-sm text-center">
             {error}
           </div>
         )}
@@ -356,7 +356,7 @@ const SignUpForm = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-gradient-to-r from-primary to-secondary text-white font-bold py-4 rounded-xl shadow-lg shadow-secondary/20 hover:shadow-secondary/40 transition-all flex items-center justify-center gap-2 group"
+          className="w-full bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 sm:py-4 rounded-xl shadow-lg shadow-secondary/20 hover:shadow-secondary/40 transition-all flex items-center justify-center gap-2 group text-sm sm:text-base touch-manipulation"
         >
           {loading ? (
             <Loader2 className="w-5 h-5 animate-spin" />
@@ -367,7 +367,7 @@ const SignUpForm = () => {
           )}
         </button>
 
-        <p className="text-center text-gray-400 text-sm">
+        <p className="text-center text-gray-400 text-xs sm:text-sm">
           Already have an account?{' '}
           <button 
             type="button"

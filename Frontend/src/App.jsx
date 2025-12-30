@@ -82,8 +82,11 @@ function AppContent() {
   const isScan = location.pathname === "/scan";
   const isLogin = location.pathname === "/login";
 
+  // Check if bottom navbar should be shown (mobile only, non-admin pages)
+  const showBottomNav = !isDashboard && !isAdmin && !isScan && !isLogin;
+
   return (
-    <>
+    <div className={`min-h-screen min-h-screen-safe ${showBottomNav ? 'pb-16 md:pb-0' : ''}`}>
       {!isDashboard && !isAdmin && !isScan && !isLogin && <Navbar />}
       {!isDashboard && !isAdmin && !isScan && !isLogin && <Tags />}
       <AnimatePresence mode="wait">
@@ -308,9 +311,9 @@ function AppContent() {
       {!isDashboard && !isAdmin && !isScan && !isLogin && (
         <FloatingCallButton />
       )}
-      {!isDashboard && !isAdmin && !isScan && !isLogin && <BottomNavbar />}
+      {showBottomNav && <BottomNavbar />}
       <ScrollToTop />
-    </>
+    </div>
   );
 }
 
