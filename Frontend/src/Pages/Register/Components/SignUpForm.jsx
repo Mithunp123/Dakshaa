@@ -67,11 +67,41 @@ const SignUpForm = () => {
     }
 
     try {
+      // Check if email already exists
+      const { data: existingUser, error: checkError } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('email', formData.email)
+        .maybeSingle();
+
+      // Ignore 406 errors (happens when no rows found)
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('Error checking email:', checkError);
+      }
+
+      if (existingUser) {
+        toast.error('Email already registered. Please login or use a different email.', {
+          duration: 5000,
+          position: 'top-center',
+          style: {
+            background: '#ef4444',
+            color: '#fff',
+            padding: '16px',
+            borderRadius: '10px',
+            fontSize: '16px',
+            fontWeight: '600',
+          },
+        });
+        setLoading(false);
+        return;
+      }
+
       // 1. Sign up with Supabase Auth and pass metadata
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/login`,
           data: {
             full_name: formData.fullName,
             gender: formData.gender,
@@ -88,9 +118,29 @@ const SignUpForm = () => {
       if (authError) throw authError;
 
       if (authData.user) {
+        // Sign out the user immediately (they must verify email first)
+        await supabase.auth.signOut();
+        
+        // Show email verification message
+        toast.success('Registration successful! Please check your email to verify your account before logging in.', {
+          duration: 8000,
+          position: 'top-center',
+          style: {
+            background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
+            color: '#fff',
+            padding: '16px',
+            borderRadius: '10px',
+            fontSize: '16px',
+            fontWeight: '600',
+            boxShadow: '0 10px 40px rgba(14, 165, 233, 0.3)',
+          },
+          icon: '📧',
+        });
+
         // Send welcome email
         try {
-          await fetch('http://localhost:3000/send-welcome-email', {
+          const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+          await fetch(`${apiUrl}/send-welcome-email`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -104,25 +154,14 @@ const SignUpForm = () => {
           console.error('Failed to send welcome email:', emailError);
           // Don't block registration if email fails
         }
-
-        toast.success('Account created successfully! Check your email', {
-          duration: 4000,
-          position: 'top-center',
-          style: {
-            background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
-            color: '#fff',
-            padding: '16px',
-            borderRadius: '10px',
-            fontSize: '16px',
-            fontWeight: '600',
-            boxShadow: '0 10px 40px rgba(14, 165, 233, 0.3)',
-          },
-          icon: '🎉',
-        });
         
         setTimeout(() => {
-          navigate('/');
-        }, 1500);
+          navigate('/login', { 
+            state: { 
+              message: 'Please login after verifying your email' 
+            } 
+          });
+        }, 3000);
       }
     } catch (err) {
       toast.error(err.message || 'Registration failed', {

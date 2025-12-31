@@ -114,7 +114,7 @@ const Desk = () => {
     try {
       const { error } = await supabase
         .from('registrations')
-        .update({ payment_status: 'completed' })
+        .update({ payment_status: 'PAID' })
         .in('id', selectedRegs);
       
       if (error) throw error;
@@ -156,7 +156,7 @@ const Desk = () => {
         .insert({
           user_id: userId,
           event_id: eventId,
-          payment_status: 'completed',
+          payment_status: 'PAID',
           payment_mode: 'cash',
           is_force_added: true
         });

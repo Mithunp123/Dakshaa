@@ -126,7 +126,7 @@ const VolunteerDashboard = () => {
 
       // Check if user has at least one completed registration
       const hasValidRegistration = profile.registrations?.some(
-        r => r.payment_status === 'completed'
+        r => r.payment_status?.toUpperCase() === 'PAID'
       );
 
       if (!hasValidRegistration) {

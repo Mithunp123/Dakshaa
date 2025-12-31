@@ -518,7 +518,7 @@ const UserManager = () => {
                                 <p className="text-xs text-gray-500">{new Date(reg.created_at).toLocaleDateString()}</p>
                               </div>
                               <div className="flex items-center gap-3">
-                                <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${reg.payment_status === 'completed' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
+                                <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${reg.payment_status?.toUpperCase() === 'PAID' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
                                   {reg.payment_status.toUpperCase()}
                                 </span>
                                 {reg.combo_id && (

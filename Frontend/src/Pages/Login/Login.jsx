@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../../supabase';
+import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LogIn, 
@@ -66,6 +67,33 @@ const Login = () => {
   // Get return URL from state (passed from event registration)
   const returnTo = location.state?.returnTo;
 
+  // Check for email verification success from URL
+  useEffect(() => {
+    const checkEmailVerification = async () => {
+      // Check if this is an email verification callback
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const type = hashParams.get('type');
+      
+      if (type === 'signup' || type === 'email') {
+        // Email verified successfully
+        toast.success('Email verified successfully! You can now login.', {
+          duration: 5000,
+          icon: '✅',
+        });
+        
+        // Clear the hash from URL
+        window.history.replaceState(null, '', window.location.pathname);
+        
+        // Redirect to homepage after showing toast
+        setTimeout(() => {
+          navigate('/');
+        }, 3000);
+      }
+    };
+    
+    checkEmailVerification();
+  }, [navigate]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -84,6 +112,14 @@ const Login = () => {
     }
 
     if (data?.user) {
+      // Check if email is verified
+      if (!data.user.email_confirmed_at) {
+        setError('Please verify your email before logging in. Check your inbox for the verification link.');
+        await supabase.auth.signOut();
+        setLoading(false);
+        return;
+      }
+
       // Fetch user role and name from profiles table
       const { data: profile, error: profileError } = await supabase
         .from('profiles')

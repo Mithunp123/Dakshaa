@@ -109,7 +109,8 @@ const Contact = () => {
     const user_id = uuidv4();
 
     try {
-      const response = await fetch("http://localhost:3000/add-contact", {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${apiUrl}/add-contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

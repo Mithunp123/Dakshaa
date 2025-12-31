@@ -53,7 +53,7 @@ const AdminDashboard = () => {
       .channel('admin-registration-changes')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'event_registrations_config' },
+        { event: '*', schema: 'public', table: 'registrations' },
         () => fetchStats()
       )
       .subscribe();
@@ -105,7 +105,10 @@ const AdminDashboard = () => {
       // Try to use RPC function for comprehensive stats
       const { data: rpcStats, error: rpcError } = await supabase.rpc('get_admin_dashboard_stats');
       
+      console.log('RPC Stats Response:', { rpcStats, rpcError });
+      
       if (!rpcError && rpcStats) {
+        console.log('Using RPC stats:', rpcStats);
         setStats({
           totalRegistrations: rpcStats.total_registrations || 0,
           totalRevenue: rpcStats.total_revenue || 0,
@@ -118,21 +121,22 @@ const AdminDashboard = () => {
         });
         setLastUpdated(new Date());
       } else {
+        console.log('RPC failed, using fallback queries. Error:', rpcError);
         // Fallback to direct queries
         const { count: regCount } = await supabase
-          .from("event_registrations_config")
+          .from("registrations")
           .select("*", { count: "exact", head: true })
           .eq("payment_status", "PAID");
 
-        // Fetch Total Revenue
-        const { data: payments } = await supabase
-          .from("event_registrations_config")
-          .select("payment_amount")
+        // Fetch Total Revenue from events joined with registrations
+        const { data: regWithEvents } = await supabase
+          .from("registrations")
+          .select("event_id, events(price)")
           .eq("payment_status", "PAID");
 
-        const revenue = payments?.reduce((acc, curr) => {
-          return acc + (curr.payment_amount || 0);
-        }, 0);
+        const revenue = regWithEvents?.reduce((acc, curr) => {
+          return acc + (curr.events?.price || 0);
+        }, 0) || 0;
 
         // Fetch Morning Check-ins (using column-based session tracking)
         const { count: morningCount } = await supabase
@@ -159,13 +163,13 @@ const AdminDashboard = () => {
 
         // Fetch Events
         const { count: eventCount } = await supabase
-          .from("events_config")
+          .from("events")
           .select("*", { count: "exact", head: true });
 
         const { count: openEventCount } = await supabase
-          .from("events_config")
+          .from("events")
           .select("*", { count: "exact", head: true })
-          .eq("is_open", true);
+          .eq("is_active", true);
 
         setStats({
           totalRegistrations: regCount || 0,
@@ -176,6 +180,12 @@ const AdminDashboard = () => {
           eveningCheckins: eveningCount || 0,
           totalEvents: eventCount || 0,
           openEvents: openEventCount || 0,
+        });
+        console.log('Fallback stats set:', {
+          totalRegistrations: regCount,
+          totalRevenue: revenue,
+          totalUsers: userCount,
+          totalEvents: eventCount
         });
         setLastUpdated(new Date());
       }

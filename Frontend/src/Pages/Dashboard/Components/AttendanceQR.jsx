@@ -169,21 +169,13 @@ const AttendanceQR = () => {
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-secondary/10 to-primary/10 pointer-events-none"></div>
         
         <div className="relative z-10 flex flex-col items-center">
-          <div className="relative group" ref={qrRef}>
-            <div className="absolute -inset-4 bg-gradient-to-r from-secondary to-primary rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+          <div className="relative" ref={qrRef}>
             <div className="relative bg-white p-6 rounded-3xl shadow-2xl">
               <QRCodeCanvas 
                 value={profile.id}
                 size={200}
                 level="H"
                 includeMargin={false}
-              />
-              
-              <motion.div 
-                animate={{ top: ["0%", "100%", "0%"] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                className="absolute left-0 right-0 h-1 bg-secondary/50 shadow-[0_0_15px_rgba(249,115,22,0.8)] z-20"
-                style={{ top: 0 }}
               />
             </div>
           </div>

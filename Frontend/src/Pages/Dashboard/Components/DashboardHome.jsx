@@ -21,6 +21,27 @@ const DashboardHome = () => {
 
   useEffect(() => {
     fetchDashboardData();
+
+    // Set up real-time subscription for registration updates
+    const registrationSubscription = supabase
+      .channel('student-registration-updates')
+      .on(
+        'postgres_changes',
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'registrations',
+          filter: `user_id=eq.${localStorage.getItem('supabase.auth.token')}`
+        },
+        () => {
+          fetchDashboardData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(registrationSubscription);
+    };
   }, []);
 
   const fetchDashboardData = async () => {

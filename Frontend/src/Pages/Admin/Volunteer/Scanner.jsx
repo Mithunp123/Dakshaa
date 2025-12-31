@@ -34,7 +34,7 @@ const GlobalScanner = () => {
 
       if (error) throw error;
 
-      const hasValidTicket = data.registrations?.some(r => r.payment_status === 'completed');
+      const hasValidTicket = data.registrations?.some(r => r.payment_status?.toUpperCase() === 'PAID');
       
       setResult({
         user: data,

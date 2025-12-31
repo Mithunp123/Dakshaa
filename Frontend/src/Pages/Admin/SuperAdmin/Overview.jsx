@@ -36,7 +36,7 @@ const Overview = () => {
       const { data: payments } = await supabase
         .from('registrations')
         .select('events(price), combos(price)')
-        .eq('payment_status', 'completed');
+        .eq('payment_status', 'PAID');
 
       const revenue = payments?.reduce((acc, curr) => {
         return acc + (curr.events?.price || curr.combos?.price || 0);
@@ -170,7 +170,7 @@ const Overview = () => {
                     {new Date(reg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                   <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
-                    reg.payment_status === 'completed' ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'
+                    reg.payment_status?.toUpperCase() === 'PAID' ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'
                   }`}>
                     {reg.payment_status}
                   </span>

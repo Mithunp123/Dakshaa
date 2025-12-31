@@ -47,6 +47,7 @@ const LiveStats = lazy(() => import("./Pages/LiveStatus/LiveStats"));
 const TestConnection = lazy(() => import("./Pages/TestConnection"));
 const MyRegistrations = lazy(() => import("./Pages/MyRegistrations/MyRegistrations"));
 const AdminDashboard = lazy(() => import("./Pages/Admin/AdminDashboard"));
+const PaymentSimulation = lazy(() => import("./Pages/Register/Components/PaymentSimulation"));
 
 // Components that are always needed can remain static or also be lazy loaded if large
 import AuthRedirect from "./Components/AuthRedirect";
@@ -141,6 +142,7 @@ function AppContent() {
             <Route path="/test-connection" element={<TestConnection />} />
             <Route path="/my-registrations" element={<MyRegistrations />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/payment-simulation" element={<PaymentSimulation />} />
 
             {/* Admin Routes */}
             <Route

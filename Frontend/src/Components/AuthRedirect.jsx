@@ -28,17 +28,17 @@ const AuthRedirect = ({ children }) => {
 
       const role = profile?.role || 'student';
 
-      if (role === 'super_admin') {
-        navigate('/admin');
-      } else if (role === 'registration_admin') {
-        navigate('/admin/desk');
-      } else if (role === 'event_coordinator') {
-        navigate('/coordinator');
-      } else if (role === 'volunteer') {
-        navigate('/volunteer');
-      } else {
-        // If on login page, redirect to returnTo URL or home
-        if (window.location.pathname === '/login') {
+      // Only redirect if user is on login page or explicitly navigating
+      if (location.pathname === '/login') {
+        if (role === 'super_admin') {
+          navigate('/admin');
+        } else if (role === 'registration_admin') {
+          navigate('/admin/desk');
+        } else if (role === 'event_coordinator') {
+          navigate('/coordinator');
+        } else if (role === 'volunteer') {
+          navigate('/volunteer');
+        } else {
           navigate(returnTo || '/');
         }
       }

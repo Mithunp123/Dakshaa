@@ -93,7 +93,8 @@ export const supabaseService = {
         user_id: userId,
         event_id: eventId,
         event_name: eventNameMap[eventId] || null,
-        payment_status: "PAID",
+        payment_status: paymentId ? "PAID" : "PENDING", // PENDING initially, PAID when payment confirmed
+        transaction_id: paymentId || null, // Set transaction ID when payment is processed
       }));
 
       console.log("Attempting to insert registrations:", registrations);

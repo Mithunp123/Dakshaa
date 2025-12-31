@@ -441,6 +441,10 @@ const comboService = {
         return { success: false, error: "User not authenticated" };
       }
 
+      if (!comboId || comboId === 'undefined' || comboId === 'null') {
+        return { success: false, error: "Invalid combo ID. Please select a combo again." };
+      }
+
       console.log("📦 Purchasing combo:", {
         userId,
         comboId,
@@ -518,30 +522,33 @@ const comboService = {
         };
       }
 
-      // Fetch event names for all events being registered
+      // Fetch event_key for all events being registered (registrations table needs event_key, not UUID)
       const { data: eventsData } = await supabase
         .from("events_config")
-        .select("id, name")
+        .select("id, event_key")
         .in("id", eventIdsToRegister);
 
-      // Create a map of event_id to event_name
-      const eventNameMap = {};
+      // Create a map of UUID id to event_key
+      const eventKeyMap = {};
       (eventsData || []).forEach((event) => {
-        eventNameMap[event.id] = event.name;
+        eventKeyMap[event.id] = event.event_key;
       });
 
-      // Create registrations for each event with event_name
-      const registrations = eventIdsToRegister.map((eventId) => ({
-        user_id: userId,
-        event_id: eventId,
-        event_name: eventNameMap[eventId] || null,
-        payment_status: "PAID",
-      }));
+      // Create registrations for each event using event_key (registrations table only has: user_id, event_id, combo_id, payment_status, payment_id)
+      const registrations = eventIdsToRegister
+        .map((eventId) => ({
+          user_id: userId,
+          event_id: eventKeyMap[eventId], // Use event_key, not UUID
+          combo_id: comboId,
+          payment_status: "PENDING",
+          payment_id: null,
+        }))
+        .filter(r => r.event_id); // Filter out any events without event_key
 
       console.log("📦 Creating registrations:", registrations);
 
       const { data: regData, error: regError } = await supabase
-        .from("event_registrations_config")
+        .from("registrations")
         .insert(registrations)
         .select();
 
@@ -551,6 +558,18 @@ const comboService = {
       }
 
       console.log("📦 Registration success:", regData);
+
+      // Update payment status to PAID and add payment ID (simulating payment confirmation)
+      const tempPaymentId = `TEMP_COMBO_${userId.substring(0, 8)}_${Date.now()}`;
+      const registrationIds = regData.map(r => r.id);
+      
+      await supabase
+        .from('registrations')
+        .update({
+          payment_status: 'PAID',
+          payment_id: tempPaymentId
+        })
+        .in('id', registrationIds);
 
       // Update combo purchase count (ignore errors)
       try {

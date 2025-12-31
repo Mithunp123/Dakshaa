@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Package,
@@ -25,7 +25,11 @@ import { supabaseService } from "../../../services/supabaseService";
 
 const RegistrationForm = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const preSelectedEventId = location.state?.selectedEventId;
+  
+  // Check if returning from successful payment
+  const registrationSuccess = location.state?.registrationSuccess;
   
   const [currentStep, setCurrentStep] = useState(1); // Start at step 1, will adjust after events load
   const [registrationMode, setRegistrationMode] = useState("");
@@ -39,6 +43,7 @@ const RegistrationForm = () => {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   
   // Ref to track footer visibility
@@ -92,9 +97,27 @@ const RegistrationForm = () => {
         data: { user },
       } = await supabase.auth.getUser();
       setUser(user);
+      
+      // Fetch user profile
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, email, mobile_number, gender, college_name, department, year_of_study, roll_number")
+          .eq("id", user.id)
+          .single();
+        setUserProfile(profile);
+      }
     };
     getCurrentUser();
   }, []);
+
+  // Handle successful payment return
+  useEffect(() => {
+    if (registrationSuccess) {
+      setCurrentStep(4);
+      toast.success('Registration completed successfully!');
+    }
+  }, [registrationSuccess]);
 
   // Load data when user is available
   useEffect(() => {
@@ -202,6 +225,16 @@ const RegistrationForm = () => {
     [selectedEventDetails]
   );
 
+  // Count selected events by category for combo quotas
+  const selectedCountByCategory = useMemo(() => {
+    const counts = {};
+    selectedEventDetails.forEach((event) => {
+      const category = (event.category || "").toLowerCase().trim();
+      counts[category] = (counts[category] || 0) + 1;
+    });
+    return counts;
+  }, [selectedEventDetails]);
+
   // Callbacks to prevent unnecessary re-renders
   const handleModeSelect = useCallback((mode) => {
     setRegistrationMode(mode);
@@ -261,20 +294,31 @@ const RegistrationForm = () => {
         return;
       }
 
-      // Get user profile for notification
-      const { data: userProfile } = await supabase
-        .from("profiles")
-        .select("full_name, email, mobile_number")
-        .eq("id", user.id)
-        .single();
+      // Use fetched user profile from state
+      if (!userProfile) {
+        alert("Profile not loaded. Please refresh and try again.");
+        return;
+      }
 
-      // Register for each selected event
+      // Register for each selected event with PENDING status initially
       const registrationResults = await supabaseService.registerEvents(
         user.id,
         selectedEvents,
         null, // no combo
-        `PAY_${Date.now()}` // payment ID placeholder
+        null // No payment ID yet - will be added when user proceeds to payment
       );
+
+      // Now update payment status to PAID and add payment ID (simulating payment confirmation)
+      const tempPaymentId = `TEMP_${user.id.substring(0, 8)}_${Date.now()}`;
+      const registrationIds = registrationResults.map(r => r.id);
+      
+      await supabase
+        .from('registrations')
+        .update({
+          payment_status: 'PAID',
+          payment_id: tempPaymentId
+        })
+        .in('id', registrationIds);
 
       // Create admin notification for the registration
       const eventNames = selectedEventDetails
@@ -322,16 +366,15 @@ const RegistrationForm = () => {
         return;
       }
 
-      // Get user profile for notification
-      const { data: userProfile } = await supabase
-        .from("profiles")
-        .select("full_name, email, mobile_number")
-        .eq("id", user.id)
-        .single();
+      // Use fetched user profile from state
+      if (!userProfile) {
+        alert("Profile not loaded. Please refresh and try again.");
+        return;
+      }
 
       const result = await comboService.purchaseCombo(
         user.id,
-        selectedCombo.combo_id,
+        selectedCombo.id || selectedCombo.combo_id, // Support both for backwards compatibility
         selectedEvents
       );
 
@@ -347,16 +390,16 @@ const RegistrationForm = () => {
           title: "New Combo Registration",
           message: `${
             userProfile?.full_name || user.email
-          } registered for combo: ${selectedCombo.combo_name}`,
+          } registered for combo: ${selectedCombo.name || selectedCombo.combo_name}`,
           data: {
             user_id: user.id,
             user_name: userProfile?.full_name,
             user_email: user.email,
-            combo_id: selectedCombo.combo_id,
-            combo_name: selectedCombo.combo_name,
+            combo_id: selectedCombo.id || selectedCombo.combo_id,
+            combo_name: selectedCombo.name || selectedCombo.combo_name,
             events: selectedEvents,
             event_names: eventNames,
-            total_amount: selectedCombo.total_price,
+            total_amount: selectedCombo.price || selectedCombo.total_price,
             registration_type: "combo",
           },
           is_read: false,
@@ -697,11 +740,11 @@ const RegistrationForm = () => {
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {combos.map((combo) => (
+                  {combos.map((combo, index) => (
                     <ComboCard
-                      key={combo.combo_id}
+                      key={combo.combo_id || combo.id || `combo-${index}`}
                       combo={combo}
-                      isSelected={selectedCombo?.combo_id === combo.combo_id}
+                      isSelected={selectedCombo?.id === combo.id || selectedCombo?.combo_id === combo.combo_id}
                       onSelect={() => handleComboSelect(combo)}
                     />
                   ))}
@@ -823,62 +866,142 @@ const RegistrationForm = () => {
               <>
                 <div className="text-center space-y-2">
                   <h2 className="text-3xl font-bold text-white">
-                    Select Events from {selectedCombo.combo_name}
+                    Select Events from {selectedCombo.name || selectedCombo.combo_name}
                   </h2>
                   <p className="text-gray-400">
-                    Choose events according to your combo package quotas
+                    Search and select events based on your quota limits
                   </p>
                 </div>
 
-                {/* Category Quotas Display */}
-                <div className="bg-gray-800/50 rounded-2xl p-6 border border-gray-700">
-                  <h3 className="text-xl font-bold text-white mb-4">
-                    Available Quotas
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {/* Category Quotas Display with Selection Counter */}
+                <div className="bg-gray-800/50 rounded-2xl p-4 sm:p-6 border border-gray-700">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg sm:text-xl font-bold text-white">
+                      Your Quotas
+                    </h3>
+                    <div className="text-sm text-blue-400 font-medium">
+                      {selectedEvents.length} event{selectedEvents.length !== 1 ? 's' : ''} selected
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 sm:gap-4">
                     {Object.entries(selectedCombo.category_quotas || {}).map(
-                      ([category, quota]) => (
-                        <div
-                          key={category}
-                          className="bg-gray-900 rounded-xl p-4"
-                        >
-                          <p className="text-gray-400 text-sm">{category}</p>
-                          <p className="text-2xl font-bold text-white">
-                            {quota}
-                          </p>
-                        </div>
-                      )
+                      ([category, quota]) => {
+                        const categoryKey = category.toLowerCase().trim();
+                        const selected = selectedCountByCategory[categoryKey] || 0;
+                        const remaining = quota - selected;
+                        const isExceeded = remaining < 0;
+                        const isFull = remaining <= 0;
+                        
+                        return (
+                          <div
+                            key={category}
+                            className={`bg-gray-900 rounded-xl p-3 sm:p-4 border-2 transition-all ${
+                              isExceeded ? 'border-red-500' : isFull ? 'border-green-500' : 'border-gray-700'
+                            }`}
+                          >
+                            <p className="text-gray-400 text-xs sm:text-sm capitalize">{category}</p>
+                            <div className="flex items-baseline justify-between">
+                              <p className={`text-xl sm:text-2xl font-bold ${isExceeded ? 'text-red-400' : 'text-white'}`}>
+                                {selected} / {quota}
+                              </p>
+                              {isFull && !isExceeded && (
+                                <Check className="text-green-400" size={16} />
+                              )}
+                            </div>
+                            <div className="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full transition-all ${
+                                  isExceeded ? 'bg-red-500' : isFull ? 'bg-green-500' : 'bg-blue-500'
+                                }`}
+                                style={{ width: `${Math.min(100, (selected / quota) * 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      }
                     )}
                   </div>
                 </div>
 
-                {/* Events from Combo */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {events
-                    .filter((e) =>
-                      selectedCombo.event_ids?.includes(e.id || e.event_id)
-                    )
-                    .map((event) => {
-                      const isFull = event.current_registrations >= event.capacity;
-                      const isOpen = event.is_open !== false;
-                      const isEventDisabled = isFull || !isOpen;
-                      
-                      return (
-                        <EventCard
-                          key={event.id || event.event_id}
-                          event={event}
-                          isSelected={selectedEvents.includes(
-                            event.id || event.event_id
-                          )}
-                          isDisabled={isEventDisabled}
-                          onSelect={() =>
-                            handleEventToggle(event.id || event.event_id)
-                          }
-                          showPrice={false}
-                        />
-                      );
-                    })}
+                {/* Search and Filter - Same as Individual Events */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1 relative">
+                    <Search
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                      size={20}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Search events..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="flex gap-2 overflow-x-auto pb-2">
+                    <button
+                      onClick={() => setCategoryFilter("ALL")}
+                      className={`px-4 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
+                        categoryFilter === "ALL"
+                          ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+                          : "bg-gray-800 text-gray-400 hover:text-white"
+                      }`}
+                    >
+                      All Events
+                    </button>
+                    {categories
+                      .filter((cat) => cat !== "ALL")
+                      .map((cat, index) => (
+                        <button
+                          key={`combo-cat-${cat}-${index}`}
+                          onClick={() => setCategoryFilter(cat)}
+                          className={`px-4 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
+                            categoryFilter === cat
+                              ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+                              : "bg-gray-800 text-gray-400 hover:text-white"
+                          }`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                  </div>
                 </div>
+
+                {/* Events Grid - All Events with Search/Filter */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredEvents.map((event, index) => {
+                    const isFull = event.current_registrations >= event.capacity;
+                    const isOpen = event.is_open !== false;
+                    const isEventDisabled = isFull || !isOpen;
+                    
+                    return (
+                      <EventCard
+                        key={event.id || event.event_id || `combo-event-${index}`}
+                        event={event}
+                        isSelected={selectedEvents.includes(
+                          event.id || event.event_id
+                        )}
+                        isDisabled={isEventDisabled}
+                        onSelect={() =>
+                          handleEventToggle(event.id || event.event_id)
+                        }
+                        showPrice={false}
+                      />
+                    );
+                  })}
+                </div>
+
+                {filteredEvents.length === 0 && (
+                  <div className="text-center py-12">
+                    <Calendar
+                      className="mx-auto text-gray-600 mb-4"
+                      size={64}
+                    />
+                    <p className="text-gray-400">
+                      No events found matching your criteria
+                    </p>
+                  </div>
+                )}
               </>
             ) : (
               <>
@@ -972,7 +1095,7 @@ const RegistrationForm = () => {
               </h2>
               <p className="text-gray-400 text-lg">
                 {registrationMode === "combo"
-                  ? `You've successfully registered for the ${selectedCombo?.combo_name} package`
+                  ? `You've successfully registered for the ${selectedCombo?.name || selectedCombo?.combo_name} package`
                   : `You've successfully registered for ${
                       selectedEvents.length
                     } event${selectedEvents.length > 1 ? "s" : ""}`}
@@ -1037,8 +1160,12 @@ const RegistrationForm = () => {
                   </>
                 ) : (
                   <>
-                    <span className="hidden sm:inline">{currentStep === 3 ? "Confirm Registration" : "Next"}</span>
-                    <span className="sm:hidden">{currentStep === 3 ? "Confirm" : "Next"}</span>
+                    <span className="hidden sm:inline">
+                      {currentStep === 3 ? "Confirm Registration" : "Next"}
+                    </span>
+                    <span className="sm:hidden">
+                      {currentStep === 3 ? "Confirm" : "Next"}
+                    </span>
                     <ChevronRight size={18} className="sm:w-5 sm:h-5" />
                   </>
                 )}

@@ -105,7 +105,7 @@ const RegistrationAdminDashboard = () => {
         .select('amount')
         .eq('marked_by', user.id)
         .eq('method', 'cash')
-        .eq('status', 'completed')
+        .eq('status', 'PAID')
         .gte('created_at', new Date().toISOString().split('T')[0]);
       
       const cashInHand = cashData?.reduce((sum, t) => sum + parseFloat(t.amount), 0) || 0;
@@ -174,7 +174,7 @@ const RegistrationAdminDashboard = () => {
       const { error: regError } = await supabase
         .from('registrations')
         .update({ 
-          payment_status: 'completed',
+          payment_status: 'PAID',
           approved_by: user.id,
           approved_at: new Date().toISOString(),
           amount_paid: amount
@@ -191,7 +191,7 @@ const RegistrationAdminDashboard = () => {
           amount: amount,
           type: 'payment',
           method: 'cash',
-          status: 'completed',
+          status: 'PAID',
           marked_by: user.id,
           notes: 'Cash payment approved at registration desk'
         });
@@ -225,7 +225,7 @@ const RegistrationAdminDashboard = () => {
           await supabase
             .from('registrations')
             .update({ 
-              payment_status: 'completed',
+              payment_status: 'PAID',
               approved_by: user.id,
               approved_at: new Date().toISOString(),
               amount_paid: reg.events.price
@@ -239,7 +239,7 @@ const RegistrationAdminDashboard = () => {
               amount: reg.events.price,
               type: 'payment',
               method: 'cash',
-              status: 'completed',
+              status: 'PAID',
               marked_by: user.id,
               notes: 'Bulk approval'
             });
@@ -336,7 +336,7 @@ const RegistrationAdminDashboard = () => {
         .insert({
           user_id: authData.user.id,
           event_id: onSpotForm.selectedEventId,
-          payment_status: 'completed',
+          payment_status: 'PAID',
           payment_mode: 'cash',
           amount_paid: onSpotForm.amountCollected,
           approved_by: adminUser.id,
@@ -356,7 +356,7 @@ const RegistrationAdminDashboard = () => {
           amount: onSpotForm.amountCollected,
           type: 'payment',
           method: 'cash',
-          status: 'completed',
+          status: 'PAID',
           marked_by: adminUser.id,
           notes: 'On-spot registration'
         });
@@ -963,7 +963,7 @@ const RegistrationAdminDashboard = () => {
                             <p className="text-sm text-gray-400 capitalize">{reg.events?.category}</p>
                           </div>
                           <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full ${
-                            reg.payment_status === 'completed'
+                            reg.payment_status?.toUpperCase() === 'PAID'
                               ? 'bg-green-500/20 text-green-500'
                               : 'bg-yellow-500/20 text-yellow-500'
                           }`}>

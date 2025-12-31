@@ -108,7 +108,8 @@ const AccommodationBooking = () => {
         }
 
         // Add to backend
-        const response = await fetch('http://localhost:3000/add-accommodation', {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const response = await fetch(`${apiUrl}/add-accommodation`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -163,7 +164,8 @@ const AccommodationBooking = () => {
         }
 
         // Add lunch booking via backend
-        const response = await fetch('http://localhost:3000/add-lunch-booking', {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const response = await fetch(`${apiUrl}/add-lunch-booking`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

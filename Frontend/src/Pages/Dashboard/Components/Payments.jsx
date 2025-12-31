@@ -17,15 +17,43 @@ import { supabaseService } from '../../../services/supabaseService';
 const Payments = () => {
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     fetchPayments();
   }, []);
 
+  // Set up real-time subscription for payment updates
+  useEffect(() => {
+    if (!userId) return;
+
+    const subscription = supabase
+      .channel(`user-payments-${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'registrations',
+          filter: `user_id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('Payment update detected:', payload);
+          fetchPayments();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [userId]);
+
   const fetchPayments = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        setUserId(user.id);
         const data = await supabaseService.getUserRegistrations(user.id);
         setRegistrations(data);
       }
@@ -37,17 +65,18 @@ const Payments = () => {
   };
 
   const totalSpent = registrations
-    .filter(r => r.payment_status === 'completed')
+    .filter(r => r.payment_status?.toUpperCase() === 'PAID')
     .reduce((sum, r) => sum + (r.events?.price || 0), 0);
 
-  const successfulPayments = registrations.filter(r => r.payment_status === 'completed').length;
-  const pendingPayments = registrations.filter(r => r.payment_status === 'pending').length;
+  const successfulPayments = registrations.filter(r => r.payment_status?.toUpperCase() === 'PAID').length;
+  const pendingPayments = registrations.filter(r => r.payment_status?.toUpperCase() === 'PENDING').length;
 
   const getStatusStyles = (status) => {
-    switch (status) {
-      case 'completed': return 'text-green-500 bg-green-500/10 border-green-500/20';
-      case 'pending': return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
-      case 'failed': return 'text-red-500 bg-red-500/10 border-red-500/20';
+    const statusUpper = status?.toUpperCase();
+    switch (statusUpper) {
+      case 'PAID': return 'text-green-500 bg-green-500/10 border-green-500/20';
+      case 'PENDING': return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
+      case 'FAILED': return 'text-red-500 bg-red-500/10 border-red-500/20';
       default: return 'text-gray-500 bg-gray-500/10 border-gray-500/20';
     }
   };
@@ -151,7 +180,7 @@ const Payments = () => {
                   </td>
                   <td className="p-6">
                     <button 
-                      disabled={reg.payment_status !== 'completed'}
+                      disabled={reg.payment_status?.toUpperCase() !== 'PAID'}
                       className="p-2 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-secondary disabled:opacity-30"
                     >
                       <Download size={18} />
