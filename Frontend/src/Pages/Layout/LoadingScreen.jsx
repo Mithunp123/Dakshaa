@@ -295,7 +295,11 @@ const CircuitLoader = ({ text }) => {
             cy="50"
             r="8"
             fill="#0ea5e9"
-            animate={{ r: [8, 12, 8] }}
+            animate={{ 
+              scale: [1, 1.5, 1],
+              opacity: [0.8, 1, 0.8]
+            }}
+            style={{ transformOrigin: "50px 50px" }}
             transition={{ duration: 1, repeat: Infinity }}
           />
           

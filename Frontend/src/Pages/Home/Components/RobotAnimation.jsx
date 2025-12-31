@@ -56,6 +56,7 @@ const RobotAnimation = () => {
               cx="85" cy="67" r="5"
               fill="#0ea5e9"
               filter="url(#glow)"
+              style={{ transformOrigin: "85px 67px" }}
               animate={{
                 opacity: [1, 0.4, 1],
                 scale: [1, 1.2, 1],
@@ -66,6 +67,7 @@ const RobotAnimation = () => {
               cx="115" cy="67" r="5"
               fill="#0ea5e9"
               filter="url(#glow)"
+              style={{ transformOrigin: "115px 67px" }}
               animate={{
                 opacity: [1, 0.4, 1],
                 scale: [1, 1.2, 1],
@@ -79,6 +81,7 @@ const RobotAnimation = () => {
               cx="100" cy="20" r="4"
               fill="#0ea5e9"
               filter="url(#glow)"
+              style={{ transformOrigin: "100px 20px" }}
               animate={{
                 scale: [1, 1.5, 1],
                 opacity: [0.5, 1, 0.5],

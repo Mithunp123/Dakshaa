@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -39,6 +39,32 @@ const RegistrationForm = () => {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [user, setUser] = useState(null);
+  const [isFooterVisible, setIsFooterVisible] = useState(false);
+  
+  // Ref to track footer visibility
+  const footerObserverRef = useRef(null);
+
+  // Detect when footer becomes visible to hide navigation buttons
+  useEffect(() => {
+    const footer = document.querySelector('footer');
+    if (!footer) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsFooterVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 } // Trigger when 10% of footer is visible
+    );
+
+    observer.observe(footer);
+    footerObserverRef.current = observer;
+
+    return () => {
+      if (footerObserverRef.current) {
+        footerObserverRef.current.disconnect();
+      }
+    };
+  }, []);
 
   // Memoized steps configuration
   const steps = useMemo(
@@ -390,9 +416,9 @@ const RegistrationForm = () => {
   }
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="pb-4">
       {/* Progress Steps */}
-      <div className="max-w-4xl mx-auto mb-12">
+      <div className="max-w-4xl mx-auto mb-8">
         <div className="flex items-center justify-between">
           {steps.map((step, index) => (
             <div
@@ -452,9 +478,9 @@ const RegistrationForm = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="space-y-12"
+            className="space-y-8"
           >
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-3">
               <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
                 Choose Your Registration Type
               </h2>
@@ -463,7 +489,7 @@ const RegistrationForm = () => {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {/* Individual Events Card */}
               <motion.div
                 whileHover={{ scale: 1.02, y: -5 }}
@@ -971,45 +997,59 @@ const RegistrationForm = () => {
         )}
       </AnimatePresence>
 
-      {/* Navigation Buttons */}
-      {currentStep < 4 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 p-6">
-          <div className="max-w-4xl mx-auto flex justify-between items-center">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleBack}
-              disabled={currentStep === 1 || isSubmitting}
-              className="px-6 py-3 bg-gray-800 text-white font-bold rounded-full flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ChevronLeft size={20} />
-              Back
-            </motion.button>
+      {/* Navigation Buttons - Hidden when footer is visible */}
+      <AnimatePresence mode="wait">
+        {currentStep < 4 && !isFooterVisible && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed left-0 right-0 bg-gray-900 border-t border-gray-800 z-[110] bottom-16 md:bottom-0"
+            style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+          >
+            <div className="max-w-4xl mx-auto flex justify-between items-center p-4 sm:p-6">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleBack}
+                disabled={currentStep === 1 || isSubmitting}
+                className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-800 hover:bg-gray-700 text-white font-bold rounded-full flex items-center gap-1.5 sm:gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
+              >
+                <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Back</span>
+              </motion.button>
 
-            <motion.button
-              whileHover={{
-                scale: canProceedToNext && !isSubmitting ? 1.05 : 1,
-              }}
-              whileTap={{ scale: canProceedToNext && !isSubmitting ? 0.95 : 1 }}
-              onClick={handleNext}
-              disabled={!canProceedToNext || isSubmitting}
-              className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  {currentStep === 3 ? "Confirm Registration" : "Next"}
-                  <ChevronRight size={20} />
-                </>
-              )}
-            </motion.button>
-          </div>
-        </div>
-      )}
+              <motion.button
+                whileHover={{
+                  scale: canProceedToNext && !isSubmitting ? 1.02 : 1,
+                }}
+                whileTap={{ scale: canProceedToNext && !isSubmitting ? 0.98 : 1 }}
+                onClick={handleNext}
+                disabled={!canProceedToNext || isSubmitting}
+                className="px-5 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold rounded-full flex items-center gap-1.5 sm:gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm sm:text-base shadow-lg shadow-purple-500/20"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span className="hidden sm:inline">Processing...</span>
+                    <span className="sm:hidden">...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="hidden sm:inline">{currentStep === 3 ? "Confirm Registration" : "Next"}</span>
+                    <span className="sm:hidden">{currentStep === 3 ? "Confirm" : "Next"}</span>
+                    <ChevronRight size={18} className="sm:w-5 sm:h-5" />
+                  </>
+                )}
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Spacer to prevent content from being hidden behind fixed navigation */}
+      {currentStep < 4 && !isFooterVisible && <div className="h-24 md:h-20" />}
     </div>
   );
 };

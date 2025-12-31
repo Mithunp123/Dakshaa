@@ -506,6 +506,10 @@ const Events = () => {
                     const endX = 50 + 48 * Math.cos(angleRad);
                     const endY = 50 + 48 * Math.sin(angleRad);
                     const isSelected = selectedEvent === event.id;
+                    
+                    // Skip rendering if values are invalid
+                    if (isNaN(endX) || isNaN(endY)) return null;
+                    
                     return (
                       <g key={event.id || i}>
                         <line
@@ -525,8 +529,8 @@ const Events = () => {
                             r="1"
                             fill="#22d3ee"
                             animate={{
-                              cx: [50, endX],
-                              cy: [50, endY],
+                              cx: [50, endX || 50],
+                              cy: [50, endY || 50],
                               opacity: [0, 1, 0],
                             }}
                             transition={{

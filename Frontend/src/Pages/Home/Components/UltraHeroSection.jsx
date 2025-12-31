@@ -6,10 +6,11 @@ import HeroImg from "../../../assets/Heroimg.png";
 import Daksha from "../../../assets/DaKshaa.png";
 import UltraCountdown from "./UltraCountdown";
 import RegisterAni from "../../../assets/registerani.gif";
-import brochure from "../../../assets/brochure.pdf";
+import brochure from "../../../assets/Brochure.pdf";
 
 // Lazy load the 3D component
 const RobotHero = lazy(() => import("./RobotHero"));
+// import RobotHero from "./RobotHero";
 
 // Enhanced Glowing Text Animation
 const glowAnimation = {
@@ -610,28 +611,36 @@ const UltraHeroSection = () => {
           animate={{ opacity: 0.4 }}
         >
           <svg className="w-[95%] h-[95%]" viewBox="0 0 200 200">
-            <motion.circle
-              cx="100"
-              cy="100"
-              r="95"
-              fill="none"
-              stroke="url(#heroGradient)"
-              strokeWidth="0.3"
-              strokeDasharray="5 10"
+            <motion.g
               animate={{ rotate: 360 }}
               transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.circle
-              cx="100"
-              cy="100"
-              r="80"
-              fill="none"
-              stroke="url(#heroGradient)"
-              strokeWidth="0.5"
-              strokeDasharray="15 8"
+              style={{ transformOrigin: "100px 100px" }}
+            >
+              <circle
+                cx="100"
+                cy="100"
+                r="95"
+                fill="none"
+                stroke="url(#heroGradient)"
+                strokeWidth="0.3"
+                strokeDasharray="5 10"
+              />
+            </motion.g>
+            <motion.g
               animate={{ rotate: -360 }}
               transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-            />
+              style={{ transformOrigin: "100px 100px" }}
+            >
+              <circle
+                cx="100"
+                cy="100"
+                r="80"
+                fill="none"
+                stroke="url(#heroGradient)"
+                strokeWidth="0.5"
+                strokeDasharray="15 8"
+              />
+            </motion.g>
             <defs>
               <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#0ea5e9" />

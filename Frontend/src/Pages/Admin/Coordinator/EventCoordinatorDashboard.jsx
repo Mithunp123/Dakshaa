@@ -90,6 +90,27 @@ const EventCoordinatorDashboard = () => {
 
   const getCameras = async () => {
     try {
+      // Check if we're in a secure context (HTTPS or localhost)
+      const isSecureContext = window.isSecureContext || 
+        window.location.protocol === 'https:' || 
+        window.location.hostname === 'localhost' || 
+        window.location.hostname === '127.0.0.1';
+
+      if (!isSecureContext) {
+        setCameraError(
+          'Camera requires HTTPS. Use manual ID entry below, or access via HTTPS.'
+        );
+        return;
+      }
+
+      // Check if mediaDevices API is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setCameraError(
+          'Camera API not available. Use manual ID entry or try a different browser.'
+        );
+        return;
+      }
+
       await navigator.mediaDevices.getUserMedia({ video: true });
       const devices = await Html5Qrcode.getCameras();
       setCameras(devices);
@@ -107,7 +128,20 @@ const EventCoordinatorDashboard = () => {
       setCameraError(null);
     } catch (error) {
       console.error('Error getting cameras:', error);
-      setCameraError('Camera access denied. Please enable camera permissions.');
+      
+      // Provide more helpful error messages
+      let errorMessage = 'Camera access denied. ';
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        errorMessage = 'Camera permission denied. Allow camera access in browser settings.';
+      } else if (error.name === 'NotFoundError') {
+        errorMessage = 'No camera found. Use manual ID entry.';
+      } else if (error.name === 'NotReadableError') {
+        errorMessage = 'Camera in use by another app. Close other apps and retry.';
+      } else if (error.name === 'TypeError' || error.message?.includes('undefined')) {
+        errorMessage = 'Camera requires HTTPS. Use manual ID entry instead.';
+      }
+      
+      setCameraError(errorMessage);
     }
   };
 
@@ -849,9 +883,14 @@ const EventCoordinatorDashboard = () => {
             >
               <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 text-center">
                 {cameraError && (
-                  <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm">
-                    <AlertCircle className="inline mr-2" size={18} />
-                    {cameraError}
+                  <div className="mb-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl">
+                    <div className="flex items-start gap-3 text-left">
+                      <AlertCircle className="text-amber-400 flex-shrink-0 mt-0.5\" size={20} />
+                      <div>
+                        <p className="text-amber-400 font-medium text-sm mb-1">Camera Unavailable</p>
+                        <p className="text-amber-300/80 text-xs">{cameraError}</p>
+                      </div>
+                    </div>
                   </div>
                 )}
                 
@@ -869,21 +908,26 @@ const EventCoordinatorDashboard = () => {
                         </span>
                       </p>
                     </div>
-                    <button
-                      onClick={startScanning}
-                      disabled={!!cameraError}
-                      className="w-full py-5 bg-secondary text-white font-bold text-lg rounded-2xl hover:bg-secondary-dark transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Camera size={24} />
-                      Start Scanning
-                    </button>
-                    {cameraError && (
+                    {cameraError ? (
+                      <div className="flex flex-col gap-3">
+                        <button
+                          onClick={getCameras}
+                          className="w-full py-4 bg-white/5 border border-white/10 text-gray-300 font-bold rounded-xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                        >
+                          <RefreshCw size={18} />
+                          Retry Camera Access
+                        </button>
+                        <p className="text-xs text-gray-500">
+                          💡 Tip: Use the "Manual Entry" in the Participants tab to mark attendance without camera
+                        </p>
+                      </div>
+                    ) : (
                       <button
-                        onClick={getCameras}
-                        className="w-full py-3 bg-white/5 border border-white/10 text-gray-400 font-bold rounded-xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                        onClick={startScanning}
+                        className="w-full py-5 bg-secondary text-white font-bold text-lg rounded-2xl hover:bg-secondary-dark transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-3"
                       >
-                        <RefreshCw size={18} />
-                        Retry Camera Access
+                        <Camera size={24} />
+                        Start Scanning
                       </button>
                     )}
                   </div>

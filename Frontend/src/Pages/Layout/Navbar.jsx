@@ -5,7 +5,7 @@ import { React, useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown, Download, LogIn, LogOut, User } from "lucide-react";
-import brochure from "../../assets/brochure.pdf";
+import brochure from "../../assets/Brochure.pdf";
 import { supabase } from "../../supabase";
 
 const Navbar = () => {

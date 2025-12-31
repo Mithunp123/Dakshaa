@@ -82,6 +82,7 @@ function AppContent() {
     location.pathname.startsWith("/volunteer");
   const isScan = location.pathname === "/scan";
   const isLogin = location.pathname === "/login";
+  const isRegisterEvents = location.pathname === "/register-events";
 
   // Check if bottom navbar should be shown (mobile only, non-admin pages)
   const showBottomNav = !isDashboard && !isAdmin && !isScan && !isLogin;
@@ -310,8 +311,8 @@ function AppContent() {
       </AnimatePresence>
 
       {!isDashboard && !isAdmin && !isScan && !isLogin && <UltraFooter />}
-      {!isAdmin && <FloatingDashboardButton />}
-      {!isDashboard && !isAdmin && !isScan && !isLogin && (
+      {!isAdmin && !isRegisterEvents && <FloatingDashboardButton />}
+      {!isDashboard && !isAdmin && !isScan && !isLogin && !isRegisterEvents && (
         <FloatingCallButton />
       )}
       {showBottomNav && <BottomNavbar />}

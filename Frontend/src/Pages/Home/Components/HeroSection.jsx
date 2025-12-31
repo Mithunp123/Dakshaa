@@ -6,7 +6,7 @@ import HeroImg from "../../../assets/Heroimg.png";
 import Daksha from "../../../assets/DaKshaa T26.png";
 import Countdown from "./Countdown";
 import RegisterAni from "../../../assets/registerani.gif";
-import brochure from "../../../assets/brochure.pdf";
+import brochure from "../../../assets/Brochure.pdf";
 
 // Wave Animation for Words (Description & Event Details)
 const wordWaveAnimation = {

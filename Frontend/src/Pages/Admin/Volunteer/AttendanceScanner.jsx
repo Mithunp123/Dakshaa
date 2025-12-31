@@ -103,6 +103,29 @@ const AttendanceScanner = () => {
 
   const getCameras = async () => {
     try {
+      // Check if we're in a secure context (HTTPS or localhost)
+      const isSecureContext = window.isSecureContext || 
+        window.location.protocol === 'https:' || 
+        window.location.hostname === 'localhost' || 
+        window.location.hostname === '127.0.0.1';
+
+      if (!isSecureContext) {
+        setCameraError(
+          "Camera access requires HTTPS. Please access this page via HTTPS or use localhost for development. " +
+          "You can still use manual ID entry below."
+        );
+        return;
+      }
+
+      // Check if mediaDevices API is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setCameraError(
+          "Camera API not available. Your browser may not support camera access, or you're not using HTTPS. " +
+          "Please use manual ID entry or try a different browser."
+        );
+        return;
+      }
+
       // Request camera permission first
       await navigator.mediaDevices.getUserMedia({ video: true });
       
@@ -125,7 +148,22 @@ const AttendanceScanner = () => {
       setCameraError(null);
     } catch (error) {
       console.error("Error getting cameras:", error);
-      setCameraError("Camera access denied. Please enable camera permissions.");
+      
+      // Provide more helpful error messages based on error type
+      let errorMessage = "Camera access denied. ";
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        errorMessage = "Camera permission denied. Please allow camera access in your browser settings and reload the page.";
+      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+        errorMessage = "No camera found. Please connect a camera or use manual ID entry.";
+      } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+        errorMessage = "Camera is in use by another application. Please close other apps using the camera and try again.";
+      } else if (error.name === 'OverconstrainedError') {
+        errorMessage = "Camera doesn't support the required settings. Please try a different camera.";
+      } else if (error.name === 'TypeError' || error.message?.includes('undefined')) {
+        errorMessage = "Camera access requires HTTPS. Please use HTTPS or localhost, or use manual ID entry.";
+      }
+      
+      setCameraError(errorMessage);
     }
   };
 
@@ -416,16 +454,31 @@ const AttendanceScanner = () => {
               
               {cameraError ? (
                 <div className="space-y-4">
-                  <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
-                    <p className="text-red-400 text-sm">{cameraError}</p>
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="text-amber-400 flex-shrink-0 mt-0.5" size={20} />
+                      <div className="text-left">
+                        <p className="text-amber-400 font-medium text-sm mb-1">Camera Unavailable</p>
+                        <p className="text-amber-300/80 text-xs">{cameraError}</p>
+                      </div>
+                    </div>
                   </div>
-                  <button
-                    onClick={getCameras}
-                    className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors flex items-center gap-2 mx-auto"
-                  >
-                    <RefreshCw size={18} />
-                    <span>Retry</span>
-                  </button>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button
+                      onClick={getCameras}
+                      className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors flex items-center gap-2"
+                    >
+                      <RefreshCw size={18} />
+                      <span>Retry Camera</span>
+                    </button>
+                    <button
+                      onClick={() => setManualEntry(true)}
+                      className="px-6 py-3 bg-gradient-to-r from-secondary to-primary rounded-xl font-bold text-white flex items-center gap-2"
+                    >
+                      <Keyboard size={18} />
+                      <span>Use Manual Entry</span>
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <>

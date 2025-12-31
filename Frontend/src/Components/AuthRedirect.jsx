@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../supabase';
 
 const AuthRedirect = ({ children }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
+  
+  // Get return URL from state (passed from event registration or other pages)
+  const returnTo = location.state?.returnTo;
 
   useEffect(() => {
     const checkUser = async () => {
@@ -33,16 +37,16 @@ const AuthRedirect = ({ children }) => {
       } else if (role === 'volunteer') {
         navigate('/volunteer');
       } else {
-        // If on login page, redirect to home
+        // If on login page, redirect to returnTo URL or home
         if (window.location.pathname === '/login') {
-          navigate('/');
+          navigate(returnTo || '/');
         }
       }
       setLoading(false);
     };
 
     checkUser();
-  }, [navigate]);
+  }, [navigate, returnTo]);
 
   if (loading) return null;
 
