@@ -1,0 +1,207 @@
+<!-- 
+  SUPABASE EMAIL VERIFICATION TEMPLATE
+  Copy this entire HTML and paste it in:
+  Supabase Dashboard → Authentication → Email Templates → Confirm Signup
+  
+  Available Variables:
+  - {{ .Email }} - User's email address
+  - {{ .ConfirmationURL }} - Verification link
+  - {{ .Data.full_name }} - User's full name (from signup metadata)
+  - {{ .SiteURL }} - Your site URL
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Your Email - DaKshaa T26</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Arial', 'Helvetica', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%;">
+  
+  <!-- Wrapper Table -->
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        
+        <!-- Main Container -->
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);">
+          
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%); padding: 50px 40px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 36px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;">
+                🎓 DaKshaa
+              </h1>
+              <p style="margin: 10px 0 0 0; color: rgba(255, 255, 255, 0.9); font-size: 16px; letter-spacing: 1px;">
+                Technical Symposium 2026
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Main Content -->
+          <tr>
+            <td style="padding: 50px 40px;">
+              
+              <!-- Greeting -->
+              <h2 style="margin: 0 0 10px 0; color: #0ea5e9; font-size: 28px; font-weight: bold;">
+                Welcome{{ if .Data.full_name }}, {{ .Data.full_name }}{{ end }}! 🎉
+              </h2>
+              
+              <p style="margin: 0 0 25px 0; color: #64748b; font-size: 16px; line-height: 1.6;">
+                You're just one step away from joining India's most exciting technical symposium!
+              </p>
+              
+              <!-- Message -->
+              <p style="margin: 0 0 30px 0; color: #1e293b; font-size: 16px; line-height: 1.8;">
+                Thanks for registering for <strong style="color: #0ea5e9;">DaKshaa T26</strong>! Before you can access exclusive workshops, competitions, and events, we need to verify your email address.
+              </p>
+              
+              <!-- Verification Button -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding: 10px 0 30px 0;">
+                    <a href="{{ .ConfirmationURL }}" 
+                       style="display: inline-block; 
+                              background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%); 
+                              color: #ffffff; 
+                              font-size: 18px; 
+                              font-weight: bold; 
+                              text-decoration: none; 
+                              padding: 18px 50px; 
+                              border-radius: 50px; 
+                              box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);
+                              transition: transform 0.2s;">
+                      ✓ Verify Email Address
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- Info Box -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: #f0f9ff; border-left: 5px solid #0ea5e9; border-radius: 10px; margin: 30px 0;">
+                <tr>
+                  <td style="padding: 25px;">
+                    <h3 style="margin: 0 0 15px 0; color: #0ea5e9; font-size: 18px; font-weight: bold;">
+                      📋 What's Next?
+                    </h3>
+                    <ul style="margin: 0; padding-left: 20px; color: #475569; font-size: 15px; line-height: 1.8;">
+                      <li style="margin: 8px 0;">Click the verification button above</li>
+                      <li style="margin: 8px 0;">Complete your profile setup</li>
+                      <li style="margin: 8px 0;">Browse 50+ technical events & workshops</li>
+                      <li style="margin: 8px 0;">Register for competitions & get your QR pass</li>
+                      <li style="margin: 8px 0;">Join 1000+ students from across India</li>
+                    </ul>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- Alternative Link -->
+              <div style="margin: 30px 0; padding: 20px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px;">
+                <p style="margin: 0 0 10px 0; color: #92400e; font-size: 14px; font-weight: bold;">
+                  ⚠️ Button not working?
+                </p>
+                <p style="margin: 0 0 10px 0; color: #78350f; font-size: 14px; line-height: 1.6;">
+                  Copy and paste this link into your browser:
+                </p>
+                <p style="margin: 0; word-break: break-all;">
+                  <a href="{{ .ConfirmationURL }}" style="color: #0ea5e9; text-decoration: underline; font-size: 13px;">
+                    {{ .ConfirmationURL }}
+                  </a>
+                </p>
+              </div>
+              
+              <!-- Expiry Notice -->
+              <div style="margin: 25px 0; padding: 15px; background: #fee2e2; border-left: 4px solid #ef4444; border-radius: 8px;">
+                <p style="margin: 0; color: #991b1b; font-size: 14px; line-height: 1.6;">
+                  ⏰ <strong>Important:</strong> This verification link will expire in <strong>24 hours</strong>. Please verify your email as soon as possible.
+                </p>
+              </div>
+              
+              <!-- Security Notice -->
+              <p style="margin: 25px 0 0 0; padding-top: 25px; border-top: 2px solid #e2e8f0; color: #64748b; font-size: 14px; line-height: 1.6;">
+                If you didn't create an account with DaKshaa, you can safely ignore this email. Your email address will not be used.
+              </p>
+              
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="background: #f8fafc; padding: 40px; text-align: center; border-top: 3px solid #e2e8f0;">
+              
+              <!-- Event Details -->
+              <div style="margin-bottom: 25px; padding: 20px; background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%); border-radius: 12px;">
+                <h4 style="margin: 0 0 15px 0; color: #0ea5e9; font-size: 18px; font-weight: bold;">
+                  🎯 DaKshaa T26 Highlights
+                </h4>
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                  <tr>
+                    <td style="padding: 5px; color: #475569; font-size: 14px;">
+                      ⚡ 50+ Technical Events
+                    </td>
+                    <td style="padding: 5px; color: #475569; font-size: 14px;">
+                      🎓 Expert Workshops
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px; color: #475569; font-size: 14px;">
+                      🏆 Exciting Competitions
+                    </td>
+                    <td style="padding: 5px; color: #475569; font-size: 14px;">
+                      🎤 Guest Lectures
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px; color: #475569; font-size: 14px;">
+                      🎸 Cultural Events
+                    </td>
+                    <td style="padding: 5px; color: #475569; font-size: 14px;">
+                      🍔 Food & Fun
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              
+              <!-- Contact Info -->
+              <p style="margin: 0 0 15px 0; color: #64748b; font-size: 14px;">
+                <strong>Need Help?</strong><br>
+                Contact us at: <a href="mailto:support@dakshaa.com" style="color: #0ea5e9; text-decoration: none; font-weight: bold;">support@dakshaa.com</a><br>
+                Phone: <a href="tel:+919876543210" style="color: #0ea5e9; text-decoration: none; font-weight: bold;">+91 98765 43210</a>
+              </p>
+              
+              <!-- Social Links -->
+              <div style="margin: 20px 0;">
+                <a href="#" style="display: inline-block; margin: 0 10px; color: #0ea5e9; text-decoration: none; font-weight: bold; font-size: 14px;">
+                  📘 Facebook
+                </a>
+                <a href="#" style="display: inline-block; margin: 0 10px; color: #0ea5e9; text-decoration: none; font-weight: bold; font-size: 14px;">
+                  🐦 Twitter
+                </a>
+                <a href="#" style="display: inline-block; margin: 0 10px; color: #0ea5e9; text-decoration: none; font-weight: bold; font-size: 14px;">
+                  📸 Instagram
+                </a>
+                <a href="#" style="display: inline-block; margin: 0 10px; color: #0ea5e9; text-decoration: none; font-weight: bold; font-size: 14px;">
+                  💼 LinkedIn
+                </a>
+              </div>
+              
+              <!-- Legal -->
+              <p style="margin: 20px 0 0 0; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 12px; line-height: 1.6;">
+                This email was sent to <strong>{{ .Email }}</strong><br>
+                © 2026 DaKshaa Technical Symposium. All rights reserved.<br>
+                <a href="{{ .SiteURL }}" style="color: #0ea5e9; text-decoration: none;">Visit Website</a> | 
+                <a href="{{ .SiteURL }}/events" style="color: #0ea5e9; text-decoration: none;">View Events</a>
+              </p>
+              
+            </td>
+          </tr>
+          
+        </table>
+        
+      </td>
+    </tr>
+  </table>
+  
+</body>
+</html>

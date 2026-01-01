@@ -1,0 +1,70 @@
+<!-- 
+  SUPABASE EMAIL SUBJECT LINE
+  Copy this for the "Subject" field in Supabase Email Templates
+-->
+✓ Verify Your DaKshaa T26 Account - Action Required
+
+
+
+<!-- 
+  PLAIN TEXT VERSION (Fallback)
+  Some email clients may prefer plain text
+-->
+
+========================================
+🎓 DAKSHAA TECHNICAL SYMPOSIUM 2026
+========================================
+
+Welcome{{ if .Data.full_name }}, {{ .Data.full_name }}{{ end }}! 🎉
+
+You're just one step away from joining India's most exciting technical symposium!
+
+========================================
+
+Thanks for registering for DaKshaa T26! Before you can access exclusive workshops, competitions, and events, we need to verify your email address.
+
+VERIFY YOUR EMAIL:
+Click here: {{ .ConfirmationURL }}
+
+Or copy and paste this link into your browser:
+{{ .ConfirmationURL }}
+
+========================================
+
+WHAT'S NEXT?
+✓ Click the verification link above
+✓ Complete your profile setup
+✓ Browse 50+ technical events & workshops
+✓ Register for competitions & get your QR pass
+✓ Join 1000+ students from across India
+
+========================================
+
+⏰ IMPORTANT: This verification link will expire in 24 hours. Please verify your email as soon as possible.
+
+========================================
+
+DAKSHAA T26 HIGHLIGHTS:
+⚡ 50+ Technical Events
+🎓 Expert Workshops
+🏆 Exciting Competitions
+🎤 Guest Lectures
+🎸 Cultural Events
+🍔 Food & Fun
+
+========================================
+
+NEED HELP?
+Email: support@dakshaa.com
+Phone: +91 98765 43210
+Website: {{ .SiteURL }}
+
+========================================
+
+If you didn't create an account with DaKshaa, you can safely ignore this email. Your email address will not be used.
+
+© 2026 DaKshaa Technical Symposium. All rights reserved.
+
+This email was sent to {{ .Email }}
+
+========================================

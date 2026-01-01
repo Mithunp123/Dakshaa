@@ -75,8 +75,31 @@ const Login = () => {
       const type = hashParams.get('type');
       
       if (type === 'signup' || type === 'email') {
+        // Get user data
+        const { data: userData } = await supabase.auth.getUser();
+        
+        // Send welcome email after successful verification
+        if (userData?.user?.email) {
+          try {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+            await fetch(`${apiUrl}/send-welcome-email`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                email: userData.user.email,
+                fullName: userData.user.user_metadata?.full_name || 'User'
+              })
+            });
+            console.log('✅ Welcome email sent after verification');
+          } catch (emailError) {
+            console.error('Failed to send welcome email:', emailError);
+          }
+        }
+        
         // Email verified successfully
-        toast.success('Email verified successfully! You can now login.', {
+        toast.success('Email verified successfully! Welcome email sent. You can now login.', {
           duration: 5000,
           icon: '✅',
         });
@@ -112,13 +135,23 @@ const Login = () => {
     }
 
     if (data?.user) {
+      console.log('🔐 User login data:', {
+        email: data.user.email,
+        email_confirmed_at: data.user.email_confirmed_at,
+        confirmed: !!data.user.email_confirmed_at,
+        created_at: data.user.created_at
+      });
+      
       // Check if email is verified
       if (!data.user.email_confirmed_at) {
+        console.error('❌ Email not verified! Blocking login.');
         setError('Please verify your email before logging in. Check your inbox for the verification link.');
         await supabase.auth.signOut();
         setLoading(false);
         return;
       }
+      
+      console.log('✅ Email verified, proceeding with login');
 
       // Fetch user role and name from profiles table
       const { data: profile, error: profileError } = await supabase

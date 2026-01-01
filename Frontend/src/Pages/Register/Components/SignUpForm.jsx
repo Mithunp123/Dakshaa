@@ -137,23 +137,9 @@ const SignUpForm = () => {
           icon: '📧',
         });
 
-        // Send welcome email
-        try {
-          const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-          await fetch(`${apiUrl}/send-welcome-email`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              email: formData.email,
-              fullName: formData.fullName
-            })
-          });
-        } catch (emailError) {
-          console.error('Failed to send welcome email:', emailError);
-          // Don't block registration if email fails
-        }
+        // NOTE: Welcome email will be sent AFTER email verification
+        // The verification email is automatically sent by Supabase
+        // Welcome email is sent when user verifies and logs in for the first time
         
         setTimeout(() => {
           navigate('/login', { 
