@@ -19,6 +19,7 @@ import ScrollToTop from "./Pages/Layout/ScrollToTop";
 import FloatingCallButton from "./Pages/Layout/FloatingCallButton";
 import FloatingDashboardButton from "./Pages/Layout/FloatingDashboardButton";
 import BottomNavbar from "./Pages/Layout/BottomNavbar";
+import SupabaseHealthCheck from "./components/SupabaseHealthCheck";
 
 // Lazy Load Pages
 const Home = lazy(() => import("./Pages/Home/Home"));
@@ -365,10 +366,12 @@ function App() {
       </AnimatePresence>
 
       {!isLoading && (
-        <Router>
-          <ParticlesComponent id="particlesBG" />
-          <AppContent />
-        </Router>
+        <SupabaseHealthCheck>
+          <Router>
+            <ParticlesComponent id="particlesBG" />
+            <AppContent />
+          </Router>
+        </SupabaseHealthCheck>
       )}
     </>
   );

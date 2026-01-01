@@ -76,18 +76,36 @@ const RegistrationAdminDashboard = () => {
     fetchEvents();
     fetchStats();
     
-    // Real-time updates
-    const subscription = supabase
-      .channel('cash-approvals')
+    // Real-time updates for registrations and transactions
+    const registrationChannel = supabase
+      .channel('reg-admin-registrations')
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: 'registrations',
-        filter: 'payment_mode=eq.cash'
-      }, fetchPendingCashApprovals)
+      }, () => {
+        console.log('Registration updated');
+        fetchPendingCashApprovals();
+        fetchStats();
+      })
       .subscribe();
 
-    return () => subscription.unsubscribe();
+    const transactionChannel = supabase
+      .channel('reg-admin-transactions')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'transactions',
+      }, () => {
+        console.log('Transaction updated');
+        fetchStats();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(registrationChannel);
+      supabase.removeChannel(transactionChannel);
+    };
   }, []);
 
   const fetchAdminData = async () => {

@@ -1,50 +1,124 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 import { supabase } from '../../supabase';
 import { CheckCircle, XCircle, Camera, RefreshCw } from 'lucide-react';
+import {
+  checkCameraSupport,
+  getCameraErrorMessage,
+  getCameraConfig,
+  selectBestCamera,
+  requestCameraPermission,
+  vibrate
+} from '../../utils/scannerConfig';
 
 const Scan = () => {
   const [data, setData] = useState('No result');
   const [status, setStatus] = useState('idle'); // idle, success, error
   const [message, setMessage] = useState('');
-  const [scanning, setScanning] = useState(true);
-  const scannerRef = useRef(null);
+  const [scanning, setScanning] = useState(false);
+  const [cameraError, setCameraError] = useState(null);
+  const [cameraId, setCameraId] = useState(null);
+  const html5QrCodeRef = useRef(null);
 
   useEffect(() => {
-    if (scanning && !scannerRef.current) {
-      const scanner = new Html5QrcodeScanner(
-        "qr-reader",
-        { 
-          fps: 10,
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1.0
-        },
-        false
-      );
+    getCameras();
+    return () => {
+      stopScanner();
+    };
+  }, []);
 
-      scanner.render(
-        (decodedText) => {
-          setData(decodedText);
-          setScanning(false);
-          validateTicket(decodedText);
-          scanner.clear();
-          scannerRef.current = null;
-        },
-        (error) => {
-          // Silent error handling - QR not detected yet
-        }
-      );
+  useEffect(() => {
+    if (cameraId && scanning) {
+      startScanner();
+    }
+  }, [cameraId, scanning]);
 
-      scannerRef.current = scanner;
+  const getCameras = async () => {
+    const support = checkCameraSupport();
+    if (!support.isSecureContext) {
+      const error = getCameraErrorMessage({ message: 'HTTPS required' });
+      setCameraError(error.message);
+      return;
     }
 
-    return () => {
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(console.error);
-        scannerRef.current = null;
+    const permissionResult = await requestCameraPermission();
+    if (!permissionResult.success) {
+      setCameraError(permissionResult.error.message);
+      return;
+    }
+
+    try {
+      const devices = await Html5Qrcode.getCameras();
+      if (!devices || devices.length === 0) {
+        const error = getCameraErrorMessage({ message: 'No cameras found' });
+        setCameraError(error.message);
+        return;
       }
-    };
-  }, [scanning]);
+
+      const bestCameraId = selectBestCamera(devices);
+      setCameraId(bestCameraId);
+      setScanning(true);
+    } catch (error) {
+      console.error("Error getting cameras:", error);
+      const errorInfo = getCameraErrorMessage(error);
+      setCameraError(errorInfo.message);
+    }
+  };
+
+  const startScanner = async () => {
+    try {
+      setCameraError(null);
+      
+      if (!html5QrCodeRef.current) {
+        html5QrCodeRef.current = new Html5Qrcode("qr-reader", {
+          verbose: false
+        });
+      }
+
+      const support = checkCameraSupport();
+      const config = getCameraConfig(support.isMobile);
+
+      // Force back camera on mobile devices
+      const isMobileDevice = /iPhone|iPad|iPod|Android|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      const cameraConfig = cameraId 
+        ? cameraId 
+        : isMobileDevice
+          ? { facingMode: { exact: "environment" } }
+          : { facingMode: "user" };
+
+      await html5QrCodeRef.current.start(
+        cameraConfig,
+        config,
+        onScanSuccess,
+        () => {} // Silent error handler
+      );
+    } catch (error) {
+      console.error("Error starting scanner:", error);
+      const errorInfo = getCameraErrorMessage(error);
+      setCameraError(errorInfo.message);
+    }
+  };
+
+  const stopScanner = async () => {
+    if (html5QrCodeRef.current) {
+      try {
+        await html5QrCodeRef.current.stop();
+        await html5QrCodeRef.current.clear();
+        html5QrCodeRef.current = null;
+      } catch (error) {
+        console.error("Error stopping scanner:", error);
+      }
+    }
+  };
+
+  const onScanSuccess = async (decodedText) => {
+    vibrate(100);
+    setData(decodedText);
+    setScanning(false);
+    await stopScanner();
+    validateTicket(decodedText);
+  };
 
   const validateTicket = async (qrString) => {
     setStatus('loading');
@@ -76,10 +150,12 @@ const Scan = () => {
   };
 
   const resetScanner = () => {
-    setScanning(true);
     setStatus('idle');
     setData('No result');
     setMessage('');
+    setCameraError(null);
+    startScanner();
+    setScanning(true);
   };
 
   return (
@@ -89,7 +165,18 @@ const Scan = () => {
       </h1>
 
       <div className="w-full max-w-md bg-black rounded-2xl overflow-hidden border-4 border-gray-800 relative">
-        {scanning ? (
+        {cameraError ? (
+          <div className="w-full p-8 text-center bg-red-900/20">
+            <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <p className="text-red-400">{cameraError}</p>
+            <button 
+              onClick={getCameras}
+              className="mt-4 px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700"
+            >
+              Retry
+            </button>
+          </div>
+        ) : scanning ? (
           <div id="qr-reader" className="w-full"></div>
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center">

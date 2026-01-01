@@ -33,7 +33,27 @@ const RegistrationManagement = () => {
 
   useEffect(() => {
     loadEventStats();
-  }, []);
+
+    // Set up real-time subscription for registration changes
+    const registrationChannel = supabase
+      .channel('registration-management')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'registrations' },
+        () => {
+          console.log('Registration updated, refreshing stats');
+          loadEventStats();
+          if (selectedEvent) {
+            loadEventRegistrations(selectedEvent.id);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(registrationChannel);
+    };
+  }, [selectedEvent]);
 
   const loadEventStats = async () => {
     setLoading(true);
@@ -142,7 +162,13 @@ const RegistrationManagement = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-3xl font-bold">Registration Management</h2>
-            <p className="text-gray-400">Event-wise registration overview</p>
+            <div className="flex items-center gap-3 mt-1">
+              <p className="text-gray-400">Event-wise registration overview</p>
+              <span className="flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/30 rounded-full text-xs text-green-400">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                Live
+              </span>
+            </div>
           </div>
         </div>
 

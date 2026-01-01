@@ -17,7 +17,15 @@ import {
   Info
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
+import {
+  checkCameraSupport,
+  getCameraErrorMessage,
+  getCameraConfig,
+  selectBestCamera,
+  requestCameraPermission,
+  vibrate
+} from '../../../utils/scannerConfig';
 
 const VolunteerDashboard = () => {
   const [activeTab, setActiveTab] = useState('gate');
@@ -26,9 +34,11 @@ const VolunteerDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [cameraError, setCameraError] = useState(null);
+  const [cameraId, setCameraId] = useState(null);
+  const [scanMode, setScanMode] = useState(null);
   
-  const scannerRef = useRef(null);
-  const html5QrCodeScannerRef = useRef(null);
+  const html5QrCodeRef = useRef(null);
 
   const kitTypes = [
     { id: 'welcome_kit', label: 'Welcome Kit', icon: Gift, color: 'purple' },
@@ -58,53 +68,115 @@ const VolunteerDashboard = () => {
     }
   };
 
-  const startScanning = (mode) => {
-    setScanning(mode);
+  const getCameras = async () => {
+    const support = checkCameraSupport();
+    if (!support.isSecureContext) {
+      const error = getCameraErrorMessage({ message: 'HTTPS required' });
+      setCameraError(error.message);
+      return false;
+    }
 
-    setTimeout(() => {
-      if (scannerRef.current && !html5QrCodeScannerRef.current) {
-        try {
-          const scanner = new Html5QrcodeScanner(
-            "volunteer-qr-reader",
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            false
-          );
+    const permissionResult = await requestCameraPermission();
+    if (!permissionResult.success) {
+      setCameraError(permissionResult.error.message);
+      return false;
+    }
 
-          scanner.render(
-            (decodedText) => onScanSuccess(decodedText, mode),
-            onScanError
-          );
-          html5QrCodeScannerRef.current = scanner;
-        } catch (error) {
-          console.error('Scanner error:', error);
-          alert('Camera access failed. Please allow camera permissions.');
-          setScanning(false);
-        }
+    try {
+      const devices = await Html5Qrcode.getCameras();
+      if (!devices || devices.length === 0) {
+        const error = getCameraErrorMessage({ message: 'No cameras found' });
+        setCameraError(error.message);
+        return false;
       }
-    }, 100);
+
+      const bestCameraId = selectBestCamera(devices);
+      setCameraId(bestCameraId);
+      return true;
+    } catch (error) {
+      console.error("Error getting cameras:", error);
+      const errorInfo = getCameraErrorMessage(error);
+      setCameraError(errorInfo.message);
+      return false;
+    }
   };
 
-  const stopScanning = () => {
-    if (html5QrCodeScannerRef.current) {
-      html5QrCodeScannerRef.current.clear();
-      html5QrCodeScannerRef.current = null;
+  const startScanning = async (mode) => {
+    setScanMode(mode);
+    setCameraError(null);
+
+    const hasCamera = await getCameras();
+    if (!hasCamera) {
+      setScanning(false);
+      return;
+    }
+
+    try {
+      if (!html5QrCodeRef.current) {
+        html5QrCodeRef.current = new Html5Qrcode("volunteer-qr-reader", {
+          verbose: false
+        });
+      }
+
+      const support = checkCameraSupport();
+      const config = getCameraConfig(support.isMobile);
+
+      // Force back camera on mobile devices
+      const isMobileDevice = /iPhone|iPad|iPod|Android|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      const cameraConfig = cameraId 
+        ? cameraId 
+        : isMobileDevice
+          ? { facingMode: { exact: "environment" } }
+          : { facingMode: "user" };
+
+      console.log('📸 Volunteer scanner:', { isMobile: isMobileDevice, mode });
+
+      await html5QrCodeRef.current.start(
+        cameraConfig,
+        config,
+        (decodedText) => onScanSuccess(decodedText, mode),
+        () => {} // Silent error handler
+      );
+
+      setScanning(true);
+    } catch (error) {
+      console.error('Scanner error:', error);
+      const errorInfo = getCameraErrorMessage(error);
+      setCameraError(errorInfo.message);
+      setScanning(false);
+    }
+  };
+
+  const stopScanning = async () => {
+    if (html5QrCodeRef.current) {
+      try {
+        await html5QrCodeRef.current.stop();
+        await html5QrCodeRef.current.clear();
+        html5QrCodeRef.current = null;
+      } catch (error) {
+        console.error("Error stopping scanner:", error);
+      }
     }
     setScanning(false);
+    setScanMode(null);
+    setCameraError(null);
   };
 
   const onScanSuccess = async (decodedText, mode) => {
     console.log('QR Scanned:', decodedText);
-    stopScanning();
+    vibrate(100);
+    await stopScanning();
 
     if (mode === 'gate') {
       await verifyGatePass(decodedText);
     } else if (mode === 'kit') {
-      await deliverKit(decodedText);
+      await distributeKit(decodedText);
     }
   };
 
-  const onScanError = (error) => {
-    // Silent error handling
+  const onScanError = (errorMessage) => {
+    // Silent error handling - QR not detected yet
   };
 
   const verifyGatePass = async (userId) => {
@@ -356,11 +428,23 @@ const VolunteerDashboard = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div 
-                      id="volunteer-qr-reader" 
-                      ref={scannerRef}
-                      className="rounded-2xl overflow-hidden"
-                    />
+                    {cameraError ? (
+                      <div className="p-6 bg-red-900/20 border border-red-500/20 rounded-2xl text-center">
+                        <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
+                        <p className="text-red-400 mb-4">{cameraError}</p>
+                        <button
+                          onClick={() => startScanning('gate')}
+                          className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+                        >
+                          Retry Camera
+                        </button>
+                      </div>
+                    ) : (
+                      <div 
+                        id="volunteer-qr-reader" 
+                        className="rounded-2xl overflow-hidden"
+                      />
+                    )}
                     <button
                       onClick={stopScanning}
                       className="w-full py-4 bg-red-500/10 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-2"
@@ -450,11 +534,23 @@ const VolunteerDashboard = () => {
                         {kitTypes.find(k => k.id === selectedKitType)?.label}
                       </p>
                     </div>
-                    <div 
-                      id="volunteer-qr-reader" 
-                      ref={scannerRef}
-                      className="rounded-2xl overflow-hidden"
-                    />
+                    {cameraError ? (
+                      <div className="p-6 bg-red-900/20 border border-red-500/20 rounded-2xl text-center">
+                        <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
+                        <p className="text-red-400 mb-4">{cameraError}</p>
+                        <button
+                          onClick={() => startScanning('kit')}
+                          className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+                        >
+                          Retry Camera
+                        </button>
+                      </div>
+                    ) : (
+                      <div 
+                        id="volunteer-qr-reader" 
+                        className="rounded-2xl overflow-hidden"
+                      />
+                    )}
                     <button
                       onClick={stopScanning}
                       className="w-full py-4 bg-red-500/10 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-2"

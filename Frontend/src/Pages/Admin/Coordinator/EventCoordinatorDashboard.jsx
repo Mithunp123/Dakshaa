@@ -24,6 +24,14 @@ import {
 import { supabase } from '../../../supabase';
 import { Html5Qrcode } from 'html5-qrcode';
 import toast, { Toaster } from 'react-hot-toast';
+import {
+  checkCameraSupport,
+  getCameraErrorMessage,
+  getCameraConfig,
+  selectBestCamera,
+  requestCameraPermission,
+  vibrate
+} from '../../../utils/scannerConfig';
 
 // Helper function to format UUID as Dakshaa ID (first 8 characters uppercase)
 const formatDakshaaId = (uuid) => {
@@ -89,64 +97,42 @@ const EventCoordinatorDashboard = () => {
   }, []);
 
   const getCameras = async () => {
+    const support = checkCameraSupport();
+    if (!support.isSecureContext) {
+      const error = getCameraErrorMessage({ message: 'HTTPS required' });
+      setCameraError(error.message);
+      return;
+    }
+
+    const permissionResult = await requestCameraPermission();
+    if (!permissionResult.success) {
+      setCameraError(permissionResult.error.message);
+      return;
+    }
+
     try {
-      // Check if we're in a secure context (HTTPS or localhost)
-      const isSecureContext = window.isSecureContext || 
-        window.location.protocol === 'https:' || 
-        window.location.hostname === 'localhost' || 
-        window.location.hostname === '127.0.0.1';
-
-      if (!isSecureContext) {
-        setCameraError(
-          'Camera requires HTTPS. Use manual ID entry below, or access via HTTPS.'
-        );
-        return;
-      }
-
-      // Check if mediaDevices API is available
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setCameraError(
-          'Camera API not available. Use manual ID entry or try a different browser.'
-        );
-        return;
-      }
-
-      await navigator.mediaDevices.getUserMedia({ video: true });
       const devices = await Html5Qrcode.getCameras();
-      setCameras(devices);
-      // Prefer back camera on mobile
-      const backCamera = devices.find(
-        (d) => d.label.toLowerCase().includes('back') ||
-               d.label.toLowerCase().includes('rear') ||
-               d.label.toLowerCase().includes('environment')
-      );
-      if (backCamera) {
-        setCameraId(backCamera.id);
-      } else if (devices.length > 0) {
-        setCameraId(devices[0].id);
+      if (!devices || devices.length === 0) {
+        const error = getCameraErrorMessage({ message: 'No cameras found' });
+        setCameraError(error.message);
+        return;
       }
+
+      setCameras(devices);
+      const bestCameraId = selectBestCamera(devices);
+      setCameraId(bestCameraId);
       setCameraError(null);
     } catch (error) {
       console.error('Error getting cameras:', error);
-      
-      // Provide more helpful error messages
-      let errorMessage = 'Camera access denied. ';
-      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        errorMessage = 'Camera permission denied. Allow camera access in browser settings.';
-      } else if (error.name === 'NotFoundError') {
-        errorMessage = 'No camera found. Use manual ID entry.';
-      } else if (error.name === 'NotReadableError') {
-        errorMessage = 'Camera in use by another app. Close other apps and retry.';
-      } else if (error.name === 'TypeError' || error.message?.includes('undefined')) {
-        errorMessage = 'Camera requires HTTPS. Use manual ID entry instead.';
-      }
-      
-      setCameraError(errorMessage);
+      const errorInfo = getCameraErrorMessage(error);
+      setCameraError(errorInfo.message);
     }
   };
 
   useEffect(() => {
     if (selectedEvent) {
+      // Initial fetch
+      console.log('📊 Loading participants and stats for:', selectedEvent.name);
       fetchParticipants();
       fetchStats();
 
@@ -161,7 +147,7 @@ const EventCoordinatorDashboard = () => {
             table: 'attendance'
           },
           (payload) => {
-            console.log('Attendance change detected:', payload);
+            console.log('🔄 Attendance change detected:', payload);
             fetchParticipants();
             fetchStats();
           }
@@ -180,20 +166,23 @@ const EventCoordinatorDashboard = () => {
             filter: `event_id=eq.${selectedEvent.id}`
           },
           (payload) => {
-            console.log('Registration change detected:', payload);
+            console.log('🔄 Registration change detected:', payload);
             fetchParticipants();
             fetchStats();
           }
         )
         .subscribe();
 
-      // Polling fallback: refresh stats every 5 seconds for live updates
+      // Polling fallback: refresh both participants and stats every 5 seconds
       const pollingInterval = setInterval(() => {
+        console.log('⏱️ Polling update...');
+        fetchParticipants();
         fetchStats();
       }, 5000);
 
       // Cleanup subscriptions and interval on unmount or event change
       return () => {
+        console.log('🧹 Cleaning up subscriptions for:', selectedEvent.name);
         supabase.removeChannel(attendanceSubscription);
         supabase.removeChannel(registrationSubscription);
         clearInterval(pollingInterval);
@@ -475,37 +464,24 @@ const EventCoordinatorDashboard = () => {
         html5QrCodeRef.current = new Html5Qrcode("qr-reader", { verbose: false });
       }
 
-      // Detect device type
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      // Get device-optimized config
+      const support = checkCameraSupport();
+      const config = getCameraConfig(support.isMobile);
+
+      // Force back camera on mobile devices (regardless of viewport)
+      const isMobileDevice = /iPhone|iPad|iPod|Android|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       
-      const config = {
-        fps: 15,
-        qrbox: isMobile ? { width: 220, height: 220 } : { width: 280, height: 280 },
-        aspectRatio: 1.0,
-        disableFlip: false,
-        experimentalFeatures: {
-          useBarCodeDetectorIfSupported: true
-        }
-      };
+      const cameraConfig = cameraId 
+        ? cameraId 
+        : isMobileDevice 
+          ? { facingMode: { exact: "environment" } } // Force back camera
+          : { facingMode: "user" }; // Front camera for desktop
 
-      // For desktop, try to use any available camera
-      // For mobile, prefer back camera (environment)
-      let cameraConfig;
-      if (cameraId) {
-        // User selected a specific camera
-        cameraConfig = cameraId;
-      } else if (isMobile) {
-        // Mobile: prefer back camera
-        cameraConfig = { facingMode: "environment" };
-      } else if (cameras.length > 0) {
-        // Desktop: use first available camera
-        cameraConfig = cameras[0].id;
-      } else {
-        // Fallback: let browser choose
-        cameraConfig = { facingMode: "user" };
-      }
-
-      console.log('Starting camera with config:', cameraConfig);
+      console.log('📸 Starting camera:', {
+        isMobile: isMobileDevice,
+        cameraId: cameraId,
+        facingMode: cameraConfig.facingMode
+      });
 
       await html5QrCodeRef.current.start(
         cameraConfig,
@@ -513,37 +489,12 @@ const EventCoordinatorDashboard = () => {
         onScanSuccess,
         () => {} // Silent error handler
       );
+      
+      setCameraError(null);
     } catch (error) {
       console.error('Scanner error:', error);
-      
-      // Provide more helpful error messages
-      let errorMessage = 'Failed to start camera. ';
-      if (error.message?.includes('Permission')) {
-        errorMessage = 'Camera permission denied. Please allow camera access in your browser settings.';
-      } else if (error.message?.includes('NotFoundError') || error.message?.includes('not found')) {
-        errorMessage = 'No camera found. Please connect a camera or use a device with a camera.';
-      } else if (error.message?.includes('NotReadableError') || error.message?.includes('in use')) {
-        errorMessage = 'Camera is in use by another application. Please close other apps using the camera.';
-      } else if (error.message?.includes('OverconstrainedError')) {
-        errorMessage = 'Camera does not support the requested settings. Trying with default settings...';
-        // Try again with simpler config
-        try {
-          await html5QrCodeRef.current.start(
-            { facingMode: "user" },
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            onScanSuccess,
-            () => {}
-          );
-          setCameraError(null);
-          return;
-        } catch (retryError) {
-          errorMessage = 'Failed to start camera. Please try a different browser or device.';
-        }
-      } else {
-        errorMessage += error.message || 'Please try again or use a different browser.';
-      }
-      
-      setCameraError(errorMessage);
+      const errorInfo = getCameraErrorMessage(error);
+      setCameraError(errorInfo.message);
       setScanning(false);
     }
   };
@@ -568,8 +519,8 @@ const EventCoordinatorDashboard = () => {
     console.log('Current Session (from ref):', currentSession);
     console.log('Current Event (from ref):', currentEvent?.name || currentEvent?.id);
     
-    // Vibrate on scan
-    navigator.vibrate?.(100);
+    // Vibrate on scan using utility
+    vibrate(100);
     
     // Stop scanner temporarily to process
     await stopScanning();

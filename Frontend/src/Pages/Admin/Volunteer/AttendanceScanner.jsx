@@ -23,10 +23,20 @@ import {
   Building,
   Hash,
   Zap,
-  Scan
+  Scan,
+  Copy
 } from "lucide-react";
 import { Html5Qrcode } from "html5-qrcode";
 import { supabase } from "../../../supabase";
+import {
+  checkCameraSupport,
+  getCameraErrorMessage,
+  getCameraConfig,
+  selectBestCamera,
+  requestCameraPermission,
+  vibrate,
+  playSound
+} from "../../../utils/scannerConfig";
 
 const AttendanceScanner = () => {
   // Scanner states
@@ -103,98 +113,80 @@ const AttendanceScanner = () => {
 
   const getCameras = async () => {
     try {
-      // Check if we're in a secure context (HTTPS or localhost)
-      const isSecureContext = window.isSecureContext || 
-        window.location.protocol === 'https:' || 
-        window.location.hostname === 'localhost' || 
-        window.location.hostname === '127.0.0.1';
-
-      if (!isSecureContext) {
-        setCameraError(
-          "Camera access requires HTTPS. Please access this page via HTTPS or use localhost for development. " +
-          "You can still use manual ID entry below."
-        );
-        return;
-      }
-
-      // Check if mediaDevices API is available
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setCameraError(
-          "Camera API not available. Your browser may not support camera access, or you're not using HTTPS. " +
-          "Please use manual ID entry or try a different browser."
-        );
-        return;
-      }
-
-      // Request camera permission first
-      await navigator.mediaDevices.getUserMedia({ video: true });
+      // Check camera support
+      const support = checkCameraSupport();
       
+      if (!support.isSecureContext) {
+        const error = getCameraErrorMessage({ message: 'HTTPS required' });
+        setCameraError(error.message);
+        return;
+      }
+
+      if (!support.hasMediaDevices || !support.hasGetUserMedia) {
+        setCameraError(
+          "Camera API not available in your browser. Please use Chrome, Firefox, or Safari, or try manual ID entry."
+        );
+        return;
+      }
+
+      // Request permission first
+      const permissionResult = await requestCameraPermission();
+      if (!permissionResult.success) {
+        setCameraError(permissionResult.error.message);
+        return;
+      }
+      
+      // Get available cameras
       const devices = await Html5Qrcode.getCameras();
       setCameras(devices);
       
-      // Prefer back camera on mobile
-      const backCamera = devices.find(
-        (d) => d.label.toLowerCase().includes("back") || 
-               d.label.toLowerCase().includes("rear") ||
-               d.label.toLowerCase().includes("environment")
-      );
-      
-      if (backCamera) {
-        setCameraId(backCamera.id);
-      } else if (devices.length > 0) {
-        setCameraId(devices[0].id);
+      // Select best camera for device
+      const bestCameraId = selectBestCamera(devices);
+      if (bestCameraId) {
+        setCameraId(bestCameraId);
       }
       
       setCameraError(null);
     } catch (error) {
       console.error("Error getting cameras:", error);
-      
-      // Provide more helpful error messages based on error type
-      let errorMessage = "Camera access denied. ";
-      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        errorMessage = "Camera permission denied. Please allow camera access in your browser settings and reload the page.";
-      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
-        errorMessage = "No camera found. Please connect a camera or use manual ID entry.";
-      } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
-        errorMessage = "Camera is in use by another application. Please close other apps using the camera and try again.";
-      } else if (error.name === 'OverconstrainedError') {
-        errorMessage = "Camera doesn't support the required settings. Please try a different camera.";
-      } else if (error.name === 'TypeError' || error.message?.includes('undefined')) {
-        errorMessage = "Camera access requires HTTPS. Please use HTTPS or localhost, or use manual ID entry.";
-      }
-      
-      setCameraError(errorMessage);
+      const errorInfo = getCameraErrorMessage(error);
+      setCameraError(errorInfo.message);
     }
   };
 
   const startScanner = async () => {
     try {
+      console.log('\u{1F680} Starting scanner...');
       setCameraError(null);
       
       if (!html5QrCodeRef.current) {
+        console.log('\u{1F4E6} Creating Html5Qrcode instance');
         html5QrCodeRef.current = new Html5Qrcode("qr-reader", {
           verbose: false
         });
       }
 
-      // Mobile-optimized config
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      const config = {
-        fps: 15,
-        qrbox: isMobile 
-          ? { width: 220, height: 220 } 
-          : { width: 280, height: 280 },
-        aspectRatio: 1.0,
-        disableFlip: false,
-        experimentalFeatures: {
-          useBarCodeDetectorIfSupported: true
-        }
-      };
+      // Get device-optimized config
+      const support = checkCameraSupport();
+      const config = getCameraConfig(support.isMobile);
 
+      // Force back camera on mobile devices (regardless of viewport/desktop mode)
+      const isMobileDevice = /iPhone|iPad|iPod|Android|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
       const cameraConfig = cameraId 
         ? cameraId 
-        : { facingMode: "environment" };
+        : isMobileDevice
+          ? { facingMode: { exact: "environment" } } // Force back camera on mobile
+          : { facingMode: "user" }; // Desktop default
 
+      console.log('\u{1F4F8} Scanner configuration:', {
+        isMobile: isMobileDevice,
+        cameraId: cameraId,
+        cameraConfig: cameraConfig,
+        qrConfig: config
+      });
+
+      console.log('\u{23F3} Starting camera...');
       await html5QrCodeRef.current.start(
         cameraConfig,
         config,
@@ -202,14 +194,19 @@ const AttendanceScanner = () => {
         () => {} // Silent error handler
       );
 
+      console.log('\u{2705} Scanner started successfully!');
       setScanning(true);
     } catch (error) {
-      console.error("Error starting scanner:", error);
-      setCameraError(
-        error.message.includes("Permission")
-          ? "Camera permission denied. Please allow camera access."
-          : "Failed to start camera. Please try again."
-      );
+      console.error("\u{1F525} SCANNER START ERROR:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+        cameraId: cameraId
+      });
+      const errorInfo = getCameraErrorMessage(error);
+      const errorMessage = errorInfo.message || error.message;
+      console.error('\u{1F4AC} User-friendly error:', errorMessage);
+      setCameraError(`\u{1F6A8} ${errorMessage}`);
     }
   };
 
@@ -225,8 +222,8 @@ const AttendanceScanner = () => {
   };
 
   const onScanSuccess = useCallback(async (decodedText) => {
-    // Vibrate on scan
-    navigator.vibrate?.(100);
+    // Vibrate on scan using utility
+    vibrate(100);
     
     // Stop scanner temporarily
     await stopScanner();
@@ -453,30 +450,98 @@ const AttendanceScanner = () => {
               </div>
               
               {cameraError ? (
+                <div className="bg-red-900/30 border-2 border-red-500 rounded-2xl p-6 text-center">
+                  <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-red-400 mb-3">Camera Error</h3>
+                  <div className="bg-black/40 rounded-lg p-4 mb-4">
+                    <p className="text-amber-300 text-sm font-mono break-words">{cameraError}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(`Device: ${navigator.userAgent}\nError: ${cameraError}`);
+                      alert('Error details copied to clipboard!');
+                    }}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm mb-3"
+                  >
+                    Copy Error Details
+                  </button>
+                  <div className="text-gray-400 text-xs space-y-2 text-left">
+                    <p><strong>Troubleshooting:</strong></p>
+                    <ul className="list-disc list-inside space-y-1">
+                      <li>Check browser console (F12) for detailed logs</li>
+                      <li>Ensure camera permissions are granted</li>
+                      <li>Try refreshing the page</li>
+                      <li>Use HTTPS or localhost</li>
+                      <li>Close other apps using camera</li>
+                    </ul>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setCameraError(null);
+                      getCameras();
+                    }}
+                    className="mt-4 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-xl font-bold flex items-center gap-2 mx-auto"
+                  >
+                    <RefreshCw className="w-5 h-5" /> Retry Camera
+                  </button>
+                </div>
+              ) : cameraError ? (
                 <div className="space-y-4">
-                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
-                    <div className="flex items-start gap-3">
-                      <AlertTriangle className="text-amber-400 flex-shrink-0 mt-0.5" size={20} />
-                      <div className="text-left">
-                        <p className="text-amber-400 font-medium text-sm mb-1">Camera Unavailable</p>
-                        <p className="text-amber-300/80 text-xs">{cameraError}</p>
+                  {/* Prominent Error Display */}
+                  <div className="bg-red-900/30 border-2 border-red-500 rounded-xl p-6">
+                    <div className="flex flex-col items-center gap-4 text-center">
+                      <AlertTriangle className="text-red-400 animate-pulse" size={48} />
+                      <div>
+                        <p className="text-red-400 font-bold text-lg mb-2">Camera Error</p>
+                        <div className="bg-black/40 rounded-lg p-4 mb-3">
+                          <p className="text-amber-300 text-base font-mono break-words">{cameraError}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Troubleshooting Guide */}
+                  <div className="bg-blue-900/20 border border-blue-500/30 rounded-xl p-4">
+                    <p className="text-blue-400 font-semibold text-sm mb-2">📋 Troubleshooting:</p>
+                    <ul className="text-gray-300 text-xs space-y-1 list-disc list-inside text-left">
+                      <li>Open browser console (F12) for detailed logs</li>
+                      <li>Ensure camera permission is granted</li>
+                      <li>Close other apps using the camera</li>
+                      <li>Use HTTPS or localhost URL</li>
+                      <li>Try refreshing the page</li>
+                    </ul>
+                  </div>
+                  
+                  {/* Action Buttons */}
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                     <button
-                      onClick={getCameras}
-                      className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors flex items-center gap-2"
+                      onClick={() => {
+                        console.log('🔄 User clicked Retry Camera');
+                        setCameraError(null);
+                        getCameras();
+                      }}
+                      className="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-xl transition-colors flex items-center gap-2 font-bold"
                     >
                       <RefreshCw size={18} />
                       <span>Retry Camera</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        const errorDetails = `Device: ${navigator.userAgent}\nPlatform: ${navigator.platform}\nError: ${cameraError}\nURL: ${window.location.href}\nSecure: ${window.isSecureContext}`;
+                        navigator.clipboard.writeText(errorDetails);
+                        alert('✅ Error details copied to clipboard!');
+                      }}
+                      className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors flex items-center gap-2"
+                    >
+                      <Copy size={18} />
+                      <span>Copy Error</span>
                     </button>
                     <button
                       onClick={() => setManualEntry(true)}
                       className="px-6 py-3 bg-gradient-to-r from-secondary to-primary rounded-xl font-bold text-white flex items-center gap-2"
                     >
                       <Keyboard size={18} />
-                      <span>Use Manual Entry</span>
+                      <span>Manual Entry</span>
                     </button>
                   </div>
                 </div>
