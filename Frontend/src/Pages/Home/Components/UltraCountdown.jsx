@@ -94,7 +94,7 @@ const EventBadge = () => {
           transition={{ duration: 1, repeat: Infinity, repeatDelay: 2 }}
         />
         <span className="text-red-300 font-orbitron text-sm sm:text-base tracking-wide">
-          12th, 13th & 14th February, 2026
+          11th, 12th, 13th & 14th February, 2026
         </span>
       </motion.div>
     </motion.div>
