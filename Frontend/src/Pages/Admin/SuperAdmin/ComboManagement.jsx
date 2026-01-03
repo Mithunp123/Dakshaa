@@ -40,9 +40,10 @@ const ComboManagement = () => {
   const handleToggleStatus = async (comboId) => {
     const result = await comboService.toggleComboStatus(comboId);
     if (result.success) {
+      alert(result.message || 'Status updated successfully');
       fetchCombos();
     } else {
-      alert('Failed to toggle status: ' + result.error);
+      alert('Failed to toggle status: ' + (result.message || result.error));
     }
   };
 
@@ -51,9 +52,10 @@ const ComboManagement = () => {
     
     const result = await comboService.deleteCombo(comboId);
     if (result.success) {
+      alert(result.message || 'Combo deleted successfully');
       fetchCombos();
     } else {
-      alert('Delete failed: ' + result.error);
+      alert(result.message || result.error || 'Delete failed');
     }
   };
 
@@ -130,7 +132,7 @@ const ComboManagement = () => {
           <div className="flex items-center justify-between mb-4">
             <Users className="text-orange-400" size={32} />
             <span className="text-3xl font-bold">
-              {combos.reduce((sum, c) => sum + c.total_purchases, 0)}
+              {combos.reduce((sum, c) => sum + (c.total_purchases || c.current_purchases || 0), 0)}
             </span>
           </div>
           <p className="text-gray-400 text-sm">Total Purchases</p>
@@ -153,7 +155,7 @@ const ComboManagement = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {combos.map((combo) => (
             <ComboCard
-              key={combo.combo_id}
+              key={combo.id || combo.combo_id}
               combo={combo}
               onEdit={openEditModal}
               onDelete={handleDelete}
@@ -185,11 +187,11 @@ const ComboCard = ({ combo, onEdit, onDelete, onToggleStatus }) => {
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h3 className="text-xl font-bold mb-2">{combo.combo_name}</h3>
-          <p className="text-sm text-gray-400">{combo.combo_description}</p>
+          <h3 className="text-xl font-bold mb-2">{combo.name || combo.combo_name}</h3>
+          <p className="text-sm text-gray-400">{combo.description || 'No description'}</p>
         </div>
         <button
-          onClick={() => onToggleStatus(combo.combo_id)}
+          onClick={() => onToggleStatus(combo.id || combo.combo_id)}
           className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
             combo.is_active
               ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
@@ -203,59 +205,42 @@ const ComboCard = ({ combo, onEdit, onDelete, onToggleStatus }) => {
 
       {/* Pricing */}
       <div className="flex items-baseline gap-3 mb-4">
-        <span className="text-3xl font-bold text-secondary">₹{combo.combo_price}</span>
-        <span className="text-lg text-gray-500 line-through">₹{combo.original_price}</span>
-        <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-bold">
-          <TrendingDown size={12} className="inline mr-1" />
-          Save {combo.savings_percentage}%
+        <span className="text-3xl font-bold text-secondary">₹{combo.price}</span>
+        <span className="text-sm text-gray-400">
+          {combo.total_events_required || 0} events required
         </span>
       </div>
 
-      {/* Events Included */}
+      {/* Category Quotas */}
       <div className="mb-4">
-        <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Includes {combo.event_count} Events:</p>
+        <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Category Requirements:</p>
         <div className="space-y-2">
-          {combo.events && combo.events.slice(0, 3).map((event, idx) => (
-            <div key={idx} className="flex items-center gap-2 text-sm">
-              <Check size={14} className="text-green-400" />
-              <span>{event.event_name}</span>
-              <span className="text-gray-500">•</span>
-              <span className="text-xs text-gray-500">{event.event_category}</span>
-              <span className="text-gray-500">•</span>
-              <span className="text-gray-500">₹{event.event_price}</span>
-            </div>
+          {combo.category_quotas && Object.entries(combo.category_quotas).map(([category, count]) => (
+            count > 0 && (
+              <div key={category} className="flex items-center gap-2 text-sm">
+                <Check size={14} className="text-green-400" />
+                <span className="font-medium">{count}x</span>
+                <span>{category}</span>
+                <span className="text-xs text-gray-500">events</span>
+              </div>
+            )
           ))}
-          {combo.event_count > 3 && (
-            <p className="text-xs text-gray-500">+ {combo.event_count - 3} more events</p>
+          {(!combo.category_quotas || Object.keys(combo.category_quotas).length === 0) && (
+            <p className="text-xs text-gray-500">No category requirements set</p>
           )}
         </div>
       </div>
 
-      {/* Category Quotas */}
-      {combo.category_quotas && Object.keys(combo.category_quotas).length > 0 && (
-        <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
-          <p className="text-xs text-blue-400 mb-2 font-bold">Selection Requirements:</p>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(combo.category_quotas).map(([category, count]) => (
-              count > 0 && (
-                <span key={category} className="text-xs px-2 py-1 bg-blue-500/20 rounded-lg">
-                  {count} {category}
-                </span>
-              )
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Stats */}
       <div className="flex items-center gap-4 mb-4 pt-4 border-t border-white/10">
         <div className="flex items-center gap-2 text-sm">
-          <Users size={16} className="text-gray-500" />
-          <span>{combo.total_purchases} purchases</span>
+          <Users size={16} className="text-purple-400" />
+          <span className="font-bold text-purple-400">{combo.total_purchases || combo.current_purchases || 0}</span>
+          <span className="text-gray-400">purchases</span>
         </div>
         <div className="flex items-center gap-2 text-sm">
-          <DollarSign size={16} className="text-gray-500" />
-          <span>₹{combo.savings} savings/combo</span>
+          <Package size={16} className="text-gray-500" />
+          <span>{combo.total_events_required || 0} events required</span>
         </div>
       </div>
 
@@ -269,7 +254,7 @@ const ComboCard = ({ combo, onEdit, onDelete, onToggleStatus }) => {
           Edit
         </button>
         <button
-          onClick={() => onDelete(combo.combo_id)}
+          onClick={() => onDelete(combo.id || combo.combo_id)}
           className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500/20 transition-all"
         >
           <Trash2 size={16} />
@@ -288,23 +273,18 @@ const ComboModal = ({ isOpen, onClose, onSuccess, editingCombo }) => {
     name: '',
     description: '',
     price: 0,
-    eventIds: [],
     isActive: true,
     categoryQuotas: {} // e.g., { "Workshop": 2, "Technical": 3 }
   });
-  const [availableEvents, setAvailableEvents] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [loadingEvents, setLoadingEvents] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      fetchAvailableEvents();
       if (editingCombo) {
         setFormData({
           name: editingCombo.combo_name,
-          description: editingCombo.combo_description || '',
-          price: editingCombo.combo_price,
-          eventIds: editingCombo.events ? editingCombo.events.map(e => e.event_id) : [],
+          description: editingCombo.description || '',
+          price: editingCombo.price,
           isActive: editingCombo.is_active,
           categoryQuotas: editingCombo.category_quotas || {}
         });
@@ -313,7 +293,6 @@ const ComboModal = ({ isOpen, onClose, onSuccess, editingCombo }) => {
           name: '',
           description: '',
           price: 0,
-          eventIds: [],
           isActive: true,
           categoryQuotas: {}
         });
@@ -321,33 +300,23 @@ const ComboModal = ({ isOpen, onClose, onSuccess, editingCombo }) => {
     }
   }, [isOpen, editingCombo]);
 
-  const fetchAvailableEvents = async () => {
-    setLoadingEvents(true);
-    const result = await comboService.getSoloEventsForCombo();
-    if (result.success) {
-      setAvailableEvents(result.data);
-    }
-    setLoadingEvents(false);
-  };
-
-  const toggleEvent = (eventId) => {
-    setFormData(prev => ({
-      ...prev,
-      eventIds: prev.eventIds.includes(eventId)
-        ? prev.eventIds.filter(id => id !== eventId)
-        : [...prev.eventIds, eventId]
-    }));
-  };
-
-  const calculateSuggestedPrice = () => {
-    const selectedEvents = availableEvents.filter(e => formData.eventIds.includes(e.id));
-    const total = selectedEvents.reduce((sum, e) => sum + e.price, 0);
-    const suggested = Math.floor(total * 0.8); // 20% discount
-    setFormData(prev => ({ ...prev, price: suggested }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validation - check if category quotas total at least 2 events
+    const totalEvents = Object.values(formData.categoryQuotas)
+      .filter(v => typeof v === 'number' && v > 0)
+      .reduce((sum, val) => sum + val, 0);
+
+    if (totalEvents < 2) {
+      alert('Category quotas must total at least 2 events');
+      return;
+    }
+
+    if (formData.price <= 0) {
+      alert('Please enter a valid combo price');
+      return;
+    }
 
     setLoading(true);
 
@@ -366,11 +335,6 @@ const ComboModal = ({ isOpen, onClose, onSuccess, editingCombo }) => {
   };
 
   if (!isOpen) return null;
-
-  const selectedEvents = availableEvents.filter(e => formData.eventIds.includes(e.id));
-  const originalPrice = selectedEvents.reduce((sum, e) => sum + e.price, 0);
-  const savings = originalPrice - formData.price;
-  const savingsPercent = originalPrice > 0 ? ((savings / originalPrice) * 100).toFixed(1) : 0;
 
   return (
     <AnimatePresence>
@@ -434,32 +398,15 @@ const ComboModal = ({ isOpen, onClose, onSuccess, editingCombo }) => {
                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
                 placeholder="399"
               />
-
-              {/* Price Summary */}
-              {formData.eventIds.length > 0 && (
-                <div className="mt-3 p-4 bg-white/5 rounded-2xl space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Original Total:</span>
-                    <span className="font-bold">₹{originalPrice}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Combo Price:</span>
-                    <span className="font-bold text-secondary">₹{formData.price}</span>
-                  </div>
-                  <div className="flex justify-between text-sm pt-2 border-t border-white/10">
-                    <span className="text-green-400">Savings:</span>
-                    <span className="font-bold text-green-400">
-                      ₹{savings} ({savingsPercent}% off)
-                    </span>
-                  </div>
-                </div>
-              )}
+              <p className="text-xs text-gray-500 mt-2">
+                Students will select events matching the category quotas at purchase time
+              </p>
             </div>
 
             {/* Category Quotas */}
             <div>
               <label className="block text-sm font-bold mb-2 text-gray-400">
-                Category Quotas (Optional)
+                Category Quotas * (Required - minimum 2 events total)
                 <span className="text-xs font-normal ml-2 text-gray-500">
                   Define how many events from each category students must select
                 </span>

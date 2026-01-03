@@ -47,14 +47,30 @@ const comboService = {
    */
   getCombosWithDetails: async () => {
     try {
-      // Use direct query instead of RPC function
+      // Use combos_with_stats view to get purchase counts
       const { data, error } = await supabase
-        .from("combos")
+        .from("combos_with_stats")
         .select("*")
-        .eq("is_active", true)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        // Fallback to regular combos table if view doesn't exist
+        console.warn("combos_with_stats view not found, using combos table");
+        const fallback = await supabase
+          .from("combos")
+          .select("*")
+          .order("created_at", { ascending: false });
+        
+        if (fallback.error) throw fallback.error;
+        
+        return {
+          success: true,
+          data: (fallback.data || []).map(c => ({
+            ...c,
+            total_purchases: c.current_purchases || 0
+          })),
+        };
+      }
 
       return {
         success: true,
@@ -140,13 +156,12 @@ const comboService = {
   },
 
   /**
-   * Create new combo
+   * Create new combo (category quotas only)
    */
   createCombo: async ({
     name,
     description,
     price,
-    eventIds,
     isActive = true,
     categoryQuotas = {},
   }) => {
@@ -155,7 +170,6 @@ const comboService = {
         p_name: name,
         p_description: description,
         p_price: price,
-        p_event_ids: eventIds,
         p_is_active: isActive,
         p_category_quotas: categoryQuotas,
       });
@@ -183,11 +197,11 @@ const comboService = {
   },
 
   /**
-   * Update existing combo
+   * Update existing combo (category quotas only)
    */
   updateCombo: async (
     comboId,
-    { name, description, price, eventIds, isActive, categoryQuotas = {} }
+    { name, description, price, isActive, categoryQuotas = {} }
   ) => {
     try {
       const { data, error } = await supabase.rpc("update_combo", {
@@ -195,7 +209,6 @@ const comboService = {
         p_name: name,
         p_description: description,
         p_price: price,
-        p_event_ids: eventIds,
         p_is_active: isActive,
         p_category_quotas: categoryQuotas,
       });
@@ -433,7 +446,127 @@ const comboService = {
   },
 
   /**
-   * Purchase a combo package and register for selected events
+   * Validate combo event selection (NEW - uses RPC function)
+   */
+  validateComboSelection: async (comboId, selectedEventIds) => {
+    try {
+      const { data, error } = await supabase.rpc("validate_combo_selection", {
+        p_combo_id: comboId,
+        p_selected_event_ids: selectedEventIds,
+      });
+
+      if (error) throw error;
+
+      return {
+        valid: data?.valid || false,
+        categoryBreakdown: data?.category_breakdown || {},
+        errors: data?.errors || [],
+      };
+    } catch (error) {
+      console.error("Error validating combo selection:", error);
+      return {
+        valid: false,
+        categoryBreakdown: {},
+        errors: [error.message],
+      };
+    }
+  },
+
+  /**
+   * Create combo purchase (NEW - initiates purchase before payment)
+   */
+  createComboPurchase: async (comboId, userId, selectedEventIds) => {
+    try {
+      const { data, error } = await supabase.rpc("create_combo_purchase", {
+        p_combo_id: comboId,
+        p_user_id: userId,
+        p_selected_event_ids: selectedEventIds,
+      });
+
+      if (error) throw error;
+
+      if (!data?.success) {
+        return {
+          success: false,
+          error: data?.message || "Failed to create purchase",
+        };
+      }
+
+      return {
+        success: true,
+        purchaseId: data.purchase_id,
+        amount: data.amount,
+      };
+    } catch (error) {
+      console.error("Error creating combo purchase:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Complete combo payment (NEW - updates payment and triggers explosion)
+   */
+  completeComboPayment: async (purchaseId, transactionId) => {
+    try {
+      const { data, error } = await supabase.rpc("complete_combo_payment", {
+        p_combo_purchase_id: purchaseId,
+        p_transaction_id: transactionId,
+      });
+
+      if (error) throw error;
+
+      if (!data?.success) {
+        return {
+          success: false,
+          error: data?.message || "Payment completion failed",
+        };
+      }
+
+      return {
+        success: true,
+        registrationIds: data.registration_ids,
+        eventCount: data.event_count,
+        message: data.message,
+      };
+    } catch (error) {
+      console.error("Error completing combo payment:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Get user combo purchases with full details (NEW - uses RPC function)
+   */
+  getUserComboPurchasesDetailed: async (userId) => {
+    try {
+      const { data, error } = await supabase.rpc("get_user_combo_purchases", {
+        p_user_id: userId,
+      });
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data: data || [],
+      };
+    } catch (error) {
+      console.error("Error fetching user combo purchases:", error);
+      return {
+        success: false,
+        data: [],
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Purchase a combo package (UPDATED - uses new flow)
    */
   purchaseCombo: async (userId, comboId, selectedEventIds) => {
     try {
@@ -445,7 +578,68 @@ const comboService = {
         return { success: false, error: "Invalid combo ID. Please select a combo again." };
       }
 
-      console.log("📦 Purchasing combo:", {
+      console.log("📦 Purchasing combo with new flow:", {
+        userId,
+        comboId,
+        selectedEventIds,
+      });
+
+      // Step 1: Validate selection
+      const validation = await comboService.validateComboSelection(
+        comboId,
+        selectedEventIds
+      );
+
+      if (!validation.valid) {
+        return {
+          success: false,
+          error: `Invalid selection: ${validation.errors.join(", ")}`,
+        };
+      }
+
+      // Step 2: Create purchase record
+      const purchaseResult = await comboService.createComboPurchase(
+        comboId,
+        userId,
+        selectedEventIds
+      );
+
+      if (!purchaseResult.success) {
+        return purchaseResult;
+      }
+
+      // Step 3: Return purchase details for payment gateway integration
+      return {
+        success: true,
+        purchaseId: purchaseResult.purchaseId,
+        amount: purchaseResult.amount,
+        needsPayment: true,
+        message: "Purchase initiated. Proceed to payment.",
+      };
+
+    } catch (error) {
+      console.error("Error purchasing combo:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Purchase a combo package - Legacy flow (for backward compatibility)
+   */
+  purchaseComboLegacy: async (userId, comboId, selectedEventIds) => {
+    try {
+      if (!userId) {
+        return { success: false, error: "User not authenticated" };
+      }
+
+      if (!comboId || comboId === 'undefined' || comboId === 'null') {
+        return { success: false, error: "Invalid combo ID. Please select a combo again." };
+      }
+
+      console.log("📦 Purchasing combo (legacy):", {
         userId,
         comboId,
         selectedEventIds,
@@ -463,89 +657,47 @@ const comboService = {
         throw comboError;
       }
 
-      console.log("📦 Combo data:", combo);
-
-      // Use selectedEventIds if provided, otherwise try to get from combo
+      // Resolve event IDs
       let eventIdsToRegister = selectedEventIds || [];
-
       if (eventIdsToRegister.length === 0) {
-        // Try combo.event_ids array
-        if (
-          combo.event_ids &&
-          Array.isArray(combo.event_ids) &&
-          combo.event_ids.length > 0
-        ) {
+        if (combo.event_ids && Array.isArray(combo.event_ids)) {
           eventIdsToRegister = combo.event_ids;
-        }
-        // Try combo.events JSON field
-        else if (combo.events && Array.isArray(combo.events)) {
+        } else if (combo.events && Array.isArray(combo.events)) {
           eventIdsToRegister = combo.events
             .map((e) => e.id || e.event_id)
             .filter(Boolean);
         }
       }
 
-      console.log("📦 Events to register:", eventIdsToRegister);
-
-      // If no events, get all available events as fallback for combo registration
-      if (eventIdsToRegister.length === 0) {
-        console.warn("No event IDs in combo, fetching available events");
-
-        // Get some events from events_config
-        const { data: availableEvents } = await supabase
-          .from("events_config")
-          .select("id")
-          .eq("is_open", true)
-          .limit(5);
-
-        if (availableEvents && availableEvents.length > 0) {
-          eventIdsToRegister = availableEvents.map((e) => e.id);
-          console.log("📦 Using available events:", eventIdsToRegister);
-        } else {
-          return {
-            success: false,
-            error:
-              "No events available for registration. Please contact admin.",
-            comboName: combo.name || combo.combo_name,
-          };
-        }
-      }
-
-      // Resolve event IDs (convert text event_keys to UUIDs if needed)
       eventIdsToRegister = await resolveEventIds(eventIdsToRegister);
       
       if (eventIdsToRegister.length === 0) {
         return {
           success: false,
           error: "No valid events found to register",
-          comboName: combo.name || combo.combo_name,
         };
       }
 
-      // Fetch event_key for all events being registered (registrations table needs event_key, not UUID)
+      // Create registrations using legacy registrations table
       const { data: eventsData } = await supabase
         .from("events_config")
         .select("id, event_key")
         .in("id", eventIdsToRegister);
 
-      // Create a map of UUID id to event_key
       const eventKeyMap = {};
       (eventsData || []).forEach((event) => {
         eventKeyMap[event.id] = event.event_key;
       });
 
-      // Create registrations for each event using event_key (registrations table only has: user_id, event_id, combo_id, payment_status, payment_id)
       const registrations = eventIdsToRegister
         .map((eventId) => ({
           user_id: userId,
-          event_id: eventKeyMap[eventId], // Use event_key, not UUID
+          event_id: eventKeyMap[eventId],
           combo_id: comboId,
-          payment_status: "PENDING",
-          payment_id: null,
+          payment_status: "PAID",
+          payment_id: `COMBO_${Date.now()}`,
         }))
-        .filter(r => r.event_id); // Filter out any events without event_key
-
-      console.log("📦 Creating registrations:", registrations);
+        .filter(r => r.event_id);
 
       const { data: regData, error: regError } = await supabase
         .from("registrations")
@@ -557,39 +709,14 @@ const comboService = {
         throw regError;
       }
 
-      console.log("📦 Registration success:", regData);
-
-      // Update payment status to PAID and add payment ID (simulating payment confirmation)
-      const tempPaymentId = `TEMP_COMBO_${userId.substring(0, 8)}_${Date.now()}`;
-      const registrationIds = regData.map(r => r.id);
-      
-      await supabase
-        .from('registrations')
-        .update({
-          payment_status: 'PAID',
-          payment_id: tempPaymentId
-        })
-        .in('id', registrationIds);
-
-      // Update combo purchase count (ignore errors)
-      try {
-        await supabase
-          .from("combos")
-          .update({ current_purchases: (combo.current_purchases || 0) + 1 })
-          .eq("id", comboId);
-      } catch (updateErr) {
-        console.log("Combo count update skipped:", updateErr);
-      }
-
       return {
         success: true,
         data: regData,
         comboName: combo.name || combo.combo_name,
-        totalPrice: combo.total_price || combo.price,
         message: "Combo purchase successful",
       };
     } catch (error) {
-      console.error("Error purchasing combo:", error);
+      console.error("Error purchasing combo (legacy):", error);
       return {
         success: false,
         error: error.message,

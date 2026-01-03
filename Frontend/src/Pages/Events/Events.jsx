@@ -507,16 +507,17 @@ const Events = () => {
                     const endY = 50 + 48 * Math.sin(angleRad);
                     const isSelected = selectedEvent === event.id;
                     
-                    // Skip rendering if values are invalid
-                    if (isNaN(endX) || isNaN(endY)) return null;
+                    // Ensure values are valid numbers
+                    const validEndX = !isNaN(endX) && isFinite(endX) ? endX : 50;
+                    const validEndY = !isNaN(endY) && isFinite(endY) ? endY : 50;
                     
                     return (
                       <g key={event.id || i}>
                         <line
                           x1="50"
                           y1="50"
-                          x2={endX}
-                          y2={endY}
+                          x2={validEndX}
+                          y2={validEndY}
                           stroke={isSelected ? "#22d3ee" : "#0ea5e9"}
                           strokeWidth={isSelected ? "0.4" : "0.1"}
                           opacity={isSelected ? "1" : "0.3"}
@@ -524,13 +525,13 @@ const Events = () => {
                         />
                         {isSelected && (
                           <motion.circle
-                            cx="50"
-                            cy="50"
+                            cx={50}
+                            cy={50}
                             r="1"
                             fill="#22d3ee"
                             animate={{
-                              cx: [50, endX || 50],
-                              cy: [50, endY || 50],
+                              cx: [50, validEndX],
+                              cy: [50, validEndY],
                               opacity: [0, 1, 0],
                             }}
                             transition={{

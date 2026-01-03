@@ -3,6 +3,9 @@ import { Canvas, useFrame, createPortal } from '@react-three/fiber';
 import { useGLTF, OrbitControls, Environment, Float, Sparkles, useAnimations, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
+// Preload model immediately
+useGLTF.preload('/models/robot_playground.glb');
+
 const CyrusNametag = ({ bone }) => {
   if (!bone) return null;
   return createPortal(
@@ -132,7 +135,7 @@ const RobotHero = () => {
     <div className="w-full h-[400px] xs:h-[500px] sm:h-[600px] md:h-[700px] relative z-20 cursor-grab active:cursor-grabbing">
       <Canvas
         camera={{ position: [0, 2, 10], fov: 35 }}
-        gl={{ alpha: true, antialias: true }}
+        gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
         dpr={[1, 2]}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0); // Transparent background
@@ -165,7 +168,5 @@ const RobotHero = () => {
     </div>
   );
 };
-
-useGLTF.preload('/models/robot_playground.glb');
 
 export default RobotHero;

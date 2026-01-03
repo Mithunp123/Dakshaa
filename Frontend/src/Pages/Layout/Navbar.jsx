@@ -66,7 +66,6 @@ const Navbar = () => {
     else if (path === "/sponsors") setActiveLink("Sponsors");
     else if (path === "/teams") setActiveLink("Teams");
     else if (path === "/contact") setActiveLink("Contact");
-    else if (path === "/feedback") setActiveLink("Feedback");
     else if (path.startsWith("/dashboard")) setActiveLink("Dashboard");
   }, [location]);
 
@@ -110,7 +109,6 @@ const Navbar = () => {
     { name: "Sponsors", path: "/sponsors" },
     { name: "Teams", path: "/teams" },
     { name: "Contact", path: "/contact" },
-    { name: "Feedback", path: "/feedback" },
   ];
 
   const getDashboardPath = () => {
@@ -149,7 +147,7 @@ const Navbar = () => {
             </motion.div>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-6">
               {navLinks.map((link) => (
                 <button
                   key={link.name}

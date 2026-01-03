@@ -20,6 +20,8 @@ import eventConfigService, {
   registerForEvent,
 } from "../../../services/eventConfigService";
 import comboService from "../../../services/comboService";
+import paymentService from "../../../services/paymentService";
+import notificationService from "../../../services/notificationService";
 import { supabase } from "../../../supabase";
 import { supabaseService } from "../../../services/supabaseService";
 
@@ -45,6 +47,8 @@ const RegistrationForm = () => {
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
+  const [validationStatus, setValidationStatus] = useState(null);
+  const [validationMessage, setValidationMessage] = useState("");
   
   // Ref to track footer visibility
   const footerObserverRef = useRef(null);
@@ -252,7 +256,7 @@ const RegistrationForm = () => {
     setCurrentStep(3);
   }, []);
 
-  const handleEventToggle = useCallback((eventId) => {
+  const handleEventToggle = useCallback(async (eventId) => {
     // Find the event to check if it's full
     const event = events.find(e => e.id === eventId || e.event_id === eventId);
     if (event) {
@@ -265,12 +269,37 @@ const RegistrationForm = () => {
       }
     }
     
-    setSelectedEvents((prev) =>
-      prev.includes(eventId)
-        ? prev.filter((id) => id !== eventId)
-        : [...prev, eventId]
-    );
-  }, [events]);
+    const newSelection = selectedEvents.includes(eventId)
+      ? selectedEvents.filter((id) => id !== eventId)
+      : [...selectedEvents, eventId];
+    
+    setSelectedEvents(newSelection);
+
+    // Real-time validation for combo selection
+    if (selectedCombo && registrationMode === 'combo' && newSelection.length > 0) {
+      try {
+        const validation = await comboService.validateComboSelection(
+          selectedCombo.id || selectedCombo.combo_id,
+          newSelection
+        );
+
+        setValidationStatus(validation);
+
+        if (validation.valid) {
+          setValidationMessage('✓ Selection complete and valid!');
+        } else {
+          setValidationMessage(
+            validation.errors && validation.errors.length > 0
+              ? `⚠ ${validation.errors.join(', ')}`
+              : '⚠ Selection incomplete'
+          );
+        }
+      } catch (error) {
+        console.error('Validation error:', error);
+        setValidationMessage('⚠ Unable to validate selection');
+      }
+    }
+  }, [events, selectedEvents, selectedCombo, registrationMode]);
 
   const handleBack = useCallback(() => {
     if (currentStep === 3 && registrationMode === "combo") {
@@ -356,7 +385,9 @@ const RegistrationForm = () => {
   }, [user, selectedEvents, selectedEventDetails, totalAmount, isSubmitting]);
 
   const handleComboRegistration = useCallback(async () => {
-    if (isSubmitting || !selectedCombo) return;
+    if (isSubmitting || !selectedCombo) {
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -366,57 +397,88 @@ const RegistrationForm = () => {
         return;
       }
 
-      // Use fetched user profile from state
       if (!userProfile) {
         alert("Profile not loaded. Please refresh and try again.");
         return;
       }
 
-      const result = await comboService.purchaseCombo(
-        user.id,
-        selectedCombo.id || selectedCombo.combo_id, // Support both for backwards compatibility
+      // Step 1: Validate selection
+      const validation = await comboService.validateComboSelection(
+        selectedCombo.id || selectedCombo.combo_id,
         selectedEvents
       );
 
-      if (result.success) {
-        // Get event names for notification
-        const eventNames = selectedEventDetails
-          .map((e) => e.event_name || e.name)
-          .join(", ");
-
-        // Create admin notification for the combo registration
-        await supabase.from("admin_notifications").insert({
-          type: "NEW_COMBO_REGISTRATION",
-          title: "New Combo Registration",
-          message: `${
-            userProfile?.full_name || user.email
-          } registered for combo: ${selectedCombo.name || selectedCombo.combo_name}`,
-          data: {
-            user_id: user.id,
-            user_name: userProfile?.full_name,
-            user_email: user.email,
-            combo_id: selectedCombo.id || selectedCombo.combo_id,
-            combo_name: selectedCombo.name || selectedCombo.combo_name,
-            events: selectedEvents,
-            event_names: eventNames,
-            total_amount: selectedCombo.price || selectedCombo.total_price,
-            registration_type: "combo",
-          },
-          is_read: false,
-        });
-
-        console.log("Combo registration successful:", result);
-        setCurrentStep(4);
-      } else {
-        alert(result.error || "Registration failed. Please try again.");
+      if (!validation.valid) {
+        alert(`Invalid selection:\n${validation.errors.join('\n')}`);
+        setIsSubmitting(false);
+        return;
       }
+
+      // Step 2: Create purchase record (PENDING status)
+      const purchaseResult = await comboService.createComboPurchase(
+        selectedCombo.id || selectedCombo.combo_id,
+        user.id,
+        selectedEvents
+      );
+
+      if (!purchaseResult.success) {
+        alert(purchaseResult.error || "Failed to create purchase");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Step 3: Process payment (simulated)
+      const transactionId = `TXN_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      
+      // Step 4: Complete payment and trigger explosion
+      const completionResult = await comboService.completeComboPayment(
+        purchaseResult.purchaseId,
+        transactionId
+      );
+
+      if (!completionResult.success) {
+        alert(completionResult.error || "Payment completion failed");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Create admin notification
+      const eventNames = selectedEventDetails
+        .map((e) => e.event_name || e.name)
+        .join(", ");
+
+      await supabase.from("admin_notifications").insert({
+        type: "NEW_COMBO_REGISTRATION",
+        title: "New Combo Registration",
+        message: `${
+          userProfile?.full_name || user.email
+        } registered for combo: ${selectedCombo.name || selectedCombo.combo_name}`,
+        data: {
+          user_id: user.id,
+          user_name: userProfile?.full_name,
+          user_email: user.email,
+          combo_id: selectedCombo.id || selectedCombo.combo_id,
+          combo_name: selectedCombo.name || selectedCombo.combo_name,
+          events: selectedEvents,
+          event_names: eventNames,
+          total_amount: selectedCombo.price || selectedCombo.total_price,
+          registration_type: "combo",
+          event_count: completionResult.eventCount,
+        },
+        is_read: false,
+      });
+
+      // Success!
+      alert(`Registration Successful!\n\n✓ Combo: ${selectedCombo.name || selectedCombo.combo_name}\n✓ Events: ${completionResult.eventCount}\n✓ Amount: ₹${selectedCombo.price || selectedCombo.total_price}\n\nCheck your dashboard for QR codes!`);
+      setCurrentStep(4);
+      
     } catch (error) {
       console.error("Combo registration error:", error);
-      alert("Registration failed. Please try again.");
+      alert(`Registration failed: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
-  }, [user, selectedCombo, selectedEvents, selectedEventDetails, isSubmitting]);
+  }, [user, userProfile, selectedCombo, selectedEvents, selectedEventDetails, isSubmitting]);
 
   // Handle next step navigation
   const handleNext = useCallback(() => {

@@ -325,20 +325,11 @@ function AppContent() {
 }
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     AOS.init({
       duration: 1000, // Animation duration
       once: true, // Whether animation should happen only once
     });
-
-    // Simulate loading time
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2500);
-
-    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -352,27 +343,12 @@ function App() {
           },
         }}
       />
-      <AnimatePresence mode="wait">
-        {isLoading && (
-          <motion.div
-            key="loader"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <LoadingScreen variant="cyber" text="Initializing..." />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {!isLoading && (
-        <SupabaseHealthCheck>
-          <Router>
-            <ParticlesComponent id="particlesBG" />
-            <AppContent />
-          </Router>
-        </SupabaseHealthCheck>
-      )}
+      <SupabaseHealthCheck>
+        <Router>
+          <ParticlesComponent id="particlesBG" />
+          <AppContent />
+        </Router>
+      </SupabaseHealthCheck>
     </>
   );
 }

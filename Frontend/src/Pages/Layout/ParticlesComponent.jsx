@@ -42,7 +42,7 @@ const ParticlesComponent = (props) => {
       interactivity: {
         events: {
           onClick: {
-            enable: true,
+            enable: false,
             mode: "none",
           },
           onHover: {
@@ -88,7 +88,7 @@ const ParticlesComponent = (props) => {
           density: {
             enable: true,
           },
-          value: 400,
+          value: 80,
         },
         opacity: {
           value: 0.3,
@@ -108,10 +108,10 @@ const ParticlesComponent = (props) => {
 
   return (
     <>
-    <BackgroundAnimation/>
-    <Particles id={props.id} init={particlesLoaded} options={options} />
+      <BackgroundAnimation />
+      <Particles id={props.id} init={particlesLoaded} options={options} />
     </>
-  ); 
+  );
 };
 
 export default ParticlesComponent;

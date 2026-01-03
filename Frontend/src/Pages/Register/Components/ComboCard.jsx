@@ -51,7 +51,7 @@ const ComboCard = ({ combo, onSelect, isSelected, userPurchasedCombos = [] }) =>
                 <Package size={20} className="text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold">{combo.combo_name}</h3>
+                <h3 className="text-xl font-bold">{combo.name || combo.combo_name}</h3>
                 {discount > 0 && (
                   <div className="flex items-center gap-1.5 mt-1">
                     <TrendingDown size={14} className="text-green-400" />
@@ -141,15 +141,40 @@ const ComboCard = ({ combo, onSelect, isSelected, userPurchasedCombos = [] }) =>
           </div>
         )}
 
-        {/* Purchases Count */}
-        {combo.total_purchases > 0 && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-purple-500/10 border border-purple-500/20 rounded-xl">
-            <Sparkles size={14} className="text-purple-400" />
-            <span className="text-xs text-purple-400">
-              <strong>{combo.total_purchases}</strong> students already purchased
-            </span>
-          </div>
-        )}
+        {/* Purchases Count & Availability */}
+        <div className="space-y-2">
+          {combo.total_purchases !== undefined && combo.total_purchases > 0 && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-purple-500/10 border border-purple-500/20 rounded-xl">
+              <Sparkles size={14} className="text-purple-400" />
+              <span className="text-xs text-purple-400">
+                <strong>{combo.total_purchases}</strong> students already purchased
+              </span>
+            </div>
+          )}
+          
+          {/* Availability Status */}
+          {combo.max_purchases && (
+            <div className={`flex items-center gap-2 px-3 py-2 rounded-xl ${
+              combo.is_available !== false
+                ? 'bg-green-500/10 border border-green-500/20'
+                : 'bg-red-500/10 border border-red-500/20'
+            }`}>
+              {combo.is_available !== false ? (
+                <>
+                  <Unlock size={14} className="text-green-400" />
+                  <span className="text-xs text-green-400">
+                    <strong>{combo.max_purchases - (combo.current_purchases || 0)}</strong> spots left
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Lock size={14} className="text-red-400" />
+                  <span className="text-xs text-red-400">Sold Out</span>
+                </>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Status Message */}
         {!combo.is_active && (

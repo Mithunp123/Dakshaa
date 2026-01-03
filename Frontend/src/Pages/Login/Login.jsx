@@ -13,7 +13,8 @@ import {
   Users, 
   UserCog,
   ShieldCheck,
-  CheckCircle2
+  CheckCircle2,
+  ArrowLeft
 } from 'lucide-react';
 
 // Role information for display
@@ -231,9 +232,20 @@ const Login = () => {
         {/* Login Form */}
         {!loginSuccess && (
           <>
-            <div className="text-center mb-6 sm:mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white">Welcome Back</h2>
-              <p className="text-gray-400 mt-2 text-sm sm:text-base">Sign in to your DaKshaa account</p>
+            <div className="relative mb-6 sm:mb-8">
+              {/* Back Arrow */}
+              <button
+                onClick={() => navigate('/')}
+                className="absolute left-0 top-0 p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                aria-label="Go back to home"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              
+              <div className="text-center">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white">Welcome Back</h2>
+                <p className="text-gray-400 mt-2 text-sm sm:text-base">Sign in to your DaKshaa account</p>
+              </div>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">

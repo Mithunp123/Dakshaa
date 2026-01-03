@@ -1,5 +1,5 @@
-import React, { useEffect, useState, lazy, Suspense } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useState, Suspense } from "react";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Download } from "lucide-react";
 import HeroImg from "../../../assets/Heroimg.png";
@@ -7,10 +7,7 @@ import Daksha from "../../../assets/DaKshaa.png";
 import UltraCountdown from "./UltraCountdown";
 import RegisterAni from "../../../assets/registerani.gif";
 import brochure from "../../../assets/Brochure.pdf";
-
-// Lazy load the 3D component
-const RobotHero = lazy(() => import("./RobotHero"));
-// import RobotHero from "./RobotHero";
+import RobotHero from "./RobotHero";
 
 // Enhanced Glowing Text Animation
 const glowAnimation = {
@@ -248,16 +245,25 @@ const FloatingBadge = ({ text, position, delay }) => (
 
 const UltraHeroSection = () => {
   const navigate = useNavigate();
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  // Optimization: useMotionValue prevents re-renders on mouse move
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  // Create transformed values for the glow effect (centering the 384px circle)
+  const glowX = useTransform(mouseX, value => value - 192);
+  const glowY = useTransform(mouseY, value => value - 192);
+
   const eventDetails = ["3 DAYS", "20+ WORKSHOPS", "25+ EVENTS"];
 
   useEffect(() => {
     const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+      // Update motion values directly - no React re-render!
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
     };
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  }, [mouseX, mouseY]);
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -311,13 +317,13 @@ const UltraHeroSection = () => {
       <HeroParticles />
       <HexPattern />
 
-      {/* Mouse follow glow */}
+      {/* Mouse follow glow - Optimized */}
       <motion.div
         className="fixed w-96 h-96 rounded-full pointer-events-none z-0 hidden lg:block"
         style={{
           background: 'radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%)',
-          left: mousePosition.x - 192,
-          top: mousePosition.y - 192,
+          left: glowX,
+          top: glowY,
         }}
         animate={{
           scale: [1, 1.1, 1],
@@ -599,7 +605,7 @@ const UltraHeroSection = () => {
             perspective: "1000px",
           }}
         >
-          <Suspense fallback={<div className="w-full h-[500px] flex items-center justify-center text-sky-400">Loading Model...</div>}>
+          <Suspense fallback={<div className="w-full h-[400px] xs:h-[500px] sm:h-[600px] md:h-[700px]" />}>
             <RobotHero />
           </Suspense>
         </motion.div>
