@@ -253,7 +253,7 @@ const UltraHeroSection = () => {
   const glowX = useTransform(mouseX, value => value - 192);
   const glowY = useTransform(mouseY, value => value - 192);
 
-  const eventDetails = ["3 DAYS", "20+ WORKSHOPS", "25+ EVENTS"];
+  const eventDetails = ["4 DAYS", "20+ WORKSHOPS", "25+ EVENTS"];
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -501,7 +501,7 @@ const UltraHeroSection = () => {
               onClick={() => {
                 if (detail === "20+ WORKSHOPS") handleNavigation("/events");
                 else if (detail === "25+ EVENTS") handleNavigation("/events");
-                else if (detail === "3 DAYS") handleNavigation("/schedule");
+                else if (detail === "4 DAYS") handleNavigation("/schedule");
               }}
             />
           ))}
