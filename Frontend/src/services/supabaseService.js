@@ -134,21 +134,12 @@ export const supabaseService = {
   // Team methods
   async getUserTeams(userId) {
     try {
+      // Use the safe RPC function that bypasses RLS properly
       const { data, error } = await supabase
-        .from("team_members")
-        .select(
-          `
-          *,
-          teams (
-            *,
-            events (*)
-          )
-        `
-        )
-        .eq("user_id", userId);
+        .rpc('get_user_teams', { p_user_id: userId });
 
       if (error) {
-        console.warn("Teams table may not exist:", error.message);
+        console.warn("Error fetching teams:", error.message);
         return [];
       }
 
@@ -156,45 +147,51 @@ export const supabaseService = {
         return [];
       }
 
-      // For each team, fetch all members
+      // Fetch members for each team separately
       const teamsWithMembers = await Promise.all(
-        data.map(async (membership) => {
-          const { data: members, error: membersError } = await supabase
+        data.map(async (team) => {
+          // Fetch team members with their profiles
+          const { data: members } = await supabase
             .from("team_members")
             .select(
               `
-            *,
-            profiles:user_id (full_name, email)
+            user_id,
+            role,
+            status,
+            created_at,
+            profiles!inner (id, full_name, email, roll_no, department, college_name)
           `
             )
-            .eq("team_id", membership.team_id);
-
-          if (membersError) {
-            console.warn("Error fetching team members:", membersError.message);
-            return {
-              ...membership.teams,
-              role: membership.role,
-              members: [],
-            };
-          }
+            .eq("team_id", team.team_id)
+            .eq("status", "active")
+            .order("role", { ascending: false });
 
           return {
-            ...membership.teams,
-            role: membership.role,
-            members: (members || []).map((m) => ({
-              name: m.profiles?.full_name || "Unknown",
-              email: m.profiles?.email || "N/A",
-              role: m.role,
-              status: m.status,
-            })),
+            id: team.team_id,
+            name: team.team_name,
+            event_id: team.event_id,
+            leader_id: team.leader_id,
+            max_members: team.max_team_size,
+            is_active: true,
+            created_at: team.created_at,
+            events: {
+              id: team.event_id,
+              title: team.event_title,
+              category: team.event_category,
+              max_team_size: team.max_team_size,
+              min_team_size: team.min_team_size
+            },
+            role: team.role,
+            members: members || [],
+            is_registered: team.is_registered
           };
         })
       );
 
       return teamsWithMembers;
-    } catch (err) {
-      console.error("Error in getUserTeams:", err);
-      return [];
+    } catch (error) {
+      console.error("Error fetching user teams:", error);
+      throw error;
     }
   },
 

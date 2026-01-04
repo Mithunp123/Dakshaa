@@ -28,7 +28,7 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated }) => {
       // Fetch events that allow teams (is_team_event = true)
       const { data, error } = await supabase
         .from('events')
-        .select('id, title, max_team_size, min_team_size')
+        .select('event_id, title, max_team_size, min_team_size')
         .eq('is_team_event', true)
         .eq('is_active', true)
         .order('title');
@@ -50,7 +50,7 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated }) => {
     
     // Update max members based on selected event
     if (name === 'eventId') {
-      const selectedEvent = events.find(e => e.id === value);
+      const selectedEvent = events.find(e => e.event_id === value);
       if (selectedEvent) {
         setFormData(prev => ({ 
           ...prev, 
@@ -196,7 +196,7 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated }) => {
                 >
                   <option value="" className="bg-slate-900">Select an event</option>
                   {events.map(event => (
-                    <option key={event.id} value={event.id} className="bg-slate-900">
+                    <option key={event.event_id} value={event.event_id} className="bg-slate-900">
                       {event.title} (Team size: {event.min_team_size || 2}-{event.max_team_size || 4})
                     </option>
                   ))}

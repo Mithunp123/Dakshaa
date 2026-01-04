@@ -40,14 +40,30 @@ const notificationService = {
    */
   getAllNotifications: async (userId, limit = 50) => {
     try {
+      // Try notifications table first (new system with team features)
       const { data, error } = await supabase
-        .from('notification_queue')
+        .from('notifications')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(limit);
 
       if (error) throw error;
+
+      // If no data, try notification_queue as fallback
+      if (!data || data.length === 0) {
+        const { data: legacyData, error: legacyError } = await supabase
+          .from('notification_queue')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(limit);
+
+        return {
+          success: true,
+          data: legacyData || [],
+        };
+      }
 
       return {
         success: true,
@@ -68,15 +84,31 @@ const notificationService = {
    */
   markAsRead: async (notificationId) => {
     try {
-      const { data, error } = await supabase
-        .from('notification_queue')
+      // Try notifications table first (new system)
+      let { data, error } = await supabase
+        .from('notifications')
         .update({
           is_read: true,
-          read_at: new Date().toISOString(),
         })
         .eq('id', notificationId)
         .select()
-        .single();
+        .maybeSingle();
+
+      // If not found, try notification_queue (legacy)
+      if (!data && !error) {
+        const result = await supabase
+          .from('notification_queue')
+          .update({
+            is_read: true,
+            read_at: new Date().toISOString(),
+          })
+          .eq('id', notificationId)
+          .select()
+          .maybeSingle();
+        
+        data = result.data;
+        error = result.error;
+      }
 
       if (error) throw error;
 
@@ -98,7 +130,16 @@ const notificationService = {
    */
   markAllAsRead: async (userId) => {
     try {
-      const { data, error } = await supabase
+      // Update notifications table (new system)
+      const { data: data1, error: error1 } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('user_id', userId)
+        .eq('is_read', false)
+        .select();
+
+      // Also update notification_queue (legacy)
+      const { data: data2, error: error2 } = await supabase
         .from('notification_queue')
         .update({
           is_read: true,
@@ -108,11 +149,11 @@ const notificationService = {
         .eq('is_read', false)
         .select();
 
-      if (error) throw error;
+      const totalCount = (data1?.length || 0) + (data2?.length || 0);
 
       return {
         success: true,
-        count: data?.length || 0,
+        count: totalCount,
       };
     } catch (error) {
       console.error('Error marking all as read:', error);
@@ -240,6 +281,104 @@ const notificationService = {
         success: false,
         count: 0,
         error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Accept team invitation
+   */
+  acceptTeamInvitation: async (invitationId) => {
+    try {
+      const { data, error } = await supabase.rpc('accept_team_invitation', {
+        invitation_id: invitationId
+      });
+
+      if (error) throw error;
+
+      return {
+        success: data.success,
+        error: data.error || null
+      };
+    } catch (error) {
+      console.error("Error accepting invitation:", error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  },
+
+  /**
+   * Reject team invitation
+   */
+  rejectTeamInvitation: async (invitationId) => {
+    try {
+      const { data, error } = await supabase.rpc('reject_team_invitation', {
+        invitation_id: invitationId
+      });
+
+      if (error) throw error;
+
+      return {
+        success: data.success,
+        error: data.error || null
+      };
+    } catch (error) {
+      console.error("Error rejecting invitation:", error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  },
+
+  /**
+   * Approve team join request (for team leaders)
+   */
+  approveJoinRequest: async (requestId) => {
+    try {
+      const { data, error } = await supabase.rpc('approve_join_request', {
+        request_id: requestId
+      });
+
+      if (error) throw error;
+
+      return {
+        success: data.success,
+        error: data.error || null,
+        message: data.message || null
+      };
+    } catch (error) {
+      console.error("Error approving join request:", error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  },
+
+  /**
+   * Reject team join request (for team leaders)
+   */
+  rejectJoinRequest: async (requestId) => {
+    try {
+      const { data, error } = await supabase.rpc('reject_join_request', {
+        request_id: requestId
+      });
+
+      if (error) throw error;
+
+      return {
+        success: data.success,
+        error: data.error || null,
+        message: data.message || null
+      };
+    } catch (error) {
+      console.error("Error rejecting join request:", error);
+      return {
+        success: false,
+        error: error.message
       };
     }
   },

@@ -33,10 +33,21 @@ const RegistrationForm = () => {
   // Check if returning from successful payment
   const registrationSuccess = location.state?.registrationSuccess;
   
+  // Team registration data from MyTeams
+  const teamRegistrationData = location.state?.teamRegistration ? {
+    teamId: location.state.teamId,
+    teamName: location.state.teamName,
+    eventId: location.state.eventId,
+    eventName: location.state.eventName,
+    teamMembers: location.state.teamMembers,
+    memberCount: location.state.memberCount
+  } : null;
+  
   const [currentStep, setCurrentStep] = useState(1); // Start at step 1, will adjust after events load
   const [registrationMode, setRegistrationMode] = useState("");
   const [selectedCombo, setSelectedCombo] = useState(null);
   const [selectedEvents, setSelectedEvents] = useState([]);
+  const [teamData, setTeamData] = useState(teamRegistrationData);
   const [preSelectApplied, setPreSelectApplied] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
@@ -81,7 +92,7 @@ const RegistrationForm = () => {
       { number: 1, title: "Choose Type", icon: Package },
       {
         number: 2,
-        title: registrationMode === "combo" ? "Select Combo" : "Select Events",
+        title: registrationMode === "combo" ? "Select Combo" : registrationMode === "team" ? "Team Details" : "Select Events",
         icon: Calendar,
       },
       {
@@ -145,6 +156,32 @@ const RegistrationForm = () => {
 
   // Apply pre-selection after events are loaded
   useEffect(() => {
+    // Handle team registration pre-selection
+    if (teamRegistrationData && events.length > 0 && !preSelectApplied) {
+      console.log('Team registration data:', teamRegistrationData);
+      console.log('Looking for event:', teamRegistrationData.eventId);
+      const matchedEvent = events.find(e => {
+        console.log('Checking event:', e.event_id, e.id);
+        return e.id === teamRegistrationData.eventId || e.event_id === teamRegistrationData.eventId;
+      });
+      console.log('Matched event:', matchedEvent);
+      if (matchedEvent) {
+        setRegistrationMode("team");
+        setSelectedEvents([matchedEvent.id || matchedEvent.event_id]);
+        setCurrentStep(3); // Skip to review
+        setPreSelectApplied(true);
+        return;
+      } else {
+        // Event not found, but still set team mode and go to step 2 to select
+        console.warn('Event not found, showing team event selection');
+        setRegistrationMode("team");
+        setCurrentStep(2);
+        setPreSelectApplied(true);
+        return;
+      }
+    }
+    
+    // Handle individual event pre-selection
     if (preSelectedEventId && events.length > 0 && !preSelectApplied) {
       // Find the event by event_key OR by id
       const matchedEvent = events.find(
@@ -173,7 +210,7 @@ const RegistrationForm = () => {
       }
       setPreSelectApplied(true);
     }
-  }, [preSelectedEventId, events, preSelectApplied]);
+  }, [preSelectedEventId, teamRegistrationData, events, preSelectApplied]);
 
   // Memoized categories - prevents recalculation on every render
   const categories = useMemo(() => {
@@ -199,6 +236,20 @@ const RegistrationForm = () => {
     return events.filter((event) => {
       if (event.category === "Special") return false;
 
+      const minTeamSize = event.min_team_size || 0;
+      const maxTeamSize = event.max_team_size || 0;
+      const isTeamEvent = minTeamSize > 1 || maxTeamSize > 1;
+
+      // For team mode, only show events that support teams
+      if (registrationMode === "team") {
+        if (!isTeamEvent) return false; // Not a team event
+      }
+
+      // For individual mode, only show events that are NOT team events
+      if (registrationMode === "individual") {
+        if (isTeamEvent) return false; // This is a team event, exclude it
+      }
+
       const eventName = (event.name || event.event_name || "").toLowerCase();
       const eventDescription = (event.description || "").toLowerCase();
       const searchLower = searchTerm.toLowerCase();
@@ -211,7 +262,7 @@ const RegistrationForm = () => {
 
       return matchesSearch && matchesCategory;
     });
-  }, [events, searchTerm, categoryFilter]);
+  }, [events, searchTerm, categoryFilter, registrationMode]);
 
   // Memoized selected event details
   const selectedEventDetails = useMemo(
@@ -480,12 +531,78 @@ const RegistrationForm = () => {
     }
   }, [user, userProfile, selectedCombo, selectedEvents, selectedEventDetails, isSubmitting]);
 
+  // Handle team registration
+  const handleTeamRegistration = useCallback(async () => {
+    if (isSubmitting || !teamData) return;
+
+    try {
+      setIsSubmitting(true);
+
+      if (!user) {
+        alert("Please login to register your team");
+        return;
+      }
+
+      if (!userProfile) {
+        alert("Profile not loaded. Please refresh and try again.");
+        return;
+      }
+
+      // Register team for the event
+      const tempPaymentId = `TEAM_${teamData.teamId}_${Date.now()}`;
+      
+      // Create registration for each team member
+      const registrations = teamData.teamMembers.map(member => ({
+        user_id: member.id,
+        event_id: selectedEvents[0],
+        team_id: teamData.teamId,
+        payment_status: 'PAID',
+        payment_id: tempPaymentId,
+        registration_type: 'team'
+      }));
+
+      const { error: regError } = await supabase
+        .from('registrations')
+        .insert(registrations);
+
+      if (regError) throw regError;
+
+      // Create admin notification
+      const eventDetails = selectedEventDetails[0];
+      await supabase.from("admin_notifications").insert({
+        type: "NEW_REGISTRATION",
+        title: "New Team Registration",
+        message: `Team "${teamData.teamName}" registered for: ${eventDetails?.name || eventDetails?.event_name}`,
+        data: {
+          team_id: teamData.teamId,
+          team_name: teamData.teamName,
+          event_id: selectedEvents[0],
+          event_name: eventDetails?.name || eventDetails?.event_name,
+          member_count: teamData.memberCount,
+          total_amount: (eventDetails?.price || 0) * teamData.memberCount,
+          registration_type: "team",
+        },
+        is_read: false,
+      });
+
+      alert(`Team Registration Successful!\n\n✓ Team: ${teamData.teamName}\n✓ Event: ${eventDetails?.name || eventDetails?.event_name}\n✓ Members: ${teamData.memberCount}\n✓ Amount: ₹${(eventDetails?.price || 0) * teamData.memberCount}\n\nCheck your dashboard!`);
+      setCurrentStep(4);
+    } catch (error) {
+      console.error("Team registration error:", error);
+      alert(`Registration failed: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [user, userProfile, teamData, selectedEvents, selectedEventDetails, isSubmitting]);
+
   // Handle next step navigation
   const handleNext = useCallback(() => {
     if (currentStep === 3 && registrationMode === "combo") {
       handleComboRegistration();
     } else if (currentStep === 3 && registrationMode === "individual") {
       handleIndividualRegistration();
+    } else if (currentStep === 3 && registrationMode === "team") {
+      handleTeamRegistration();
     } else if (currentStep < steps.length) {
       setCurrentStep((prev) => prev + 1);
     }
@@ -495,6 +612,7 @@ const RegistrationForm = () => {
     steps.length,
     handleComboRegistration,
     handleIndividualRegistration,
+    handleTeamRegistration,
   ]);
 
   // Memoized check for next button
@@ -504,10 +622,14 @@ const RegistrationForm = () => {
       return selectedCombo !== null;
     if (currentStep === 2 && registrationMode === "individual")
       return selectedEvents.length > 0;
+    if (currentStep === 2 && registrationMode === "team")
+      return selectedEvents.length > 0;
     if (currentStep === 3 && registrationMode === "combo")
       return selectedEvents.length > 0;
+    if (currentStep === 3 && registrationMode === "team")
+      return teamData !== null;
     return true;
-  }, [currentStep, registrationMode, selectedCombo, selectedEvents.length]);
+  }, [currentStep, registrationMode, selectedCombo, selectedEvents.length, teamData]);
 
   if (loading) {
     return (
@@ -590,11 +712,11 @@ const RegistrationForm = () => {
                 Choose Your Registration Type
               </h2>
               <p className="text-gray-400 text-lg">
-                Register for individual events or save with our combo packages
+                Register for individual events, save with combos, or register as a team
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {/* Individual Events Card */}
               <motion.div
                 whileHover={{ scale: 1.02, y: -5 }}
@@ -673,6 +795,44 @@ const RegistrationForm = () => {
                     <li className="flex items-center text-gray-300">
                       <Check className="text-green-400 mr-2" size={20} />
                       Exclusive perks
+                    </li>
+                  </ul>
+                </div>
+              </motion.div>
+
+              {/* Team Events Card */}
+              <motion.div
+                whileHover={{ scale: 1.02, y: -5 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => handleModeSelect("team")}
+                className={`relative p-8 rounded-3xl border-2 cursor-pointer transition-all ${
+                  registrationMode === "team"
+                    ? "border-green-500 bg-green-500/10"
+                    : "border-gray-700 hover:border-green-400 bg-gray-800/50"
+                }`}
+              >
+                <div className="absolute top-4 right-4">
+                  <Users className="text-green-400" size={32} />
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-bold text-white">
+                    Team Events
+                  </h3>
+                  <p className="text-gray-400">
+                    Register your team for collaborative events. Perfect for group competitions.
+                  </p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center text-gray-300">
+                      <Check className="text-green-400 mr-2" size={20} />
+                      Team collaboration
+                    </li>
+                    <li className="flex items-center text-gray-300">
+                      <Check className="text-green-400 mr-2" size={20} />
+                      Group registration
+                    </li>
+                    <li className="flex items-center text-gray-300">
+                      <Check className="text-green-400 mr-2" size={20} />
+                      Shared payment
                     </li>
                   </ul>
                 </div>
@@ -825,46 +985,50 @@ const RegistrationForm = () => {
               <>
                 <div className="text-center space-y-2">
                   <h2 className="text-3xl font-bold text-white">
-                    Select Your Events
+                    {registrationMode === "team" ? "Select Team Event" : "Select Your Events"}
                   </h2>
                   <p className="text-gray-400">
-                    Choose the events you want to attend
+                    {registrationMode === "team" 
+                      ? "Choose a team-based event that requires collaboration" 
+                      : "Choose the events you want to attend"
+                    }
                   </p>
                 </div>
 
-                {/* Search and Filter */}
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <Search
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
-                      size={20}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Search events..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
-                    />
-                  </div>
-                  <div className="flex gap-2 overflow-x-auto pb-2">
-                    <button
-                      onClick={() => setCategoryFilter("ALL")}
-                      className={`px-4 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
-                        categoryFilter === "ALL"
-                          ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
-                          : "bg-gray-800 text-gray-400 hover:text-white"
-                      }`}
-                    >
-                      All Events
-                    </button>
-                    {categories
-                      .filter((cat) => cat !== "ALL")
-                      .map((cat, index) => (
-                        <button
-                          key={`cat-${cat}-${index}`}
-                          onClick={() => setCategoryFilter(cat)}
-                          className={`px-4 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
+                {/* Search and Filter - Hide for team mode */}
+                {registrationMode !== "team" && (
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex-1 relative">
+                      <Search
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                        size={20}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Search events..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                    <div className="flex gap-2 overflow-x-auto pb-2">
+                      <button
+                        onClick={() => setCategoryFilter("ALL")}
+                        className={`px-4 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
+                          categoryFilter === "ALL"
+                            ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+                            : "bg-gray-800 text-gray-400 hover:text-white"
+                        }`}
+                      >
+                        All Events
+                      </button>
+                      {categories
+                        .filter((cat) => cat !== "ALL")
+                        .map((cat, index) => (
+                          <button
+                            key={`cat-${cat}-${index}`}
+                            onClick={() => setCategoryFilter(cat)}
+                            className={`px-4 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
                             categoryFilter === cat
                               ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
                               : "bg-gray-800 text-gray-400 hover:text-white"
@@ -874,7 +1038,8 @@ const RegistrationForm = () => {
                         </button>
                       ))}
                   </div>
-                </div>
+                  </div>
+                )}
 
                 {/* Events Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1069,14 +1234,44 @@ const RegistrationForm = () => {
               <>
                 <div className="text-center space-y-2">
                   <h2 className="text-3xl font-bold text-white">
-                    Review Your Registration
+                    {registrationMode === "team" ? "Review Team Registration" : "Review Your Registration"}
                   </h2>
                   <p className="text-gray-400">
-                    Confirm your event selections to complete registration
+                    {registrationMode === "team" 
+                      ? "Confirm team details and event to complete registration"
+                      : "Confirm your event selections to complete registration"
+                    }
                   </p>
                 </div>
 
                 <div className="max-w-2xl mx-auto space-y-6">
+                  {/* Team Details - Only for team registration */}
+                  {registrationMode === "team" && teamData && (
+                    <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-2 border-green-500/30 rounded-2xl p-6">
+                      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <Users size={24} className="text-green-400" />
+                        Team: {teamData.teamName}
+                      </h3>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-400">Team Members</span>
+                          <span className="text-white font-bold">{teamData.memberCount} members</span>
+                        </div>
+                        <div className="bg-gray-900/50 rounded-xl p-4">
+                          <p className="text-sm text-gray-400 mb-2">Members:</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {teamData.teamMembers?.map((member, idx) => (
+                              <div key={idx} className="text-sm text-white flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                                {member.name}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Selected Events Summary */}
                   <div className="bg-gray-800/50 rounded-2xl p-6 border border-gray-700">
                     <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">

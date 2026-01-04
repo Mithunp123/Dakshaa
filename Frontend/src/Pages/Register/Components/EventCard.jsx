@@ -59,7 +59,8 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
 
   const status = getStatusConfig();
   const StatusIcon = status.icon;
-  const TypeIcon = event.type === "TEAM" ? UsersRound : UserCheck;
+  const isTeamEvent = event.is_team_event || event.min_team_size > 1;
+  const TypeIcon = isTeamEvent ? UsersRound : UserCheck;
 
   return (
     <motion.div
@@ -90,7 +91,7 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h3 className="text-xl font-bold mb-2 line-clamp-1">
-              {event.name}
+              {event.name || event.title || event.event_name || "Unnamed Event"}
             </h3>
             {event.description && (
               <p className="text-sm text-gray-400 line-clamp-2">
@@ -116,17 +117,26 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
           <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-xl">
             <DollarSign size={16} className="text-green-400 flex-shrink-0" />
             <div className="min-w-0">
-              <p className="text-xs text-gray-500">Price</p>
+              <p className="text-xs text-gray-500">
+                {isTeamEvent ? "Per Person" : "Price"}
+              </p>
               <p className="font-bold text-white truncate">₹{event.price}</p>
             </div>
           </div>
 
-          {/* Type */}
+          {/* Type or Team Size */}
           <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-xl">
             <TypeIcon size={16} className="text-blue-400 flex-shrink-0" />
             <div className="min-w-0">
-              <p className="text-xs text-gray-500">Type</p>
-              <p className="font-bold text-white truncate">{event.type}</p>
+              <p className="text-xs text-gray-500">
+                {isTeamEvent ? "Team Size" : "Type"}
+              </p>
+              <p className="font-bold text-white truncate">
+                {isTeamEvent 
+                  ? `${event.min_team_size}-${event.max_team_size}`
+                  : event.type || "Individual"
+                }
+              </p>
             </div>
           </div>
         </div>
