@@ -103,7 +103,7 @@ const MyTeams = () => {
               .select('id, payment_status')
               .eq('team_id', team.id)
               .eq('user_id', user.id)
-              .single();
+              .maybeSingle(); // Use maybeSingle() instead of single() to handle 0 or 1 results
             
             return {
               ...team,

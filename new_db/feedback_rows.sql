@@ -1,0 +1,1 @@
+INSERT INTO "public"."feedback" ("id", "username", "email_id", "rating", "message", "created_at") VALUES ('37cb1a65-05ac-4d01-be9c-8cb91f7402af', 'pavithran', 'godofhacker780@gmail.com', '5', 'its a fantastic event', '2025-12-27 20:13:29.479015+00'), ('5d15956b-f725-4223-ac45-d99e8f7040a2', 'sf', 'gnanaveldhinesha@gmail.com', '5', 'zxgghfg', '2025-12-30 14:40:14.859658+00');

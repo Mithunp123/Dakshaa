@@ -77,20 +77,21 @@ const MyRegistrations = () => {
         .select(
           `
           *,
-          events_config:event_id (
+          events:event_id (
             id,
-            event_name,
+            event_id,
+            name,
             description,
             category,
             price,
             event_date,
-            event_time,
+            start_time,
             venue
           )
         `
         )
         .eq("user_id", userId)
-        .order("created_at", { ascending: false });
+        .order("registered_at", { ascending: false });
 
       if (error) {
         console.error("Error fetching registrations:", error);
@@ -99,7 +100,7 @@ const MyRegistrations = () => {
           .from("event_registrations_config")
           .select("*")
           .eq("user_id", userId)
-          .order("created_at", { ascending: false });
+          .order("registered_at", { ascending: false });
 
         if (!simpleError) {
           setRegistrations(simpleData || []);
@@ -115,7 +116,7 @@ const MyRegistrations = () => {
   };
 
   const filteredRegistrations = registrations.filter((reg) => {
-    const eventName = reg.event_name || reg.events_config?.name || "";
+    const eventName = reg.event_name || reg.events?.name || "";
     const matchesSearch = eventName
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
@@ -458,30 +459,30 @@ const MyRegistrations = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="text-xl font-bold text-white mb-1">
-                          {reg.event_name || reg.events_config?.name ||
+                          {reg.event_name || reg.events?.name ||
                             `Event #${reg.event_id?.slice(0, 8)}`}
                         </h3>
                         <p className="text-gray-400 text-sm mb-3">
-                          {reg.events_config?.description ||
+                          {reg.events?.description ||
                             "Event registration"}
                         </p>
                         <div className="flex flex-wrap gap-4 text-sm">
-                          {reg.events_config?.event_date && (
+                          {reg.events?.event_date && (
                             <span className="flex items-center gap-1 text-gray-400">
                               <Calendar size={14} />
-                              {formatDate(reg.events_config.event_date)}
+                              {formatDate(reg.events.event_date)}
                             </span>
                           )}
-                          {reg.events_config?.event_time && (
+                          {reg.events?.start_time && (
                             <span className="flex items-center gap-1 text-gray-400">
                               <Clock size={14} />
-                              {formatTime(reg.events_config.event_time)}
+                              {formatTime(reg.events.start_time)}
                             </span>
                           )}
-                          {reg.events_config?.venue && (
+                          {reg.events?.venue && (
                             <span className="flex items-center gap-1 text-gray-400">
                               <MapPin size={14} />
-                              {reg.events_config.venue}
+                              {reg.events.venue}
                             </span>
                           )}
                         </div>
@@ -497,13 +498,13 @@ const MyRegistrations = () => {
                     >
                       {reg.payment_status || "CONFIRMED"}
                     </span>
-                    {reg.events_config?.price && (
+                    {(reg.payment_amount || reg.events?.price) && (
                       <span className="text-xl font-bold text-blue-400">
-                        ₹{reg.events_config.price}
+                        ₹{reg.payment_amount || reg.events.price}
                       </span>
                     )}
                     <span className="text-xs text-gray-500">
-                      Registered: {formatDate(reg.created_at)}
+                      Registered: {formatDate(reg.registered_at || reg.created_at)}
                     </span>
                   </div>
                 </div>

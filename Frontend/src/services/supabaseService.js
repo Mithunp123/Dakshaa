@@ -7,14 +7,39 @@ const isValidUUID = (str) => {
 };
 
 export const supabaseService = {
-  // Fetch all active events
+  // Fetch all active events with dynamic registration counts
   async getEvents() {
-    const { data, error } = await supabase
+    const { data: events, error } = await supabase
       .from("events")
       .select("*")
       .eq("is_active", true);
+    
     if (error) throw error;
-    return data;
+    
+    // Get actual registration counts for each event
+    const eventsWithCounts = await Promise.all(
+      events.map(async (event) => {
+        // Count registrations for this event using event_id
+        const { count } = await supabase
+          .from("event_registrations_config")
+          .select("*", { count: "exact", head: true })
+          .eq("event_id", event.id);
+        
+        return {
+          ...event,
+          // Convert TEXT fields to numbers for the UI
+          capacity: parseInt(event.capacity) || 100,
+          current_registrations: count || 0,
+          price: event.price,
+          min_team_size: parseInt(event.min_team_size) || 1,
+          max_team_size: parseInt(event.max_team_size) || 10,
+          is_team_event: event.is_team_event === 'true' || event.is_team_event === true,
+          is_open: event.is_open === 'true' || event.is_open === true || event.is_open !== 'false'
+        };
+      })
+    );
+    
+    return eventsWithCounts;
   },
 
   // Fetch all active combos
@@ -35,18 +60,21 @@ export const supabaseService = {
       const uuids = eventIds.filter(id => isValidUUID(id));
       const eventKeys = eventIds.filter(id => !isValidUUID(id));
 
-      // Convert event_keys to UUIDs by looking up in events_config
+      // Convert event_keys to UUIDs by looking up in events table
       let resolvedUUIDs = [...uuids];
       
       if (eventKeys.length > 0) {
         const { data: keyLookup } = await supabase
-          .from("events_config")
-          .select("id, event_key")
-          .in("event_key", eventKeys);
+          .from("events")
+          .select("id, event_key, event_id")
+          .or(`event_key.in.(${eventKeys.join(',')}),event_id.in.(${eventKeys.join(',')})`);
         
         if (keyLookup) {
           const keyToUUID = {};
-          keyLookup.forEach(e => { keyToUUID[e.event_key] = e.id; });
+          keyLookup.forEach(e => { 
+            if (e.event_key) keyToUUID[e.event_key] = e.id;
+            if (e.event_id) keyToUUID[e.event_id] = e.id;
+          });
           eventKeys.forEach(key => {
             if (keyToUUID[key]) {
               resolvedUUIDs.push(keyToUUID[key]);
@@ -76,16 +104,16 @@ export const supabaseService = {
         throw new Error("You are already registered for all selected events!");
       }
 
-      // Fetch event names for the new event IDs
+      // Fetch event names for the new event IDs from events table
       const { data: eventsData } = await supabase
-        .from("events_config")
-        .select("id, name")
+        .from("events")
+        .select("id, name, event_name, title")
         .in("id", newEventIds);
 
       // Create a map of event_id to event_name
       const eventNameMap = {};
       (eventsData || []).forEach((event) => {
-        eventNameMap[event.id] = event.name;
+        eventNameMap[event.id] = event.name || event.event_name || event.title;
       });
 
       // Include event_name along with other columns
@@ -125,7 +153,7 @@ export const supabaseService = {
   async getUserRegistrations(userId) {
     const { data, error } = await supabase
       .from("event_registrations_config")
-      .select("*, events_config(*)")
+      .select("*, events:event_id(id, name, category, price, event_date, start_time, venue, description)")
       .eq("user_id", userId);
     if (error) throw error;
     return data;
@@ -134,64 +162,115 @@ export const supabaseService = {
   // Team methods
   async getUserTeams(userId) {
     try {
-      // Use the safe RPC function that bypasses RLS properly
-      const { data, error } = await supabase
-        .rpc('get_user_teams', { p_user_id: userId });
+      // First, get team IDs where user is a member
+      const { data: teamMemberships, error: memberError } = await supabase
+        .from("team_members")
+        .select("team_id, role, status")
+        .eq("user_id", userId)
+        .in("status", ["active", "joined"]);
 
-      if (error) {
-        console.warn("Error fetching teams:", error.message);
+      if (memberError) {
+        console.warn("Error fetching team memberships:", memberError.message);
         return [];
       }
 
-      if (!data || data.length === 0) {
+      if (!teamMemberships || teamMemberships.length === 0) {
         return [];
       }
 
-      // Fetch members for each team separately
-      const teamsWithMembers = await Promise.all(
-        data.map(async (team) => {
-          // Fetch team members with their profiles
-          const { data: members } = await supabase
-            .from("team_members")
-            .select(
-              `
-            user_id,
-            role,
-            status,
-            created_at,
-            profiles!inner (id, full_name, email, roll_no, department, college_name)
-          `
-            )
-            .eq("team_id", team.team_id)
-            .eq("status", "active")
-            .order("role", { ascending: false });
+      // Get team IDs
+      const teamIds = teamMemberships.map(tm => tm.team_id);
 
-          return {
-            id: team.team_id,
-            name: team.team_name,
-            event_id: team.event_id,
-            leader_id: team.leader_id,
-            max_members: team.max_team_size,
-            is_active: true,
-            created_at: team.created_at,
-            events: {
-              id: team.event_id,
-              title: team.event_title,
-              category: team.event_category,
-              max_team_size: team.max_team_size,
-              min_team_size: team.min_team_size
-            },
-            role: team.role,
-            members: members || [],
-            is_registered: team.is_registered
-          };
-        })
-      );
+      // Fetch team details separately - use wildcard to get all columns
+      const { data: teams, error: teamsError } = await supabase
+        .from("teams")
+        .select("*")
+        .in("id", teamIds);
 
-      return teamsWithMembers;
+      if (teamsError) {
+        console.warn("Error fetching teams:", teamsError.message);
+        return [];
+      }
+
+      if (!teams || teams.length === 0) {
+        return [];
+      }
+
+      // Get event IDs for fetching event details
+      const eventIds = [...new Set(teams.map(t => t.event_id).filter(Boolean))];
+
+      // Fetch events if there are any event IDs
+      let events = [];
+      if (eventIds.length > 0) {
+        const { data: eventsData } = await supabase
+          .from("events")
+          .select("id, event_id, name, category, min_team_size, max_team_size")
+          .in("event_id", eventIds);
+        events = eventsData || [];
+      }
+
+      // Fetch all team members for these teams
+      const { data: allMembers } = await supabase
+        .from("team_members")
+        .select(`
+          team_id,
+          user_id,
+          role,
+          status,
+          created_at,
+          profiles (id, full_name, email, roll_no, department, college_name)
+        `)
+        .in("team_id", teamIds)
+        .in("status", ["active", "joined"])
+        .order("role", { ascending: false });
+
+      // Build the complete team objects
+      const teamsWithDetails = teams.map(team => {
+        const membership = teamMemberships.find(tm => tm.team_id === team.id);
+        const event = events.find(e => e.event_id === team.event_id);
+        const teamMembers = allMembers?.filter(m => m.team_id === team.id) || [];
+        
+        // Flatten member data structure for easier access in UI
+        const flattenedMembers = teamMembers.map(member => ({
+          user_id: member.user_id,
+          role: member.role,
+          status: member.status,
+          created_at: member.created_at,
+          // Flatten profile data
+          id: member.profiles?.id,
+          name: member.profiles?.full_name || 'Unknown',
+          email: member.profiles?.email || '',
+          roll_no: member.profiles?.roll_no || '',
+          department: member.profiles?.department || '',
+          college: member.profiles?.college_name || ''
+        }));
+
+        return {
+          id: team.id,
+          name: team.team_name || team.name || 'Unnamed Team',
+          event_id: team.event_id,
+          leader_id: team.leader_id || team.created_by,
+          max_members: event?.max_team_size || 10,
+          is_active: team.is_active !== undefined ? team.is_active : true,
+          created_at: team.created_at,
+          events: event ? {
+            id: event.id,
+            title: event.name,
+            category: event.category,
+            max_team_size: event.max_team_size,
+            min_team_size: event.min_team_size
+          } : null,
+          role: membership?.role || 'member',
+          members: flattenedMembers,
+          is_registered: false
+        };
+      });
+
+      return teamsWithDetails;
     } catch (error) {
       console.error("Error fetching user teams:", error);
-      throw error;
+      // Return empty array instead of throwing to prevent UI crashes
+      return [];
     }
   },
 

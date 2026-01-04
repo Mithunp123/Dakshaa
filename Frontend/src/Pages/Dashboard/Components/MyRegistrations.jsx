@@ -108,10 +108,10 @@ const MyRegistrations = () => {
                     {reg.payment_status}
                   </span>
                   <h3 className="text-lg font-bold mt-2">
-                    {reg.event_name || reg.events_config?.name || 'Event'}
+                    {reg.event_name || reg.events?.name || 'Event'}
                   </h3>
                   <p className="text-sm text-gray-400 capitalize">
-                    {reg.events_config?.category || ''}
+                    {reg.events?.category || ''}
                   </p>
                 </div>
               </div>
@@ -120,8 +120,8 @@ const MyRegistrations = () => {
                 <div className="flex items-center gap-2">
                   <Calendar size={14} />
                   <span>
-                    {reg.events_config?.event_date 
-                      ? new Date(reg.events_config.event_date).toLocaleDateString('en-US', { 
+                    {reg.events?.event_date 
+                      ? new Date(reg.events.event_date).toLocaleDateString('en-US', { 
                           month: 'long', 
                           day: 'numeric', 
                           year: 'numeric' 
@@ -131,7 +131,7 @@ const MyRegistrations = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock size={14} />
-                  <span>{reg.events_config?.event_time || '09:00 AM onwards'}</span>
+                  <span>{reg.events?.start_time || '09:00 AM onwards'}</span>
                 </div>
               </div>
 
