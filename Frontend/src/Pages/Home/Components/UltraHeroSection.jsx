@@ -307,23 +307,27 @@ const UltraHeroSection = () => {
 
   return (
     <motion.section
-      className="relative min-h-screen flex flex-col lg:flex-row items-center justify-center px-4 sm:px-6 lg:px-12 pt-40 lg:pt-32 pb-10 overflow-hidden"
+      className="relative w-full flex flex-col lg:flex-row items-center justify-center px-4 sm:px-6 lg:px-12 pt-40 lg:pt-32 pb-10 overflow-hidden"
+      style={{ minHeight: '100vh' }}
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
       {/* Background Elements */}
-      <CyberGrid />
-      <HeroParticles />
-      <HexPattern />
+      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+        <CyberGrid />
+        <HeroParticles />
+        <HexPattern />
+      </div>
 
       {/* Mouse follow glow - Optimized */}
       <motion.div
-        className="fixed w-96 h-96 rounded-full pointer-events-none z-0 hidden lg:block"
+        className="fixed w-96 h-96 rounded-full pointer-events-none hidden lg:block"
         style={{
           background: 'radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%)',
           left: glowX,
           top: glowY,
+          zIndex: 1
         }}
         animate={{
           scale: [1, 1.1, 1],
@@ -331,11 +335,10 @@ const UltraHeroSection = () => {
         transition={{ duration: 2, repeat: Infinity }}
       />
 
-
-
       {/* Brochure Download Button - Top Right */}
       <motion.div
-        className="hidden md:flex absolute right-8 top-32 z-20"
+        className="hidden md:flex absolute right-8 top-32"
+        style={{ zIndex: 20 }}
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 1, duration: 0.8 }}
@@ -397,7 +400,8 @@ const UltraHeroSection = () => {
 
       {/* Left Content */}
       <motion.div
-        className="flex flex-col items-center lg:items-start lg:ml-16 w-full lg:w-1/2 z-10 order-2 lg:order-1 mt-8 lg:mt-0"
+        className="flex flex-col items-center lg:items-start lg:ml-16 w-full lg:w-1/2 order-2 lg:order-1 mt-8 lg:mt-0"
+        style={{ zIndex: 10, position: 'relative' }}
         variants={containerVariants}
       >
         {/* Event Type Badge */}
@@ -529,6 +533,7 @@ const UltraHeroSection = () => {
       {/* Right Content - Hero Image */}
       <motion.div
         className="relative w-full lg:w-1/2 flex justify-center items-center order-1 lg:order-2 mb-6 lg:mb-0"
+        style={{ zIndex: 10, position: 'relative' }}
         variants={itemVariants}
       >
         {/* Multi-layer glow effect */}

@@ -60,6 +60,7 @@ const RegistrationForm = () => {
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const [validationStatus, setValidationStatus] = useState(null);
   const [validationMessage, setValidationMessage] = useState("");
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
   
   // Ref to track footer visibility
   const footerObserverRef = useRef(null);
@@ -134,24 +135,60 @@ const RegistrationForm = () => {
     }
   }, [registrationSuccess]);
 
-  // Load data when user is available
+  // Load data when component mounts and when user changes
   useEffect(() => {
     let isMounted = true;
+    let channel = null;
     
     const loadData = async () => {
       try {
         setLoading(true);
+        setLoadingTimeout(false);
+        console.log('Loading events and combos...');
+        
+        // Set a timeout to show error if loading takes too long
+        const timeoutId = setTimeout(() => {
+          setLoadingTimeout(true);
+          console.error('Loading timeout - database may be unreachable');
+        }, 10000); // 10 second timeout
+        
+        // Always load events (doesn't require user)
+        const eventsPromise = eventConfigService.getEventsWithStats();
+        
+        // Only load combos if user is available
+        const combosPromise = user?.id 
+          ? comboService.getActiveCombosForStudents(user.id)
+          : Promise.resolve({ data: [] });
+        
         const [eventsResult, combosResult] = await Promise.all([
-          eventConfigService.getEventsWithStats(),
-          comboService.getActiveCombosForStudents(user?.id),
+          eventsPromise,
+          combosPromise
         ]);
         
+        clearTimeout(timeoutId);
+        
         if (isMounted) {
-          setEvents(eventsResult?.data || []);
-          setCombos(combosResult?.data || []);
+          // Check if events failed to load
+          if (eventsResult && !eventsResult.success && eventsResult.error) {
+            console.error('Failed to load events:', eventsResult.error);
+            alert(`⚠️ Database Error\n\n${eventsResult.error}\n\nPossible causes:\n• Events table doesn't exist\n• RLS policies not configured\n• Database connection issue\n\nPlease check the browser console for details.`);
+          }
+          
+          const eventsData = eventsResult?.data || [];
+          const combosData = combosResult?.data || [];
+          
+          console.log(`Loaded ${eventsData.length} events and ${combosData.length} combos`);
+          
+          setEvents(eventsData);
+          setCombos(combosData);
         }
       } catch (error) {
         console.error("Error loading data:", error);
+        // Still set empty arrays to stop loading state
+        if (isMounted) {
+          setEvents([]);
+          setCombos([]);
+        }
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -159,12 +196,46 @@ const RegistrationForm = () => {
       }
     };
     
+    // Load data immediately
     loadData();
+    
+    // Set up real-time subscription for registration changes (debounced)
+    let refreshTimeout = null;
+    try {
+      channel = supabase
+        .channel('registration-updates')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'event_registrations_config'
+          },
+          (payload) => {
+            console.log('Registration update detected:', payload.eventType);
+            // Debounce refreshes to avoid too many calls
+            if (refreshTimeout) clearTimeout(refreshTimeout);
+            refreshTimeout = setTimeout(() => {
+              if (isMounted) {
+                console.log('Reloading events data...');
+                loadData();
+              }
+            }, 1500); // Wait 1.5 seconds before refreshing
+          }
+        )
+        .subscribe();
+    } catch (error) {
+      console.error("Error setting up real-time subscription:", error);
+    }
     
     return () => {
       isMounted = false;
+      if (refreshTimeout) clearTimeout(refreshTimeout);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
-  }, [user?.id]);
+  }, [user]); // Re-run when user changes
 
   // Apply pre-selection after events are loaded
   useEffect(() => {
@@ -392,25 +463,42 @@ const RegistrationForm = () => {
         return;
       }
 
-      // Register for each selected event with PENDING status initially
-      const registrationResults = await supabaseService.registerEvents(
-        user.id,
-        selectedEvents,
-        null, // no combo
-        null // No payment ID yet - will be added when user proceeds to payment
-      );
-
-      // Now update payment status to PAID and add payment ID (simulating payment confirmation)
+      // Register for each selected event using event_registrations_config
       const tempPaymentId = `TEMP_${user.id.substring(0, 8)}_${Date.now()}`;
-      const registrationIds = registrationResults.map(r => r.id);
+      const registrations = [];
       
-      await supabase
-        .from('registrations')
-        .update({
+      for (const eventId of selectedEvents) {
+        const eventInfo = selectedEventDetails.find(e => (e.id || e.event_id) === eventId);
+        
+        if (!eventInfo) {
+          console.warn(`Event not found for ID: ${eventId}`);
+          continue;
+        }
+        
+        // Use UUID id field for event_registrations_config (not event_id TEXT)
+        const eventUuidId = eventInfo.id || eventId;
+        
+        registrations.push({
+          event_id: eventUuidId, // Must be UUID to match FK constraint
+          user_id: user.id,
+          event_name: eventInfo?.name || eventInfo?.event_name || eventInfo?.title,
           payment_status: 'PAID',
-          payment_id: tempPaymentId
-        })
-        .in('id', registrationIds);
+          payment_amount: eventInfo?.price || 0,
+          transaction_id: tempPaymentId
+        });
+      }
+
+      console.log('Submitting registrations:', registrations);
+
+      const { data: registrationResults, error: regError } = await supabase
+        .from('event_registrations_config')
+        .insert(registrations)
+        .select();
+      
+      if (regError) {
+        console.error('Registration error:', regError);
+        throw new Error(regError.message || 'Failed to create registrations');
+      }
 
       // Create admin notification for the registration
       const eventNames = selectedEventDetails
@@ -649,6 +737,73 @@ const RegistrationForm = () => {
         <div className="flex flex-col items-center space-y-4">
           <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
           <p className="text-gray-400">Loading events...</p>
+          {loadingTimeout && (
+            <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg max-w-md text-center">
+              <p className="text-red-400 font-semibold mb-2">⚠️ Loading is taking longer than expected</p>
+              <p className="text-gray-400 text-sm mb-3">
+                The database connection might be slow or unavailable. 
+                The events table may not exist or RLS policies may be blocking access.
+              </p>
+              <div className="flex gap-2 justify-center flex-wrap">
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-secondary rounded-lg hover:bg-secondary/80 transition-colors text-sm"
+                >
+                  Force Refresh
+                </button>
+                <button
+                  onClick={() => {
+                    setLoading(false);
+                    setEvents([]);
+                  }}
+                  className="px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors text-sm"
+                >
+                  Stop Loading
+                </button>
+              </div>
+            </div>
+          )}
+          {!loadingTimeout && (
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 px-4 py-2 bg-secondary rounded-lg hover:bg-secondary/80 transition-colors text-sm"
+            >
+              Refresh Page
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // If no events loaded but not loading anymore, show error message
+  if (!loading && events.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4 max-w-md text-center">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-white">No Events Available</h2>
+          <p className="text-gray-400">
+            Unable to load events. This might be due to a database connection issue.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                console.log('Retry loading events');
+                setLoading(true);
+                window.location.reload();
+              }}
+              className="px-6 py-3 bg-secondary rounded-lg hover:bg-secondary/80 transition-colors font-bold"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => window.open('https://ltmyqtcirhsgfyortgfo.supabase.co', '_blank')}
+              className="px-6 py-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Check Database
+            </button>
+          </div>
         </div>
       </div>
     );

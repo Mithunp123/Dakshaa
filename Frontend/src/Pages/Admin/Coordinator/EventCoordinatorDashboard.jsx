@@ -755,7 +755,7 @@ const EventCoordinatorDashboard = () => {
           }`}
         >
           <Sun size={18} />
-          Morning
+          Forenoon
         </button>
         <button
           onClick={() => setSelectedSession('evening')}
@@ -766,7 +766,7 @@ const EventCoordinatorDashboard = () => {
           }`}
         >
           <Moon size={18} />
-          Evening
+          Afternoon
         </button>
       </div>
 
@@ -780,12 +780,12 @@ const EventCoordinatorDashboard = () => {
         <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-4 text-center">
           <Sun className="mx-auto text-yellow-500 mb-2" size={24} />
           <p className="text-2xl font-bold text-yellow-500">{stats.morningCheckedIn}</p>
-          <p className="text-xs text-gray-400 uppercase">Morning ✓</p>
+          <p className="text-xs text-gray-400 uppercase">Forenoon ✓</p>
         </div>
         <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-4 text-center">
           <Moon className="mx-auto text-indigo-500 mb-2" size={24} />
           <p className="text-2xl font-bold text-indigo-500">{stats.eveningCheckedIn}</p>
-          <p className="text-xs text-gray-400 uppercase">Evening ✓</p>
+          <p className="text-xs text-gray-400 uppercase">Afternoon ✓</p>
         </div>
         <div className="bg-secondary/10 border border-secondary/20 rounded-2xl p-4 text-center">
           <Clock className="mx-auto text-secondary mb-2" size={24} />
@@ -967,9 +967,9 @@ const EventCoordinatorDashboard = () => {
                   : 'bg-indigo-500/20 text-indigo-500 border border-indigo-500/30'
               }`}>
                 {selectedSession === 'morning' ? (
-                  <span className="flex items-center justify-center gap-2"><Sun size={18} /> Marking MORNING Session</span>
+                  <span className="flex items-center justify-center gap-2"><Sun size={18} /> Marking FORENOON Session</span>
                 ) : (
-                  <span className="flex items-center justify-center gap-2"><Moon size={18} /> Marking EVENING Session</span>
+                  <span className="flex items-center justify-center gap-2"><Moon size={18} /> Marking AFTERNOON Session</span>
                 )}
               </div>
 

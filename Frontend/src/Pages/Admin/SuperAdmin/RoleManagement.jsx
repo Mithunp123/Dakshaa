@@ -127,7 +127,7 @@ const RoleManagement = () => {
     try {
       const { data, error } = await supabase
         .from('event_coordinators')
-        .select('*, profiles(full_name, email), events(event_id, category)');
+        .select('*, profiles(full_name, email), events(event_id, title, category)');
 
       if (error) throw error;
       setCoordinatorAssignments(data || []);
@@ -585,7 +585,7 @@ const RoleManagement = () => {
               >
                 <div>
                   <p className="font-bold">{assignment.profiles?.full_name}</p>
-                  <p className="text-sm text-gray-400">{assignment.events?.event_id}</p>
+                  <p className="text-sm text-gray-400">{assignment.events?.title || assignment.events?.event_id}</p>
                   <p className="text-xs text-gray-500 capitalize">{assignment.events?.category}</p>
                 </div>
                 <button
@@ -783,7 +783,7 @@ const RoleManagement = () => {
                         className="w-5 h-5 rounded border-white/10 bg-white/5 text-purple-500 focus:ring-purple-500"
                       />
                       <div className="flex-1">
-                        <p className="font-bold">{event.event_id}</p>
+                        <p className="font-bold">{event.title || event.event_id}</p>
                         <p className="text-xs text-gray-400 capitalize">{event.category} • ₹{event.price}</p>
                       </div>
                     </label>

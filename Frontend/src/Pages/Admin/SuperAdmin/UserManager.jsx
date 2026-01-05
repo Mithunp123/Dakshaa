@@ -35,6 +35,7 @@ const UserManager = () => {
   const [userActivity, setUserActivity] = useState([]);
   const [userRegistrations, setUserRegistrations] = useState([]);
   const [userTeams, setUserTeams] = useState([]);
+  const [allUserTeams, setAllUserTeams] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('users');
   const [messageForm, setMessageForm] = useState({ subject: '', body: '', target: 'all' });
@@ -52,6 +53,51 @@ const UserManager = () => {
       
       if (error) throw error;
       setUsers(data);
+      
+      // Fetch team members data
+      const { data: teamMembersData, error: teamMembersError } = await supabase
+        .from('team_members')
+        .select('user_id, role, team_id');
+      
+      if (teamMembersError) {
+        console.error('Error fetching team members:', teamMembersError);
+        setAllUserTeams({});
+        return;
+      }
+      
+      // Fetch all teams data
+      const { data: teamsData, error: teamsError } = await supabase
+        .from('teams')
+        .select('id, team_name, event_id');
+      
+      if (teamsError) {
+        console.error('Error fetching teams:', teamsError);
+        setAllUserTeams({});
+        return;
+      }
+      
+      // Create a map of team_id to team data for quick lookup
+      const teamsMap = {};
+      if (teamsData) {
+        teamsData.forEach(team => {
+          teamsMap[team.id] = team;
+        });
+      }
+      
+      // Organize teams by user_id and add team details
+      const userTeamsMap = {};
+      if (teamMembersData) {
+        teamMembersData.forEach(tm => {
+          if (!userTeamsMap[tm.user_id]) {
+            userTeamsMap[tm.user_id] = [];
+          }
+          userTeamsMap[tm.user_id].push({
+            ...tm,
+            teams: teamsMap[tm.team_id] || null
+          });
+        });
+      }
+      setAllUserTeams(userTeamsMap);
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
@@ -323,11 +369,32 @@ const UserManager = () => {
                   </div>
                   <div className="flex items-center gap-3 text-sm text-gray-400">
                     <Phone size={16} className="shrink-0" />
-                    <span>{user.mobile_number || 'N/A'}</span>
+                    <span className="break-all">{user.mobile_number || 'N/A'}</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-gray-400">
-                    <Shield size={16} className="shrink-0" />
-                    <span className="capitalize">{user.department || 'N/A'}</span>
+                  <div className="flex items-start gap-3 text-sm text-gray-400">
+                    <Users size={16} className="shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      {allUserTeams[user.id] && allUserTeams[user.id].length > 0 ? (
+                        <div className="space-y-1">
+                          {allUserTeams[user.id].map((tm, idx) => (
+                            <div key={idx} className="flex items-center gap-2 flex-wrap">
+                              <span className="font-medium text-gray-300">
+                                {tm.teams?.team_name || 'Unknown Team'}
+                              </span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                tm.role === 'leader' 
+                                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' 
+                                  : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                              }`}>
+                                {tm.role === 'leader' ? 'Leader' : 'Member'}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-gray-500 italic">No Team</span>
+                      )}
+                    </div>
                   </div>
                 </div>
 

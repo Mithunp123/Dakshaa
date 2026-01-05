@@ -263,11 +263,14 @@ function UltraAbout() {
   const dakshaaDescription = `DaKshaa T26 is a premier National Level Techno-Cultural Fest that brings together innovation, creativity, and talent under one grand stage. Designed to foster technical excellence and artistic expression, this fest serves as a vibrant platform for students and professionals across the country to showcase their skills, exchange ideas, and compete at the highest level. With a perfect blend of technology, culture, and entertainment, DaKshaa T26 features an array of events, including technical challenges, hackathons, workshops, cultural performances, and interactive sessions with industry experts. Whether you're a tech enthusiast eager to dive into the latest advancements or an artist looking to mesmerize the audience, DaKshaa T26 has something for everyone.`;
 
   return (
-    <section className="relative py-20 px-4 sm:px-8 lg:px-20 overflow-hidden">
-      <FloatingTechElements />
+    <section className="relative w-full py-20 px-4 sm:px-8 lg:px-20 overflow-hidden bg-transparent">
+      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+        <FloatingTechElements />
+      </div>
       
-      {/* Section Title */}
-      <SectionTitle 
+      <div className="relative" style={{ zIndex: 1 }}>
+        {/* Section Title */}
+        <SectionTitle 
         title="About Us" 
         subtitle="Discover the legacy of excellence and innovation"
       />
@@ -310,6 +313,7 @@ function UltraAbout() {
           <div className="w-20 h-[2px] bg-gradient-to-l from-transparent to-sky-500" />
         </div>
       </motion.div>
+      </div>
     </section>
   );
 }

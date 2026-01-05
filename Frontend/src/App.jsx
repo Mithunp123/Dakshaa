@@ -49,6 +49,7 @@ const TestConnection = lazy(() => import("./Pages/TestConnection"));
 const MyRegistrations = lazy(() => import("./Pages/MyRegistrations/MyRegistrations"));
 const AdminDashboard = lazy(() => import("./Pages/Admin/AdminDashboard"));
 const PaymentSimulation = lazy(() => import("./Pages/Register/Components/PaymentSimulation"));
+const NotFound = lazy(() => import("./Pages/NotFound"));
 
 // Components that are always needed can remain static or also be lazy loaded if large
 import AuthRedirect from "./Components/AuthRedirect";
@@ -90,7 +91,7 @@ function AppContent() {
   const showBottomNav = !isDashboard && !isAdmin && !isScan && !isLogin;
 
   return (
-    <div className={`min-h-screen min-h-screen-safe ${showBottomNav ? 'pb-16 md:pb-0' : ''}`}>
+    <div className="min-h-screen min-h-screen-safe" style={{ minHeight: '100vh', position: 'relative' }}>
       {!isDashboard && !isAdmin && !isScan && !isLogin && <Navbar />}
       {!isDashboard && !isAdmin && !isScan && !isLogin && <Tags />}
       <AnimatePresence mode="wait">
@@ -309,6 +310,9 @@ function AppContent() {
               <Route index element={<VolunteerDashboard />} />
               <Route path="scanner" element={<AttendanceScanner />} />
             </Route>
+
+            {/* 404 Route - Must be last */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </AnimatePresence>

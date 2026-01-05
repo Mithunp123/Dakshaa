@@ -152,18 +152,15 @@ const Overview = () => {
         console.log('✅ Total events:', totalEventCount);
       }
 
-      // Fetch Recent Registrations (without joins, fetch separately)
+      // Fetch Recent Registrations (with proper FK reference)
       console.log('📋 Fetching recent registrations...');
       const { data: recent, error: recentError } = await supabase
         .from('event_registrations_config')
-        .select('*, profiles!user_id(full_name)')
+        .select('*, profiles!event_registrations_config_user_id_profiles_fkey(full_name, email)')
         .order('registered_at', { ascending: false })
         .limit(5);
 
       if (recentError) {
-        // Fallback or retry with created_at if registered_at is missing?
-        // Usually event_registrations_config uses 'registered_at'. Let's check schema.
-        // Assuming registered_at based on service file usage.
         console.error('❌ Error fetching recent registrations:', recentError);
       } else {
         console.log('✅ Recent registrations fetched:', recent?.length || 0);

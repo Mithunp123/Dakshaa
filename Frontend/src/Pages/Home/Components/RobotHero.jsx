@@ -131,14 +131,67 @@ function Model(props) {
 const RobotHero = () => {
   const [loadError, setLoadError] = useState(false);
 
+  useEffect(() => {
+    // Handle WebGL context loss
+    const handleContextLost = (event) => {
+      event.preventDefault();
+      console.warn('WebGL context lost. Reloading...');
+      setLoadError(true);
+    };
+
+    const handleContextRestored = () => {
+      console.log('WebGL context restored');
+      setLoadError(false);
+    };
+
+    const canvas = document.querySelector('canvas');
+    if (canvas) {
+      canvas.addEventListener('webglcontextlost', handleContextLost);
+      canvas.addEventListener('webglcontextrestored', handleContextRestored);
+    }
+
+    return () => {
+      if (canvas) {
+        canvas.removeEventListener('webglcontextlost', handleContextLost);
+        canvas.removeEventListener('webglcontextrestored', handleContextRestored);
+      }
+    };
+  }, []);
+
+  if (loadError) {
+    return (
+      <div className="w-full h-[400px] xs:h-[500px] sm:h-[600px] md:h-[700px] relative z-20 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-400 mb-4">3D view temporarily unavailable</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-secondary rounded-lg hover:bg-secondary/80 transition-colors"
+          >
+            Reload Page
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full h-[400px] xs:h-[500px] sm:h-[600px] md:h-[700px] relative z-20 cursor-grab active:cursor-grabbing">
       <Canvas
         camera={{ position: [0, 2, 10], fov: 35 }}
-        gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
-        dpr={[1, 2]}
+        gl={{ 
+          alpha: true, 
+          antialias: true, 
+          powerPreference: 'high-performance',
+          preserveDrawingBuffer: false,
+          failIfMajorPerformanceCaveat: false
+        }}
+        dpr={[1, Math.min(window.devicePixelRatio, 2)]}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0); // Transparent background
+        }}
+        onError={(error) => {
+          console.error('Canvas error:', error);
+          setLoadError(true);
         }}
       >
         <ambientLight intensity={0.5} />

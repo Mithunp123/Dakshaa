@@ -11,17 +11,158 @@ import { supabase } from "../supabase";
  */
 export const getEventsWithStats = async () => {
   try {
-    const { data, error } = await supabase.rpc("get_events_with_stats");
+    console.log('Fetching events with stats...');
+    
+    // Create a timeout promise (5 seconds)
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Database query timeout - check if events table exists and is accessible')), 5000)
+    );
+    
+    // First, try a simple query without any filters to test connectivity
+    console.log('Testing database connectivity...');
+    const testPromise = supabase
+      .from('events')
+      .select('id, event_id, name, title')
+      .limit(1);
+    
+    const { data: testData, error: testError } = await Promise.race([
+      testPromise,
+      timeoutPromise
+    ]).catch(err => ({ data: null, error: err }));
+    
+    if (testError) {
+      console.error('Database connectivity test failed:', testError);
+      console.error('Error details:', {
+        message: testError.message,
+        details: testError.details,
+        hint: testError.hint,
+        code: testError.code
+      });
+      
+      // Return empty array with clear error message
+      return {
+        success: false,
+        data: [],
+        error: `Database connection failed: ${testError.message}. Please ensure the events table exists in Supabase.`
+      };
+    }
+    
+    console.log('Database connection OK, fetching all events...');
+    
+    // Now fetch all events with timeout
+    const eventsPromise = supabase
+      .from('events')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+    
+    const { data: eventsData, error: eventsError } = await Promise.race([
+      eventsPromise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Events query timeout')), 5000))
+    ]).catch(err => ({ data: null, error: err }));
 
-    if (error) throw error;
+    if (eventsError || !eventsData) {
+      console.error('Failed to fetch events:', eventsError);
+      return {
+        success: false,
+        data: [],
+        error: eventsError?.message || 'Failed to load events'
+      };
+    }
 
-    return {
-      success: true,
-      data: data || [],
-      error: null
-    };
+    console.log(`Loaded ${eventsData.length} events from database`);
+    
+    // If no events found, return early
+    if (eventsData.length === 0) {
+      console.warn('No active events found in database');
+      return {
+        success: true,
+        data: [],
+        error: null
+      };
+    }
+    
+    // Check which column name to use for event ID (id vs event_id)
+    const hasUuidId = eventsData.length > 0 && 'id' in eventsData[0];
+    const idField = hasUuidId ? 'id' : 'event_id';
+    
+    console.log(`Using ${idField} as event identifier`);
+    
+    // Skip registration counting if it's taking too long - just return events
+    // Users can still see events even if counts aren't accurate
+    try {
+      // Determine which registration table to use (with timeout)
+      const testRegPromise = supabase
+        .from('event_registrations_config')
+        .select('event_id')
+        .limit(1);
+      
+      const { error: testRegError } = await Promise.race([
+        testRegPromise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000))
+      ]).catch(() => ({ error: true }));
+      
+      const registrationTable = testRegError ? 'registrations' : 'event_registrations_config';
+      const registrationIdField = 'event_id';
+      
+      console.log(`Using ${registrationTable} table for counting registrations`);
+      
+      // Count registrations for each event (with timeout for each)
+      const eventsWithStats = await Promise.all(
+        eventsData.map(async (event) => {
+          const eventId = event[idField];
+          
+          try {
+            const countPromise = supabase
+              .from(registrationTable)
+              .select('*', { count: 'exact', head: true })
+              .eq(registrationIdField, eventId);
+            
+            const { count } = await Promise.race([
+              countPromise,
+              new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1000))
+            ]).catch(() => ({ count: 0 }));
+            
+            return {
+              ...event,
+              current_registrations: count || 0,
+              registered_count: count || 0
+            };
+          } catch (err) {
+            // If counting fails, return event with 0 registrations
+            return {
+              ...event,
+              current_registrations: 0,
+              registered_count: 0
+            };
+          }
+        })
+      );
+      
+      console.log(`Successfully loaded ${eventsWithStats.length} events with registration counts`);
+      
+      return {
+        success: true,
+        data: eventsWithStats,
+        error: null
+      };
+    } catch (countError) {
+      // If registration counting fails entirely, return events without counts
+      console.warn('Failed to count registrations, returning events without counts:', countError);
+      const eventsWithDefaults = eventsData.map(event => ({
+        ...event,
+        current_registrations: 0,
+        registered_count: 0
+      }));
+      
+      return {
+        success: true,
+        data: eventsWithDefaults,
+        error: null
+      };
+    }
   } catch (error) {
-    console.error("Error fetching events:", error);
+    console.error("Fatal error fetching events:", error);
     return {
       success: false,
       data: [],
