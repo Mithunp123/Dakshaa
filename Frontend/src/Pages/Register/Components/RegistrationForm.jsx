@@ -136,6 +136,8 @@ const RegistrationForm = () => {
 
   // Load data when user is available
   useEffect(() => {
+    let isMounted = true;
+    
     const loadData = async () => {
       try {
         setLoading(true);
@@ -143,15 +145,25 @@ const RegistrationForm = () => {
           eventConfigService.getEventsWithStats(),
           comboService.getActiveCombosForStudents(user?.id),
         ]);
-        setEvents(eventsResult?.data || []);
-        setCombos(combosResult?.data || []);
+        
+        if (isMounted) {
+          setEvents(eventsResult?.data || []);
+          setCombos(combosResult?.data || []);
+        }
       } catch (error) {
         console.error("Error loading data:", error);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
+    
     loadData();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [user?.id]);
 
   // Apply pre-selection after events are loaded

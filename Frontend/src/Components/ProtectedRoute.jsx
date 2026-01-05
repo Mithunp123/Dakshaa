@@ -9,7 +9,19 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const location = useLocation();
 
   useEffect(() => {
-    checkAuth();
+    let isMounted = true;
+    
+    const performAuthCheck = async () => {
+      if (isMounted) {
+        await checkAuth();
+      }
+    };
+    
+    performAuthCheck();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const checkAuth = async () => {

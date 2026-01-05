@@ -27,19 +27,29 @@ const MyRegistrations = () => {
   const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+    
     const getCurrentUser = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+      
+      if (!isMounted) return;
+      
       setUser(user);
       if (user) {
-        fetchRegistrations(user.id);
-        fetchUserNotifications(user.id);
+        await fetchRegistrations(user.id);
+        await fetchUserNotifications(user.id);
       } else {
         setLoading(false);
       }
     };
+    
     getCurrentUser();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const fetchUserNotifications = async (userId) => {

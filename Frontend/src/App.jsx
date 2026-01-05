@@ -95,7 +95,7 @@ function AppContent() {
       {!isDashboard && !isAdmin && !isScan && !isLogin && <Tags />}
       <AnimatePresence mode="wait">
         <Suspense fallback={<LoadingScreen variant="cyber" text="Loading..." />}>
-          <Routes>
+          <Routes location={location}>
             <Route
               path="/"
               element={

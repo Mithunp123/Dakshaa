@@ -79,8 +79,20 @@ const MyTeams = () => {
   };
 
   useEffect(() => {
-    fetchTeams();
-    getCurrentUser();
+    let isMounted = true;
+    
+    const loadData = async () => {
+      if (isMounted) {
+        await fetchTeams();
+        await getCurrentUser();
+      }
+    };
+    
+    loadData();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const getCurrentUser = async () => {
@@ -90,45 +102,50 @@ const MyTeams = () => {
 
   const fetchTeams = async () => {
     try {
+      setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const data = await supabaseService.getUserTeams(user.id);
-        
-        // Check registration status for each team
-        const teamsWithStatus = await Promise.all(
-          data.map(async (team) => {
-            // Check if team is registered for the event
-            const { data: registrations } = await supabase
-              .from('registrations')
-              .select('id, payment_status')
-              .eq('team_id', team.id)
-              .eq('user_id', user.id)
-              .maybeSingle(); // Use maybeSingle() instead of single() to handle 0 or 1 results
-            
-            return {
-              ...team,
-              is_registered: !!registrations,
-              registration_status: registrations?.payment_status || null
-            };
-          })
-        );
-        
-        setTeams(teamsWithStatus);
-        
-        // Fetch pending invitations for each team
-        const invitations = {};
-        for (const team of teamsWithStatus) {
-          if (team.role === "lead" || team.leader_id === user.id) {
-            const result = await getTeamInvitations(team.id);
-            if (result.success) {
-              invitations[team.id] = result.data;
-            }
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      
+      const data = await supabaseService.getUserTeams(user.id);
+      
+      // Check registration status for each team
+      const teamsWithStatus = await Promise.all(
+        data.map(async (team) => {
+          // Check if team is registered for the event
+          const { data: registrations } = await supabase
+            .from('registrations')
+            .select('id, payment_status')
+            .eq('team_id', team.id)
+            .eq('user_id', user.id)
+            .maybeSingle(); // Use maybeSingle() instead of single() to handle 0 or 1 results
+          
+          return {
+            ...team,
+            is_registered: !!registrations,
+            registration_status: registrations?.payment_status || null
+          };
+        })
+      );
+      
+      setTeams(teamsWithStatus);
+      
+      // Fetch pending invitations for each team
+      const invitations = {};
+      for (const team of teamsWithStatus) {
+        if (team.role === "lead" || team.leader_id === user.id) {
+          const result = await getTeamInvitations(team.id);
+          if (result.success) {
+            invitations[team.id] = result.data;
           }
         }
-        setPendingInvitations(invitations);
       }
+      setPendingInvitations(invitations);
     } catch (error) {
       console.error("Error fetching teams:", error);
+      toast.error('Failed to load teams');
     } finally {
       setLoading(false);
     }
