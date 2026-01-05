@@ -334,31 +334,14 @@ const UserManager = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-lg leading-tight">{user.full_name}</h3>
-                      <p className="text-secondary text-xs font-mono mt-1">{user.roll_number || 'No Roll No'}</p>
+                      <p className={`text-xs font-semibold uppercase tracking-wider mt-1 ${
+                        user.role === 'super_admin' ? 'text-red-400' :
+                        user.role === 'event_coordinator' ? 'text-purple-400' :
+                        user.role === 'registration_admin' ? 'text-blue-400' :
+                        user.role === 'volunteer' ? 'text-green-400' :
+                        'text-gray-400'
+                      }`}>{user.role?.replace(/_/g, ' ') || 'Student'}</p>
                     </div>
-                  </div>
-                  <div className="relative">
-                    <select 
-                      value={user.role}
-                      onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                      disabled={updatingId === user.id}
-                      className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border appearance-none cursor-pointer focus:outline-none ${
-                        user.role === 'super_admin' ? 'bg-red-500/20 text-red-500 border-red-500/30' :
-                        user.role === 'event_coordinator' ? 'bg-purple-500/20 text-purple-500 border-purple-500/30' :
-                        user.role === 'registration_admin' ? 'bg-blue-500/20 text-blue-500 border-blue-500/30' :
-                        user.role === 'volunteer' ? 'bg-green-500/20 text-green-500 border-green-500/30' :
-                        'bg-gray-500/20 text-gray-400 border-gray-500/30'
-                      }`}
-                    >
-                      {roles.filter(r => r !== 'all').map(r => (
-                        <option key={r} value={r} className="bg-slate-900">{r}</option>
-                      ))}
-                    </select>
-                    {updatingId === user.id && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-slate-900/50 rounded-full">
-                        <Loader2 className="animate-spin" size={12} />
-                      </div>
-                    )}
                   </div>
                 </div>
 

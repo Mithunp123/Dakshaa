@@ -9,12 +9,12 @@ const Home = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="relative w-full"
-      style={{ minHeight: '100vh' }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="relative w-full min-h-screen"
     >
-      {/* Global animated background - Fixed positioning */}
-      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+      {/* Global animated background - Absolute positioning within container */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
         <GradientOrbs />
         <FloatingParticles count={30} />
       </div>

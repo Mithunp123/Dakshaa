@@ -4,7 +4,7 @@ import { X, Users, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { supabase } from '../../../supabase';
 import { createTeam } from '../../../services/teamService';
 
-const CreateTeamModal = ({ isOpen, onClose, onTeamCreated }) => {
+const CreateTeamModal = ({ isOpen, onClose, onTeamCreated, preSelectedEventId, preSelectedEventName }) => {
   const [formData, setFormData] = useState({
     teamName: '',
     eventId: '',
@@ -21,6 +21,20 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated }) => {
       fetchTeamEvents();
     }
   }, [isOpen]);
+
+  // Pre-select event if provided via navigation
+  useEffect(() => {
+    if (preSelectedEventId && events.length > 0) {
+      const selectedEvent = events.find(e => e.event_id === preSelectedEventId);
+      if (selectedEvent) {
+        setFormData(prev => ({
+          ...prev,
+          eventId: preSelectedEventId,
+          maxMembers: selectedEvent.max_team_size || 4
+        }));
+      }
+    }
+  }, [preSelectedEventId, events]);
 
   const fetchTeamEvents = async () => {
     try {
@@ -155,6 +169,19 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated }) => {
 
           {/* Body */}
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            {/* Pre-selected Event Info */}
+            {preSelectedEventId && preSelectedEventName && (
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-start gap-3">
+                <CheckCircle2 className="text-blue-500 shrink-0 mt-0.5" size={18} />
+                <div>
+                  <p className="text-sm font-bold text-blue-400">Event Selected</p>
+                  <p className="text-xs text-gray-300 mt-1">
+                    Creating team for: <span className="font-semibold">{preSelectedEventName}</span>
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Team Name */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -172,37 +199,39 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated }) => {
               />
             </div>
 
-            {/* Event Selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Select Event <span className="text-red-500">*</span>
-              </label>
-              {fetchingEvents ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-secondary" />
-                </div>
-              ) : events.length === 0 ? (
-                <div className="text-center py-8 bg-white/5 rounded-xl border border-white/10">
-                  <p className="text-gray-400 text-sm">No team events available</p>
-                </div>
-              ) : (
-                <select
-                  name="eventId"
-                  value={formData.eventId}
-                  onChange={handleChange}
-                  disabled={loading}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all disabled:opacity-50"
-                  required
-                >
-                  <option value="" className="bg-slate-900">Select an event</option>
-                  {events.map(event => (
-                    <option key={event.event_id} value={event.event_id} className="bg-slate-900">
-                      {event.title} (Team size: {event.min_team_size || 2}-{event.max_team_size || 4})
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
+            {/* Event Selection - Hidden when pre-selected */}
+            {!preSelectedEventId && (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Select Event <span className="text-red-500">*</span>
+                </label>
+                {fetchingEvents ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-secondary" />
+                  </div>
+                ) : events.length === 0 ? (
+                  <div className="text-center py-8 bg-white/5 rounded-xl border border-white/10">
+                    <p className="text-gray-400 text-sm">No team events available</p>
+                  </div>
+                ) : (
+                  <select
+                    name="eventId"
+                    value={formData.eventId}
+                    onChange={handleChange}
+                    disabled={loading}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all disabled:opacity-50"
+                    required
+                  >
+                    <option value="" className="bg-slate-900">Select an event</option>
+                    {events.map(event => (
+                      <option key={event.event_id} value={event.event_id} className="bg-slate-900">
+                        {event.title} (Team size: {event.min_team_size || 2}-{event.max_team_size || 4})
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            )}
 
             {/* Max Members Info */}
             {formData.eventId && (

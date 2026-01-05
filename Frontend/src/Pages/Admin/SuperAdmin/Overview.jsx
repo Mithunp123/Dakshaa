@@ -156,14 +156,30 @@ const Overview = () => {
       console.log('📋 Fetching recent registrations...');
       const { data: recent, error: recentError } = await supabase
         .from('event_registrations_config')
-        .select('*, profiles!event_registrations_config_user_id_profiles_fkey(full_name, email)')
+        .select('*')
         .order('registered_at', { ascending: false })
         .limit(5);
+
+      // Fetch user profiles separately for recent registrations
+      let recentWithProfiles = [];
+      if (recent && recent.length > 0) {
+        const userIds = [...new Set(recent.map(r => r.user_id))];
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, email')
+          .in('id', userIds);
+        
+        const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+        recentWithProfiles = recent.map(reg => ({
+          ...reg,
+          profiles: profileMap.get(reg.user_id) || { full_name: 'Unknown', email: '' }
+        }));
+      }
 
       if (recentError) {
         console.error('❌ Error fetching recent registrations:', recentError);
       } else {
-        console.log('✅ Recent registrations fetched:', recent?.length || 0);
+        console.log('✅ Recent registrations fetched:', recentWithProfiles?.length || 0);
       }
 
       const finalStats = {
@@ -172,7 +188,7 @@ const Overview = () => {
         totalCheckins: checkinCount || 0,
         activeEvents: activeEventCount || 0,
         totalEvents: totalEventCount || 0,
-        recentRegistrations: recent || []
+        recentRegistrations: recentWithProfiles || []
       };
 
       console.log('📊 Final stats:', finalStats);

@@ -17,6 +17,7 @@ import { supabaseService } from '../../../services/supabaseService';
 const DashboardHome = () => {
   const [profile, setProfile] = useState(null);
   const [registrations, setRegistrations] = useState([]);
+  const [teamsCount, setTeamsCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -49,13 +50,15 @@ const DashboardHome = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         // Fetch profile and registrations in parallel for faster load
-        const [profileResponse, regData] = await Promise.all([
+        const [profileResponse, regData, teamsData] = await Promise.all([
           supabase.from('profiles').select('full_name, email, college_name, role').eq('id', user.id).single(),
-          supabaseService.getUserRegistrations(user.id)
+          supabaseService.getUserRegistrations(user.id),
+          supabase.from('team_members').select('team_id', { count: 'exact' }).eq('user_id', user.id)
         ]);
         
         setProfile(profileResponse.data);
         setRegistrations(regData);
+        setTeamsCount(teamsData.count || 0);
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -80,8 +83,8 @@ const DashboardHome = () => {
       bg: 'bg-primary/10' 
     },
     { 
-      label: 'Teams Joined', 
-      value: '0', // Placeholder for team logic
+      label: 'Teams', 
+      value: teamsCount.toString(),
       icon: Users, 
       color: 'text-secondary-light', 
       bg: 'bg-secondary/10' 
@@ -141,7 +144,7 @@ const DashboardHome = () => {
             Welcome, {profile?.full_name || 'Student'} 👋
           </motion.h1>
           <motion.p variants={itemVariants} className="text-gray-400 max-w-2xl">
-            {profile?.college_name || 'College Name'} • {profile?.department || 'Department'} • {profile?.year_of_study || 'Year'}
+            {profile?.college_name || 'College Name'}
           </motion.p>
           <motion.div variants={itemVariants} className="mt-6 flex flex-wrap gap-3">
             {registrations.some(r => r.combo_id) && (
@@ -149,9 +152,6 @@ const DashboardHome = () => {
                 Combo Pass Holder
               </span>
             )}
-            <span className="px-4 py-1.5 rounded-full bg-primary/20 border border-primary/30 text-primary-light text-sm font-medium">
-              Roll No: {profile?.roll_number || 'N/A'}
-            </span>
           </motion.div>
         </div>
         {/* Decorative elements */}

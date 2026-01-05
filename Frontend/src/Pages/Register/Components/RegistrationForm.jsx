@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import toast from 'react-hot-toast';
 import {
   Package,
   Calendar,
@@ -138,19 +139,23 @@ const RegistrationForm = () => {
   // Load data when component mounts and when user changes
   useEffect(() => {
     let isMounted = true;
-    let channel = null;
+    
+    // INSTANT: Show cached events immediately (no loading spinner)
+    const cachedEvents = eventConfigService.getCachedEvents();
+    if (cachedEvents && cachedEvents.length > 0) {
+      console.log(`Instant display: ${cachedEvents.length} cached events`);
+      setEvents(cachedEvents.map(e => ({ ...e, current_registrations: 0, registered_count: 0 })));
+      setLoading(false); // No loading spinner if we have cached data
+    }
     
     const loadData = async () => {
       try {
-        setLoading(true);
-        setLoadingTimeout(false);
-        console.log('Loading events and combos...');
+        // Only show loading if no cached data
+        if (!cachedEvents || cachedEvents.length === 0) {
+          setLoading(true);
+        }
         
-        // Set a timeout to show error if loading takes too long
-        const timeoutId = setTimeout(() => {
-          setLoadingTimeout(true);
-          console.error('Loading timeout - database may be unreachable');
-        }, 10000); // 10 second timeout
+        console.log('Fetching fresh events and combos...');
         
         // Always load events (doesn't require user)
         const eventsPromise = eventConfigService.getEventsWithStats();
@@ -165,27 +170,19 @@ const RegistrationForm = () => {
           combosPromise
         ]);
         
-        clearTimeout(timeoutId);
-        
         if (isMounted) {
-          // Check if events failed to load
-          if (eventsResult && !eventsResult.success && eventsResult.error) {
-            console.error('Failed to load events:', eventsResult.error);
-            alert(`⚠️ Database Error\n\n${eventsResult.error}\n\nPossible causes:\n• Events table doesn't exist\n• RLS policies not configured\n• Database connection issue\n\nPlease check the browser console for details.`);
-          }
-          
           const eventsData = eventsResult?.data || [];
           const combosData = combosResult?.data || [];
           
-          console.log(`Loaded ${eventsData.length} events and ${combosData.length} combos`);
+          console.log(`Loaded ${eventsData.length} events with fresh counts`);
           
           setEvents(eventsData);
           setCombos(combosData);
         }
       } catch (error) {
         console.error("Error loading data:", error);
-        // Still set empty arrays to stop loading state
-        if (isMounted) {
+        // Keep cached events if fetch fails
+        if (isMounted && (!cachedEvents || cachedEvents.length === 0)) {
           setEvents([]);
           setCombos([]);
         }
@@ -196,44 +193,11 @@ const RegistrationForm = () => {
       }
     };
     
-    // Load data immediately
+    // Load fresh data in background
     loadData();
-    
-    // Set up real-time subscription for registration changes (debounced)
-    let refreshTimeout = null;
-    try {
-      channel = supabase
-        .channel('registration-updates')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'event_registrations_config'
-          },
-          (payload) => {
-            console.log('Registration update detected:', payload.eventType);
-            // Debounce refreshes to avoid too many calls
-            if (refreshTimeout) clearTimeout(refreshTimeout);
-            refreshTimeout = setTimeout(() => {
-              if (isMounted) {
-                console.log('Reloading events data...');
-                loadData();
-              }
-            }, 1500); // Wait 1.5 seconds before refreshing
-          }
-        )
-        .subscribe();
-    } catch (error) {
-      console.error("Error setting up real-time subscription:", error);
-    }
     
     return () => {
       isMounted = false;
-      if (refreshTimeout) clearTimeout(refreshTimeout);
-      if (channel) {
-        supabase.removeChannel(channel);
-      }
     };
   }, [user]); // Re-run when user changes
 
@@ -453,13 +417,19 @@ const RegistrationForm = () => {
       setIsSubmitting(true);
 
       if (!user) {
-        alert("Please login to register for events");
+        toast.error('Please login to register for events', {
+          duration: 3000,
+          position: 'top-center',
+        });
         return;
       }
 
       // Use fetched user profile from state
       if (!userProfile) {
-        alert("Profile not loaded. Please refresh and try again.");
+        toast.error('Profile not loaded. Please refresh and try again.', {
+          duration: 3000,
+          position: 'top-center',
+        });
         return;
       }
 
@@ -490,22 +460,36 @@ const RegistrationForm = () => {
 
       console.log('Submitting registrations:', registrations);
 
-      const { data: registrationResults, error: regError } = await supabase
+      // Insert registrations (no need to select back - faster)
+      const { error: regError } = await supabase
         .from('event_registrations_config')
-        .insert(registrations)
-        .select();
+        .insert(registrations);
       
       if (regError) {
         console.error('Registration error:', regError);
+        
+        // Check for duplicate registration (PostgreSQL unique constraint violation)
+        if (regError.code === '23505' || regError.message?.includes('duplicate') || regError.message?.includes('unique')) {
+          toast.error('Already registered for one or more selected events', {
+            duration: 4000,
+            position: 'top-center',
+            style: {
+              background: '#DC2626',
+              color: '#fff',
+            },
+          });
+          return;
+        }
+        
         throw new Error(regError.message || 'Failed to create registrations');
       }
 
-      // Create admin notification for the registration
+      // Create admin notification in background (don't await - faster UX)
       const eventNames = selectedEventDetails
         .map((e) => e.event_name || e.name)
         .join(", ");
 
-      await supabase.from("admin_notifications").insert({
+      supabase.from("admin_notifications").insert({
         type: "NEW_REGISTRATION",
         title: "New Event Registration",
         message: `${
@@ -521,15 +505,22 @@ const RegistrationForm = () => {
           registration_type: "individual",
         },
         is_read: false,
-      });
+      }).then(() => console.log('Admin notification sent')).catch(e => console.warn('Notification failed:', e));
 
-      console.log("Registration successful:", registrationResults);
+      console.log("Registration successful!");
+      toast.success('Registration successful! 🎉', {
+        duration: 3000,
+        position: 'top-center',
+      });
       setCurrentStep(4);
     } catch (error) {
       console.error("Registration error:", error);
       // Show the actual error message if available, otherwise generic message
       const errorMessage = error.message || "Registration failed. Please try again.";
-      alert(errorMessage);
+      toast.error(errorMessage, {
+        duration: 4000,
+        position: 'top-center',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -544,12 +535,18 @@ const RegistrationForm = () => {
       setIsSubmitting(true);
 
       if (!user) {
-        alert("Please login to register for events");
+        toast.error('Please login to register for events', {
+          duration: 3000,
+          position: 'top-center',
+        });
         return;
       }
 
       if (!userProfile) {
-        alert("Profile not loaded. Please refresh and try again.");
+        toast.error('Profile not loaded. Please refresh and try again.', {
+          duration: 3000,
+          position: 'top-center',
+        });
         return;
       }
 
@@ -560,7 +557,10 @@ const RegistrationForm = () => {
       );
 
       if (!validation.valid) {
-        alert(`Invalid selection:\n${validation.errors.join('\n')}`);
+        toast.error(`Invalid selection: ${validation.errors.join(', ')}`, {
+          duration: 4000,
+          position: 'top-center',
+        });
         setIsSubmitting(false);
         return;
       }
@@ -573,7 +573,10 @@ const RegistrationForm = () => {
       );
 
       if (!purchaseResult.success) {
-        alert(purchaseResult.error || "Failed to create purchase");
+        toast.error(purchaseResult.error || 'Failed to create purchase', {
+          duration: 4000,
+          position: 'top-center',
+        });
         setIsSubmitting(false);
         return;
       }
@@ -588,7 +591,10 @@ const RegistrationForm = () => {
       );
 
       if (!completionResult.success) {
-        alert(completionResult.error || "Payment completion failed");
+        toast.error(completionResult.error || 'Payment completion failed', {
+          duration: 4000,
+          position: 'top-center',
+        });
         setIsSubmitting(false);
         return;
       }
@@ -620,12 +626,18 @@ const RegistrationForm = () => {
       });
 
       // Success!
-      alert(`Registration Successful!\n\n✓ Combo: ${selectedCombo.name || selectedCombo.combo_name}\n✓ Events: ${completionResult.eventCount}\n✓ Amount: ₹${selectedCombo.price || selectedCombo.total_price}\n\nCheck your dashboard for QR codes!`);
+      toast.success(`Registration Successful! Combo: ${selectedCombo.name || selectedCombo.combo_name} - ${completionResult.eventCount} Events`, {
+        duration: 5000,
+        position: 'top-center',
+      });
       setCurrentStep(4);
       
     } catch (error) {
       console.error("Combo registration error:", error);
-      alert(`Registration failed: ${error.message}`);
+      toast.error(`Registration failed: ${error.message}`, {
+        duration: 4000,
+        position: 'top-center',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -639,12 +651,18 @@ const RegistrationForm = () => {
       setIsSubmitting(true);
 
       if (!user) {
-        alert("Please login to register your team");
+        toast.error('Please login to register your team', {
+          duration: 3000,
+          position: 'top-center',
+        });
         return;
       }
 
       if (!userProfile) {
-        alert("Profile not loaded. Please refresh and try again.");
+        toast.error('Profile not loaded. Please refresh and try again.', {
+          duration: 3000,
+          position: 'top-center',
+        });
         return;
       }
 
@@ -665,11 +683,26 @@ const RegistrationForm = () => {
         .from('registrations')
         .insert(registrations);
 
-      if (regError) throw regError;
+      if (regError) {
+        // Check for duplicate registration
+        if (regError.code === '23505' || regError.message?.includes('duplicate') || regError.message?.includes('unique')) {
+          toast.error('Team already registered for this event', {
+            duration: 4000,
+            position: 'top-center',
+            style: {
+              background: '#DC2626',
+              color: '#fff',
+            },
+          });
+          setIsSubmitting(false);
+          return;
+        }
+        throw regError;
+      }
 
-      // Create admin notification
+      // Create admin notification in background (don't await - faster UX)
       const eventDetails = selectedEventDetails[0];
-      await supabase.from("admin_notifications").insert({
+      supabase.from("admin_notifications").insert({
         type: "NEW_REGISTRATION",
         title: "New Team Registration",
         message: `Team "${teamData.teamName}" registered for: ${eventDetails?.name || eventDetails?.event_name}`,
@@ -683,13 +716,19 @@ const RegistrationForm = () => {
           registration_type: "team",
         },
         is_read: false,
-      });
+      }).then(() => console.log('Admin notification sent')).catch(e => console.warn('Notification failed:', e));
 
-      alert(`Team Registration Successful!\n\n✓ Team: ${teamData.teamName}\n✓ Event: ${eventDetails?.name || eventDetails?.event_name}\n✓ Members: ${teamData.memberCount}\n✓ Amount: ₹${(eventDetails?.price || 0) * teamData.memberCount}\n\nCheck your dashboard!`);
+      toast.success(`Team Registration Successful! ${teamData.teamName} - ${teamData.memberCount} Members`, {
+        duration: 5000,
+        position: 'top-center',
+      });
       setCurrentStep(4);
     } catch (error) {
       console.error("Team registration error:", error);
-      alert(`Registration failed: ${error.message}`);
+      toast.error(`Registration failed: ${error.message}`, {
+        duration: 4000,
+        position: 'top-center',
+      });
     } finally {
       setIsSubmitting(false);
     }

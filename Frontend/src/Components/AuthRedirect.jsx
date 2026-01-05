@@ -5,7 +5,7 @@ import { supabase } from '../supabase';
 const AuthRedirect = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
+  const [isReady, setIsReady] = useState(false);
   
   // Get return URL from state (passed from event registration or other pages)
   const returnTo = location.state?.returnTo;
@@ -15,7 +15,7 @@ const AuthRedirect = ({ children }) => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        setLoading(false);
+        setIsReady(true);
         return;
       }
 
@@ -28,27 +28,36 @@ const AuthRedirect = ({ children }) => {
 
       const role = profile?.role || 'student';
 
-      // Only redirect if user is on login page or explicitly navigating
+      // Only redirect if user is on login page
       if (location.pathname === '/login') {
         if (role === 'super_admin') {
-          navigate('/admin');
+          navigate('/admin', { replace: true });
         } else if (role === 'registration_admin') {
-          navigate('/admin/desk');
+          navigate('/admin/desk', { replace: true });
         } else if (role === 'event_coordinator') {
-          navigate('/coordinator');
+          navigate('/coordinator', { replace: true });
         } else if (role === 'volunteer') {
-          navigate('/volunteer');
+          navigate('/volunteer', { replace: true });
         } else {
-          navigate(returnTo || '/');
+          navigate(returnTo || '/', { replace: true });
         }
+        return; // Don't set ready if redirecting from login
       }
-      setLoading(false);
+      
+      setIsReady(true);
     };
 
     checkUser();
-  }, [navigate, returnTo]);
+  }, [navigate, returnTo, location.pathname]);
 
-  if (loading) return null;
+  // For home page and other pages, render children immediately while checking auth in background
+  // This prevents blank screen while auth loads
+  if (location.pathname !== '/login') {
+    return <>{children}</>;
+  }
+
+  // For login page, wait until we know if we should redirect
+  if (!isReady) return null;
 
   return <>{children}</>;
 };

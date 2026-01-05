@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   Users,
   DollarSign,
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 
 const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
+  const navigate = useNavigate();
   const capacityPercentage =
     (event.current_registrations / event.capacity) * 100;
   const isNearlyFull = capacityPercentage >= 80;
@@ -62,12 +64,31 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
   const isTeamEvent = event.is_team_event || event.min_team_size > 1;
   const TypeIcon = isTeamEvent ? UsersRound : UserCheck;
 
+  // Handle card click - redirect to dashboard for team events
+  const handleCardClick = () => {
+    if (isDisabled || !isOpen) return;
+    
+    // If it's a team event, redirect to dashboard team creation
+    if (isTeamEvent) {
+      navigate('/dashboard/teams', { 
+        state: { 
+          createTeam: true,
+          eventId: event.id,
+          eventName: event.name || event.title || event.event_name
+        } 
+      });
+    } else {
+      // For individual events, use the original onSelect handler
+      if (onSelect) onSelect();
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={!isDisabled && isOpen ? { y: -5 } : {}}
-      onClick={() => !isDisabled && isOpen && onSelect && onSelect()}
+      onClick={handleCardClick}
       className={`group relative bg-gradient-to-br from-white/5 to-white/[0.02] border rounded-3xl overflow-hidden transition-all duration-300 cursor-pointer ${
         isSelected
           ? "border-secondary shadow-lg shadow-secondary/20 scale-[1.02]"
@@ -181,6 +202,16 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
             {status.text}
           </span>
         </div>
+
+        {/* Team Event Indicator */}
+        {isTeamEvent && !isDisabled && isOpen && (
+          <div className="mt-2 px-3 py-2 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+            <p className="text-xs text-blue-400 font-semibold flex items-center gap-1.5">
+              <UsersRound size={14} />
+              Click to create team in dashboard
+            </p>
+          </div>
+        )}
 
         {/* Premium/Featured Badge (if price > 500) */}
         {event.price > 500 && (

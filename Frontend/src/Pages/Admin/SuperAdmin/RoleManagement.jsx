@@ -125,12 +125,44 @@ const RoleManagement = () => {
 
   const fetchCoordinatorAssignments = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch coordinator assignments
+      const { data: assignments, error } = await supabase
         .from('event_coordinators')
-        .select('*, profiles(full_name, email), events(event_id, title, category)');
+        .select('*');
 
       if (error) throw error;
-      setCoordinatorAssignments(data || []);
+
+      if (!assignments || assignments.length === 0) {
+        setCoordinatorAssignments([]);
+        return;
+      }
+
+      // Fetch profiles for coordinators
+      const userIds = [...new Set(assignments.map(a => a.user_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .in('id', userIds);
+      
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+      // Fetch events for coordinators
+      const eventIds = [...new Set(assignments.map(a => a.event_id))];
+      const { data: eventsData } = await supabase
+        .from('events')
+        .select('event_id, title, category')
+        .in('event_id', eventIds);
+      
+      const eventMap = new Map(eventsData?.map(e => [e.event_id, e]) || []);
+
+      // Combine data
+      const assignmentsWithData = assignments.map(a => ({
+        ...a,
+        profiles: profileMap.get(a.user_id) || { full_name: 'Unknown', email: '' },
+        events: eventMap.get(a.event_id) || { event_id: a.event_id, title: a.event_id, category: '' }
+      }));
+
+      setCoordinatorAssignments(assignmentsWithData);
     } catch (error) {
       console.error('Error fetching assignments:', error);
     }

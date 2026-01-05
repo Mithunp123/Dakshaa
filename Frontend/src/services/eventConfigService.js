@@ -5,76 +5,132 @@ import { supabase } from "../supabase";
  * Handles all event CRUD operations for admin panel
  */
 
+// Cache configuration - use localStorage for persistent cache across sessions
+const EVENTS_CACHE_KEY = 'dakshaa_events_cache';
+const EVENTS_STATIC_KEY = 'dakshaa_events_static'; // For instant display
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes for full cache
+const STATIC_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours for static event data
+
 /**
- * Get all events with registration statistics
+ * Clear the events cache - useful when events are updated
+ */
+export const clearEventsCache = () => {
+  try {
+    localStorage.removeItem(EVENTS_CACHE_KEY);
+    localStorage.removeItem(EVENTS_STATIC_KEY);
+    console.log('Events cache cleared');
+    return true;
+  } catch (error) {
+    console.warn('Failed to clear events cache:', error);
+    return false;
+  }
+};
+
+/**
+ * Get cached events instantly (for immediate display)
+ * Returns null if no cache available
+ */
+export const getCachedEvents = () => {
+  try {
+    const cached = localStorage.getItem(EVENTS_STATIC_KEY);
+    if (cached) {
+      const { data } = JSON.parse(cached);
+      return data || null;
+    }
+  } catch (e) {
+    // Ignore cache errors
+  }
+  return null;
+};
+
+/**
+ * Get all events with registration statistics (with caching for static data)
+ * Static event data is cached, but registration counts are always fetched fresh
  * @returns {Promise<Array>} List of events with current_registrations count
  */
 export const getEventsWithStats = async () => {
   try {
-    console.log('Fetching events with stats...');
+    let eventsData = null;
+    let fromCache = false;
     
-    // Create a timeout promise (5 seconds)
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Database query timeout - check if events table exists and is accessible')), 5000)
-    );
+    // Try to get from localStorage first (persistent cache)
+    const cachedData = localStorage.getItem(EVENTS_CACHE_KEY);
+    if (cachedData) {
+      try {
+        const { data, timestamp } = JSON.parse(cachedData);
+        const age = Date.now() - timestamp;
+        
+        if (age < CACHE_DURATION && data && data.length > 0) {
+          console.log(`Using cached event data (${Math.round(age / 1000)}s old)`);
+          eventsData = data;
+          fromCache = true;
+        }
+      } catch (e) {
+        console.warn('Failed to parse cache, fetching fresh data...');
+      }
+    }
     
-    // First, try a simple query without any filters to test connectivity
-    console.log('Testing database connectivity...');
-    const testPromise = supabase
-      .from('events')
-      .select('id, event_id, name, title')
-      .limit(1);
-    
-    const { data: testData, error: testError } = await Promise.race([
-      testPromise,
-      timeoutPromise
-    ]).catch(err => ({ data: null, error: err }));
-    
-    if (testError) {
-      console.error('Database connectivity test failed:', testError);
-      console.error('Error details:', {
-        message: testError.message,
-        details: testError.details,
-        hint: testError.hint,
-        code: testError.code
-      });
+    // If no valid cache, fetch events from database
+    if (!eventsData) {
+      console.log('Fetching events from database...');
       
-      // Return empty array with clear error message
-      return {
-        success: false,
-        data: [],
-        error: `Database connection failed: ${testError.message}. Please ensure the events table exists in Supabase.`
-      };
-    }
-    
-    console.log('Database connection OK, fetching all events...');
-    
-    // Now fetch all events with timeout
-    const eventsPromise = supabase
-      .from('events')
-      .select('*')
-      .eq('is_active', true)
-      .order('created_at', { ascending: false });
-    
-    const { data: eventsData, error: eventsError } = await Promise.race([
-      eventsPromise,
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Events query timeout')), 5000))
-    ]).catch(err => ({ data: null, error: err }));
+      const { data: fetchedEvents, error: eventsError } = await supabase
+        .from('events')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
 
-    if (eventsError || !eventsData) {
-      console.error('Failed to fetch events:', eventsError);
-      return {
-        success: false,
-        data: [],
-        error: eventsError?.message || 'Failed to load events'
-      };
+      if (eventsError || !fetchedEvents) {
+        console.error('Failed to fetch events:', eventsError);
+        
+        // Try to use stale static cache as fallback
+        const staleCache = localStorage.getItem(EVENTS_STATIC_KEY);
+        if (staleCache) {
+          try {
+            const { data } = JSON.parse(staleCache);
+            if (data && data.length > 0) {
+              console.warn('Using stale cache due to fetch error');
+              return {
+                success: true,
+                data: data.map(e => ({ ...e, current_registrations: 0, registered_count: 0 })),
+                error: null,
+                fromCache: true,
+                stale: true
+              };
+            }
+          } catch (e) {}
+        }
+        
+        return {
+          success: false,
+          data: [],
+          error: eventsError?.message || 'Failed to load events'
+        };
+      }
+      
+      eventsData = fetchedEvents;
+      
+      // Cache the static event data in localStorage (persists across sessions)
+      try {
+        localStorage.setItem(EVENTS_CACHE_KEY, JSON.stringify({
+          data: eventsData,
+          timestamp: Date.now()
+        }));
+        // Also save static version for instant display
+        localStorage.setItem(EVENTS_STATIC_KEY, JSON.stringify({
+          data: eventsData,
+          timestamp: Date.now()
+        }));
+        console.log('Event data cached to localStorage');
+      } catch (cacheError) {
+        console.warn('Failed to cache events:', cacheError);
+      }
     }
 
-    console.log(`Loaded ${eventsData.length} events from database`);
+    console.log(`Processing ${eventsData.length} events`);
     
     // If no events found, return early
     if (eventsData.length === 0) {
-      console.warn('No active events found in database');
       return {
         success: true,
         data: [],
@@ -86,81 +142,58 @@ export const getEventsWithStats = async () => {
     const hasUuidId = eventsData.length > 0 && 'id' in eventsData[0];
     const idField = hasUuidId ? 'id' : 'event_id';
     
-    console.log(`Using ${idField} as event identifier`);
-    
-    // Skip registration counting if it's taking too long - just return events
-    // Users can still see events even if counts aren't accurate
+    // ALWAYS fetch fresh registration counts (this is quick)
+    console.log('Fetching fresh registration counts...');
     try {
-      // Determine which registration table to use (with timeout)
-      const testRegPromise = supabase
+      // Get all registration counts in a single query for efficiency
+      const { data: allRegistrations, error: regError } = await supabase
         .from('event_registrations_config')
-        .select('event_id')
-        .limit(1);
+        .select('event_id');
       
-      const { error: testRegError } = await Promise.race([
-        testRegPromise,
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000))
-      ]).catch(() => ({ error: true }));
-      
-      const registrationTable = testRegError ? 'registrations' : 'event_registrations_config';
-      const registrationIdField = 'event_id';
-      
-      console.log(`Using ${registrationTable} table for counting registrations`);
-      
-      // Count registrations for each event (with timeout for each)
-      const eventsWithStats = await Promise.all(
-        eventsData.map(async (event) => {
+      if (!regError && allRegistrations) {
+        // Count registrations per event
+        const countMap = {};
+        allRegistrations.forEach(reg => {
+          countMap[reg.event_id] = (countMap[reg.event_id] || 0) + 1;
+        });
+        
+        // Merge counts with event data
+        const eventsWithStats = eventsData.map(event => {
           const eventId = event[idField];
-          
-          try {
-            const countPromise = supabase
-              .from(registrationTable)
-              .select('*', { count: 'exact', head: true })
-              .eq(registrationIdField, eventId);
-            
-            const { count } = await Promise.race([
-              countPromise,
-              new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1000))
-            ]).catch(() => ({ count: 0 }));
-            
-            return {
-              ...event,
-              current_registrations: count || 0,
-              registered_count: count || 0
-            };
-          } catch (err) {
-            // If counting fails, return event with 0 registrations
-            return {
-              ...event,
-              current_registrations: 0,
-              registered_count: 0
-            };
-          }
-        })
-      );
-      
-      console.log(`Successfully loaded ${eventsWithStats.length} events with registration counts`);
-      
-      return {
-        success: true,
-        data: eventsWithStats,
-        error: null
-      };
+          const count = countMap[eventId] || 0;
+          return {
+            ...event,
+            current_registrations: count,
+            registered_count: count
+          };
+        });
+        
+        console.log(`Loaded ${eventsWithStats.length} events with fresh registration counts`);
+        
+        return {
+          success: true,
+          data: eventsWithStats,
+          error: null,
+          fromCache: fromCache
+        };
+      }
     } catch (countError) {
-      // If registration counting fails entirely, return events without counts
-      console.warn('Failed to count registrations, returning events without counts:', countError);
-      const eventsWithDefaults = eventsData.map(event => ({
-        ...event,
-        current_registrations: 0,
-        registered_count: 0
-      }));
-      
-      return {
-        success: true,
-        data: eventsWithDefaults,
-        error: null
-      };
+      console.warn('Failed to fetch registration counts:', countError);
     }
+    
+    // Fallback: return events with 0 counts if registration fetch fails
+    const eventsWithDefaults = eventsData.map(event => ({
+      ...event,
+      current_registrations: 0,
+      registered_count: 0
+    }));
+    
+    return {
+      success: true,
+      data: eventsWithDefaults,
+      error: null,
+      fromCache: fromCache
+    };
   } catch (error) {
     console.error("Fatal error fetching events:", error);
     return {
@@ -603,6 +636,8 @@ export const updateRegistrationPayment = async (
 
 export default {
   getEventsWithStats,
+  getCachedEvents,
+  clearEventsCache,
   getEventById,
   getEventByKey,
   checkEventAvailability,

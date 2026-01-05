@@ -1,12 +1,13 @@
 import logo from "../../assets/logo1.png";
 import collegeLogo from "../../assets/collegeLogoWhite.png";
 import round from "../../assets/round.svg";
-import { React, useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { React, useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown, Download, LogIn, LogOut, User } from "lucide-react";
 import brochure from "../../assets/Brochure.pdf";
 import { supabase } from "../../supabase";
+import { preloadPages } from "../../App";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,6 +19,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const location = useLocation();
+  
+  // Preload cache to avoid duplicate preloads
+  const preloadedRef = useRef(new Set());
 
   useEffect(() => {
     const checkUser = async () => {
@@ -103,13 +107,21 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "Events", path: "/events" },
-    { name: "Event Schedule", path: "/schedule" },
-    { name: "Sponsors", path: "/sponsors" },
-    { name: "Teams", path: "/teams" },
-    { name: "Contact", path: "/contact" },
+    { name: "Home", path: "/", preload: "home" },
+    { name: "Events", path: "/events", preload: "events" },
+    { name: "Event Schedule", path: "/schedule", preload: "schedule" },
+    { name: "Sponsors", path: "/sponsors", preload: "sponsors" },
+    { name: "Teams", path: "/teams", preload: "teams" },
+    { name: "Contact", path: "/contact", preload: "contact" },
   ];
+
+  // Preload page on hover for instant navigation
+  const handlePreload = useCallback((preloadKey) => {
+    if (preloadKey && preloadPages[preloadKey] && !preloadedRef.current.has(preloadKey)) {
+      preloadedRef.current.add(preloadKey);
+      preloadPages[preloadKey]();
+    }
+  }, []);
 
   const getDashboardPath = () => {
     switch (userRole) {
@@ -152,6 +164,7 @@ const Navbar = () => {
                 <button
                   key={link.name}
                   onClick={() => handleLinkClick(link.name, link.path)}
+                  onMouseEnter={() => handlePreload(link.preload)}
                   className={`font-orbitron text-sm tracking-widest transition-all duration-300 hover:text-secondary relative group ${
                     activeLink === link.name ? "text-secondary" : "text-white/80"
                   }`}
@@ -168,6 +181,7 @@ const Navbar = () => {
                   <div className="flex items-center gap-4">
                     <button 
                       onClick={() => handleLinkClick("Dashboard", getDashboardPath())}
+                      onMouseEnter={() => handlePreload("dashboard")}
                       className={`${isAdminRole ? 'text-orange-400 hover:text-orange-300' : 'text-white/90 hover:text-secondary'} transition-colors font-orbitron text-sm tracking-widest flex items-center gap-2`}
                     >
                       <User size={16} /> {isAdminRole ? 'ADMIN PANEL' : 'DASHBOARD'}
@@ -182,6 +196,7 @@ const Navbar = () => {
                 ) : (
                   <button 
                     onClick={() => handleLinkClick("Login", "/login")}
+                    onMouseEnter={() => handlePreload("login")}
                     className="text-white/90 hover:text-secondary transition-colors font-orbitron text-sm tracking-widest flex items-center gap-2"
                   >
                     <LogIn size={16} /> LOGIN
@@ -191,6 +206,7 @@ const Navbar = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleLinkClick("Register", user ? "/register-events" : "/signup")}
+                  onMouseEnter={() => handlePreload(user ? "registerEvents" : "register")}
                   className="px-6 py-2 rounded-full bg-gradient-to-r from-secondary to-cyan-500 text-white font-orbitron text-sm tracking-widest font-bold shadow-[0_0_20px_rgba(34,211,238,0.3)]"
                 >
                   {user ? "REGISTER EVENTS" : "REGISTER"}

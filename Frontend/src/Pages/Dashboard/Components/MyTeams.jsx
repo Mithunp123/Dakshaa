@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import toast from 'react-hot-toast';
 import { 
   Users, 
@@ -34,6 +34,7 @@ import {
 
 const MyTeams = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -90,10 +91,15 @@ const MyTeams = () => {
     
     loadData();
     
+    // Check if we should open the create team modal based on navigation state
+    if (location.state?.createTeam) {
+      setIsModalOpen(true);
+    }
+    
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [location.state]);
 
   const getCurrentUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -333,8 +339,16 @@ const MyTeams = () => {
       {/* Create Team Modal */}
       <CreateTeamModal 
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          // Clear navigation state after modal closes
+          if (location.state?.createTeam) {
+            navigate(location.pathname, { replace: true });
+          }
+        }}
         onTeamCreated={handleTeamCreated}
+        preSelectedEventId={location.state?.eventId}
+        preSelectedEventName={location.state?.eventName}
       />
 
       {/* My Teams Tab */}

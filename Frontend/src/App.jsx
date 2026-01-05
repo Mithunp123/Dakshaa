@@ -21,7 +21,7 @@ import FloatingDashboardButton from "./Pages/Layout/FloatingDashboardButton";
 import BottomNavbar from "./Pages/Layout/BottomNavbar";
 import SupabaseHealthCheck from "./components/SupabaseHealthCheck";
 
-// Lazy Load Pages
+// Lazy Load Pages with preload functions for faster navigation
 const Home = lazy(() => import("./Pages/Home/Home"));
 const Events = lazy(() => import("./Pages/Events/Events"));
 const GuestLecture = lazy(() => import("./Pages/GuestLecture/GuestLecture"));
@@ -50,6 +50,20 @@ const MyRegistrations = lazy(() => import("./Pages/MyRegistrations/MyRegistratio
 const AdminDashboard = lazy(() => import("./Pages/Admin/AdminDashboard"));
 const PaymentSimulation = lazy(() => import("./Pages/Register/Components/PaymentSimulation"));
 const NotFound = lazy(() => import("./Pages/NotFound"));
+
+// Preload functions for critical pages - call these on hover
+export const preloadPages = {
+  home: () => import("./Pages/Home/Home"),
+  events: () => import("./Pages/Events/Events"),
+  schedule: () => import("./Pages/Schedule/Schedule"),
+  sponsors: () => import("./Pages/Sponsors/Sponsors"),
+  teams: () => import("./Pages/Teams/Teams"),
+  contact: () => import("./Pages/Home/Components/Contact"),
+  login: () => import("./Pages/Login/Login"),
+  register: () => import("./Pages/Register/Register"),
+  registerEvents: () => import("./Pages/Register/EventRegistration"),
+  dashboard: () => import("./Pages/Dashboard/Dashboard"),
+};
 
 // Components that are always needed can remain static or also be lazy loaded if large
 import AuthRedirect from "./Components/AuthRedirect";
@@ -90,18 +104,39 @@ function AppContent() {
   // Check if bottom navbar should be shown (mobile only, non-admin pages)
   const showBottomNav = !isDashboard && !isAdmin && !isScan && !isLogin;
 
+  // Prefetch critical pages after initial load for faster navigation
+  useEffect(() => {
+    const prefetchTimer = setTimeout(() => {
+      // Prefetch most commonly visited pages in background
+      preloadPages.events?.();
+      preloadPages.schedule?.();
+      preloadPages.dashboard?.();
+      preloadPages.registerEvents?.();
+    }, 2000); // Wait 2s after page load to not block initial render
+    
+    return () => clearTimeout(prefetchTimer);
+  }, []);
+
   return (
     <div className="min-h-screen min-h-screen-safe" style={{ minHeight: '100vh', position: 'relative' }}>
       {!isDashboard && !isAdmin && !isScan && !isLogin && <Navbar />}
       {!isDashboard && !isAdmin && !isScan && !isLogin && <Tags />}
-      <AnimatePresence mode="wait">
-        <Suspense fallback={<LoadingScreen variant="cyber" text="Loading..." />}>
-          <Routes location={location}>
+      <AnimatePresence>
+        <Suspense key={location.key} fallback={<LoadingScreen variant="cyber" text="Loading..." />}>
+          <Routes location={location} key={location.key}>
             <Route
               path="/"
               element={
                 <AuthRedirect>
-                  <Home />
+                  <Home key={location.key} />
+                </AuthRedirect>
+              }
+            />
+            <Route
+              path="/home"
+              element={
+                <AuthRedirect>
+                  <Home key={location.key} />
                 </AuthRedirect>
               }
             />
