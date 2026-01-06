@@ -29,7 +29,10 @@ import {
   searchTeamsToJoin,
   sendJoinRequest,
   getMyJoinRequests,
-  cancelJoinRequest
+  cancelJoinRequest,
+  getTeamJoinRequests,
+  acceptJoinRequest,
+  rejectJoinRequest
 } from "../../../services/teamService";
 
 const MyTeams = () => {
@@ -51,6 +54,7 @@ const MyTeams = () => {
   const [teamsToJoin, setTeamsToJoin] = useState([]);
   const [isSearchingTeams, setIsSearchingTeams] = useState(false);
   const [myJoinRequests, setMyJoinRequests] = useState([]);
+  const [incomingJoinRequests, setIncomingJoinRequests] = useState([]);
 
   const handleTeamRegistration = (team) => {
     // Verify minimum team size
@@ -246,12 +250,12 @@ const MyTeams = () => {
     const result = await sendJoinRequest(teamId, "");
     
     if (result.success) {
-      alert("Join request sent! Team leader will review your request.");
+      toast.success("Join request sent! Team leader will review your request.");
       setTeamSearchQuery("");
       setTeamsToJoin([]);
       fetchMyJoinRequests();
     } else {
-      alert(`Error: ${result.error}`);
+      toast.error(`Error: ${result.error}`);
     }
   };
 
@@ -261,10 +265,43 @@ const MyTeams = () => {
     const result = await cancelJoinRequest(requestId);
     
     if (result.success) {
-      alert("Join request cancelled");
+      toast.success("Join request cancelled");
       fetchMyJoinRequests();
     } else {
-      alert(`Error: ${result.error}`);
+      toast.error(`Error: ${result.error}`);
+    }
+  };
+
+  // Incoming Join Requests (for team leaders)
+  const fetchIncomingJoinRequests = async () => {
+    const result = await getTeamJoinRequests();
+    if (result.success) {
+      setIncomingJoinRequests(result.data);
+    }
+  };
+
+  const handleAcceptJoinRequest = async (requestId) => {
+    const result = await acceptJoinRequest(requestId);
+    
+    if (result.success) {
+      toast.success("Join request accepted! User has been added to the team.");
+      fetchIncomingJoinRequests();
+      fetchTeams(); // Refresh teams to show new member
+    } else {
+      toast.error(`Error: ${result.error}`);
+    }
+  };
+
+  const handleRejectJoinRequest = async (requestId) => {
+    if (!confirm("Reject this join request?")) return;
+    
+    const result = await rejectJoinRequest(requestId);
+    
+    if (result.success) {
+      toast.success("Join request rejected");
+      fetchIncomingJoinRequests();
+    } else {
+      toast.error(`Error: ${result.error}`);
     }
   };
 
@@ -274,6 +311,13 @@ const MyTeams = () => {
       fetchMyJoinRequests();
     }
   }, [activeTab]);
+
+  // Fetch incoming join requests for team leaders
+  useEffect(() => {
+    if (activeTab === "my-teams" && teams.some(t => t.leader_id === currentUserId)) {
+      fetchIncomingJoinRequests();
+    }
+  }, [activeTab, teams, currentUserId]);
 
   // Live search for teams
   useEffect(() => {
@@ -609,6 +653,61 @@ const MyTeams = () => {
             </p>
           </div>
         )}
+
+        {/* Incoming Join Requests (for team leaders) */}
+        {incomingJoinRequests.length > 0 && (
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-5 mt-6">
+            <h3 className="font-bold mb-4 flex items-center gap-2">
+              <UserPlus className="text-green-400" size={20} />
+              Incoming Join Requests ({incomingJoinRequests.length})
+            </h3>
+            <div className="space-y-3">
+              {incomingJoinRequests.map((request) => (
+                <div
+                  key={request.id}
+                  className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center justify-between gap-4"
+                >
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="w-10 h-10 bg-gradient-to-br from-green-500/20 to-green-600/20 rounded-full flex items-center justify-center shrink-0">
+                      <User className="text-green-400" size={18} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-sm truncate">{request.profiles?.full_name}</p>
+                      <p className="text-xs text-gray-400 truncate">{request.profiles?.email}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] text-secondary">
+                          → {request.teams?.team_name}
+                        </span>
+                        <span className="text-[10px] text-gray-500">
+                          ({request.teams?.events?.title})
+                        </span>
+                      </div>
+                      {request.message && (
+                        <p className="text-[10px] text-gray-400 mt-1 italic">"{request.message}"</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => handleAcceptJoinRequest(request.id)}
+                      className="p-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg transition-colors"
+                      title="Accept"
+                    >
+                      <Check size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleRejectJoinRequest(request.id)}
+                      className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
+                      title="Reject"
+                    >
+                      <XCircle size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         </div>
       )}
 
@@ -628,7 +727,7 @@ const MyTeams = () => {
                 type="text"
                 value={teamSearchQuery}
                 onChange={(e) => setTeamSearchQuery(e.target.value)}
-                placeholder="Search by team name..."
+                placeholder="Search by team name or leader name..."
                 className="w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-secondary text-white"
               />
             </div>

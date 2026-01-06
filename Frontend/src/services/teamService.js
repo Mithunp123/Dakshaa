@@ -367,20 +367,30 @@ export const searchTeamsToJoin = async (searchQuery) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
+    // First, search for leaders by name to get their IDs
+    const { data: matchingLeaders } = await supabase
+      .from('profiles')
+      .select('id')
+      .ilike('full_name', `%${searchQuery}%`)
+      .limit(50);
+
+    const leaderIdsFromSearch = matchingLeaders?.map(l => l.id) || [];
+
+    // Search teams by team name
+    const { data: teamsByName, error: nameError } = await supabase
       .from('teams')
       .select(`
         id,
         team_name,
         max_members,
         leader_id,
+        event_id,
         created_at,
-        events(id, title, category, event_type),
         team_members(
           user_id,
           role,
           created_at,
-          profiles(full_name, email, roll_no, department)
+          profiles(full_name, email)
         )
       `)
       .eq('is_active', true)
@@ -388,7 +398,45 @@ export const searchTeamsToJoin = async (searchQuery) => {
       .order('created_at', { ascending: false })
       .limit(20);
 
-    if (error) throw error;
+    if (nameError) throw nameError;
+
+    // Search teams by leader ID (if any leaders matched)
+    let teamsByLeader = [];
+    if (leaderIdsFromSearch.length > 0) {
+      const { data: leaderTeams, error: leaderError } = await supabase
+        .from('teams')
+        .select(`
+          id,
+          team_name,
+          max_members,
+          leader_id,
+          event_id,
+          created_at,
+          team_members(
+            user_id,
+            role,
+            created_at,
+            profiles(full_name, email)
+          )
+        `)
+        .eq('is_active', true)
+        .in('leader_id', leaderIdsFromSearch)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (!leaderError && leaderTeams) {
+        teamsByLeader = leaderTeams;
+      }
+    }
+
+    // Combine and deduplicate results
+    const allTeamsMap = new Map();
+    [...(teamsByName || []), ...teamsByLeader].forEach(team => {
+      if (!allTeamsMap.has(team.id)) {
+        allTeamsMap.set(team.id, team);
+      }
+    });
+    const data = Array.from(allTeamsMap.values());
 
     // Filter out teams user is already in or has pending requests for
     const { data: userTeams } = await supabase
@@ -405,19 +453,29 @@ export const searchTeamsToJoin = async (searchQuery) => {
     const userTeamIds = new Set(userTeams?.map(t => t.team_id) || []);
     const pendingTeamIds = new Set(pendingRequests?.map(r => r.team_id) || []);
 
-    // Fetch leader profiles separately
+    // Get unique event IDs and leader IDs
+    const eventIds = [...new Set(data?.map(t => t.event_id).filter(Boolean) || [])];
     const leaderIds = [...new Set(data?.map(t => t.leader_id).filter(Boolean) || [])];
-    const { data: leaderProfiles } = await supabase
-      .from('profiles')
-      .select('id, full_name, email, roll_no, department')
-      .in('id', leaderIds);
 
-    const leaderMap = new Map(leaderProfiles?.map(p => [p.id, p]) || []);
+    // Fetch events and leaders separately
+    const [eventsResult, leaderProfiles] = await Promise.all([
+      eventIds.length > 0 
+        ? supabase.from('events').select('event_id, title, category, event_type').in('event_id', eventIds)
+        : { data: [] },
+      leaderIds.length > 0
+        ? supabase.from('profiles').select('id, full_name, email')
+            .in('id', leaderIds)
+        : { data: [] }
+    ]);
+
+    const eventMap = new Map(eventsResult.data?.map(e => [e.event_id, e]) || []);
+    const leaderMap = new Map(leaderProfiles.data?.map(p => [p.id, p]) || []);
 
     const filteredTeams = (data || [])
       .filter(team => !userTeamIds.has(team.id) && !pendingTeamIds.has(team.id))
       .map(team => ({
         ...team,
+        events: eventMap.get(team.event_id) || { title: team.event_id, category: '', event_type: '' },
         leader: leaderMap.get(team.leader_id),
         members: team.team_members || [],
         current_members: team.team_members?.length || 0,
@@ -487,6 +545,7 @@ export const getTeamJoinRequests = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    // Fetch join requests with team and user data
     const { data, error } = await supabase
       .from('team_join_requests')
       .select(`
@@ -494,17 +553,44 @@ export const getTeamJoinRequests = async () => {
         message,
         created_at,
         status,
-        teams(id, team_name, events(title)),
-        profiles(id, full_name, email, roll_no, department)
+        user_id,
+        teams(id, team_name, event_id, leader_id),
+        profiles(id, full_name, email)
       `)
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
 
+    if (!data || data.length === 0) {
+      return { success: true, data: [], error: null };
+    }
+
+    // Filter to only show requests for teams the user leads
+    const userTeamRequests = data.filter(r => r.teams?.leader_id === user.id);
+
+    // Get unique event IDs
+    const eventIds = [...new Set(userTeamRequests.map(r => r.teams?.event_id).filter(Boolean))];
+
+    // Fetch events separately
+    const { data: eventsData } = eventIds.length > 0 
+      ? await supabase.from('events').select('event_id, title').in('event_id', eventIds)
+      : { data: [] };
+
+    const eventMap = new Map(eventsData?.map(e => [e.event_id, e]) || []);
+
+    // Combine data
+    const enrichedData = userTeamRequests.map(request => ({
+      ...request,
+      teams: request.teams ? {
+        ...request.teams,
+        events: eventMap.get(request.teams.event_id) || { title: request.teams.event_id }
+      } : null
+    }));
+
     return {
       success: true,
-      data: data || [],
+      data: enrichedData,
       error: null
     };
   } catch (error) {
@@ -526,6 +612,7 @@ export const getMyJoinRequests = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    // Fetch join requests with team data
     const { data, error } = await supabase
       .from('team_join_requests')
       .select(`
@@ -533,16 +620,48 @@ export const getMyJoinRequests = async () => {
         message,
         created_at,
         status,
-        teams(id, team_name, events(title), leader:profiles!teams_leader_id_fkey(full_name))
+        team_id,
+        teams(id, team_name, event_id, leader_id)
       `)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
 
+    if (!data || data.length === 0) {
+      return { success: true, data: [], error: null };
+    }
+
+    // Get unique event IDs and leader IDs
+    const eventIds = [...new Set(data.map(r => r.teams?.event_id).filter(Boolean))];
+    const leaderIds = [...new Set(data.map(r => r.teams?.leader_id).filter(Boolean))];
+
+    // Fetch events and leaders separately
+    const [eventsResult, leadersResult] = await Promise.all([
+      eventIds.length > 0 
+        ? supabase.from('events').select('event_id, title').in('event_id', eventIds)
+        : { data: [] },
+      leaderIds.length > 0
+        ? supabase.from('profiles').select('id, full_name').in('id', leaderIds)
+        : { data: [] }
+    ]);
+
+    const eventMap = new Map(eventsResult.data?.map(e => [e.event_id, e]) || []);
+    const leaderMap = new Map(leadersResult.data?.map(l => [l.id, l]) || []);
+
+    // Combine data
+    const enrichedData = data.map(request => ({
+      ...request,
+      teams: request.teams ? {
+        ...request.teams,
+        events: eventMap.get(request.teams.event_id) || { title: request.teams.event_id },
+        leader: leaderMap.get(request.teams.leader_id) || { full_name: 'Unknown' }
+      } : null
+    }));
+
     return {
       success: true,
-      data: data || [],
+      data: enrichedData,
       error: null
     };
   } catch (error) {
@@ -583,6 +702,120 @@ export const cancelJoinRequest = async (requestId) => {
   }
 };
 
+/**
+ * Accept a join request (team leader only)
+ * @param {String} requestId - ID of the join request
+ * @returns {Promise<Object>} Response with success status
+ */
+export const acceptJoinRequest = async (requestId) => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // Get the join request details
+    const { data: request, error: requestError } = await supabase
+      .from('team_join_requests')
+      .select('*, teams(id, leader_id, max_members)')
+      .eq('id', requestId)
+      .single();
+
+    if (requestError) throw requestError;
+    if (!request) throw new Error('Join request not found');
+
+    // Verify current user is the team leader
+    if (request.teams.leader_id !== user.id) {
+      throw new Error('Only team leader can accept join requests');
+    }
+
+    // Check if team is full
+    const { count: memberCount } = await supabase
+      .from('team_members')
+      .select('*', { count: 'exact', head: true })
+      .eq('team_id', request.team_id);
+
+    if (memberCount >= request.teams.max_members) {
+      throw new Error('Team is full');
+    }
+
+    // Add user to team
+    const { error: memberError } = await supabase
+      .from('team_members')
+      .insert({
+        team_id: request.team_id,
+        user_id: request.user_id,
+        role: 'member',
+        status: 'active'
+      });
+
+    if (memberError) throw memberError;
+
+    // Update request status to accepted
+    const { error: updateError } = await supabase
+      .from('team_join_requests')
+      .update({ status: 'accepted' })
+      .eq('id', requestId);
+
+    if (updateError) throw updateError;
+
+    return {
+      success: true,
+      error: null
+    };
+  } catch (error) {
+    console.error("Error accepting join request:", error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+};
+
+/**
+ * Reject a join request (team leader only)
+ * @param {String} requestId - ID of the join request
+ * @returns {Promise<Object>} Response with success status
+ */
+export const rejectJoinRequest = async (requestId) => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // Get the join request details
+    const { data: request, error: requestError } = await supabase
+      .from('team_join_requests')
+      .select('*, teams(id, leader_id)')
+      .eq('id', requestId)
+      .single();
+
+    if (requestError) throw requestError;
+    if (!request) throw new Error('Join request not found');
+
+    // Verify current user is the team leader
+    if (request.teams.leader_id !== user.id) {
+      throw new Error('Only team leader can reject join requests');
+    }
+
+    // Update request status to rejected
+    const { error: updateError } = await supabase
+      .from('team_join_requests')
+      .update({ status: 'rejected' })
+      .eq('id', requestId);
+
+    if (updateError) throw updateError;
+
+    return {
+      success: true,
+      error: null
+    };
+  } catch (error) {
+    console.error("Error rejecting join request:", error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+};
+
 export default {
   createTeam,
   getTeamDetails,
@@ -597,5 +830,7 @@ export default {
   sendJoinRequest,
   getTeamJoinRequests,
   getMyJoinRequests,
-  cancelJoinRequest
+  cancelJoinRequest,
+  acceptJoinRequest,
+  rejectJoinRequest
 };

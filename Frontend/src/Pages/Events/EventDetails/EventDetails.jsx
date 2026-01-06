@@ -81,6 +81,7 @@ const EventDetails = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [registrationStats, setRegistrationStats] = useState({ current: 0, capacity: 100, loading: true });
 
   // Check authentication status
   useEffect(() => {
@@ -97,6 +98,54 @@ const EventDetails = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Fetch registration stats for this event
+  useEffect(() => {
+    const fetchRegistrationStats = async () => {
+      try {
+        // Get the database event ID
+        const dbEventId = rawEventId;
+        
+        // Use RPC function to get total count (bypasses RLS)
+        const { data: rpcData, error: rpcError } = await supabase
+          .rpc('get_event_registration_count', { p_event_id: dbEventId });
+
+        if (!rpcError && rpcData) {
+          setRegistrationStats({
+            current: rpcData.count || rpcData.current_registrations || 0,
+            capacity: rpcData.capacity || 100,
+            loading: false
+          });
+        } else {
+          // Fallback: fetch from events table (current_registrations column)
+          const { data: eventData, error: eventError } = await supabase
+            .from('events')
+            .select('capacity, current_registrations')
+            .eq('event_id', dbEventId)
+            .single();
+
+          if (!eventError && eventData) {
+            setRegistrationStats({
+              current: parseInt(eventData.current_registrations) || 0,
+              capacity: parseInt(eventData.capacity) || 100,
+              loading: false
+            });
+          } else {
+            setRegistrationStats({
+              current: 0,
+              capacity: 100,
+              loading: false
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching registration stats:', error);
+        setRegistrationStats(prev => ({ ...prev, loading: false }));
+      }
+    };
+
+    fetchRegistrationStats();
+  }, [rawEventId]);
 
   // Map new database event IDs to old EventDetails IDs
   const eventIdMap = {
@@ -2729,6 +2778,37 @@ const EventDetails = () => {
             {eventPrice === 0 && <span className="ml-2 text-green-400">(FREE)</span>}
           </div>
         )}
+
+        {/* Display Registration Count */}
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center gap-3 px-6 py-3 bg-gray-800/50 rounded-lg border border-primary-dark/50">
+            <div className="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+              </svg>
+              <span className="text-gray-300 text-lg">Registered:</span>
+            </div>
+            {registrationStats.loading ? (
+              <span className="text-primary text-xl font-bold animate-pulse">Loading...</span>
+            ) : (
+              <span className={`text-xl font-bold ${
+                registrationStats.current >= registrationStats.capacity 
+                  ? 'text-red-400' 
+                  : registrationStats.current >= registrationStats.capacity * 0.8 
+                    ? 'text-yellow-400' 
+                    : 'text-green-400'
+              }`}>
+                {registrationStats.current} / {registrationStats.capacity}
+              </span>
+            )}
+            {!registrationStats.loading && registrationStats.current >= registrationStats.capacity && (
+              <span className="text-red-400 text-sm">(Full)</span>
+            )}
+            {!registrationStats.loading && registrationStats.current >= registrationStats.capacity * 0.8 && registrationStats.current < registrationStats.capacity && (
+              <span className="text-yellow-400 text-sm">(Filling Fast!)</span>
+            )}
+          </div>
+        </div>
 
         {/* Register Now Button */}
         <motion.button
