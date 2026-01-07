@@ -37,8 +37,10 @@ app.post("/add-accommodation", async (req, res) => {
       });
     }
 
-    // Determine if March 28 is selected
-    const march_28_accommodation = accommodation_dates.includes('March 28');
+    // Determine which dates are selected (February 12, 13, 14)
+    const february_12_accommodation = accommodation_dates.includes('February 12');
+    const february_13_accommodation = accommodation_dates.includes('February 13');
+    const february_14_accommodation = accommodation_dates.includes('February 14');
     
     // 🏷️ Calculate price: ₹300 per day
     const number_of_days = accommodation_dates.length;
@@ -71,7 +73,9 @@ app.post("/add-accommodation", async (req, res) => {
           phone: mobile_number,
           college_name: college_name,
           gender: gender,
-          march_28_accommodation,
+          february_12_accommodation,
+          february_13_accommodation,
+          february_14_accommodation,
           number_of_days,
           total_price: accommodation_price,
           payment_status: 'PENDING'
@@ -169,9 +173,10 @@ app.post("/add-lunch-booking", async (req, res) => {
       });
     }
 
-    // Determine which days are selected
-    const march_28_lunch = lunch_dates.includes('March 28');
-    const march_29_lunch = lunch_dates.includes('March 29');
+    // Determine which days are selected (February 12, 13, 14)
+    const february_12_lunch = lunch_dates.includes('February 12');
+    const february_13_lunch = lunch_dates.includes('February 13');
+    const february_14_lunch = lunch_dates.includes('February 14');
     
     // Calculate totals
     const total_lunches = lunch_dates.length;
@@ -202,8 +207,9 @@ app.post("/add-lunch-booking", async (req, res) => {
           full_name,
           email,
           phone: mobile,
-          march_28_lunch,
-          march_29_lunch,
+          february_12_lunch,
+          february_13_lunch,
+          february_14_lunch,
           total_lunches,
           total_price: calculated_price,
           payment_status: 'PENDING'

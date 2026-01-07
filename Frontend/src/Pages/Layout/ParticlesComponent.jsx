@@ -27,7 +27,7 @@ const ParticlesComponent = (props) => {
   }, []);
 
   const particlesLoaded = (container) => {
-    console.log(container);
+    // Particles loaded successfully
   };
 
 
@@ -38,7 +38,7 @@ const ParticlesComponent = (props) => {
           value: "transparent",
         },
       },
-      fpsLimit: 120,
+      fpsLimit: 60, // Reduced from 120 for better performance
       interactivity: {
         events: {
           onClick: {
@@ -81,14 +81,14 @@ const ParticlesComponent = (props) => {
             default: "bounce",
           },
           random: true,
-          speed: 1,
+          speed: 0.5, // Slower, smoother movement
           straight: false,
         },
         number: {
           density: {
             enable: true,
           },
-          value: 80,
+          value: 50, // Reduced from 80 for better performance
         },
         opacity: {
           value: 0.3,

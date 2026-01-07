@@ -1123,15 +1123,15 @@ const RegistrationForm = () => {
                   <ul className="space-y-2">
                     <li className="flex items-center text-gray-300 text-sm">
                       <Calendar className="text-blue-400 mr-2" size={16} />
-                      March 12 Evening Stay
+                      February 12 Evening Stay
                     </li>
                     <li className="flex items-center text-gray-300 text-sm">
                       <Calendar className="text-blue-400 mr-2" size={16} />
-                      March 13 Breakfast & Night
+                      February 13 Breakfast & Night
                     </li>
                     <li className="flex items-center text-gray-300 text-sm">
                       <Calendar className="text-blue-400 mr-2" size={16} />
-                      March 14 Breakfast
+                      February 14 Breakfast
                     </li>
                   </ul>
                   <button className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-xl transition-all shadow-lg">
@@ -1158,20 +1158,20 @@ const RegistrationForm = () => {
                   </h3>
                   <p className="text-orange-200 font-semibold">Rs. 100 per lunch</p>
                   <p className="text-gray-400 text-sm">
-                    Only Lunch will be provided for 12th, 13th and 14th March. Reserve your meals.
+                    Only Lunch will be provided for 12th, 13th and 14th February. Reserve your meals.
                   </p>
                   <ul className="space-y-2">
                     <li className="flex items-center text-gray-300 text-sm">
                       <Calendar className="text-orange-400 mr-2" size={16} />
-                      March 12 Lunch
+                      February 12 Lunch
                     </li>
                     <li className="flex items-center text-gray-300 text-sm">
                       <Calendar className="text-orange-400 mr-2" size={16} />
-                      March 13 Lunch
+                      February 13 Lunch
                     </li>
                     <li className="flex items-center text-gray-300 text-sm">
                       <Calendar className="text-orange-400 mr-2" size={16} />
-                      March 14 Lunch
+                      February 14 Lunch
                     </li>
                   </ul>
                   <button className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold rounded-xl transition-all shadow-lg">

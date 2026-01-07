@@ -10,7 +10,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { Toaster } from 'react-hot-toast';
 import "./App.css";
-import ParticlesComponent from "./Pages/Layout/ParticlesComponent";
+const ParticlesComponent = lazy(() => import("./Pages/Layout/ParticlesComponent"));
 import Navbar from "./Pages/Layout/Navbar";
 import Tags from "./Pages/Layout/Tags";
 import UltraFooter from "./Pages/Layout/UltraFooter";
@@ -106,15 +106,23 @@ function AppContent() {
 
   // Prefetch critical pages after initial load for faster navigation
   useEffect(() => {
-    const prefetchTimer = setTimeout(() => {
-      // Prefetch most commonly visited pages in background
-      preloadPages.events?.();
-      preloadPages.schedule?.();
-      preloadPages.dashboard?.();
-      preloadPages.registerEvents?.();
-    }, 2000); // Wait 2s after page load to not block initial render
-    
-    return () => clearTimeout(prefetchTimer);
+    // Start prefetching earlier when browser is idle
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        preloadPages.events?.();
+        preloadPages.schedule?.();
+        preloadPages.dashboard?.();
+        preloadPages.registerEvents?.();
+      }, { timeout: 1000 });
+    } else {
+      const prefetchTimer = setTimeout(() => {
+        preloadPages.events?.();
+        preloadPages.schedule?.();
+        preloadPages.dashboard?.();
+        preloadPages.registerEvents?.();
+      }, 1000); // Reduced from 2s to 1s
+      return () => clearTimeout(prefetchTimer);
+    }
   }, []);
 
   return (
@@ -122,7 +130,7 @@ function AppContent() {
       {!isDashboard && !isAdmin && !isScan && !isLogin && <Navbar />}
       {!isDashboard && !isAdmin && !isScan && !isLogin && <Tags />}
       <AnimatePresence>
-        <Suspense key={location.key} fallback={<LoadingScreen variant="cyber" text="Loading..." />}>
+        <Suspense key={location.key} fallback={<LoadingScreen variant="pulse" text="Loading..." />}>
           <Routes location={location} key={location.key}>
             <Route
               path="/"
@@ -366,8 +374,10 @@ function AppContent() {
 function App() {
   useEffect(() => {
     AOS.init({
-      duration: 1000, // Animation duration
+      duration: 800, // Smooth animation duration
       once: true, // Whether animation should happen only once
+      easing: 'ease-in-out', // Smooth easing for better flow
+      offset: 50, // Trigger animations slightly earlier
     });
   }, []);
 
@@ -384,7 +394,9 @@ function App() {
       />
       <SupabaseHealthCheck>
         <Router>
-          <ParticlesComponent id="particlesBG" />
+          <Suspense fallback={null}>
+            <ParticlesComponent id="particlesBG" />
+          </Suspense>
           <AppContent />
         </Router>
       </SupabaseHealthCheck>

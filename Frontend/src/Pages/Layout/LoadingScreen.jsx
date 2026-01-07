@@ -131,7 +131,7 @@ const CyberLoader = ({ text }) => {
   );
 };
 
-// Pulse Loader - Expanding circles
+// Pulse Loader - Expanding circles (Optimized for performance)
 const PulseLoader = ({ text }) => {
   return (
     <motion.div
@@ -139,6 +139,7 @@ const PulseLoader = ({ text }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      transition={{ duration: 0.3, ease: 'easeInOut' }} // Smooth fade in
     >
       <div className="relative w-24 h-24">
         {[...Array(3)].map((_, i) => (
@@ -146,7 +147,7 @@ const PulseLoader = ({ text }) => {
             key={i}
             className="absolute inset-0 border-2 border-sky-400 rounded-full"
             animate={{
-              scale: [1, 2.5],
+              scale: [1, 2.2],
               opacity: [0.8, 0],
             }}
             transition={{

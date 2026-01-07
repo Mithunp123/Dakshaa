@@ -151,7 +151,8 @@ const AccommodationBooking = () => {
           });
           setShowModal(false);
         } else {
-          throw new Error('Booking failed');
+          console.error('Backend error details:', result);
+          throw new Error(result.error || 'Booking failed');
         }
       } else {
         if (formData.lunchDates.length === 0) {
@@ -206,7 +207,8 @@ const AccommodationBooking = () => {
           });
           setShowModal(false);
         } else {
-          throw new Error('Booking failed');
+          console.error('Backend error details:', result);
+          throw new Error(result.error || 'Booking failed');
         }
       }
     } catch (error) {
@@ -268,15 +270,15 @@ const AccommodationBooking = () => {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <Calendar size={16} />
-                <span>March 12 Evening Stay</span>
+                <span>February 12 Evening Stay</span>
               </div>
               <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <Calendar size={16} />
-                <span>March 13 Breakfast & Night Stay</span>
+                <span>February 13 Breakfast & Night Stay</span>
               </div>
               <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <Calendar size={16} />
-                <span>March 14 Breakfast</span>
+                <span>February 14 Breakfast</span>
               </div>
             </div>
           </div>
@@ -308,22 +310,22 @@ const AccommodationBooking = () => {
           <div className="space-y-4 mb-6">
             <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
               <p className="text-gray-300 text-sm leading-relaxed">
-                Only Lunch will be provided for <strong>12th, 13th and 14th March</strong>. Register here to reserve your meals.
+                Only Lunch will be provided for <strong>12th, 13th and 14th February</strong>. Register here to reserve your meals.
               </p>
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <Calendar size={16} />
-                <span>March 12 Lunch</span>
+                <span>February 12 Lunch</span>
               </div>
               <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <Calendar size={16} />
-                <span>March 13 Lunch</span>
+                <span>February 13 Lunch</span>
               </div>
               <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <Calendar size={16} />
-                <span>March 14 Lunch</span>
+                <span>February 14 Lunch</span>
               </div>
             </div>
           </div>
@@ -446,40 +448,75 @@ const AccommodationBooking = () => {
                 </label>
                 <div className="flex gap-4">
                   {bookingType === 'accommodation' ? (
-                    <button
-                      type="button"
-                      onClick={() => handleDateToggle('March 28', 'accommodation')}
-                      className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
-                        formData.accommodationDates.includes('March 28')
-                          ? 'border-blue-500 bg-blue-500/20 text-blue-400'
-                          : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-blue-500/50'
-                      }`}
-                    >
-                      March 28 Evening
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleDateToggle('February 12', 'accommodation')}
+                        className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
+                          formData.accommodationDates.includes('February 12')
+                            ? 'border-blue-500 bg-blue-500/20 text-blue-400'
+                            : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-blue-500/50'
+                        }`}
+                      >
+                        February 12 Evening
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDateToggle('February 13', 'accommodation')}
+                        className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
+                          formData.accommodationDates.includes('February 13')
+                            ? 'border-blue-500 bg-blue-500/20 text-blue-400'
+                            : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-blue-500/50'
+                        }`}
+                      >
+                        February 13 Full Day
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDateToggle('February 14', 'accommodation')}
+                        className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
+                          formData.accommodationDates.includes('February 14')
+                            ? 'border-blue-500 bg-blue-500/20 text-blue-400'
+                            : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-blue-500/50'
+                        }`}
+                      >
+                        February 14 Breakfast
+                      </button>
+                    </>
                   ) : (
                     <>
                       <button
                         type="button"
-                        onClick={() => handleDateToggle('March 28', 'lunch')}
+                        onClick={() => handleDateToggle('February 12', 'lunch')}
                         className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
-                          formData.lunchDates.includes('March 28')
+                          formData.lunchDates.includes('February 12')
                             ? 'border-orange-500 bg-orange-500/20 text-orange-400'
                             : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-orange-500/50'
                         }`}
                       >
-                        March 28
+                        February 12
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDateToggle('March 29', 'lunch')}
+                        onClick={() => handleDateToggle('February 13', 'lunch')}
                         className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
-                          formData.lunchDates.includes('March 29')
+                          formData.lunchDates.includes('February 13')
                             ? 'border-orange-500 bg-orange-500/20 text-orange-400'
                             : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-orange-500/50'
                         }`}
                       >
-                        March 29
+                        February 13
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDateToggle('February 14', 'lunch')}
+                        className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
+                          formData.lunchDates.includes('February 14')
+                            ? 'border-orange-500 bg-orange-500/20 text-orange-400'
+                            : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-orange-500/50'
+                        }`}
+                      >
+                        February 14
                       </button>
                     </>
                   )}
