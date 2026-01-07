@@ -56,7 +56,7 @@ const pulseAnimation = {
 
 const HeroSection = () => {
   const navigate = useNavigate(); // Initialize useNavigate
-  const eventDetails = ["4 DAYS", "20+ WORKSHOPS", "25+ EVENTS"];
+  const eventDetails = ["3 DAYS", "20+ WORKSHOPS", "25+ EVENTS"];
 
   // Function to handle navigation
   const handleNavigation = (path) => {
@@ -153,7 +153,7 @@ const HeroSection = () => {
                       handleNavigation("/events/workshop"); // Navigate to workshops
                     } else if (word === "25+ EVENTS") {
                       handleNavigation("/events"); // Navigate to events
-                    } else if (word === "4 DAYS") {
+                    } else if (word === "3 DAYS") {
                       handleNavigation("/accomodation"); // Navigate to upcoming events
                     }
                   }}

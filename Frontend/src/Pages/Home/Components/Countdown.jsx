@@ -53,7 +53,7 @@ const CountdownTimer = () => {
       >
         <span className="inline-flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-1 sm:py-2 border-2 border-secondary/50 bg-secondary/20 flicker">
           <img className="w-8 sm:w-10 md:w-8" src={warning} alt="Warning Icon" />
-          11th, 12th, 13th & 14th February, 2026
+          12th, 13th & 14th February, 2026
         </span>
       </p>
       <div className="relative sm:my-8 flex">

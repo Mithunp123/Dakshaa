@@ -147,7 +147,7 @@ const getWelcomeEmailTemplate = (userName, userEmail) => {
           <div class="info-box">
             <h3>🎯 What's Next?</h3>
             <ul>
-              <li>🎪 <strong>4 DAYS</strong> of amazing events</li>
+              <li>🎪 <strong>3 DAYS</strong> of amazing events</li>
               <li>🎓 <strong>20+ Workshops</strong> to enhance your skills</li>
               <li>🏆 <strong>25+ Events</strong> to showcase your talent</li>
               <li>🤝 Network with industry professionals</li>
