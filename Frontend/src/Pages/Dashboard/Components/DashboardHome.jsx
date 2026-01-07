@@ -15,6 +15,20 @@ import { supabase } from '../../../supabase';
 import { supabaseService } from '../../../services/supabaseService';
 
 const DashboardHome = () => {
+  // Get user from localStorage synchronously for instant load
+  const getStoredUser = () => {
+    try {
+      const session = localStorage.getItem('sb-ltmyqtcirhsgfyortgfo-auth-token');
+      if (session) {
+        const sessionData = JSON.parse(session);
+        return sessionData?.user || null;
+      }
+    } catch (error) {
+      console.warn('Error reading stored session:', error);
+    }
+    return null;
+  };
+
   const [profile, setProfile] = useState(null);
   const [registrations, setRegistrations] = useState([]);
   const [teamsCount, setTeamsCount] = useState(0);
@@ -24,36 +38,39 @@ const DashboardHome = () => {
     fetchDashboardData();
 
     // Set up real-time subscription for registration updates
-    const registrationSubscription = supabase
-      .channel('student-registration-updates')
-      .on(
-        'postgres_changes',
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'registrations',
-          filter: `user_id=eq.${localStorage.getItem('supabase.auth.token')}`
-        },
-        () => {
-          fetchDashboardData();
-        }
-      )
-      .subscribe();
+    const storedUser = getStoredUser();
+    if (storedUser) {
+      const registrationSubscription = supabase
+        .channel('student-registration-updates')
+        .on(
+          'postgres_changes',
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'registrations',
+            filter: `user_id=eq.${storedUser.id}`
+          },
+          () => {
+            fetchDashboardData();
+          }
+        )
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(registrationSubscription);
-    };
+      return () => {
+        supabase.removeChannel(registrationSubscription);
+      };
+    }
   }, []);
 
   const fetchDashboardData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
+      const storedUser = getStoredUser();
+      if (storedUser) {
         // Fetch profile and registrations in parallel for faster load
         const [profileResponse, regData, teamsData] = await Promise.all([
-          supabase.from('profiles').select('full_name, email, college_name, role').eq('id', user.id).single(),
-          supabaseService.getUserRegistrations(user.id),
-          supabase.from('team_members').select('team_id', { count: 'exact' }).eq('user_id', user.id)
+          supabase.from('profiles').select('full_name, email, college_name, role').eq('id', storedUser.id).single(),
+          supabaseService.getUserRegistrations(storedUser.id),
+          supabase.from('team_members').select('team_id', { count: 'exact' }).eq('user_id', storedUser.id)
         ]);
         
         setProfile(profileResponse.data);

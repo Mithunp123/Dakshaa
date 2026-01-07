@@ -1,5 +1,34 @@
 import { supabase } from "../supabase";
 
+// Cache for combos (similar to events cache)
+const COMBOS_CACHE_KEY = 'dakshaa_combos_cache';
+const COMBOS_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// Helper to get cached combos
+const getCachedCombos = () => {
+  try {
+    const cached = localStorage.getItem(COMBOS_CACHE_KEY);
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp < COMBOS_CACHE_DURATION && data?.length > 0) {
+        console.log('🔵 [comboService] Using cached combos');
+        return data;
+      }
+    }
+  } catch (e) {}
+  return null;
+};
+
+// Helper to cache combos
+const cacheCombos = (combos) => {
+  try {
+    localStorage.setItem(COMBOS_CACHE_KEY, JSON.stringify({
+      data: combos,
+      timestamp: Date.now()
+    }));
+  } catch (e) {}
+};
+
 // Helper function to check if a string is a valid UUID
 const isValidUUID = (str) => {
   if (!str || typeof str !== 'string') return false;
@@ -88,24 +117,92 @@ const comboService = {
 
   /**
    * Get active combos for students (with availability checks)
+   * @param {string} userId - The user ID (passed from caller, no re-auth needed)
    */
   getActiveCombosForStudents: async (userId) => {
     try {
-      // Use direct query instead of RPC function that doesn't exist
+      console.log('🔵 [comboService] getActiveCombosForStudents called with userId:', userId);
+      
+      // Trust the userId passed in - don't call getUser() as it can timeout/hang
+      if (!userId) {
+        console.warn("⚠️ [comboService] No userId provided, combos not available");
+        return {
+          success: false,
+          data: [],
+          error: "User not authenticated",
+        };
+      }
+
+      // Try cache first for instant display
+      const cachedCombos = getCachedCombos();
+      
+      // Ensure Supabase session is initialized before querying
+      // This restores the session from localStorage if needed
+      let sessionReady = false;
+      try {
+        const { data: { session } } = await Promise.race([
+          supabase.auth.getSession(),
+          // 5 second timeout - getSession can be slow on cold start
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Session timeout')), 5000))
+        ]);
+        sessionReady = !!session;
+        console.log('🔵 [comboService] Session ready:', sessionReady);
+      } catch (e) {
+        console.warn('🔵 [comboService] Session check failed/timeout:', e.message);
+        // If session check fails but we have cache, return cache
+        if (cachedCombos) {
+          console.log('🔵 [comboService] Returning cached combos due to session issue');
+          return { success: true, data: cachedCombos };
+        }
+      }
+
+      // Query combos table
+      console.log('🔵 [comboService] Querying combos table...');
       const { data, error } = await supabase
         .from("combos")
         .select("*")
         .eq("is_active", true)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      console.log("🔵 [comboService] Raw combos query result:", { 
+        dataLength: data?.length || 0,
+        error: error?.message,
+        firstCombo: data?.[0]?.name
+      });
+      
+      if (error) {
+        console.error("🔵 [comboService] Query error:", error);
+        // If query fails but we have cache, return cache
+        if (cachedCombos) {
+          console.log('🔵 [comboService] Returning cached combos due to query error');
+          return { success: true, data: cachedCombos };
+        }
+        throw error;
+      }
 
       // Filter combos that are still available (not sold out)
-      const availableCombos = (data || []).filter((combo) => {
-        const maxPurchases = combo.max_purchases || 100;
-        const currentPurchases = combo.current_purchases || 0;
-        return currentPurchases < maxPurchases;
+      const availableCombos = (data || []).map((combo) => {
+        // Normalize combo data - convert TEXT fields to proper types
+        const normalizedCombo = {
+          ...combo,
+          price: parseFloat(combo.price) || 0,
+          max_purchases: parseInt(combo.max_purchases) || 100,
+          current_purchases: parseInt(combo.current_purchases) || 0,
+          is_active: combo.is_active === true || combo.is_active === 'true'
+        };
+        return normalizedCombo;
+      }).filter((combo) => {
+        const isAvailable = combo.current_purchases < combo.max_purchases;
+        console.log(`🔵 [comboService] Combo "${combo.name}": current=${combo.current_purchases}, max=${combo.max_purchases}, available=${isAvailable}`);
+        return isAvailable;
       });
+      
+      console.log("🔵 [comboService] Available combos after filtering:", availableCombos.length);
+
+      // Cache the results
+      if (availableCombos.length > 0) {
+        cacheCombos(availableCombos);
+      }
 
       return {
         success: true,

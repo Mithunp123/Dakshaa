@@ -24,14 +24,22 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated, preSelectedEventId, p
 
   // Pre-select event if provided via navigation
   useEffect(() => {
-    if (preSelectedEventId && events.length > 0) {
-      const selectedEvent = events.find(e => e.event_id === preSelectedEventId);
-      if (selectedEvent) {
-        setFormData(prev => ({
-          ...prev,
-          eventId: preSelectedEventId,
-          maxMembers: selectedEvent.max_team_size || 4
-        }));
+    if (preSelectedEventId) {
+      // Set eventId immediately, don't wait for events array
+      setFormData(prev => ({
+        ...prev,
+        eventId: preSelectedEventId
+      }));
+      
+      // Update maxMembers once events are loaded
+      if (events.length > 0) {
+        const selectedEvent = events.find(e => e.event_id === preSelectedEventId);
+        if (selectedEvent) {
+          setFormData(prev => ({
+            ...prev,
+            maxMembers: selectedEvent.max_team_size || 4
+          }));
+        }
       }
     }
   }, [preSelectedEventId, events]);
@@ -39,12 +47,12 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated, preSelectedEventId, p
   const fetchTeamEvents = async () => {
     try {
       setFetchingEvents(true);
-      // Fetch events that allow teams (is_team_event = true)
+      // Fetch events that allow teams (is_team_event = 'true' for TEXT field)
       const { data, error } = await supabase
         .from('events')
         .select('event_id, title, max_team_size, min_team_size')
-        .eq('is_team_event', true)
-        .eq('is_active', true)
+        .eq('is_team_event', 'true')
+        .eq('is_active', 'true')
         .order('title');
 
       if (error) throw error;

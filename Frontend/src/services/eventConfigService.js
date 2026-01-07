@@ -138,6 +138,19 @@ export const getEventsWithStats = async () => {
       };
     }
     
+    // Normalize event data - convert TEXT fields to proper types
+    eventsData = eventsData.map(event => ({
+      ...event,
+      price: parseFloat(event.price) || 0,
+      capacity: parseInt(event.capacity) || 100,
+      current_registrations: parseInt(event.current_registrations) || 0,
+      min_team_size: parseInt(event.min_team_size) || 1,
+      max_team_size: parseInt(event.max_team_size) || 1,
+      is_team_event: event.is_team_event === true || event.is_team_event === 'true',
+      is_open: event.is_open === true || event.is_open === 'true' || event.is_open === undefined,
+      is_active: event.is_active === true || event.is_active === 'true' || event.is_active === undefined
+    }));
+    
     // Check which column name to use for event ID (id vs event_id)
     const hasUuidId = eventsData.length > 0 && 'id' in eventsData[0];
     const idField = hasUuidId ? 'id' : 'event_id';
@@ -634,6 +647,36 @@ export const updateRegistrationPayment = async (
   }
 };
 
+/**
+ * Get all event IDs that the user has already registered for
+ * @param {string} userId - User ID
+ * @returns {Promise<Set<string>>} Set of event IDs user is registered for
+ */
+export const getUserRegisteredEventIds = async (userId) => {
+  try {
+    if (!userId) {
+      return new Set();
+    }
+
+    // Only get PAID registrations (not PENDING or FAILED)
+    const { data, error } = await supabase
+      .from('event_registrations_config')
+      .select('event_id')
+      .eq('user_id', userId)
+      .eq('payment_status', 'PAID');
+
+    if (error) throw error;
+
+    // Return a Set of event IDs for fast lookup
+    const eventIds = new Set((data || []).map(reg => reg.event_id));
+    console.log(`📋 User has ${eventIds.size} registered events`);
+    return eventIds;
+  } catch (error) {
+    console.error("Error fetching user registered events:", error);
+    return new Set();
+  }
+};
+
 export default {
   getEventsWithStats,
   getCachedEvents,
@@ -649,5 +692,6 @@ export default {
   registerForEvent,
   getUserRegistrations,
   getEventRegistrations,
-  updateRegistrationPayment
+  updateRegistrationPayment,
+  getUserRegisteredEventIds
 };

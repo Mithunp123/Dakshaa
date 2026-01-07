@@ -261,14 +261,23 @@ const AccommodationBooking = () => {
           <div className="space-y-4 mb-6">
             <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
               <p className="text-gray-300 text-sm leading-relaxed">
-                Accommodation is only provided for <strong>28th Evening stay</strong> with
-                Evening Dinner and <strong>29th Morning breakfast</strong>.
+                Accommodation is only provided for <strong>12th Night stay</strong> with Dinner, <strong>13th Breakfast</strong>, Night stay and <strong>14th Breakfast</strong>.
               </p>
             </div>
 
-            <div className="flex items-center gap-2 text-gray-400 text-sm">
-              <Calendar size={16} />
-              <span>March 28 Evening Stay</span>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-gray-400 text-sm">
+                <Calendar size={16} />
+                <span>March 12 Evening Stay</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-400 text-sm">
+                <Calendar size={16} />
+                <span>March 13 Breakfast & Night Stay</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-400 text-sm">
+                <Calendar size={16} />
+                <span>March 14 Breakfast</span>
+              </div>
             </div>
           </div>
 
@@ -299,19 +308,22 @@ const AccommodationBooking = () => {
           <div className="space-y-4 mb-6">
             <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
               <p className="text-gray-300 text-sm leading-relaxed">
-                Only Lunch will be provided for <strong>28th and 29th March</strong>.
-                Register here to reserve your meals.
+                Only Lunch will be provided for <strong>12th, 13th and 14th March</strong>. Register here to reserve your meals.
               </p>
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <Calendar size={16} />
-                <span>March 28 Lunch</span>
+                <span>March 12 Lunch</span>
               </div>
               <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <Calendar size={16} />
-                <span>March 29 Lunch</span>
+                <span>March 13 Lunch</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-400 text-sm">
+                <Calendar size={16} />
+                <span>March 14 Lunch</span>
               </div>
             </div>
           </div>

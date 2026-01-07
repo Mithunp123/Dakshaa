@@ -12,7 +12,8 @@ import {
 } from 'lucide-react';
 
 const ComboCard = ({ combo, onSelect, isSelected, userPurchasedCombos = [] }) => {
-  const isPurchased = userPurchasedCombos.includes(combo.combo_id);
+  const comboId = combo.id || combo.combo_id;
+  const isPurchased = userPurchasedCombos.includes(comboId);
   const isAvailable = combo.is_active && !isPurchased;
 
   // Calculate discount percentage if individual event prices were higher
@@ -81,8 +82,8 @@ const ComboCard = ({ combo, onSelect, isSelected, userPurchasedCombos = [] }) =>
             )}
           </div>
 
-          {combo.combo_description && (
-            <p className="text-sm text-gray-400 line-clamp-2">{combo.combo_description}</p>
+          {(combo.description || combo.combo_description) && (
+            <p className="text-sm text-gray-400 line-clamp-2">{combo.description || combo.combo_description}</p>
           )}
         </div>
 

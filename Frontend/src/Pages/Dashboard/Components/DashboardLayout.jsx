@@ -20,29 +20,46 @@ import NotificationDropdown from './NotificationDropdown';
 
 const DashboardLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  
+  // Get user from localStorage synchronously for instant load
+  const getStoredUser = () => {
+    try {
+      const session = localStorage.getItem('sb-ltmyqtcirhsgfyortgfo-auth-token');
+      if (session) {
+        const sessionData = JSON.parse(session);
+        return sessionData?.user || null;
+      }
+    } catch (error) {
+      console.warn('Error reading stored session:', error);
+    }
+    return null;
+  };
+
+  const [userProfile, setUserProfile] = useState(() => {
+    // Try to get cached profile first
+    const cachedProfile = sessionStorage.getItem('userProfile');
+    return cachedProfile ? JSON.parse(cachedProfile) : null;
+  });
+  const [loading, setLoading] = useState(!userProfile);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (user) {
-          // Check sessionStorage first for faster load
-          const cachedProfile = sessionStorage.getItem('userProfile');
-          if (cachedProfile) {
-            setUserProfile(JSON.parse(cachedProfile));
-            setLoading(false);
-            return;
-          }
+      // If we already have cached profile, skip loading
+      if (userProfile) {
+        setLoading(false);
+        return;
+      }
 
+      try {
+        const storedUser = getStoredUser();
+        
+        if (storedUser) {
           const { data: profile } = await supabase
             .from('profiles')
             .select('full_name, email, role')
-            .eq('id', user.id)
+            .eq('id', storedUser.id)
             .single();
           
           if (profile) {
@@ -58,7 +75,7 @@ const DashboardLayout = ({ children }) => {
     };
 
     fetchUserProfile();
-  }, []);
+  }, [userProfile]);
 
   // Close sidebar when route changes on mobile
   useEffect(() => {
@@ -218,10 +235,7 @@ const DashboardLayout = ({ children }) => {
         {/* Desktop Header */}
         <header className="hidden lg:flex h-16 xl:h-20 bg-slate-900/30 border-b border-white/10 backdrop-blur-md sticky top-0 z-30 items-center justify-between px-4 xl:px-8">
           <div className="flex items-center gap-4 xl:gap-8">
-            <div className="flex flex-col">
-              <span className="text-[10px] xl:text-xs text-gray-500 uppercase tracking-widest font-bold">Event Countdown</span>
-              <span className="text-secondary font-orbitron font-bold text-sm xl:text-base">Day 1: 02:14:45</span>
-            </div>
+            {/* Event countdown removed */}
           </div>
 
           <div className="flex items-center gap-4 xl:gap-6">

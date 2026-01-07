@@ -14,16 +14,34 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
+const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistered }) => {
   const navigate = useNavigate();
-  const capacityPercentage =
-    (event.current_registrations / event.capacity) * 100;
+  
+  // Normalize event data - ensure numeric types
+  const capacity = parseInt(event.capacity) || 100;
+  const currentRegistrations = parseInt(event.current_registrations) || 0;
+  const price = parseFloat(event.price) || 0;
+  const minTeamSize = parseInt(event.min_team_size) || 1;
+  const maxTeamSize = parseInt(event.max_team_size) || 1;
+  const isOpen = event.is_open === true || event.is_open === 'true' || event.is_open === undefined;
+  const isTeamEvent = event.is_team_event === true || event.is_team_event === 'true' || minTeamSize > 1;
+  
+  const capacityPercentage = (currentRegistrations / capacity) * 100;
   const isNearlyFull = capacityPercentage >= 80;
-  const isFull = event.current_registrations >= event.capacity;
-  const isOpen = event.is_open && !isFull;
+  const isFull = currentRegistrations >= capacity;
+  const canRegister = isOpen && !isFull;
 
   const getStatusConfig = () => {
-    if (!event.is_open) {
+    if (isAlreadyRegistered) {
+      return {
+        icon: CheckCircle2,
+        text: "Already Registered",
+        bgColor: "bg-blue-500/10",
+        textColor: "text-blue-400",
+        borderColor: "border-blue-500/30",
+      };
+    }
+    if (!isOpen) {
       return {
         icon: XCircle,
         text: "Registration Closed",
@@ -61,19 +79,25 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
 
   const status = getStatusConfig();
   const StatusIcon = status.icon;
-  const isTeamEvent = event.is_team_event || event.min_team_size > 1;
   const TypeIcon = isTeamEvent ? UsersRound : UserCheck;
 
   // Handle card click - redirect to dashboard for team events
   const handleCardClick = () => {
-    if (isDisabled || !isOpen) return;
+    // Prevent interaction if already registered, disabled, or not open
+    if (isAlreadyRegistered || isDisabled || !canRegister) {
+      if (isAlreadyRegistered) {
+        // Optional: show a toast message
+        console.log('Event already registered');
+      }
+      return;
+    }
     
     // If it's a team event, redirect to dashboard team creation
     if (isTeamEvent) {
       navigate('/dashboard/teams', { 
         state: { 
           createTeam: true,
-          eventId: event.id,
+          eventId: event.event_id || event.id,
           eventName: event.name || event.title || event.event_name
         } 
       });
@@ -87,14 +111,16 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={!isDisabled && isOpen ? { y: -5 } : {}}
+      whileHover={!isDisabled && !isAlreadyRegistered && canRegister ? { y: -5 } : {}}
       onClick={handleCardClick}
-      className={`group relative bg-gradient-to-br from-white/5 to-white/[0.02] border rounded-3xl overflow-hidden transition-all duration-300 cursor-pointer ${
-        isSelected
-          ? "border-secondary shadow-lg shadow-secondary/20 scale-[1.02]"
-          : isDisabled || !isOpen
+      className={`group relative bg-gradient-to-br from-white/5 to-white/[0.02] border rounded-3xl overflow-hidden transition-all duration-300 ${
+        isAlreadyRegistered
+          ? "border-blue-500/30 opacity-60 cursor-not-allowed"
+          : isSelected
+          ? "border-secondary shadow-lg shadow-secondary/20 scale-[1.02] cursor-pointer"
+          : isDisabled || !canRegister
           ? "border-white/5 opacity-50 cursor-not-allowed"
-          : "border-white/10 hover:border-white/20 hover:shadow-xl"
+          : "border-white/10 hover:border-white/20 hover:shadow-xl cursor-pointer"
       }`}
     >
       {/* Gradient Overlay */}
@@ -141,7 +167,7 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
               <p className="text-xs text-gray-500">
                 {isTeamEvent ? "Per Person" : "Price"}
               </p>
-              <p className="font-bold text-white truncate">₹{event.price}</p>
+              <p className="font-bold text-white truncate">₹{price}</p>
             </div>
           </div>
 
@@ -154,7 +180,7 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
               </p>
               <p className="font-bold text-white truncate">
                 {isTeamEvent 
-                  ? `${event.min_team_size}-${event.max_team_size}`
+                  ? `${minTeamSize}-${maxTeamSize}`
                   : event.type || "Individual"
                 }
               </p>
@@ -174,7 +200,7 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
                 isNearlyFull ? "text-orange-400" : "text-gray-300"
               }`}
             >
-              {event.current_registrations} / {event.capacity}
+              {currentRegistrations} / {capacity}
             </span>
           </div>
           <div className="h-2 bg-white/5 rounded-full overflow-hidden">
@@ -204,7 +230,7 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
         </div>
 
         {/* Team Event Indicator */}
-        {isTeamEvent && !isDisabled && isOpen && (
+        {isTeamEvent && !isDisabled && canRegister && (
           <div className="mt-2 px-3 py-2 bg-blue-500/10 border border-blue-500/20 rounded-xl">
             <p className="text-xs text-blue-400 font-semibold flex items-center gap-1.5">
               <UsersRound size={14} />
@@ -214,7 +240,7 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
         )}
 
         {/* Premium/Featured Badge (if price > 500) */}
-        {event.price > 500 && (
+        {price > 500 && (
           <div className="absolute top-4 right-4">
             <div className="px-3 py-1 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-full flex items-center gap-1.5">
               <Sparkles size={12} className="text-yellow-400" />
@@ -225,7 +251,7 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled }) => {
       </div>
 
       {/* Hover Effect Border */}
-      {!isDisabled && isOpen && !isSelected && (
+      {!isDisabled && canRegister && !isSelected && (
         <div className="absolute inset-0 border-2 border-transparent group-hover:border-secondary/30 rounded-3xl transition-all pointer-events-none" />
       )}
     </motion.div>

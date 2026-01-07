@@ -14,6 +14,8 @@ import {
   Star,
   Zap,
   Trophy,
+  Building,
+  Utensils,
 } from "lucide-react";
 import EventCard from "./EventCard";
 import ComboCard from "./ComboCard";
@@ -25,6 +27,25 @@ import paymentService from "../../../services/paymentService";
 import notificationService from "../../../services/notificationService";
 import { supabase } from "../../../supabase";
 import { supabaseService } from "../../../services/supabaseService";
+
+// Helper: Read session from localStorage synchronously
+const getStoredUser = () => {
+  try {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const sessionKey = `sb-${supabaseUrl.split('//')[1].split('.')[0]}-auth-token`;
+    const storedSession = localStorage.getItem(sessionKey);
+    if (storedSession) {
+      const parsed = JSON.parse(storedSession);
+      if (parsed.expires_at && parsed.expires_at * 1000 > Date.now()) {
+        console.log('📦 Found valid session in localStorage on init');
+        return parsed.user;
+      }
+    }
+  } catch (e) {
+    console.warn('Could not read stored session:', e.message);
+  }
+  return null;
+};
 
 const RegistrationForm = () => {
   const location = useLocation();
@@ -56,8 +77,9 @@ const RegistrationForm = () => {
   const [combos, setCombos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => getStoredUser()); // Initialize with stored user
   const [userProfile, setUserProfile] = useState(null);
+  const [registeredEventIds, setRegisteredEventIds] = useState(new Set());
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const [validationStatus, setValidationStatus] = useState(null);
   const [validationMessage, setValidationMessage] = useState("");
@@ -107,26 +129,113 @@ const RegistrationForm = () => {
     [registrationMode]
   );
 
-  // Get current user on mount
+  // Load data and set up auth listener
   useEffect(() => {
-    const getCurrentUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-      
-      // Fetch user profile
-      if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("full_name, email, mobile_number, gender, college_name, department, year_of_study, roll_number")
-          .eq("id", user.id)
-          .single();
-        setUserProfile(profile);
+    console.log('🚀 Starting data loading...');
+    console.log('👤 Initial user:', user ? `✅ ${user.id}` : '❌ None');
+    let isMounted = true;
+    
+    // Show cached events immediately - NO LOADING if we have cache
+    const cachedEvents = eventConfigService.getCachedEvents();
+    if (cachedEvents && cachedEvents.length > 0) {
+      console.log(`Instant display: ${cachedEvents.length} cached events`);
+      setEvents(cachedEvents.map(e => ({ ...e, current_registrations: 0, registered_count: 0 })));
+      setLoading(false); // Don't show loading spinner if we have cached data
+    }
+    
+    // Show cached combos immediately too
+    const cachedCombos = localStorage.getItem('dakshaa_combos_cache');
+    if (cachedCombos) {
+      try {
+        const { data } = JSON.parse(cachedCombos);
+        if (data?.length > 0) {
+          console.log(`Instant display: ${data.length} cached combos`);
+          setCombos(data);
+        }
+      } catch (e) {}
+    }
+    
+    const loadData = async () => {
+      try {
+        console.log('=== LOADING DATA ===');
+        
+        // Load events (always) - runs in background to refresh cache
+        const eventsPromise = eventConfigService.getEventsWithStats();
+        
+        // Load combos if user exists
+        let combosPromise;
+        if (user?.id) {
+          console.log('🔄 Loading combos for user:', user.id);
+          combosPromise = comboService.getActiveCombosForStudents(user.id);
+          
+          // Fetch registered events - important for showing already registered events as disabled
+          eventConfigService.getUserRegisteredEventIds(user.id).then(ids => {
+            if (isMounted) {
+              console.log('✅ User registered event IDs:', ids.size, 'events');
+              setRegisteredEventIds(ids);
+            }
+          });
+          
+          // Fetch profile
+          supabase.from("profiles")
+            .select("full_name, email, mobile_number, gender, college_name, department, year_of_study, roll_number")
+            .eq("id", user.id)
+            .single()
+            .then(({ data: profile }) => {
+              if (isMounted) setUserProfile(profile);
+            });
+        } else {
+          console.log('⚠️ No user - skipping combos');
+          combosPromise = Promise.resolve({ success: false, data: [] });
+        }
+        
+        const [eventsResult, combosResult] = await Promise.all([eventsPromise, combosPromise]);
+        
+        if (isMounted) {
+          const eventsData = eventsResult?.data || [];
+          const combosData = combosResult?.success ? (combosResult.data || []) : [];
+          
+          console.log(`✅ Loaded ${eventsData.length} events`);
+          console.log(`✅ Loaded ${combosData.length} combos`);
+          
+          setEvents(eventsData);
+          setCombos(combosData);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Error loading data:", error);
+        if (isMounted) setLoading(false);
       }
     };
-    getCurrentUser();
-  }, []);
+    
+    loadData();
+    
+    // Auth state listener for future changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('🔐 Auth changed:', event);
+      if (!isMounted) return;
+      
+      if (session?.user) {
+        setUser(session.user);
+        if (event === 'SIGNED_IN') {
+          // Reload combos on sign in
+          comboService.getActiveCombosForStudents(session.user.id).then(result => {
+            if (isMounted && result.success) setCombos(result.data || []);
+          });
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setUserProfile(null);
+        setCombos([]);
+        navigate('/login');
+      }
+    });
+    
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []); // Run once on mount - user is already initialized from localStorage
 
   // Handle successful payment return
   useEffect(() => {
@@ -135,71 +244,6 @@ const RegistrationForm = () => {
       toast.success('Registration completed successfully!');
     }
   }, [registrationSuccess]);
-
-  // Load data when component mounts and when user changes
-  useEffect(() => {
-    let isMounted = true;
-    
-    // INSTANT: Show cached events immediately (no loading spinner)
-    const cachedEvents = eventConfigService.getCachedEvents();
-    if (cachedEvents && cachedEvents.length > 0) {
-      console.log(`Instant display: ${cachedEvents.length} cached events`);
-      setEvents(cachedEvents.map(e => ({ ...e, current_registrations: 0, registered_count: 0 })));
-      setLoading(false); // No loading spinner if we have cached data
-    }
-    
-    const loadData = async () => {
-      try {
-        // Only show loading if no cached data
-        if (!cachedEvents || cachedEvents.length === 0) {
-          setLoading(true);
-        }
-        
-        console.log('Fetching fresh events and combos...');
-        
-        // Always load events (doesn't require user)
-        const eventsPromise = eventConfigService.getEventsWithStats();
-        
-        // Only load combos if user is available
-        const combosPromise = user?.id 
-          ? comboService.getActiveCombosForStudents(user.id)
-          : Promise.resolve({ data: [] });
-        
-        const [eventsResult, combosResult] = await Promise.all([
-          eventsPromise,
-          combosPromise
-        ]);
-        
-        if (isMounted) {
-          const eventsData = eventsResult?.data || [];
-          const combosData = combosResult?.data || [];
-          
-          console.log(`Loaded ${eventsData.length} events with fresh counts`);
-          
-          setEvents(eventsData);
-          setCombos(combosData);
-        }
-      } catch (error) {
-        console.error("Error loading data:", error);
-        // Keep cached events if fetch fails
-        if (isMounted && (!cachedEvents || cachedEvents.length === 0)) {
-          setEvents([]);
-          setCombos([]);
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-    
-    // Load fresh data in background
-    loadData();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, [user]); // Re-run when user changes
 
   // Apply pre-selection after events are loaded
   useEffect(() => {
@@ -297,6 +341,11 @@ const RegistrationForm = () => {
         if (isTeamEvent) return false; // This is a team event, exclude it
       }
 
+      // For combo mode, only show individual events (exclude team events)
+      if (registrationMode === "combo") {
+        if (isTeamEvent) return false; // This is a team event, exclude it
+      }
+
       const eventName = (event.name || event.event_name || "").toLowerCase();
       const eventDescription = (event.description || "").toLowerCase();
       const searchLower = searchTerm.toLowerCase();
@@ -352,9 +401,17 @@ const RegistrationForm = () => {
   const handleComboSelect = useCallback((combo) => {
     setSelectedCombo(combo);
     setCurrentStep(3);
+    // Scroll to top of the page smoothly
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   const handleEventToggle = useCallback(async (eventId) => {
+    // Check if event is already registered
+    if (registeredEventIds.has(eventId)) {
+      console.log('Cannot select - event already registered');
+      return;
+    }
+    
     // Find the event to check if it's full
     const event = events.find(e => e.id === eventId || e.event_id === eventId);
     if (event) {
@@ -397,7 +454,7 @@ const RegistrationForm = () => {
         setValidationMessage('⚠ Unable to validate selection');
       }
     }
-  }, [events, selectedEvents, selectedCombo, registrationMode]);
+  }, [events, selectedEvents, selectedCombo, registrationMode, registeredEventIds]);
 
   const handleBack = useCallback(() => {
     if (currentStep === 3 && registrationMode === "combo") {
@@ -1043,6 +1100,85 @@ const RegistrationForm = () => {
                   </ul>
                 </div>
               </motion.div>
+
+              {/* Accommodation Card - Below Individual */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.02, y: -5 }}
+                className="relative p-8 rounded-3xl overflow-hidden bg-gradient-to-br from-blue-900/30 to-blue-950/30 border-2 border-blue-500/30 cursor-pointer"
+                onClick={() => navigate('/dashboard/bookings')}
+              >
+                <div className="absolute top-4 right-4">
+                  <Building className="text-blue-400" size={32} />
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-bold text-white">
+                    Accommodation
+                  </h3>
+                  <p className="text-blue-200 font-semibold">Rs. 300 per day</p>
+                  <p className="text-gray-400 text-sm">
+                    12th Night stay with Dinner, 13th Breakfast, Night stay and 14th Breakfast.
+                  </p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center text-gray-300 text-sm">
+                      <Calendar className="text-blue-400 mr-2" size={16} />
+                      March 12 Evening Stay
+                    </li>
+                    <li className="flex items-center text-gray-300 text-sm">
+                      <Calendar className="text-blue-400 mr-2" size={16} />
+                      March 13 Breakfast & Night
+                    </li>
+                    <li className="flex items-center text-gray-300 text-sm">
+                      <Calendar className="text-blue-400 mr-2" size={16} />
+                      March 14 Breakfast
+                    </li>
+                  </ul>
+                  <button className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-xl transition-all shadow-lg">
+                    BOOK NOW
+                  </button>
+                </div>
+              </motion.div>
+
+              {/* Lunch Card - Below Combo */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                whileHover={{ scale: 1.02, y: -5 }}
+                className="relative p-8 rounded-3xl overflow-hidden bg-gradient-to-br from-orange-900/30 to-red-950/30 border-2 border-orange-500/30 cursor-pointer"
+                onClick={() => navigate('/dashboard/bookings')}
+              >
+                <div className="absolute top-4 right-4">
+                  <Utensils className="text-orange-400" size={32} />
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-bold text-white">
+                    Lunch
+                  </h3>
+                  <p className="text-orange-200 font-semibold">Rs. 100 per lunch</p>
+                  <p className="text-gray-400 text-sm">
+                    Only Lunch will be provided for 12th, 13th and 14th March. Reserve your meals.
+                  </p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center text-gray-300 text-sm">
+                      <Calendar className="text-orange-400 mr-2" size={16} />
+                      March 12 Lunch
+                    </li>
+                    <li className="flex items-center text-gray-300 text-sm">
+                      <Calendar className="text-orange-400 mr-2" size={16} />
+                      March 13 Lunch
+                    </li>
+                    <li className="flex items-center text-gray-300 text-sm">
+                      <Calendar className="text-orange-400 mr-2" size={16} />
+                      March 14 Lunch
+                    </li>
+                  </ul>
+                  <button className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold rounded-xl transition-all shadow-lg">
+                    RESERVE NOW
+                  </button>
+                </div>
+              </motion.div>
             </div>
 
             {/* Special Events Section */}
@@ -1165,17 +1301,24 @@ const RegistrationForm = () => {
                   <p className="text-gray-400">
                     Select a combo package that suits your interests
                   </p>
+                  {/* Debug info - remove after fixing */}
+                  <div className="text-xs text-gray-500 mt-2">
+                    Debug: combos.length = {combos.length} | user = {user?.id ? '✅' : '❌'}
+                  </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {combos.map((combo, index) => (
-                    <ComboCard
-                      key={combo.combo_id || combo.id || `combo-${index}`}
-                      combo={combo}
-                      isSelected={selectedCombo?.id === combo.id || selectedCombo?.combo_id === combo.combo_id}
-                      onSelect={() => handleComboSelect(combo)}
-                    />
-                  ))}
+                  {combos.map((combo, index) => {
+                    console.log('🎯 Rendering combo:', combo.title || combo.name, combo);
+                    return (
+                      <ComboCard
+                        key={combo.combo_id || combo.id || `combo-${index}`}
+                        combo={combo}
+                        isSelected={selectedCombo?.id === combo.id || selectedCombo?.combo_id === combo.combo_id}
+                        onSelect={() => handleComboSelect(combo)}
+                      />
+                    );
+                  })}
                 </div>
 
                 {combos.length === 0 && (
@@ -1234,7 +1377,7 @@ const RegistrationForm = () => {
                           <button
                             key={`cat-${cat}-${index}`}
                             onClick={() => setCategoryFilter(cat)}
-                            className={`px-4 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
+                            className={`px-4 py-3 rounded-2xl font-bold whitespace-nowrap transition-all capitalize ${
                             categoryFilter === cat
                               ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
                               : "bg-gray-800 text-gray-400 hover:text-white"
@@ -1250,20 +1393,21 @@ const RegistrationForm = () => {
                 {/* Events Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredEvents.map((event, index) => {
+                    const eventId = event.id || event.event_id;
                     const isFull = event.current_registrations >= event.capacity;
                     const isOpen = event.is_open !== false;
-                    const isEventDisabled = isFull || !isOpen;
+                    const isAlreadyRegistered = registeredEventIds.has(eventId);
+                    const isEventDisabled = isFull || !isOpen || isAlreadyRegistered;
                     
                     return (
                       <EventCard
-                        key={event.id || event.event_id || `event-${index}`}
+                        key={eventId || `event-${index}`}
                         event={event}
-                        isSelected={selectedEvents.includes(
-                          event.id || event.event_id
-                        )}
+                        isSelected={selectedEvents.includes(eventId)}
                         isDisabled={isEventDisabled}
+                        isAlreadyRegistered={isAlreadyRegistered}
                         onSelect={() =>
-                          handleEventToggle(event.id || event.event_id)
+                          handleEventToggle(eventId)
                         }
                       />
                     );
@@ -1388,7 +1532,7 @@ const RegistrationForm = () => {
                         <button
                           key={`combo-cat-${cat}-${index}`}
                           onClick={() => setCategoryFilter(cat)}
-                          className={`px-4 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
+                          className={`px-4 py-3 rounded-2xl font-bold whitespace-nowrap transition-all capitalize ${
                             categoryFilter === cat
                               ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
                               : "bg-gray-800 text-gray-400 hover:text-white"
@@ -1403,20 +1547,21 @@ const RegistrationForm = () => {
                 {/* Events Grid - All Events with Search/Filter */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredEvents.map((event, index) => {
+                    const eventId = event.id || event.event_id;
                     const isFull = event.current_registrations >= event.capacity;
                     const isOpen = event.is_open !== false;
-                    const isEventDisabled = isFull || !isOpen;
+                    const isAlreadyRegistered = registeredEventIds.has(eventId);
+                    const isEventDisabled = isFull || !isOpen || isAlreadyRegistered;
                     
                     return (
                       <EventCard
-                        key={event.id || event.event_id || `combo-event-${index}`}
+                        key={eventId || `combo-event-${index}`}
                         event={event}
-                        isSelected={selectedEvents.includes(
-                          event.id || event.event_id
-                        )}
+                        isSelected={selectedEvents.includes(eventId)}
                         isDisabled={isEventDisabled}
+                        isAlreadyRegistered={isAlreadyRegistered}
                         onSelect={() =>
-                          handleEventToggle(event.id || event.event_id)
+                          handleEventToggle(eventId)
                         }
                         showPrice={false}
                       />
