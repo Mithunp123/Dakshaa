@@ -1,5 +1,5 @@
 import Tech1 from "../assets/EventsImages/EventDetails/TechnicalImages/aids_tech.png";
-//import Tech2 from "../assets/EventsImages/EventDetails/TechnicalImages/aids_tech1.png";
+import Tech2 from "../assets/EventsImages/EventDetails/TechnicalImages/csbs_tech.png";
 import Tech3 from "../assets/EventsImages/EventDetails/TechnicalImages/aiml_tech.png";
 import Tech4 from "../assets/EventsImages/EventDetails/TechnicalImages/bt_tech.png";
 import Tech5 from "../assets/EventsImages/EventDetails/TechnicalImages/bt_tech1.png";
@@ -19,7 +19,7 @@ import Tech18 from "../assets/EventsImages/EventDetails/TechnicalImages/mech_tec
 import Tech19 from "../assets/EventsImages/EventDetails/TechnicalImages/txt_tech.png";
 import Tech20 from "../assets/EventsImages/EventDetails/TechnicalImages/txt_tech1.png";
 import Tech21 from "../assets/EventsImages/EventDetails/TechnicalImages/vlsi_tech.png";
-import Tech22 from "../assets/EventsImages/EventDetails/TechnicalImages/57.png";
+import Tech22 from "../assets/EventsImages/EventDetails/TechnicalImages/ft_tech1.png";
 
 
 
@@ -28,10 +28,10 @@ export const technicalEvents = [
     image: Tech1,
     eventId: "tech-aids",
   },
-  /*{
+  {
     image: Tech2,
-    eventId: "tech-aids-1",
-  },*/
+    eventId: "tech-csbs",
+  },
   {
     image: Tech3,
     eventId: "tech-aiml",
@@ -110,6 +110,6 @@ export const technicalEvents = [
   },
   {
     image: Tech22,
-    eventId: "tech-57",
+    eventId: "tech-ft-1",
   },
 ];

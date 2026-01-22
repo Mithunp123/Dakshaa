@@ -5,7 +5,7 @@ import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
 //'tech-aids': 'AI Mystery Box Challenge – AI & DS',
-  //'tech-aids1': 'STARTUP PITCH – AI & DS',
+  //'tech-csbs': 'System Sense – CSBS',
   //'tech-aiml': 'Lovable Vibes – AIML',
   //'tech-csbs' : 'System Sense',
 
@@ -35,11 +35,11 @@ import { useInView } from "react-intersection-observer";
   //'tech-txt-1': 'Paper Presentation – TXT',
 
   //'tech-vlsi': 'corex - vlsi',
-  //'tech-57': 'Paper Presentation – MECH',
+  //'tech-ft-1': 'Paper Presentation – FT',
   
 
 import Tech1 from "../../../assets/EventsImages/EventDetails/TechnicalImages/aids_tech.png";
-//import Tech2 from "../../../assets/EventsImages/EventDetails/TechnicalImages/aids_tech1.png";
+import Tech2 from "../../../assets/EventsImages/EventDetails/TechnicalImages/csbs_tech.png";
 import Tech3 from "../../../assets/EventsImages/EventDetails/TechnicalImages/aiml_tech.png";
 import Tech4 from "../../../assets/EventsImages/EventDetails/TechnicalImages/bt_tech.png";
 import Tech5 from "../../../assets/EventsImages/EventDetails/TechnicalImages/bt_tech1.png";
@@ -59,7 +59,7 @@ import Tech18 from "../../../assets/EventsImages/EventDetails/TechnicalImages/me
 import Tech19 from "../../../assets/EventsImages/EventDetails/TechnicalImages/txt_tech.png";
 import Tech20 from "../../../assets/EventsImages/EventDetails/TechnicalImages/txt_tech1.png";
 import Tech21 from "../../../assets/EventsImages/EventDetails/TechnicalImages/vlsi_tech.png";
-import Tech22 from "../../../assets/EventsImages/EventDetails/TechnicalImages/57.png";
+import Tech22 from "../../../assets/EventsImages/EventDetails/TechnicalImages/ft_tech1.png";
 
 
 import NonTech1 from "../../../assets/EventsImages/EventDetails/Nontech/aids_nontech.png";
@@ -85,20 +85,23 @@ import NonTech20 from "../../../assets/EventsImages/EventDetails/Nontech/vlsi_no
 
 
 
-import Workshop1 from "../../../assets/EventsImages/EventDetails/Workshop/vlsi.jpg";
-import Workshop2 from "../../../assets/EventsImages/EventDetails/Workshop/it.jpg";
-import Workshop3 from "../../../assets/EventsImages/EventDetails/Workshop/aids.jpg";
-import Workshop4 from "../../../assets/EventsImages/EventDetails/Workshop/aiml.jpg";
-import Workshop5 from "../../../assets/EventsImages/EventDetails/Workshop/csbs.jpg";
-import Workshop6 from "../../../assets/EventsImages/EventDetails/Workshop/CSE.jpg";
-import Workshop7 from "../../../assets/EventsImages/EventDetails/Workshop/EEE.jpg";
-import Workshop8 from "../../../assets/EventsImages/EventDetails/Workshop/biotech.jpg";
-import Workshop9 from "../../../assets/EventsImages/EventDetails/Workshop/mechatronics.jpg";
-import Workshop10 from "../../../assets/EventsImages/EventDetails/Workshop/ece.jpg";
-import Workshop11 from "../../../assets/EventsImages/EventDetails/Workshop/ft.jpg";
-import Workshop12 from "../../../assets/EventsImages/EventDetails/Workshop/mech.jpg";
-import Workshop13 from "../../../assets/EventsImages/EventDetails/Workshop/civil.jpg";
-import Workshop14 from "../../../assets/EventsImages/EventDetails/Workshop/textile.jpg";
+import workshop1 from "../../../assets/EventsImages/EventDetails/Workshop/aids_wk.png";
+import workshop2 from "../../../assets/EventsImages/EventDetails/Workshop/aiml_wk.png";
+import workshop3 from "../../../assets/EventsImages/EventDetails/Workshop/bt_wk.png";
+import workshop4 from "../../../assets/EventsImages/EventDetails/Workshop/civil_wk.png";
+import workshop5 from "../../../assets/EventsImages/EventDetails/Workshop/csbs_wk.png";
+import workshop6 from "../../../assets/EventsImages/EventDetails/Workshop/cse_wk.png";
+import workshop7 from "../../../assets/EventsImages/EventDetails/Workshop/ece_wk.png";
+import workshop8 from "../../../assets/EventsImages/EventDetails/Workshop/eee_wk.png";
+import workshop9 from "../../../assets/EventsImages/EventDetails/Workshop/ft_wk.png";
+import workshop10 from "../../../assets/EventsImages/EventDetails/Workshop/ipr_wk.png";
+import workshop11 from "../../../assets/EventsImages/EventDetails/Workshop/it_wk.png";
+import workshop12 from "../../../assets/EventsImages/EventDetails/Workshop/mct_wk.png";
+import workshop13 from "../../../assets/EventsImages/EventDetails/Workshop/mech_wk.png";
+import workshop14 from "../../../assets/EventsImages/EventDetails/Workshop/txt_wk.png";
+import workshop15 from "../../../assets/EventsImages/EventDetails/Workshop/vlsi_wk.png";
+//import workshop16 from "../../../assets/EventsImages/EventDetails/Workshop/mca_wk1.png";
+
 
 import Culturals1 from "../../../assets/HORMONICS/MUSICAL.png";
 import Culturals2 from "../../../assets/HORMONICS/INSTRUMENT.png";
@@ -185,7 +188,7 @@ const EventDetails = () => {
   const eventIdMap = {
     // Technical Events - Database ID -> Old ID
     'tech-aids': 'technical-event-1',
-    //'tech-aids1': 'technical-event-2',
+    'tech-csbs': 'technical-event-2',
     'tech-aiml': 'technical-event-3',
     'tech-bt': 'technical-event-4',
     'tech-bt-1': 'technical-event-5',
@@ -205,7 +208,7 @@ const EventDetails = () => {
     'tech-txt': 'technical-event-19',
     'tech-txt-1': 'technical-event-20',
     'tech-vlsi': 'technical-event-21',
-    'tech-57': 'technical-event-22',
+    'tech-ft-1': 'technical-event-22',
 
     // Non-Technical Events
     
@@ -229,12 +232,35 @@ const EventDetails = () => {
 'nontech-mech': 'non-technical-event-18',
 'nontect-txt': 'non-technical-event-19',
 'nontech-vlsi': 'non-technical-event-20',
+
+
     // Cultural Events
     'cultural-musical': 'culturals-event-1',
+
+
+
     // Hackathon Events - Maps to Neura Hack
     'hackathon': 'technical-event-2',
+
+
     // Workshop Events
-    'workshop-it': 'workshop-event-10',
+    'workshop-aids': 'workshop-1',
+    'workshop-aiml': 'workshop-2',
+    'workshop-bt': 'workshop-3',
+    'workshop-civil': 'workshop-4',
+    'workshop-csbs': 'workshop-5',
+    'workshop-cse': 'workshop-6',
+    'workshop-ece': 'workshop-7',
+    'workshop-eee': 'workshop-8',
+    'workshop-ft': 'workshop-9',
+    'workshop-ipr': 'workshop-10',
+    'workshop-it': 'workshop-11',
+    'workshop-mct': 'workshop-12',
+    'workshop-mech': 'workshop-13',
+    'workshop-txt': 'workshop-14',
+    'workshop-vlsi': 'workshop-15',
+    //'workshop-mca': 'workshop-16',
+
     // Conference Events - Maps to conference page (handled separately)
     'conference': 'conference-event-1',
   };
@@ -335,7 +361,7 @@ const EventDetails = () => {
       },
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9",
     },
-    /*"technical-event-2": {
+    "technical-event-2": {
       title: "Neura Hack (Hackathon)",
       description:
         "Neura Hack 2026 is a 36-hour innovation marathon where brilliant minds unite to tackle pressing global challenges aligned with the UN Sustainable Development Goals (SDGs). Participants will collaborate, ideate, and build cutting-edge solutions leveraging technology to address issues like climate action, equality, health, and more. Join us to code, create, and catalyze change for a sustainable future!",
@@ -398,7 +424,7 @@ const EventDetails = () => {
         ],
       },
       registrationLink: "https://forms.gle/rdVwYuEvx9Bpi5zk9", // Registration link
-    },*/
+    },
 
     "technical-event-3": {
       title: "SEMISPARK(PROJECT PRESENTATION) ",
@@ -3010,7 +3036,7 @@ const EventDetails = () => {
         "Design for Testability (DFT) Demystified:The Basics you need to Know",
       description:
         "Join our workshop to gain a basic understanding of DFT and its importance in the semiconductor industry. Open to UG & PG students from all branches, with mandatory attendance for certification. Participation certificates will be provided to all attendees!",
-      image: Workshop1,
+      image: workshop1,
       schedule: [
         {
           round: "Round  ",
@@ -3052,7 +3078,7 @@ const EventDetails = () => {
       title: "A Walkthrough of Modern Techniques",
       description:
         "This workshop will introduce students to prompt engineering, a critical skill for optimizing AI interactions. Participants will learn how to craft precise, efficient, and structured prompts to get the best responses from AI models like ChatGPT, Gemini, and DeepSeek. The session will cover types of prompts, best practices, real-world applications, and hands-on exercises to help students develop a deeper understanding of AI communication.",
-      image: Workshop2,
+      image: workshop2,
       schedule: [
         {
           round: "Venue ",
@@ -3088,7 +3114,7 @@ const EventDetails = () => {
       title: "Ui Path Supported Workshop” Robotic Process Automation”",
       description:
         "Join our UiPath-Supported Workshop on Robotic Process Automation (RPA) led by Mr. M. Senthil, Lead Technical Trainer at ICT Academy, Chennai. Gain hands-on experience in automation tools and techniques to enhance workflow efficiency. Don’t miss this opportunity to elevate your automation skills! 🚀",
-      image: Workshop3,
+      image: workshop3,
       schedule: [
         {
           round: "Workshop timing",
@@ -3124,7 +3150,7 @@ const EventDetails = () => {
       title: "AI in Game Developing",
       description:
         "The AI on Game Developing Workshop, organized by IITM Pravartak Technologies Foundation, is a two-day event designed to introduce participants to the integration of Artificial Intelligence (AI) in game development. This hands-on workshop covers key AI techniques such as pathfinding, decision-making algorithms, and neural networks, enabling participants to create intelligent game characters, optimize game mechanics, and enhance player experience. Open to students, professionals, and AI/game development enthusiasts, no prior experience is required—just a basic understanding of programming is recommended. Inter-specialization teams are welcome, and registration is free! 🚀🎮",
-      image: Workshop4,
+      image: workshop4,
       schedule: [
         {
           round: "Round ",
@@ -3160,7 +3186,7 @@ const EventDetails = () => {
       title: "Blockchain 101",
       description:
         "Blockchain 101  is an introductory workshop designed to help developers understand blockchain technology and its practical applications. It covers key concepts such as decentralization, cryptographic security, consensus mechanisms, and smart contracts. Participants will gain hands-on experience in writing and deploying smart contracts using Solidity and working with blockchain development tools like Remix, Truffle, and MetaMask. By the end of the session, attendees will have a solid foundation in blockchain and the skills to start building decentralized applications (DApps).",
-      image: Workshop5,
+      image: workshop5,
       schedule: [
         {
           round: "Event Timing",
@@ -3197,7 +3223,7 @@ const EventDetails = () => {
         "Mobile Application Development By RemitBee India Private Limited - Chennai",
       description:
         "In today’s digital world, mobile applications are a key driver of how individuals and businesses engage with technology. This Mobile Application Development Workshop aims to equip participants with a solid grasp of mobile app development across both Android and iOS platforms. The workshop will feature hands-on training, live coding, and a mini-project to implement learned concepts in practice",
-      image: Workshop6,
+      image: workshop6,
       schedule: [
         {
           round: "Round ",
@@ -3233,7 +3259,7 @@ const EventDetails = () => {
       title: "Do Engineering using NI Lab VIEW By Mew Technology, Bangalore",
       description:
         "Participants will learn to create virtual instruments, control hardware, and analyze data. The workshop focuses on practical applications in engineering and control systems.",
-      image: Workshop7,
+      image: workshop7,
       schedule: [
         {
           round: "Venue",
@@ -3270,7 +3296,7 @@ const EventDetails = () => {
         "Next Generation Sequencing technologies in Health Care By Genotypic Technology, Bengaluru",
       description:
         "An interactive workshop providing hands-on experience and insights into cutting-edge sequencing technologies.",
-      image: Workshop8,
+      image: workshop8,
       schedule: [
         {
           round: "Round ",
@@ -3317,7 +3343,7 @@ const EventDetails = () => {
         "Soaring High: Hands-on Drone Building and Flight workshop By Garuda Aerospace",
       description:
         "Join our Hands-on Drone Building and Flight Workshop and experience the thrill of creating and flying your own drone! This interactive session covers drone assembly, aerodynamics, and real-world applications, giving you practical insights into UAV technology. With expert guidance, you'll build your drone from scratch and take it for a test flight, mastering essential piloting skills. Whether you're a beginner or a tech enthusiast, this workshop will elevate your knowledge and take you to new heights!",
-      image: Workshop9,
+      image: workshop9,
       schedule: [
         {
           round: "Round ",
@@ -3355,7 +3381,7 @@ const EventDetails = () => {
         "Industry IoT using LoRaWAN Technology By Enthu Technology Solutions India Pvt Ltd",
       description:
         "Workshop delves into LoRaWAN technology and its role in Industrial IoT (IIoT), enabling long-range, low-power wireless communication for various applications. Participants will gain insights into LoRaWAN architecture, device communication, network deployment, and security protocols. The workshop will cover smart manufacturing, asset tracking, environmental monitoring, and predictive maintenance, with hands-on sessions and real-world case studies to equip attendees with practical skills for implementing IoT solutions in industrial automation and efficiency.",
-      image: Workshop10,
+      image: workshop10,
       schedule: [
         {
           round: "Round ",
@@ -3391,7 +3417,7 @@ const EventDetails = () => {
       title: "",
       description:
         "'Value Addition in Millet': Millets are highly nutritious, climate-resilient grains that offer immense potential for health benefits and economic growth. This workshop aims to explore innovative ways to enhance the value of millets through processing, product development, and marketing strategies.",
-      image: Workshop11,
+      image: workshop11,
       schedule: [
         {
           round: "Round ",
@@ -3433,7 +3459,7 @@ const EventDetails = () => {
         "Design and development of automotive Product By Mr.K.Santhosh Kumar, Support Manger, Macbro Technology Pvt Ltd, Erode.",
       description:
         "The Design and Development of Automotive Products is a comprehensive process that combines innovation, engineering, and cutting-edge technology to create high-performance vehicles and components. From conceptualization and prototyping to testing and manufacturing, this process ensures safety, efficiency, and sustainability in automotive solutions. Engineers and designers work collaboratively to optimize aerodynamics, materials, and electronic systems, integrating advanced technologies like AI, IoT, and automation. Whether developing electric vehicles, smart mobility solutions, or high-performance car components, this field plays a crucial role in shaping the future of transportation. ",
-      image: Workshop12,
+      image: workshop12,
       schedule: [
         {
           round: "Round",
@@ -3470,7 +3496,7 @@ const EventDetails = () => {
         "Building Information Modeling (BIM) By ICT Academy, Chennai, Tamil Nadu",
       description:
         "The Building Information Modeling (BIM) workshop aims to introduce participants to the fundamentals of BIM technology and its applications in the construction industry. Participants will gain hands-on experience with BIM software tools and learn how to effectively utilize BIM for project planning, design, construction, and management. The Workshop “BIM in structural Design Development’ focused on enhancing architectural design skills through hands-on activities and software training. Participants utilized BIM Revit Architecture software to create 3D plans, elevations, and views. The workshop featured a building plan as exercise and emphasized innovation and creativity in design solutions. Mentors provided guidance and feedback throughout the workshop to refine participants, architectural concepts. Overall, the Workshop inspired participants to push the boundaries of architectural design and pursue excellence in their craft.",
-      image: Workshop13,
+      image: workshop13,
       schedule: [
         {
           round: "Round ",
@@ -3507,7 +3533,7 @@ const EventDetails = () => {
         "Medi Tex By Mr.T.Sureshram, Proprietor Care 4 U India Pvt, Ltd.,Tirupur",
       description:
         "The Medi-Tex Workshop is a valuable opportunity for students, researchers, and professionals in textile technology to explore advancements in medical textiles. This workshop will cover key topics such as smart textiles for healthcare, antibacterial fabrics, wound care materials, compression garments, and innovations in bio-textiles. Experts from the industry and academia will provide insights into material selection, fabrication techniques, and applications in medical fields. Participants will gain hands-on experience, engage in discussions on sustainability and regulations, and network with professionals. This workshop is ideal for those looking to enhance their knowledge and explore career opportunities in the growing field of medical textiles.",
-      image: Workshop14,
+      image: workshop14,
       schedule: [
         {
           round: "Round ",
@@ -3541,9 +3567,87 @@ const EventDetails = () => {
             phone: "9965227394",
           },
         ],
+        
       },
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
+
+
+    "workshop-15": {
+      title:
+        "Building Information Modeling (BIM) By ICT Academy, Chennai, Tamil Nadu",
+      description:
+        "The Building Information Modeling (BIM) workshop aims to introduce participants to the fundamentals of BIM technology and its applications in the construction industry. Participants will gain hands-on experience with BIM software tools and learn how to effectively utilize BIM for project planning, design, construction, and management. The Workshop “BIM in structural Design Development’ focused on enhancing architectural design skills through hands-on activities and software training. Participants utilized BIM Revit Architecture software to create 3D plans, elevations, and views. The workshop featured a building plan as exercise and emphasized innovation and creativity in design solutions. Mentors provided guidance and feedback throughout the workshop to refine participants, architectural concepts. Overall, the Workshop inspired participants to push the boundaries of architectural design and pursue excellence in their craft.",
+      image: workshop15,
+      schedule: [
+        {
+          round: "Round ",
+          date: "March 29, 2026",
+          time: "2:00 PM to 3:00 PM",
+          location: "Textile chemical processing laboratory,Textile Block ",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Dr. S. Gunasekar",
+            email: "gunasekar@ksrct.ac.in",
+            phone: "9976876238",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "B. Susimitha",
+            email: "bsusimitha18@gmail.com",
+            phone: "6374735128",
+          },
+          {
+            name: "S. Suja",
+            email: "sujavishalini234@gmail.com",
+            phone: "9500534225",
+          },
+        ],
+      },
+      registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
+    },
+    /*
+    "workshop-16": {
+      title:
+        "Building Information Modeling (BIM) By ICT Academy, Chennai, Tamil Nadu",
+      description:
+        "The Building Information Modeling (BIM) workshop aims to introduce participants to the fundamentals of BIM technology and its applications in the construction industry. Participants will gain hands-on experience with BIM software tools and learn how to effectively utilize BIM for project planning, design, construction, and management. The Workshop “BIM in structural Design Development’ focused on enhancing architectural design skills through hands-on activities and software training. Participants utilized BIM Revit Architecture software to create 3D plans, elevations, and views. The workshop featured a building plan as exercise and emphasized innovation and creativity in design solutions. Mentors provided guidance and feedback throughout the workshop to refine participants, architectural concepts. Overall, the Workshop inspired participants to push the boundaries of architectural design and pursue excellence in their craft.",
+      image: workshop16,
+      schedule: [
+        {
+          round: "Round ",
+          date: "March 29, 2026",
+          time: "2:00 PM to 3:00 PM",
+          location: "Textile chemical processing laboratory,Textile Block ",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Dr. S. Gunasekar",
+            email: "gunasekar@ksrct.ac.in",
+            phone: "9976876238",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "B. Susimitha",
+            email: "bsusimitha18@gmail.com",
+            phone: "6374735128",
+          },
+          {
+            name: "S. Suja",
+            email: "sujavishalini234@gmail.com",
+            phone: "9500534225",
+          },
+        ],
+      },
+      registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
+    },*/
   };  
 
 
