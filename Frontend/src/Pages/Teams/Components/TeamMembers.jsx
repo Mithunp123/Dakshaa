@@ -9,8 +9,8 @@ import narendhar from "../../../assets/team_members/Narendhar.png";
 import artificix from "../assest/aeva.jpg";
 import harish from "../../../assets/team_members/harish.png";
 import hariprakash from "../../../assets/team_members/Hariprakash.png";
-import deekshana from "../../../assets/team_members/deekshana.jpg";
-import deepak from "../../../assets/team_members/deepak.png";
+import deekshana from "../../../assets/team_members/Deekshana.jpg";
+import deepak from "../../../assets/team_members/Deepak.png";
 
 
 const chiefCoordinator = [
