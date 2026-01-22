@@ -24,6 +24,7 @@ import eventConfigService, {
 } from "../../../services/eventConfigService";
 import comboService from "../../../services/comboService";
 import paymentService from "../../../services/paymentService";
+import pendingPaymentService from "../../../services/pendingPaymentService";
 import notificationService from "../../../services/notificationService";
 import { supabase } from "../../../supabase";
 import { supabaseService } from "../../../services/supabaseService";
@@ -62,14 +63,19 @@ const RegistrationForm = () => {
     eventId: location.state.eventId,
     eventName: location.state.eventName,
     teamMembers: location.state.teamMembers,
-    memberCount: location.state.memberCount
+    memberCount: location.state.memberCount,
+    isPartialPayment: location.state.isPartialPayment || false,
+    registeredCount: location.state.registeredCount || 0
   } : null;
   
   const [currentStep, setCurrentStep] = useState(1); // Start at step 1, will adjust after events load
   const [registrationMode, setRegistrationMode] = useState("");
   const [selectedCombo, setSelectedCombo] = useState(null);
   const [selectedEvents, setSelectedEvents] = useState([]);
+  const [userPurchasedCombos, setUserPurchasedCombos] = useState([]);
   const [teamData, setTeamData] = useState(teamRegistrationData);
+  const [calculatedTeamAmount, setCalculatedTeamAmount] = useState(null);
+  const [teamAmountFetched, setTeamAmountFetched] = useState(false);
   const [preSelectApplied, setPreSelectApplied] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
@@ -80,11 +86,15 @@ const RegistrationForm = () => {
   const [user, setUser] = useState(() => getStoredUser()); // Initialize with stored user
   const [userProfile, setUserProfile] = useState(null);
   const [registeredEventIds, setRegisteredEventIds] = useState(new Set());
+  const [pendingPaymentEvents, setPendingPaymentEvents] = useState(new Set());
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const [validationStatus, setValidationStatus] = useState(null);
   const [validationMessage, setValidationMessage] = useState("");
   const [loadingTimeout, setLoadingTimeout] = useState(false);
   
+  // State for Mixed Registration (Team Details per Event)
+  const [teamDetailsMap, setTeamDetailsMap] = useState({});
+
   // Ref to track footer visibility
   const footerObserverRef = useRef(null);
 
@@ -124,10 +134,58 @@ const RegistrationForm = () => {
         title: registrationMode === "combo" ? "Select Events" : "Review",
         icon: Users,
       },
-      { number: 4, title: "Complete", icon: Check },
+      {
+        number: 4,
+        title: registrationMode === "combo" ? "Review" : "Complete",
+        icon: registrationMode === "combo" ? Users : Check,
+      },
+      ...(registrationMode === "combo" ? [{ number: 5, title: "Complete", icon: Check }] : []),
     ],
     [registrationMode]
   );
+
+  // Handle payment success callback
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    
+    if (paymentStatus === 'success' && user?.id) {
+      console.log('✅ Payment success detected, clearing pending payments');
+      
+      // Clear expired pending payments
+      pendingPaymentService.clearExpiredPayments();
+      
+      // Sync with database to clear completed payments
+      pendingPaymentService.syncWithDatabase(supabase, user.id).then(() => {
+        // Reload pending payment events
+        const pending = pendingPaymentService.getPendingPayments();
+        const pendingEventIds = new Set(
+          pending
+            .filter(p => p.userId === user.id)
+            .map(p => p.eventId)
+        );
+        setPendingPaymentEvents(pendingEventIds);
+        
+        // Reload registered events
+        eventConfigService.getUserRegisteredEventIds(user.id).then(ids => {
+          setRegisteredEventIds(ids);
+        });
+      });
+      
+      // Show success toast
+      toast.success('Payment successful. Registration confirmed.', {
+        duration: 4000,
+        position: 'top-center',
+        style: {
+          background: '#10B981',
+          color: '#fff',
+        },
+      });
+      
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [user]);
 
   // Load data and set up auth listener
   useEffect(() => {
@@ -135,61 +193,92 @@ const RegistrationForm = () => {
     console.log('👤 Initial user:', user ? `✅ ${user.id}` : '❌ None');
     let isMounted = true;
     
-    // Show cached events immediately - NO LOADING if we have cache
-    const cachedEvents = eventConfigService.getCachedEvents();
-    if (cachedEvents && cachedEvents.length > 0) {
-      console.log(`Instant display: ${cachedEvents.length} cached events`);
-      setEvents(cachedEvents.map(e => ({ ...e, current_registrations: 0, registered_count: 0 })));
-      setLoading(false); // Don't show loading spinner if we have cached data
-    }
-    
-    // Show cached combos immediately too
-    const cachedCombos = localStorage.getItem('dakshaa_combos_cache');
-    if (cachedCombos) {
-      try {
-        const { data } = JSON.parse(cachedCombos);
-        if (data?.length > 0) {
-          console.log(`Instant display: ${data.length} cached combos`);
-          setCombos(data);
-        }
-      } catch (e) {}
-    }
-    
     const loadData = async () => {
       try {
         console.log('=== LOADING DATA ===');
+        setLoading(true); // Show loading spinner
         
         // Load events (always) - runs in background to refresh cache
-        const eventsPromise = eventConfigService.getEventsWithStats();
+        const eventsPromise = eventConfigService.getEventsWithStats().catch(err => {
+          console.error('Failed to load events:', err);
+          return { success: false, data: [] };
+        });
         
         // Load combos if user exists
         let combosPromise;
+        let registeredIdsPromise;
+        
         if (user?.id) {
           console.log('🔄 Loading combos for user:', user.id);
-          combosPromise = comboService.getActiveCombosForStudents(user.id);
-          
-          // Fetch registered events - important for showing already registered events as disabled
-          eventConfigService.getUserRegisteredEventIds(user.id).then(ids => {
-            if (isMounted) {
-              console.log('✅ User registered event IDs:', ids.size, 'events');
-              setRegisteredEventIds(ids);
-            }
+          combosPromise = comboService.getActiveCombosForStudents(user.id).catch(err => {
+            console.error('Failed to load combos:', err);
+            return { success: false, data: [] };
           });
           
-          // Fetch profile
+          // Fetch user's PAID combo purchases
+          comboService.getUserPaidCombos(user.id).then(result => {
+            if (isMounted && result.success) {
+              console.log('💳 User paid combos:', result.data.length);
+              setUserPurchasedCombos(result.data);
+            }
+          }).catch(err => {
+            console.warn('Failed to load paid combos:', err);
+          });
+          
+          // Fetch user's PAID combo purchases
+          comboService.getUserPaidCombos(user.id).then(result => {
+            if (isMounted && result.success) {
+              console.log('💳 User paid combos:', result.data.length);
+              setUserPurchasedCombos(result.data);
+            }
+          }).catch(err => {
+            console.warn('Failed to load paid combos:', err);
+          });
+          
+          // Fetch registered events FIRST - important for showing already registered events as disabled
+          registeredIdsPromise = eventConfigService.getUserRegisteredEventIds(user.id).catch(err => {
+            console.error('Failed to load registered IDs:', err);
+            return new Set();
+          });
+          
+          // Sync pending payments with database and load pending event IDs (don't block on this)
+          pendingPaymentService.syncWithDatabase(supabase, user.id).then(() => {
+            const pending = pendingPaymentService.getPendingPayments();
+            const pendingEventIds = new Set(
+              pending
+                .filter(p => p.userId === user.id)
+                .map(p => p.eventId)
+            );
+            if (isMounted) {
+              console.log('💳 Pending payment events:', pendingEventIds.size, 'events');
+              setPendingPaymentEvents(pendingEventIds);
+            }
+          }).catch(err => {
+            console.warn('Failed to sync pending payments:', err);
+          });
+          
+          // Fetch profile (don't block on this)
           supabase.from("profiles")
             .select("full_name, email, mobile_number, gender, college_name, department, year_of_study, roll_number")
             .eq("id", user.id)
             .single()
             .then(({ data: profile }) => {
               if (isMounted) setUserProfile(profile);
+            })
+            .catch(err => {
+              console.warn('Failed to load profile:', err);
             });
         } else {
           console.log('⚠️ No user - skipping combos');
           combosPromise = Promise.resolve({ success: false, data: [] });
+          registeredIdsPromise = Promise.resolve(new Set());
         }
         
-        const [eventsResult, combosResult] = await Promise.all([eventsPromise, combosPromise]);
+        const [eventsResult, combosResult, registeredIds] = await Promise.all([
+          eventsPromise, 
+          combosPromise,
+          registeredIdsPromise
+        ]);
         
         if (isMounted) {
           const eventsData = eventsResult?.data || [];
@@ -197,14 +286,23 @@ const RegistrationForm = () => {
           
           console.log(`✅ Loaded ${eventsData.length} events`);
           console.log(`✅ Loaded ${combosData.length} combos`);
+          console.log(`✅ Loaded ${registeredIds.size} registered event IDs`);
           
           setEvents(eventsData);
           setCombos(combosData);
+          setRegisteredEventIds(registeredIds);
           setLoading(false);
         }
       } catch (error) {
         console.error("Error loading data:", error);
-        if (isMounted) setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+          // Show error toast
+          toast.error('Failed to load events. Please refresh the page.', {
+            duration: 4000,
+            position: 'top-center',
+          });
+        }
       }
     };
     
@@ -241,7 +339,10 @@ const RegistrationForm = () => {
   useEffect(() => {
     if (registrationSuccess) {
       setCurrentStep(4);
-      toast.success('Registration completed successfully!');
+      toast.success('Registration completed successfully.', {
+        duration: 4000,
+        position: 'top-center',
+      });
     }
   }, [registrationSuccess]);
 
@@ -313,7 +414,8 @@ const RegistrationForm = () => {
         )
         .map((e) => e.category.trim())
     );
-    return ["ALL", ...uniqueCategories].filter(Boolean);
+    // Add "Team Events" and "Hackathon" to the list of categories explicitly
+    return ["ALL", "Team Events", "Hackathon", ...uniqueCategories].filter(Boolean);
   }, [events]);
 
   // Memoized special events
@@ -324,26 +426,43 @@ const RegistrationForm = () => {
 
   // Memoized filtered events - prevents recalculation on every render
   const filteredEvents = useMemo(() => {
+    // Get list of specific event IDs from combo quotas (if any)
+    const specificEventIds = new Set();
+    const allowedCategories = new Set();
+    const categoriesWithSpecificEvents = new Set();
+    
+    if (registrationMode === "combo" && selectedCombo?.category_quotas) {
+      Object.entries(selectedCombo.category_quotas).forEach(([category, quota]) => {
+        const categoryKey = category.toLowerCase().trim();
+        // Check if quota is a UUID (specific event ID)
+        const isEventId = typeof quota === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(quota);
+        if (isEventId) {
+          specificEventIds.add(quota);
+          categoriesWithSpecificEvents.add(categoryKey);
+        }
+        // Always add the category to allowed categories
+        allowedCategories.add(categoryKey);
+      });
+    }
+    
     return events.filter((event) => {
       if (event.category === "Special") return false;
 
-      const minTeamSize = event.min_team_size || 0;
-      const maxTeamSize = event.max_team_size || 0;
-      const isTeamEvent = minTeamSize > 1 || maxTeamSize > 1;
+      const eventId = event.id || event.event_id;
+      const eventCategory = (event.category || "").toLowerCase().trim();
 
-      // For team mode, only show events that support teams
-      if (registrationMode === "team") {
-        if (!isTeamEvent) return false; // Not a team event
-      }
-
-      // For individual mode, only show events that are NOT team events
-      if (registrationMode === "individual") {
-        if (isTeamEvent) return false; // This is a team event, exclude it
-      }
-
-      // For combo mode, only show individual events (exclude team events)
-      if (registrationMode === "combo") {
-        if (isTeamEvent) return false; // This is a team event, exclude it
+      // For combo mode, ONLY show events from allowed categories
+      if (registrationMode === "combo" && allowedCategories.size > 0) {
+        // If this category has a specific event configured, only show that specific event
+        if (categoriesWithSpecificEvents.has(eventCategory)) {
+          if (!specificEventIds.has(eventId)) {
+            return false; // This category has a specific event, but this isn't it
+          }
+        } else if (!allowedCategories.has(eventCategory)) {
+          // This category is not in the combo quotas - don't show
+          return false;
+        }
+        // Event is from an allowed category (either specific or count-based)
       }
 
       const eventName = (event.name || event.event_name || "").toLowerCase();
@@ -353,12 +472,37 @@ const RegistrationForm = () => {
       const matchesSearch =
         eventName.includes(searchLower) ||
         eventDescription.includes(searchLower);
-      const matchesCategory =
-        categoryFilter === "ALL" || event.category === categoryFilter;
+      
+      // For combo mode, only filter by search (categories are already filtered above)
+      if (registrationMode === "combo") {
+        // When "All Events" is selected, show all allowed events
+        if (categoryFilter === "ALL") {
+          return matchesSearch;
+        }
+        // Otherwise filter by selected category (must still be in allowed categories)
+        return matchesSearch && event.category === categoryFilter;
+      }
+      
+      // For non-combo modes (individual/team), use normal category filtering
+      const minTeamSize = event.min_team_size || 0;
+      const maxTeamSize = event.max_team_size || 0;
+      const isTeamEvent = minTeamSize > 1 || maxTeamSize > 1;
+      
+      let matchesCategory = false;
+      if (categoryFilter === "ALL") {
+        matchesCategory = true;
+      } else if (categoryFilter === "Team Events") {
+        matchesCategory = isTeamEvent;
+      } else if (categoryFilter === "Hackathon") {
+        // Match if category or name contains "hackathon"
+        matchesCategory = eventCategory.includes("hackathon") || eventName.includes("hackathon");
+      } else {
+        matchesCategory = event.category === categoryFilter;
+      }
 
       return matchesSearch && matchesCategory;
     });
-  }, [events, searchTerm, categoryFilter, registrationMode]);
+  }, [events, searchTerm, categoryFilter, registrationMode, selectedCombo]);
 
   // Memoized selected event details
   const selectedEventDetails = useMemo(
@@ -366,15 +510,75 @@ const RegistrationForm = () => {
     [events, selectedEvents]
   );
 
+  // For team registrations, fetch backend-calculated amount when on review step
+  useEffect(() => {
+    const fetchTeamAmountPreview = async () => {
+      if (registrationMode !== "team") return;
+      if (currentStep !== 3) return; // Only on Review step
+      if (!teamData?.teamId) return;
+      if (!selectedEvents.length) return;
+
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const body = {
+          team_id: teamData.teamId,
+          event_id: selectedEvents[0]
+        };
+
+        console.log('💰 Fetching team amount preview:', body);
+
+        const response = await fetch(`${apiUrl}/payment/calculate-team-amount`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        });
+
+        const result = await response.json();
+        if (response.ok && result.success && typeof result.calculated_amount === 'number') {
+          setCalculatedTeamAmount(result.calculated_amount);
+          console.log('✅ Team amount preview loaded:', result);
+        } else {
+          console.warn('⚠️ Failed to calculate team amount preview:', result);
+        }
+      } catch (error) {
+        console.error('❌ Error fetching team amount preview:', error);
+      }
+    };
+
+    fetchTeamAmountPreview();
+  }, [registrationMode, currentStep, teamData, selectedEvents]);
+
   // Memoized total amount
-  const totalAmount = useMemo(
-    () =>
-      selectedEventDetails.reduce(
-        (sum, e) => sum + parseFloat(e.price || 0),
-        0
-      ),
-    [selectedEventDetails]
-  );
+  const totalAmount = useMemo(() => {
+    // For legacy single-team mode
+    if (registrationMode === "team" && calculatedTeamAmount !== null) {
+      return calculatedTeamAmount;
+    }
+
+    // For combo packages - fixed price (no extra charges for team members)
+    if (registrationMode === "combo" && selectedCombo) {
+      return parseFloat(selectedCombo.price) || 0;
+    }
+
+    let sum = 0;
+    // For "Own Combo" (Individual + Mixed Team) or just plain selection
+    selectedEventDetails.forEach(e => {
+       const isTeam = (e.min_team_size > 1 || e.max_team_size > 1);
+       if (isTeam) {
+          const eventId = e.id || e.event_id;
+          const details = teamDetailsMap[eventId];
+          const count = details?.memberCount ? parseInt(details.memberCount) : (e.min_team_size || 1);
+          const price = parseFloat(e.price || 0);
+          sum += (price * count);
+       } else {
+          sum += parseFloat(e.price || 0);
+       }
+    });
+
+    return sum;
+  }, [selectedEventDetails, registrationMode, calculatedTeamAmount, teamDetailsMap, selectedCombo]);
 
   // Count selected events by category for combo quotas
   const selectedCountByCategory = useMemo(() => {
@@ -385,6 +589,44 @@ const RegistrationForm = () => {
     });
     return counts;
   }, [selectedEventDetails]);
+
+  // Helper to check if a string is a UUID
+  const isUUID = (str) => {
+    if (!str || typeof str !== 'string') return false;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(str);
+  };
+
+  // Create a map of event IDs to event names for quota display
+  const eventIdToNameMap = useMemo(() => {
+    const map = {};
+    events.forEach(event => {
+      const eventId = event.id || event.event_id;
+      map[eventId] = event.name || event.title || event.event_name || eventId;
+    });
+    return map;
+  }, [events]);
+
+  // Process category quotas to resolve event IDs to names and determine quota type
+  const processedCategoryQuotas = useMemo(() => {
+    if (!selectedCombo?.category_quotas) return [];
+    
+    return Object.entries(selectedCombo.category_quotas).map(([category, quota]) => {
+      const isEventId = isUUID(quota);
+      const quotaCount = isEventId ? 1 : (typeof quota === 'number' ? quota : parseInt(quota) || 1);
+      const eventName = isEventId ? (eventIdToNameMap[quota] || quota) : null;
+      const specificEventId = isEventId ? quota : null;
+      
+      return {
+        category,
+        categoryKey: category.toLowerCase().trim(),
+        quotaCount,
+        isSpecificEvent: isEventId,
+        specificEventId,
+        eventName
+      };
+    });
+  }, [selectedCombo?.category_quotas, eventIdToNameMap]);
 
   // Callbacks to prevent unnecessary re-renders
   const handleModeSelect = useCallback((mode) => {
@@ -400,6 +642,28 @@ const RegistrationForm = () => {
 
   const handleComboSelect = useCallback((combo) => {
     setSelectedCombo(combo);
+    
+    // Auto-select specific events that admin has configured
+    if (combo.category_quotas) {
+      const autoSelectEventIds = [];
+      Object.entries(combo.category_quotas).forEach(([category, quota]) => {
+        // Check if quota is a UUID (specific event ID)
+        const isEventId = typeof quota === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(quota);
+        if (isEventId) {
+          autoSelectEventIds.push(quota);
+        }
+      });
+      
+      if (autoSelectEventIds.length > 0) {
+        setSelectedEvents(autoSelectEventIds);
+        console.log('🎯 Auto-selected events from combo:', autoSelectEventIds);
+      } else {
+        setSelectedEvents([]); // Clear any previous selections
+      }
+    } else {
+      setSelectedEvents([]); // Clear any previous selections
+    }
+    
     setCurrentStep(3);
     // Scroll to top of the page smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -412,6 +676,20 @@ const RegistrationForm = () => {
       return;
     }
     
+    // Check if this is a specific event from combo quota (auto-selected, can't be deselected)
+    if (registrationMode === 'combo' && selectedCombo?.category_quotas) {
+      const isSpecificEvent = Object.values(selectedCombo.category_quotas).some(quota => {
+        const isEventId = typeof quota === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(quota);
+        return isEventId && quota === eventId;
+      });
+      
+      // If trying to deselect a specific event, prevent it
+      if (isSpecificEvent && selectedEvents.includes(eventId)) {
+        console.log('Cannot deselect - this event is required by the combo');
+        return;
+      }
+    }
+    
     // Find the event to check if it's full
     const event = events.find(e => e.id === eventId || e.event_id === eventId);
     if (event) {
@@ -420,6 +698,18 @@ const RegistrationForm = () => {
       
       // Don't allow selecting full or closed events
       if (isFull || !isOpen) {
+        return;
+      }
+
+      // Check for team event and redirect to Dashboard My Teams
+      if (event.is_team_event && registrationMode !== 'individual') {
+        navigate('/dashboard/teams', { 
+          state: { 
+            createTeam: true, 
+            eventId: event.event_id || eventId,
+            eventName: event.title || event.name 
+          } 
+        });
         return;
       }
     }
@@ -458,14 +748,23 @@ const RegistrationForm = () => {
 
   const handleBack = useCallback(() => {
     if (currentStep === 3 && registrationMode === "combo") {
-      setSelectedEvents([]);
+      // When going back from combo event selection, only clear non-required events
+      // Keep specific events that are auto-selected
+      if (selectedCombo?.category_quotas) {
+        const requiredEventIds = Object.values(selectedCombo.category_quotas).filter(quota => {
+          return typeof quota === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(quota);
+        });
+        setSelectedEvents(requiredEventIds);
+      } else {
+        setSelectedEvents([]);
+      }
     } else if (currentStep === 2) {
       setRegistrationMode("");
       setSelectedCombo(null);
       setSelectedEvents([]);
     }
     setCurrentStep((prev) => Math.max(1, prev - 1));
-  }, [currentStep, registrationMode]);
+  }, [currentStep, registrationMode, selectedCombo]);
 
   const handleIndividualRegistration = useCallback(async () => {
     if (isSubmitting) return;
@@ -474,7 +773,7 @@ const RegistrationForm = () => {
       setIsSubmitting(true);
 
       if (!user) {
-        toast.error('Please login to register for events', {
+        toast.error('Please login to continue', {
           duration: 3000,
           position: 'top-center',
         });
@@ -490,9 +789,33 @@ const RegistrationForm = () => {
         return;
       }
 
-      // Register for each selected event using event_registrations_config
-      const tempPaymentId = `TEMP_${user.id.substring(0, 8)}_${Date.now()}`;
+      // Clear any existing PENDING registrations for the selected events
+      // This allows the user to retry payment without duplicate key errors
+      if (selectedEvents.length > 0) {
+        // We use a broader check here to ensure we clean up any stashed pending state
+        try {
+          // Identify event UUIDs from the selection (selectedEvents contains IDs)
+          // We need to match how event_registrations_config stores them
+          const { error: deleteError } = await supabase
+            .from('event_registrations_config')
+            .delete()
+            .eq('user_id', user.id)
+            .in('event_id', selectedEvents)
+            .eq('payment_status', 'PENDING');
+            
+          if (deleteError) {
+            console.warn('Warning: Could not clear pending registrations:', deleteError);
+          } else {
+             console.log('Cleared pending registrations for retry');
+          }
+        } catch (e) {
+          console.warn('Error clearing pending payments:', e);
+        }
+      }
+
+      // Step 1: Create pending registrations
       const registrations = [];
+      const batchId = `BATCH_${Date.now()}_${user.id.substring(0, 8)}`; // Shared batch ID for all events in this payment
       
       for (const eventId of selectedEvents) {
         const eventInfo = selectedEventDetails.find(e => (e.id || e.event_id) === eventId);
@@ -509,18 +832,21 @@ const RegistrationForm = () => {
           event_id: eventUuidId, // Must be UUID to match FK constraint
           user_id: user.id,
           event_name: eventInfo?.name || eventInfo?.event_name || eventInfo?.title,
-          payment_status: 'PAID',
+          payment_status: 'PENDING',
           payment_amount: eventInfo?.price || 0,
-          transaction_id: tempPaymentId
+          transaction_id: batchId // Use batch ID temporarily to group registrations
         });
       }
 
-      console.log('Submitting registrations:', registrations);
+      console.log('Creating pending registrations with batch ID:', batchId, registrations);
 
-      // Insert registrations (no need to select back - faster)
-      const { error: regError } = await supabase
+      // Insert registrations with PENDING status
+      const { data: insertedRegs, error: regError } = await supabase
         .from('event_registrations_config')
-        .insert(registrations);
+        .insert(registrations)
+        .select();
+      
+      console.log('Insert result:', { insertedRegs, regError });
       
       if (regError) {
         console.error('Registration error:', regError);
@@ -541,35 +867,115 @@ const RegistrationForm = () => {
         throw new Error(regError.message || 'Failed to create registrations');
       }
 
-      // Create admin notification in background (don't await - faster UX)
-      const eventNames = selectedEventDetails
-        .map((e) => e.event_name || e.name)
-        .join(", ");
+      console.log('✅ Pending registrations created successfully:', insertedRegs);
 
-      supabase.from("admin_notifications").insert({
-        type: "NEW_REGISTRATION",
-        title: "New Event Registration",
-        message: `${
-          userProfile?.full_name || user.email
-        } registered for: ${eventNames}`,
-        data: {
-          user_id: user.id,
-          user_name: userProfile?.full_name,
-          user_email: user.email,
-          events: selectedEvents,
-          event_names: eventNames,
-          total_amount: totalAmount,
-          registration_type: "individual",
-        },
-        is_read: false,
-      }).then(() => console.log('Admin notification sent')).catch(e => console.warn('Notification failed:', e));
-
-      console.log("Registration successful!");
-      toast.success('Registration successful! 🎉', {
-        duration: 3000,
+      // Step 2: Initiate payment via backend
+      const bookingId = insertedRegs && insertedRegs.length > 0 ? insertedRegs[0].id : `REG_${Date.now()}`;
+      
+      toast.loading('Preparing payment...', {
+        duration: 2000,
         position: 'top-center',
       });
-      setCurrentStep(4);
+
+      // Prepare payload for mixed booking
+      const mixedRegistrations = selectedEventDetails.map(event => {
+         const eventId = event.id || event.event_id;
+         const isTeam = (event.min_team_size > 1 || event.max_team_size > 1);
+         if (isTeam) {
+            return {
+               type: 'team',
+               event_id: eventId,
+               team_name: teamDetailsMap[eventId]?.teamName || '',
+               member_count: parseInt(teamDetailsMap[eventId]?.memberCount || event.min_team_size || 1)
+            };
+         } else {
+            return {
+               type: 'individual',
+               event_id: eventId
+            };
+         }
+      });
+      
+      // Validate teams have names
+      const invalidTeams = mixedRegistrations.filter(r => r.type === 'team' && !r.team_name?.trim());
+      if (invalidTeams.length > 0) {
+         toast.error('Please enter team names for all team events', { duration: 4000, position: 'top-center' });
+         setIsSubmitting(false);
+         return;
+      }
+
+      console.log('📡 Calling backend /payment/initiate with:', {
+        user_id: user.id,
+        booking_id: bookingId,
+        booking_type: 'mixed_registration',
+        registrations: mixedRegistrations,
+        amount: totalAmount,
+      });
+
+      // Call backend to get payment data (use localhost to avoid ngrok CORS issues)
+      const backendResponse = await fetch('http://localhost:3000/payment/initiate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          booking_id: bookingId,
+          booking_type: 'mixed_registration',
+          registrations: mixedRegistrations,
+          amount: totalAmount,
+        }),
+      });
+
+      console.log('📡 Backend response status:', backendResponse.status);
+      const backendResult = await backendResponse.json();
+      console.log('📡 Backend result:', backendResult);
+
+      if (!backendResult.success) {
+        throw new Error(backendResult.error || 'Failed to prepare payment');
+      }
+
+      // Step 3: Backend returns payment URL from gateway
+      const paymentUrl = backendResult.payment_url;
+      console.log('Payment Gateway URL:', paymentUrl);
+      
+      // Track pending payments in localStorage for each event
+      selectedEvents.forEach(eventId => {
+        pendingPaymentService.addPendingPayment({
+          userId: user.id,
+          eventId: eventId,
+          bookingId: bookingId,
+          amount: totalAmount,
+          orderId: backendResult.payment_data.order_id,
+        });
+      });
+      
+      // Update UI to show pending state
+      setPendingPaymentEvents(new Set(selectedEvents));
+      
+      // Store payment data in session for return
+      sessionStorage.setItem('pending_registration', JSON.stringify({
+        bookingId,
+        eventIds: selectedEvents,
+        amount: totalAmount,
+        orderId: backendResult.payment_data.order_id,
+      }));
+
+      toast.success('Redirecting to payment gateway...', {
+        duration: 1000,
+        position: 'top-center',
+      });
+
+      // Redirect to payment gateway page
+      setTimeout(() => {
+        window.location.href = paymentUrl;
+      }, 1000);
+      
+      return; // Don't proceed to success step yet - wait for payment
+
+      // Note: After successful payment callback, admin notification will be created
+      // and user will be redirected to success page
+
     } catch (error) {
       console.error("Registration error:", error);
       // Show the actual error message if available, otherwise generic message
@@ -592,7 +998,7 @@ const RegistrationForm = () => {
       setIsSubmitting(true);
 
       if (!user) {
-        toast.error('Please login to register for events', {
+        toast.error('Please login to continue', {
           duration: 3000,
           position: 'top-center',
         });
@@ -605,6 +1011,31 @@ const RegistrationForm = () => {
           position: 'top-center',
         });
         return;
+      }
+
+      // Validate team events have team names
+      const hasTeamEvents = selectedEventDetails.some(e => (e.min_team_size > 1 || e.max_team_size > 1));
+      if (hasTeamEvents) {
+        console.log('🔍 Validating team events...');
+        console.log('teamDetailsMap:', teamDetailsMap);
+        
+        const invalidTeams = selectedEventDetails.filter(e => {
+          const isTeam = (e.min_team_size > 1 || e.max_team_size > 1);
+          if (!isTeam) return false;
+          
+          const eventId = e.id || e.event_id;
+          const teamName = teamDetailsMap[eventId]?.teamName;
+          console.log(`Event ${e.name || e.event_name} (${eventId}): teamName = "${teamName}"`);
+          return !teamName?.trim();
+        });
+        
+        console.log('Invalid teams:', invalidTeams.map(e => e.name || e.event_name));
+        
+        if (invalidTeams.length > 0) {
+          toast.error('Please enter team names for all team events', { duration: 4000, position: 'top-center' });
+          setIsSubmitting(false);
+          return;
+        }
       }
 
       // Step 1: Validate selection
@@ -638,10 +1069,89 @@ const RegistrationForm = () => {
         return;
       }
 
-      // Step 3: Process payment (simulated)
-      const transactionId = `TXN_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      const bookingId = purchaseResult.purchaseId; // Note: purchaseId not purchase_id
+      const totalAmount = purchaseResult.amount || selectedCombo.price || selectedCombo.total_price || 0;
+
+      // Validate payment data before proceeding
+      if (!bookingId) {
+        console.error('Purchase result:', purchaseResult);
+        throw new Error('Failed to get booking ID from purchase');
+      }
+      if (!totalAmount || totalAmount <= 0) {
+        throw new Error('Invalid combo price');
+      }
+
+      console.log('Combo purchase created:', { bookingId, totalAmount });
+
+      toast.loading('Preparing payment...', {
+        duration: 2000,
+        position: 'top-center',
+      });
+
+      // Prepare team data for combo registrations
+      const teamDataForCombo = {};
+      console.log('🔍 Preparing team data for combo...');
+      console.log('📋 teamDetailsMap:', teamDetailsMap);
+      console.log('📋 selectedEventDetails:', selectedEventDetails.map(e => ({ id: e.id, name: e.name, min_team_size: e.min_team_size, max_team_size: e.max_team_size })));
       
-      // Step 4: Complete payment and trigger explosion
+      selectedEventDetails.forEach(event => {
+        const eventId = event.id || event.event_id;
+        const isTeam = (event.min_team_size > 1 || event.max_team_size > 1);
+        console.log(`Event ${event.name}: eventId=${eventId}, isTeam=${isTeam}, hasDetails=${!!teamDetailsMap[eventId]}`);
+        if (isTeam) {
+          // Always add team event data, even if teamName is empty (for debugging)
+          teamDataForCombo[eventId] = {
+            teamName: teamDetailsMap[eventId]?.teamName || '',
+            memberCount: parseInt(teamDetailsMap[eventId]?.memberCount || event.min_team_size || 2)
+          };
+          console.log(`✅ Added team data for ${event.name}:`, teamDataForCombo[eventId]);
+        }
+      });
+      
+      console.log('📦 Final teamDataForCombo:', teamDataForCombo);
+
+      // Step 3: Initiate payment via backend
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const backendResponse = await fetch(`${apiUrl}/payment/initiate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          booking_id: bookingId,
+          booking_type: 'combo',
+          amount: totalAmount,
+          team_data: teamDataForCombo,  // Always send team data (even if empty)
+          selected_events: selectedEvents
+        }),
+      });
+
+      const backendResult = await backendResponse.json();
+
+      if (!backendResult.success) {
+        throw new Error(backendResult.error || 'Failed to prepare payment');
+      }
+
+      // Store payment data
+      sessionStorage.setItem('pending_combo', JSON.stringify({
+        comboId: selectedCombo.id || selectedCombo.combo_id,
+        eventIds: selectedEvents,
+        amount: totalAmount,
+        orderId: backendResult.payment_data.order_id,
+      }));
+
+      toast.success('Redirecting to payment gateway...', {
+        duration: 1000,
+        position: 'top-center',
+      });
+
+      // Redirect to payment gateway
+      setTimeout(() => {
+        window.location.href = backendResult.payment_url;
+      }, 1000);
+      
+      return; // Don't proceed to success step yet - wait for payment
       const completionResult = await comboService.completeComboPayment(
         purchaseResult.purchaseId,
         transactionId
@@ -683,11 +1193,11 @@ const RegistrationForm = () => {
       });
 
       // Success!
-      toast.success(`Registration Successful! Combo: ${selectedCombo.name || selectedCombo.combo_name} - ${completionResult.eventCount} Events`, {
-        duration: 5000,
+      toast.success(`Combo registration successful: ${selectedCombo.name || selectedCombo.combo_name} (${completionResult.eventCount} events)`, {
+        duration: 4000,
         position: 'top-center',
       });
-      setCurrentStep(4);
+      setCurrentStep(5);  // Step 5 for combo success
       
     } catch (error) {
       console.error("Combo registration error:", error);
@@ -698,7 +1208,7 @@ const RegistrationForm = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [user, userProfile, selectedCombo, selectedEvents, selectedEventDetails, isSubmitting]);
+  }, [user, userProfile, selectedCombo, selectedEvents, selectedEventDetails, isSubmitting, teamDetailsMap]);
 
   // Handle team registration
   const handleTeamRegistration = useCallback(async () => {
@@ -708,7 +1218,7 @@ const RegistrationForm = () => {
       setIsSubmitting(true);
 
       if (!user) {
-        toast.error('Please login to register your team', {
+        toast.error('Please login to continue', {
           duration: 3000,
           position: 'top-center',
         });
@@ -723,15 +1233,85 @@ const RegistrationForm = () => {
         return;
       }
 
-      // Register team for the event
+      // Get team leader (first member or user)
+      const teamLeader = teamData.teamMembers.find(m => m.is_leader) || teamData.teamMembers[0];
+      
+      // Prompt for team leader mobile number if not available
+      let teamLeaderMobile = userProfile.mobile_number;
+      if (!teamLeaderMobile) {
+        const mobile = prompt('Enter team leader\'s mobile number for payment:');
+        if (!mobile || !/^\d{10}$/.test(mobile)) {
+          toast.error('Valid mobile number required for payment', {
+            duration: 3000,
+            position: 'top-center',
+          });
+          setIsSubmitting(false);
+          return;
+        }
+        teamLeaderMobile = mobile;
+      }
+
+      const eventDetails = selectedEventDetails[0];
+      const bookingId = `TEAM_${teamData.teamId}_${Date.now()}`;
+
+      // Initiate payment via backend (backend will compute amount for unpaid members)
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const backendResponse = await fetch(`${apiUrl}/payment/initiate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          booking_id: bookingId,
+          booking_type: 'team',
+          team_id: teamData.teamId,
+          team_name: teamData.teamName,
+          team_leader_mobile: teamLeaderMobile,
+          member_count: teamData.memberCount,
+          event_id: selectedEvents[0]
+        }),
+      });
+
+      const backendResult = await backendResponse.json();
+
+      if (!backendResult.success) {
+        throw new Error(backendResult.error || 'Failed to prepare payment');
+      }
+
+      // Update calculated amount for display (this will update totalAmount via useMemo)
+      setCalculatedTeamAmount(backendResult.calculated_amount);
+
+      // Store payment data with calculated amount
+      sessionStorage.setItem('pending_team', JSON.stringify({
+        teamId: teamData.teamId,
+        teamName: teamData.teamName,
+        eventId: selectedEvents[0],
+        memberCount: teamData.memberCount,
+        orderId: backendResult.payment_data.order_id,
+        calculatedAmount: backendResult.calculated_amount // Amount calculated by backend
+      }));
+
+      toast.success('Redirecting to payment gateway...', {
+        duration: 1000,
+        position: 'top-center',
+      });
+
+      // Redirect to payment gateway
+      setTimeout(() => {
+        window.location.href = backendResult.payment_url;
+      }, 1000);
+      
+      return; // Don't proceed - wait for payment
+      
+      // OLD CODE - keeping for reference but unreachable:
       const tempPaymentId = `TEAM_${teamData.teamId}_${Date.now()}`;
       
-      // Create registration for each team member
       const registrations = teamData.teamMembers.map(member => ({
         user_id: member.id,
         event_id: selectedEvents[0],
         team_id: teamData.teamId,
-        payment_status: 'PAID',
+        payment_status: 'PENDING',
         payment_id: tempPaymentId,
         registration_type: 'team'
       }));
@@ -758,7 +1338,6 @@ const RegistrationForm = () => {
       }
 
       // Create admin notification in background (don't await - faster UX)
-      const eventDetails = selectedEventDetails[0];
       supabase.from("admin_notifications").insert({
         type: "NEW_REGISTRATION",
         title: "New Team Registration",
@@ -792,14 +1371,76 @@ const RegistrationForm = () => {
   }, [user, userProfile, teamData, selectedEvents, selectedEventDetails, isSubmitting]);
 
   // Handle next step navigation
-  const handleNext = useCallback(() => {
-    if (currentStep === 3 && registrationMode === "combo") {
+
+  // Determine if a selected event is a team event
+  const isTeamEvent = useCallback((eventId) => {
+    const event = events.find(e => e.id === eventId || e.event_id === eventId);
+    if (!event) return false;
+    const minSize = event.min_team_size || 0;
+    const maxSize = event.max_team_size || 0;
+    return minSize > 1 || maxSize > 1;
+  }, [events]);
+
+  // Handle Team Details Inputs
+  const handleTeamDetailsChange = (eventId, field, value) => {
+    console.log(`📝 Team details changed: eventId=${eventId}, field=${field}, value=${value}`);
+    setTeamDetailsMap(prev => {
+      const newMap = {
+        ...prev,
+        [eventId]: {
+          ...prev[eventId],
+          [field]: value
+        }
+      };
+      console.log('📋 Updated teamDetailsMap:', newMap);
+      return newMap;
+    });
+  };
+
+  const handleNext = useCallback(async () => {
+    if (currentStep === 4 && registrationMode === "combo") {
       handleComboRegistration();
     } else if (currentStep === 3 && registrationMode === "individual") {
       handleIndividualRegistration();
     } else if (currentStep === 3 && registrationMode === "team") {
       handleTeamRegistration();
     } else if (currentStep < steps.length) {
+      // Logic when moving from Selection (Step 2) to Review (Step 3) in "individual" mode
+      if (currentStep === 2 && registrationMode === "individual") {
+         // Initialize default counts for any selected team events
+         const newDetails = { ...teamDetailsMap };
+         selectedEventDetails.forEach(e => {
+            const isTeam = (e.min_team_size > 1 || e.max_team_size > 1);
+            if (isTeam) {
+               const eventId = e.id || e.event_id;
+               if (!newDetails[eventId]) {
+                  newDetails[eventId] = {
+                     teamName: '',
+                     memberCount: e.min_team_size || 2 // Default to min size
+                  };
+               }
+            }
+         });
+         setTeamDetailsMap(newDetails);
+      }
+      // Logic when moving from Selection (Step 3) to Review (Step 4) in "combo" mode
+      if (currentStep === 3 && registrationMode === "combo") {
+         // Initialize default counts for any selected team events in combo
+         const newDetails = { ...teamDetailsMap };
+         selectedEventDetails.forEach(e => {
+            const isTeam = (e.min_team_size > 1 || e.max_team_size > 1);
+            if (isTeam) {
+               const eventId = e.id || e.event_id;
+               if (!newDetails[eventId]) {
+                  newDetails[eventId] = {
+                     teamName: '',
+                     memberCount: e.min_team_size || 2 // Default to min size
+                  };
+               }
+            }
+         });
+         setTeamDetailsMap(newDetails);
+      }
       setCurrentStep((prev) => prev + 1);
     }
   }, [
@@ -809,6 +1450,10 @@ const RegistrationForm = () => {
     handleComboRegistration,
     handleIndividualRegistration,
     handleTeamRegistration,
+    teamData,
+    selectedEvents,
+    selectedEventDetails,
+    teamDetailsMap
   ]);
 
   // Memoized check for next button
@@ -979,8 +1624,8 @@ const RegistrationForm = () => {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-              {/* Individual Events Card */}
+            <div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+              {/* Own Combo (Formerly Individual) */}
               <motion.div
                 whileHover={{ scale: 1.02, y: -5 }}
                 whileTap={{ scale: 0.98 }}
@@ -996,11 +1641,10 @@ const RegistrationForm = () => {
                 </div>
                 <div className="space-y-4">
                   <h3 className="text-2xl font-bold text-white">
-                    Individual Events
+                    Own Combo
                   </h3>
                   <p className="text-gray-400">
-                    Pick and choose from our wide range of events. Pay only for
-                    what you attend.
+                    Create your own schedule! Pick and choose from ALL events (Individual & Team).
                   </p>
                   <ul className="space-y-2">
                     <li className="flex items-center text-gray-300">
@@ -1009,11 +1653,11 @@ const RegistrationForm = () => {
                     </li>
                     <li className="flex items-center text-gray-300">
                       <Check className="text-green-400 mr-2" size={20} />
-                      Choose any events
+                      Includes Team Events
                     </li>
                     <li className="flex items-center text-gray-300">
                       <Check className="text-green-400 mr-2" size={20} />
-                      Individual pricing
+                      Single Checkout
                     </li>
                   </ul>
                 </div>
@@ -1063,43 +1707,12 @@ const RegistrationForm = () => {
                 </div>
               </motion.div>
 
-              {/* Team Events Card */}
-              <motion.div
-                whileHover={{ scale: 1.02, y: -5 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => handleModeSelect("team")}
-                className={`relative p-8 rounded-3xl border-2 cursor-pointer transition-all ${
-                  registrationMode === "team"
-                    ? "border-green-500 bg-green-500/10"
-                    : "border-gray-700 hover:border-green-400 bg-gray-800/50"
-                }`}
-              >
-                <div className="absolute top-4 right-4">
-                  <Users className="text-green-400" size={32} />
-                </div>
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-bold text-white">
-                    Team Events
-                  </h3>
-                  <p className="text-gray-400">
-                    Register your team for collaborative events. Perfect for group competitions.
-                  </p>
-                  <ul className="space-y-2">
-                    <li className="flex items-center text-gray-300">
-                      <Check className="text-green-400 mr-2" size={20} />
-                      Team collaboration
-                    </li>
-                    <li className="flex items-center text-gray-300">
-                      <Check className="text-green-400 mr-2" size={20} />
-                      Group registration
-                    </li>
-                    <li className="flex items-center text-gray-300">
-                      <Check className="text-green-400 mr-2" size={20} />
-                      Shared payment
-                    </li>
-                  </ul>
-                </div>
+              {/* Team Events Card - REMOVED per requirements */}
+              {/* 
+              <motion.div ...> 
+                ...
               </motion.div>
+              */}
 
               {/* Accommodation Card - Below Individual */}
               <motion.div
@@ -1316,6 +1929,7 @@ const RegistrationForm = () => {
                         combo={combo}
                         isSelected={selectedCombo?.id === combo.id || selectedCombo?.combo_id === combo.combo_id}
                         onSelect={() => handleComboSelect(combo)}
+                        userPurchasedCombos={userPurchasedCombos}
                       />
                     );
                   })}
@@ -1397,6 +2011,8 @@ const RegistrationForm = () => {
                     const isFull = event.current_registrations >= event.capacity;
                     const isOpen = event.is_open !== false;
                     const isAlreadyRegistered = registeredEventIds.has(eventId);
+                    const isPendingPayment = pendingPaymentEvents.has(eventId);
+                    // Allow selecting pending payment events so user can retry payment
                     const isEventDisabled = isFull || !isOpen || isAlreadyRegistered;
                     
                     return (
@@ -1406,6 +2022,8 @@ const RegistrationForm = () => {
                         isSelected={selectedEvents.includes(eventId)}
                         isDisabled={isEventDisabled}
                         isAlreadyRegistered={isAlreadyRegistered}
+                        isPendingPayment={isPendingPayment}
+                        allowTeamSelection={registrationMode === 'individual'}
                         onSelect={() =>
                           handleEventToggle(eventId)
                         }
@@ -1460,12 +2078,14 @@ const RegistrationForm = () => {
                       {selectedEvents.length} event{selectedEvents.length !== 1 ? 's' : ''} selected
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-3 sm:gap-4">
-                    {Object.entries(selectedCombo.category_quotas || {}).map(
-                      ([category, quota]) => {
-                        const categoryKey = category.toLowerCase().trim();
-                        const selected = selectedCountByCategory[categoryKey] || 0;
-                        const remaining = quota - selected;
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                    {processedCategoryQuotas.map(
+                      ({ category, categoryKey, quotaCount, isSpecificEvent, specificEventId, eventName }) => {
+                        // For specific events, check if that event is selected
+                        const selected = isSpecificEvent 
+                          ? (selectedEvents.includes(specificEventId) ? 1 : 0)
+                          : (selectedCountByCategory[categoryKey] || 0);
+                        const remaining = quotaCount - selected;
                         const isExceeded = remaining < 0;
                         const isFull = remaining <= 0;
                         
@@ -1477,22 +2097,37 @@ const RegistrationForm = () => {
                             }`}
                           >
                             <p className="text-gray-400 text-xs sm:text-sm capitalize">{category}</p>
-                            <div className="flex items-baseline justify-between">
-                              <p className={`text-xl sm:text-2xl font-bold ${isExceeded ? 'text-red-400' : 'text-white'}`}>
-                                {selected} / {quota}
-                              </p>
-                              {isFull && !isExceeded && (
-                                <Check className="text-green-400" size={16} />
-                              )}
-                            </div>
-                            <div className="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
-                              <div 
-                                className={`h-full transition-all ${
-                                  isExceeded ? 'bg-red-500' : isFull ? 'bg-green-500' : 'bg-blue-500'
-                                }`}
-                                style={{ width: `${Math.min(100, (selected / quota) * 100)}%` }}
-                              />
-                            </div>
+                            {isSpecificEvent ? (
+                              <>
+                                <p className="text-white font-medium text-sm mt-1 line-clamp-2" title={eventName}>
+                                  {eventName}
+                                </p>
+                                <div className="flex items-center justify-between mt-2">
+                                  <p className={`text-lg font-bold ${selected ? 'text-green-400' : 'text-gray-400'}`}>
+                                    {selected ? '✓ Selected' : 'Not selected'}
+                                  </p>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div className="flex items-baseline justify-between">
+                                  <p className={`text-xl sm:text-2xl font-bold ${isExceeded ? 'text-red-400' : 'text-white'}`}>
+                                    {selected} / {quotaCount}
+                                  </p>
+                                  {isFull && !isExceeded && (
+                                    <Check className="text-green-400" size={16} />
+                                  )}
+                                </div>
+                                <div className="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
+                                  <div 
+                                    className={`h-full transition-all ${
+                                      isExceeded ? 'bg-red-500' : isFull ? 'bg-green-500' : 'bg-blue-500'
+                                    }`}
+                                    style={{ width: `${Math.min(100, (selected / quotaCount) * 100)}%` }}
+                                  />
+                                </div>
+                              </>
+                            )}
                           </div>
                         );
                       }
@@ -1526,9 +2161,8 @@ const RegistrationForm = () => {
                     >
                       All Events
                     </button>
-                    {categories
-                      .filter((cat) => cat !== "ALL")
-                      .map((cat, index) => (
+                    {/* Only show categories that are in the combo quotas */}
+                    {Object.keys(selectedCombo?.category_quotas || {}).map((cat, index) => (
                         <button
                           key={`combo-cat-${cat}-${index}`}
                           onClick={() => setCategoryFilter(cat)}
@@ -1551,20 +2185,33 @@ const RegistrationForm = () => {
                     const isFull = event.current_registrations >= event.capacity;
                     const isOpen = event.is_open !== false;
                     const isAlreadyRegistered = registeredEventIds.has(eventId);
+                    
+                    // Check if this is a specific required event from combo
+                    const isRequiredEvent = selectedCombo?.category_quotas && Object.values(selectedCombo.category_quotas).some(quota => {
+                      const isEventId = typeof quota === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(quota);
+                      return isEventId && quota === eventId;
+                    });
+                    
                     const isEventDisabled = isFull || !isOpen || isAlreadyRegistered;
                     
                     return (
-                      <EventCard
-                        key={eventId || `combo-event-${index}`}
-                        event={event}
-                        isSelected={selectedEvents.includes(eventId)}
-                        isDisabled={isEventDisabled}
-                        isAlreadyRegistered={isAlreadyRegistered}
-                        onSelect={() =>
-                          handleEventToggle(eventId)
-                        }
-                        showPrice={false}
-                      />
+                      <div key={eventId || `combo-event-${index}`} className="relative">
+                        {isRequiredEvent && (
+                          <div className="absolute -top-2 -right-2 z-10 px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full shadow-lg">
+                            <span className="text-xs font-bold text-white">✓ Required</span>
+                          </div>
+                        )}
+                        <EventCard
+                          event={event}
+                          isSelected={selectedEvents.includes(eventId)}
+                          isDisabled={isEventDisabled || isRequiredEvent}
+                          isAlreadyRegistered={isAlreadyRegistered}
+                          onSelect={() =>
+                            handleEventToggle(eventId)
+                          }
+                          showPrice={false}
+                        />
+                      </div>
                     );
                   })}
                 </div>
@@ -1632,24 +2279,70 @@ const RegistrationForm = () => {
                       Selected
                     </h3>
                     <div className="space-y-3">
-                      {selectedEventDetails.map((event) => (
-                        <div
-                          key={event.id || event.event_id}
-                          className="flex justify-between items-center bg-gray-900 rounded-xl p-4"
-                        >
-                          <div>
-                            <p className="font-bold text-white">
-                              {event.name || event.event_name}
-                            </p>
-                            <p className="text-sm text-gray-400">
-                              {event.category}
-                            </p>
+                      {selectedEventDetails.map((event) => {
+                        const eventId = event.id || event.event_id;
+                        const isTeam = (event.min_team_size > 1 || event.max_team_size > 1);
+                        const showTeamDetails = isTeam && (registrationMode === "individual" || registrationMode === "combo");
+                        
+                        return (
+                          <div
+                            key={eventId}
+                            className="bg-gray-900 rounded-xl p-4"
+                          >
+                           <div className="flex justify-between items-center mb-2">
+                              <div>
+                                <p className="font-bold text-white">
+                                  {event.name || event.event_name}
+                                </p>
+                                <p className="text-sm text-gray-400">
+                                  {event.category} {isTeam && <span className="text-green-400 font-bold ml-2">(Team Event)</span>}
+                                </p>
+                              </div>
+                              <p className="text-xl font-bold text-green-400">
+                                {registrationMode === "combo" ? (
+                                  "Included"
+                                ) : (
+                                  isTeam && showTeamDetails ? 
+                                    `₹${(event.price || 0) * (teamDetailsMap[eventId]?.memberCount || event.min_team_size || 1)}` 
+                                    : `₹${event.price || 0}`
+                                )}
+                              </p>
+                            </div>
+                            
+                            {/* Team Details Inputs for Individual/Combo Mode with Team Events */}
+                            {showTeamDetails && (
+                              <div className="mt-3 pt-3 border-t border-gray-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                   <label className="text-xs text-gray-400 block mb-1">Team Name</label>
+                                   <input 
+                                     type="text"
+                                     className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-500 outline-none"
+                                     placeholder="Enter Team Name"
+                                     value={teamDetailsMap[eventId]?.teamName || ''}
+                                     onChange={(e) => handleTeamDetailsChange(eventId, 'teamName', e.target.value)}
+                                   />
+                                </div>
+                                <div>
+                                   <label className="text-xs text-gray-400 block mb-1">
+                                      Member Count (Max: {event.max_team_size || 4})
+                                   </label>
+                                   <select 
+                                     className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-500 outline-none"
+                                     value={teamDetailsMap[eventId]?.memberCount || (event.min_team_size || 2)}
+                                     onChange={(e) => handleTeamDetailsChange(eventId, 'memberCount', e.target.value)}
+                                   >
+                                      {Array.from({length: (event.max_team_size || 4) - (event.min_team_size || 2) + 1}, (_, i) => i + (event.min_team_size || 2)).map(num => (
+                                          <option key={num} value={num}>{num} Members</option>
+                                      ))}
+                                      {/* Fallback if range is weird */}
+                                      {(!event.min_team_size) && <option value="1">1 Member</option>}
+                                   </select>
+                                </div>
+                              </div>
+                            )}
                           </div>
-                          <p className="text-xl font-bold text-blue-400">
-                            ₹{event.price || 0}
-                          </p>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -1657,17 +2350,34 @@ const RegistrationForm = () => {
                   <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-2 border-blue-500/50 rounded-2xl p-6">
                     <div className="flex justify-between items-center">
                       <div>
-                        <p className="text-gray-400 mb-1">Total Amount</p>
+                        <p className="text-gray-400 mb-1">
+                          {registrationMode === "team" && calculatedTeamAmount !== null 
+                            ? "Total Amount" 
+                            : registrationMode === "team" ? "Per Person Price" : "Total Amount"}
+                        </p>
                         <p className="text-4xl font-bold text-white">
                           ₹{totalAmount}
                         </p>
+                        {registrationMode === "team" && (
+                          <p className="text-xs text-yellow-400 mt-2">
+                            {calculatedTeamAmount !== null 
+                              ? teamData?.isPartialPayment 
+                                ? `💵 Payment for ${teamData.memberCount - teamData.registeredCount} new ${teamData.memberCount - teamData.registeredCount === 1 ? 'member' : 'members'}`
+                                : `💵 For ${teamData?.memberCount || 0} members` 
+                              : '💡 Final amount will be calculated for unpaid members only'}
+                          </p>
+                        )}
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-gray-400">
                           Registration Fee
                         </p>
                         <p className="text-xs text-green-400">
-                          Includes all events
+                          {registrationMode === "team" && calculatedTeamAmount !== null
+                            ? teamData?.isPartialPayment
+                              ? `₹${selectedEventDetails[0]?.price || 0} × ${teamData.memberCount - teamData.registeredCount} new ${teamData.memberCount - teamData.registeredCount === 1 ? 'member' : 'members'}`
+                              : `₹${selectedEventDetails[0]?.price || 0} × ${teamData?.memberCount || 0} ${teamData?.memberCount === 1 ? 'member' : 'members'}`
+                            : registrationMode === "team" ? "Per member" : "Includes all events"}
                         </p>
                       </div>
                     </div>
@@ -1678,8 +2388,168 @@ const RegistrationForm = () => {
           </motion.div>
         )}
 
-        {/* Step 4: Success */}
+        {/* Step 4: Review for Combo OR Success for Individual/Team */}
         {currentStep === 4 && (
+          <motion.div
+            key="step4"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-8"
+          >
+            {registrationMode === "combo" && selectedCombo ? (
+              <>
+                <div className="text-center space-y-2">
+                  <h2 className="text-3xl font-bold text-white">
+                    Review Your Combo Registration
+                  </h2>
+                  <p className="text-gray-400">
+                    Confirm your selections to complete registration
+                  </p>
+                </div>
+
+                <div className="max-w-2xl mx-auto space-y-6">
+                  {/* Combo Info */}
+                  <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-2 border-purple-500/30 rounded-2xl p-6">
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      {selectedCombo.name || selectedCombo.combo_name}
+                    </h3>
+                    <p className="text-gray-400 text-sm">
+                      {selectedEvents.length} events selected from this combo
+                    </p>
+                  </div>
+
+                  {/* Selected Events Summary with Team Details */}
+                  <div className="bg-gray-800/50 rounded-2xl p-6 border border-gray-700">
+                    <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                      <Calendar size={24} />
+                      {selectedEvents.length}{" "}
+                      {selectedEvents.length === 1 ? "Event" : "Events"}{" "}
+                      Selected
+                    </h3>
+                    <div className="space-y-3">
+                      {selectedEventDetails.map((event) => {
+                        const eventId = event.id || event.event_id;
+                        const isTeam = (event.min_team_size > 1 || event.max_team_size > 1);
+                        
+                        return (
+                          <div
+                            key={eventId}
+                            className="bg-gray-900 rounded-xl p-4"
+                          >
+                            <div className="flex justify-between items-center mb-2">
+                              <div>
+                                <p className="font-bold text-white">
+                                  {event.name || event.event_name}
+                                </p>
+                                <p className="text-sm text-gray-400">
+                                  {event.category} {isTeam && <span className="text-green-400 font-bold ml-2">(Team Event)</span>}
+                                </p>
+                              </div>
+                              <p className="text-xl font-bold text-blue-400">
+                                Included
+                              </p>
+                            </div>
+                            
+                            {/* Team Details Inputs for Combo Mode */}
+                            {isTeam && (
+                              <div className="mt-3 pt-3 border-t border-gray-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                   <label className="text-xs text-gray-400 block mb-1">Team Name *</label>
+                                   <input 
+                                     type="text"
+                                     className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-500 outline-none"
+                                     placeholder="Enter Team Name"
+                                     value={teamDetailsMap[eventId]?.teamName || ''}
+                                     onChange={(e) => handleTeamDetailsChange(eventId, 'teamName', e.target.value)}
+                                   />
+                                </div>
+                                <div>
+                                   <label className="text-xs text-gray-400 block mb-1">
+                                      Member Count (Max: {event.max_team_size || 4}) *
+                                   </label>
+                                   <select 
+                                     className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-500 outline-none"
+                                     value={teamDetailsMap[eventId]?.memberCount || (event.min_team_size || 2)}
+                                     onChange={(e) => handleTeamDetailsChange(eventId, 'memberCount', e.target.value)}
+                                   >
+                                      {Array.from({length: (event.max_team_size || 4) - (event.min_team_size || 2) + 1}, (_, i) => i + (event.min_team_size || 2)).map(num => (
+                                          <option key={num} value={num}>{num} Members</option>
+                                      ))}
+                                   </select>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Total Amount */}
+                  <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-2 border-blue-500/50 rounded-2xl p-6">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-gray-400 mb-1">Total Amount</p>
+                        <p className="text-4xl font-bold text-white">
+                          ₹{selectedCombo.price || selectedCombo.total_price || 0}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-400">
+                          Combo Package
+                        </p>
+                        <p className="text-xs text-green-400">
+                          Includes all selected events
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                  className="inline-block"
+                >
+                  <div className="w-24 h-24 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto">
+                    <Check size={48} className="text-white" />
+                  </div>
+                </motion.div>
+
+                <div className="space-y-2">
+                  <h2 className="text-4xl font-bold text-white">
+                    Registration Successful!
+                  </h2>
+                  <p className="text-gray-400 text-lg">
+                    You've successfully registered for {selectedEvents.length} event{selectedEvents.length > 1 ? "s" : ""}
+                  </p>
+                </div>
+
+                <div className="max-w-md mx-auto bg-gray-800/50 rounded-2xl p-6 border border-gray-700">
+                  <p className="text-sm text-gray-400 mb-4">
+                    A confirmation email has been sent to your registered email
+                    address with all the event details.
+                  </p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => (window.location.href = "/dashboard")}
+                    className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full"
+                  >
+                    Go to Dashboard
+                  </motion.button>
+                </div>
+              </>
+            )}
+          </motion.div>
+        )}
+
+        {/* Step 5: Success for Combo */}
+        {currentStep === 5 && registrationMode === "combo" && (
           <motion.div
             key="success"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -1702,11 +2572,7 @@ const RegistrationForm = () => {
                 Registration Successful!
               </h2>
               <p className="text-gray-400 text-lg">
-                {registrationMode === "combo"
-                  ? `You've successfully registered for the ${selectedCombo?.name || selectedCombo?.combo_name} package`
-                  : `You've successfully registered for ${
-                      selectedEvents.length
-                    } event${selectedEvents.length > 1 ? "s" : ""}`}
+                You've successfully registered for the {selectedCombo?.name || selectedCombo?.combo_name} package
               </p>
             </div>
 
@@ -1728,9 +2594,9 @@ const RegistrationForm = () => {
         )}
       </AnimatePresence>
 
-      {/* Navigation Buttons - Hidden when footer is visible */}
+      {/* Navigation Buttons - Hidden when footer is visible or on success screens */}
       <AnimatePresence mode="wait">
-        {currentStep < 4 && !isFooterVisible && (
+        {((currentStep < 4) || (currentStep === 4 && registrationMode === "combo")) && !isFooterVisible && (
           <motion.div
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -1769,10 +2635,10 @@ const RegistrationForm = () => {
                 ) : (
                   <>
                     <span className="hidden sm:inline">
-                      {currentStep === 3 ? "Confirm Registration" : "Next"}
+                      {(currentStep === 3 && registrationMode !== "combo") || (currentStep === 4 && registrationMode === "combo") ? "Confirm Registration" : "Next"}
                     </span>
                     <span className="sm:hidden">
-                      {currentStep === 3 ? "Confirm" : "Next"}
+                      {(currentStep === 3 && registrationMode !== "combo") || (currentStep === 4 && registrationMode === "combo") ? "Confirm" : "Next"}
                     </span>
                     <ChevronRight size={18} className="sm:w-5 sm:h-5" />
                   </>
@@ -1784,7 +2650,7 @@ const RegistrationForm = () => {
       </AnimatePresence>
 
       {/* Spacer to prevent content from being hidden behind fixed navigation */}
-      {currentStep < 4 && !isFooterVisible && <div className="h-24 md:h-20" />}
+      {((currentStep < 4) || (currentStep === 4 && registrationMode === "combo")) && !isFooterVisible && <div className="h-24 md:h-20" />}
     </div>
   );
 };

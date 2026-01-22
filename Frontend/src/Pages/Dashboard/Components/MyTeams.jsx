@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { supabase } from "../../../supabase";
 import { supabaseService } from "../../../services/supabaseService";
+import notificationService from "../../../services/notificationService";
 import CreateTeamModal from "./CreateTeamModal";
 import { 
   sendTeamInvitation, 
@@ -69,6 +70,10 @@ const MyTeams = () => {
       return;
     }
 
+    // Check if team is already partially registered
+    const registeredCount = team.registered_count || 0;
+    const isPartiallyRegistered = registeredCount > 0 && registeredCount < currentSize;
+
     // Navigate to event registration with team data
     navigate('/register-events', {
       state: {
@@ -78,7 +83,9 @@ const MyTeams = () => {
         eventId: team.event_id,
         eventName: team.events?.title,
         teamMembers: team.members,
-        memberCount: currentSize
+        memberCount: currentSize,
+        isPartialPayment: isPartiallyRegistered,
+        registeredCount: registeredCount
       }
     });
   };
@@ -95,15 +102,74 @@ const MyTeams = () => {
     
     loadData();
     
+    // Auto-refresh when returning from payment
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get('payment') === 'success' && urlParams.get('type') === 'team') {
+      console.log('Payment successful - refreshing team data...');
+      // Wait a moment for DB to update, then refresh
+      setTimeout(() => {
+        fetchTeams();
+      }, 1000);
+      // Clean up URL
+      navigate(location.pathname, { replace: true });
+    }
+    
     // Check if we should open the create team modal based on navigation state
-    if (location.state?.createTeam) {
-      setIsModalOpen(true);
+    if (location.state?.createTeam && location.state?.eventId) {
+      // Check if user already has a team for this event
+      const checkExistingTeam = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: existingTeams } = await supabase
+          .from('team_members')
+          .select('team_id, teams!inner(id, team_name, event_id)')
+          .eq('user_id', user.id)
+          .eq('teams.event_id', location.state.eventId)
+          .in('status', ['active', 'joined']);
+
+        if (existingTeams && existingTeams.length > 0) {
+          // Team already exists for this event
+          toast.error(`You already have a team "${existingTeams[0].teams.team_name}" for this event`, {
+            duration: 4000,
+            position: 'top-center',
+          });
+          // Clear navigation state
+          navigate(location.pathname, { replace: true });
+        } else {
+          // No existing team, show create modal
+          setIsModalOpen(true);
+        }
+      };
+
+      checkExistingTeam();
+    }
+
+    // Handle payment success from query params
+    const params = new URLSearchParams(location.search);
+    const paymentStatus = params.get('payment');
+    const paymentType = params.get('type');
+
+    if (paymentStatus === 'success' && paymentType === 'team' && location.search) {
+      toast.success('Team registration successful! Payment confirmed.', {
+        duration: 5000,
+        position: 'top-center',
+        icon: '🎉',
+      });
+      // Clear the query params to prevent showing message again on refresh
+      navigate(location.pathname, { replace: true });
+    } else if (paymentStatus === 'failed' && location.search) {
+      toast.error('Payment failed. Please try again.', {
+        duration: 5000,
+        position: 'top-center',
+      });
+      navigate(location.pathname, { replace: true });
     }
     
     return () => {
       isMounted = false;
     };
-  }, [location.state]);
+  }, [location.state, location.search]);
 
   const getCurrentUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -124,28 +190,100 @@ const MyTeams = () => {
       // Check registration status for each team
       const teamsWithStatus = await Promise.all(
         data.map(async (team) => {
-          // Check if team is registered for the event
-          const { data: registrations } = await supabase
-            .from('registrations')
-            .select('id, payment_status')
-            .eq('team_id', team.id)
-            .eq('user_id', user.id)
-            .maybeSingle(); // Use maybeSingle() instead of single() to handle 0 or 1 results
+          // Get team member user_ids (not profile ids)
+          const memberUserIds = (team.members || []).map(m => m.user_id).filter(Boolean);
+          
+          if (memberUserIds.length === 0) {
+            return {
+              ...team,
+              is_registered: false,
+              registration_status: null,
+              registered_count: 0,
+              team_payment_amount: null
+            };
+          }
+
+          // Check if team members are registered for the event
+          // Use event_id from team (UUID) or fall back to text ID
+          const eventIdForRegistrations = team.events?.event_id || team.events?.id || team.event_id;
+          const teamName = team.name;
+
+          // Find all PAID registrations that match this team
+          // Team registrations use event_name = team_name
+          const { data: registrations, error: regError } = await supabase
+            .from('event_registrations_config')
+            .select('user_id, payment_status, event_name, payment_amount, transaction_id, event_id')
+            .eq('payment_status', 'PAID');
+          
+          if (regError) {
+            console.error('Error checking registration status:', regError);
+            return {
+              ...team,
+              is_registered: false,
+              registration_status: null,
+              registered_count: 0,
+              team_payment_amount: null
+            };
+          }
+
+          // Filter registrations that match this team:
+          // 1. User is a team member AND
+          // 2. Either event_id matches OR event_name matches team name
+          const teamRegistrations = (registrations || []).filter(r => {
+            const isTeamMember = memberUserIds.includes(r.user_id);
+            const eventMatches = r.event_id === eventIdForRegistrations || 
+                                r.event_id === team.event_id ||
+                                r.event_name === teamName;
+            return isTeamMember && eventMatches;
+          });
+          
+          console.log(`Team "${teamName}" registration check:`, {
+            memberUserIds,
+            eventIdForRegistrations,
+            teamEventId: team.event_id,
+            foundRegistrations: teamRegistrations.length
+          });
+          
+          // Count how many members are registered
+          const registeredMemberIds = new Set(teamRegistrations.map(r => r.user_id));
+          const registeredCount = registeredMemberIds.size;
+          
+          // Team is "registered" (fully paid) if at least one member has paid
+          // For teams created via Create Team + Payment, leader will have paid
+          const isRegistered = registeredCount > 0;
+          
+          // Get team total payment amount
+          let teamTotalAmount = null;
+          if (teamRegistrations.length > 0) {
+            // Get the maximum payment_amount (which represents the total team payment)
+            teamTotalAmount = Math.max(...teamRegistrations.map(r => Number(r.payment_amount) || 0));
+          }
           
           return {
             ...team,
-            is_registered: !!registrations,
-            registration_status: registrations?.payment_status || null
+            is_registered: isRegistered,
+            registration_status: isRegistered ? 'PAID' : null,
+            registered_count: registeredCount,
+            team_payment_amount: teamTotalAmount
           };
         })
       );
       
       setTeams(teamsWithStatus);
       
+      // Sync registrations for all members of teams where current user is leader
+      // This ensures all team members have registration records in their My Registrations
+      for (const team of teamsWithStatus) {
+        if (team.role === 'leader' || team.leader_id === user.id) {
+          console.log('🔄 Triggering sync for team:', team.name, 'is_registered:', team.is_registered);
+          await notificationService.syncTeamMemberRegistrations(team);
+        }
+      }
+      
       // Fetch pending invitations for each team
       const invitations = {};
       for (const team of teamsWithStatus) {
-        if (team.role === "lead" || team.leader_id === user.id) {
+        if (team.role === "lead" || team.role === "leader" || team.leader_id === user.id) {
           const result = await getTeamInvitations(team.id);
           if (result.success) {
             invitations[team.id] = result.data;
@@ -190,12 +328,14 @@ const MyTeams = () => {
     
     if (result.success) {
       const team = teams.find(t => t.id === teamId);
-      const memberIds = team.members.map(m => m.id);
+      const memberUserIds = team.members.map(m => m.user_id || m.id);
       
-      // Filter out users already in team or with pending invitations
-      const pendingIds = (pendingInvitations[teamId] || []).map(inv => inv.invitee.id);
+      // Filter out: current user, users already in team, users with pending invitations
+      const pendingIds = (pendingInvitations[teamId] || []).map(inv => inv.invitee?.id || inv.invitee_id);
       const filtered = result.data.filter(user => 
-        !memberIds.includes(user.id) && !pendingIds.includes(user.id)
+        user.id !== currentUserId && // Exclude yourself
+        !memberUserIds.includes(user.id) && // Exclude existing members
+        !pendingIds.includes(user.id) // Exclude pending invitations
       );
       setSearchResults(filtered);
     }
@@ -205,9 +345,22 @@ const MyTeams = () => {
   const handleSendInvitation = async (teamId, userId) => {
     const team = teams.find(t => t.id === teamId);
     const totalCount = team.members.length + (pendingInvitations[teamId]?.length || 0);
+    const maxAllowed = team.max_members || team.events?.max_team_size || 10;
     
-    if (totalCount >= team.events?.max_team_size) {
-      alert("Team is full (including pending invitations)!");
+    // Prevent inviting yourself (leader)
+    if (userId === currentUserId) {
+      alert("You are already the team leader!");
+      return;
+    }
+    
+    // Prevent inviting existing members
+    if (team.members.some(m => m.user_id === userId)) {
+      alert("This user is already a team member!");
+      return;
+    }
+    
+    if (totalCount >= maxAllowed) {
+      alert(`Team is full! Maximum ${maxAllowed} members allowed (including pending invitations).`);
       return;
     }
 
@@ -436,7 +589,15 @@ const MyTeams = () => {
                     }`}>{team.members?.length || 0} / {team.max_members || team.events?.max_team_size || 4}</p>
                     <p className="text-[9px] text-gray-400 mt-0.5">Min: {team.events?.min_team_size || 2}</p>
                   </div>
-                  {(team.role === "lead" || team.leader_id === currentUserId) && (
+                  {/* Show Team Amount if registered */}
+                  {team.is_registered && (
+                    <div className="text-center">
+                      <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-0.5">Team Amount</p>
+                      <p className="text-lg font-bold text-green-400">₹{team.team_payment_amount || (team.max_members * (team.events?.price || 100))}</p>
+                      <p className="text-[9px] text-gray-400 mt-0.5">{team.max_members} slots paid</p>
+                    </div>
+                  )}
+                  {(team.role === "lead" || team.role === "leader" || team.leader_id === currentUserId) && (
                     <>
                       {/* Registration Status Button */}
                       {team.is_registered ? (
@@ -446,6 +607,14 @@ const MyTeams = () => {
                         >
                           <CheckCircle2 size={14} />
                           Registered
+                        </button>
+                      ) : team.registered_count > 0 && team.registered_count < (team.members?.length || 0) ? (
+                        <button
+                          onClick={() => handleTeamRegistration(team)}
+                          className="px-4 py-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 hover:from-yellow-500/30 hover:to-orange-500/30 border border-yellow-500/30 text-yellow-400 hover:text-yellow-300 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
+                        >
+                          <Check size={14} />
+                          Pay for {(team.members?.length || 0) - team.registered_count} New {(team.members?.length || 0) - team.registered_count === 1 ? 'Member' : 'Members'}
                         </button>
                       ) : (team.members?.length || 0) >= (team.events?.min_team_size || 2) ? (
                         <button

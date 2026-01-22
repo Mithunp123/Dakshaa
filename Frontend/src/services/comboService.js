@@ -140,15 +140,11 @@ const comboService = {
       // This restores the session from localStorage if needed
       let sessionReady = false;
       try {
-        const { data: { session } } = await Promise.race([
-          supabase.auth.getSession(),
-          // 5 second timeout - getSession can be slow on cold start
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Session timeout')), 5000))
-        ]);
+        const { data: { session } } = await supabase.auth.getSession();
         sessionReady = !!session;
         console.log('🔵 [comboService] Session ready:', sessionReady);
       } catch (e) {
-        console.warn('🔵 [comboService] Session check failed/timeout:', e.message);
+        console.warn('🔵 [comboService] Session check failed:', e.message);
         // If session check fails but we have cache, return cache
         if (cachedCombos) {
           console.log('🔵 [comboService] Returning cached combos due to session issue');
@@ -632,6 +628,33 @@ const comboService = {
       console.error("Error completing combo payment:", error);
       return {
         success: false,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Get user's PAID combo purchases (IDs only)
+   */
+  getUserPaidCombos: async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from("combo_purchases")
+        .select("combo_id")
+        .eq("user_id", userId)
+        .eq("payment_status", "PAID");
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data: (data || []).map(p => p.combo_id),
+      };
+    } catch (error) {
+      console.error("Error fetching paid combos:", error);
+      return {
+        success: false,
+        data: [],
         error: error.message,
       };
     }

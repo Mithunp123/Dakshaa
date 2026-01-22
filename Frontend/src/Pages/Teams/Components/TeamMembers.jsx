@@ -2,53 +2,50 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Images
-import sharan from "../../../assets/team_members/sharan.jpg";
-import jefin from "../../../assets/team_members/jefin.jpg";
-import praveen from "../../../assets/team_members/praveen.jpg";
-import aabid from "../../../assets/team_members/aabid.jpg";
-import arul from "../../../assets/team_members/arul.jpg";
-import anisa from "../../../assets/team_members/anisa.png";
-import aakash from "../../../assets/team_members/aakash.jpg";
-import gobiha from "../../../assets/team_members/gobiha.jpg";
-import vignesh from "../../../assets/team_members/vignesh.jpg";
-import bala from "../../../assets/team_members/bala.jpg";
-import Dhanush from "../../../assets/team_members/Dhanush Shankar.jpg";
-import ruban from "../../../assets/team_members/ruban.jpg";
-import rithika from "../../../assets/team_members/rithika.jpg";
+import aevaLogo from "../assest/aeva.jpg";
 import kavinesh from "../../../assets/team_members/kavinesh.jpg";
-import gopinath from "../../../assets/team_members/gopinath.jpg";
-import ajay from "../../../assets/team_members/ajay.jpg";
+import kaviyarasu from "../../../assets/team_members/kaviyarasu.jpg";
+import narendhar from "../../../assets/team_members/Narendhar.png";
+import artificix from "../assest/aeva.jpg";
+import harish from "../../../assets/team_members/harish.png";
+import hariprakash from "../../../assets/team_members/Hariprakash.png";
+import deekshana from "../../../assets/team_members/deekshana.jpg";
+import deepak from "../../../assets/team_members/deepak.png";
+
 
 const chiefCoordinator = [
-  { id: 14, name: "Kavinesh", department: "Department of AIML", img: kavinesh, role: "Chief Coordinator", phone: "+91 63820 60464" },
+  { id: 14, name: "Kavinesh", department: "", img: kavinesh, role: "Chief Coordinator", phone: "+91 63820 60464", associationLogo: aevaLogo },
 ];
 
 const jointCoordinators = [
-  { id: 12, name: "Ruban", department: "Department of AIML", img: ruban, role: "Joint Coordinator", phone: "+91 93604 37867" },
-  { id: 13, name: "Rithika", department: "Department of AIML", img: rithika, role: "Joint Coordinator", phone: "+91 88258 36993" },
-  { id: 15, name: "Gopinath", department: "Department of AIML", img: gopinath, role: "Joint Coordinator", phone: "+91 93611 63363" },
+  { id: 13, name: "Narendhar D ", department: "Artificix", img: narendhar, role: "Volunteers, Helpdesk & Participant Support ", phone: "+91 97516 73398", associationLogo: artificix },
+    { id: 12, name: "Kaviyarasu P", department: "Artificix", img: kaviyarasu, role: "Website, Content & Data Management ", phone: "+91 701067 64469", associationLogo: artificix },
+
+  //{ id: 15, name: "Gopinath", department: "Department of AIML", img: gopinath, role: "Gopinath T ", phone: "+91 93611 63363", associationLogo: aevaLogo },
+  //{ id : 17, name: "Saran Senthur Suthanthran", department: "IT", img: itco, role: "Registrations, Payments & Attendance ", phone: "+91 80566 70219", associationLogo: itasso},
+  //{id : 18, name:"Yashas Yadav", department:"CSE", img:cseco, role:"Technical, Non-Technical & Team Events", phone:"+91 70108 43024", associationLogo:cseasso},
+  {id :19, name:"Deepak C ", department:"CSE", img:deepak, role:"Technical, Non-Technical & Team Events", phone:"+91 63794 07526", associationLogo:aevaLogo},
+  {id :20, name:"Hari Prakash G ", department:"VLSI", img:hariprakash, role:"Workshops, Expos, Stalls & Resource Persons ", phone:"+91 89257 92409", associationLogo:aevaLogo},
+  {id :21, name:"Harish A ", department:"Artificix", img:harish, role:"Hackathon, Codeathon & Flagship Challenges", phone:"+91 63642 32959 ", associationLogo:aevaLogo},
+  {id :22, name:"Deekshana C S ", department:"AIML", img:deekshana, role:"National Conference ", phone:"+91 90878 42931", associationLogo:aevaLogo},
+  //{id :23, name:"Aarush VS ", department:"CSE", img:cseco, role:"Design, Social Media & Promotions", phone:"+91 88918 50995", associationLogo:cseasso},
+  //{id :24, name:"Tharun Kumar R ", department:"AIML", img:aimlco, role:"Accommodation & Lunch ", phone:"+91 77084 13624", associationLogo:aimlasso},
 ];
 
+
+
 const eventCoordinators = [
-  { id: 11, name: "Vignesh", department: "Department of IT", img: vignesh, role: "Event Coordinator", phone: "+91 63836 34583" },
-  { id: 16, name: "Ajay", department: "Department of CSE", img: ajay, role: "Event Coordinator", phone: "+91 93446 36553" },
+  //{ id: 11, name: "Vignesh", department: "Department of IT", img: vignesh, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+  //{ id: 16, name: "Ajay", department: "Department of CSE", img: ajay, role: "Event Coordinator", phone: "+91 93446 36553", associationLogo: aevaLogo },
 ];
 
 const developers = [
-  { id: 1, name: "Sharan", department: "Department of IT", img: sharan, role: "Lead Developer" },
-  { id: 2, name: "Jefin Rojar", department: "Department of IT", img: jefin, role: "Full Stack Dev" },
-  { id: 3, name: "Praveen", department: "Department of IT", img: praveen, role: "Frontend Dev" },
-  { id: 4, name: "Shaik Aabid Farhan", department: "Department of IT", img: aabid, role: "Backend Dev" },
-  { id: 5, name: "Gobiha", department: "Department of IT", img: gobiha, role: "UI/UX Designer" },
-  { id: 6, name: "Arul", department: "Department of IT", img: arul, role: "Frontend Dev" },
-];
+  //{ id: 1, name: "Giridharan M", department: "AIML", img: giri, role: "Lead Developer", associationLogo: aevaLogo },
+]
 
 const designers = [
-  { id: 7, name: "Balasaastha", department: "Department of IT", img: bala, role: "Web Designer" },
-  { id: 8, name: "Anisa Fairoz", department: "Department of IT", img: anisa, role: "Web Designer" },
-  { id: 9, name: "Aakash Kannan", department: "Department of IT", img: aakash, role: "Web Designer" },
-  { id: 10, name: "Dhanush Shankar", department: "Department of IT", img: Dhanush, role: "Web Designer" },
-];
+  //{ id: 7, name: "Balasaastha", department: "Department of IT", img: bala, role: "Web Designer", associationLogo: aevaLogo },
+  ];
 
 const TechCard = ({ member, variant = "default", allowContact = false }) => {
   const [showContact, setShowContact] = useState(false);
@@ -92,8 +89,18 @@ const TechCard = ({ member, variant = "default", allowContact = false }) => {
           </div>
         </div>
 
+        {/* Association Logo - Top Left */}
+        {member.associationLogo && (
+          <div className="absolute top-3 left-3 flex items-center gap-2 z-30">
+            <div className="w-12 h-12 rounded-full border-2 border-secondary bg-[#020617] p-1 shadow-lg shadow-secondary/20">
+              <img src={member.associationLogo} alt={member.association} className="w-full h-full object-cover rounded-full" />
+            </div>
+          </div>
+        )}
+
         {/* Info Section */}
         <div className="relative h-[35%] p-4 flex flex-col justify-between bg-gradient-to-b from-transparent to-black/40">
+          
           <div>
             <div className="flex items-center gap-2 mb-1">
               <div className="h-px w-4 bg-secondary" />

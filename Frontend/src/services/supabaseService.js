@@ -151,50 +151,106 @@ export const supabaseService = {
 
   // Get user registrations
   async getUserRegistrations(userId) {
-    const { data, error } = await supabase
+    // First fetch registrations
+    const { data: registrations, error } = await supabase
       .from("event_registrations_config")
-      .select("*, events:event_id(id, name, category, price, event_date, start_time, venue, description)")
+      .select("*")
       .eq("user_id", userId);
+      
     if (error) throw error;
-    return data;
+    if (!registrations || registrations.length === 0) return [];
+    
+    // Get unique event IDs (could be UUID or text)
+    const eventIds = [...new Set(registrations.map(r => r.event_id).filter(Boolean))];
+    
+    if (eventIds.length === 0) return registrations;
+    
+    // Fetch events matching either id (UUID) or event_id (text)
+    const { data: events } = await supabase
+      .from("events")
+      .select("id, event_id, name, title, category, price, event_date, start_time, venue, description")
+      .or(`id.in.(${eventIds.map(id => `"${id}"`).join(',')}),event_id.in.(${eventIds.map(id => `"${id}"`).join(',')})`);
+    
+    // Create lookup maps
+    const eventsById = {};
+    const eventsByTextId = {};
+    (events || []).forEach(e => {
+      eventsById[e.id] = e;
+      if (e.event_id) eventsByTextId[e.event_id] = e;
+    });
+    
+    // Attach event data to registrations
+    return registrations.map(reg => ({
+      ...reg,
+      events: eventsById[reg.event_id] || eventsByTextId[reg.event_id] || null
+    }));
   },
 
   // Team methods
   async getUserTeams(userId) {
     try {
-      // First, get team IDs where user is a member
-      const { data: teamMemberships, error: memberError } = await supabase
-        .from("team_members")
-        .select("team_id, role, status")
-        .eq("user_id", userId)
-        .in("status", ["active", "joined"]);
-
-      if (memberError) {
-        console.warn("Error fetching team memberships:", memberError.message);
-        return [];
-      }
-
-      if (!teamMemberships || teamMemberships.length === 0) {
-        return [];
-      }
-
-      // Get team IDs
-      const teamIds = teamMemberships.map(tm => tm.team_id);
-
-      // Fetch team details separately - use wildcard to get all columns
-      const { data: teams, error: teamsError } = await supabase
+      // APPROACH 1: Get teams where user is leader/creator (avoids RLS recursion on team_members)
+      // Show ALL teams where user is leader (even inactive ones) so they can manage/add members
+      const { data: ownedTeams, error: ownedError } = await supabase
         .from("teams")
         .select("*")
-        .in("id", teamIds);
+        .or(`leader_id.eq.${userId},created_by.eq.${userId}`);
 
-      if (teamsError) {
-        console.warn("Error fetching teams:", teamsError.message);
+      if (ownedError) {
+        console.warn("Error fetching owned teams:", ownedError.message);
+      }
+
+      // APPROACH 2: Try to get team memberships (may fail due to RLS, but try anyway)
+      let memberTeamIds = [];
+      try {
+        const { data: teamMemberships, error: memberError } = await supabase
+          .from("team_members")
+          .select("team_id, role, status")
+          .eq("user_id", userId)
+          .in("status", ["active", "joined"]);
+
+        if (!memberError && teamMemberships) {
+          memberTeamIds = teamMemberships.map(tm => tm.team_id);
+        } else if (memberError) {
+          console.warn("Error fetching team memberships (RLS may be blocking):", memberError.message);
+        }
+      } catch (e) {
+        console.warn("team_members query failed:", e.message);
+      }
+
+      // Combine owned teams with member teams
+      const ownedTeamIds = (ownedTeams || []).map(t => t.id);
+      const allTeamIds = [...new Set([...ownedTeamIds, ...memberTeamIds])];
+
+      if (allTeamIds.length === 0) {
+        console.log("No teams found for user:", userId);
         return [];
       }
+
+      // Fetch all teams by ID (may include teams not in ownedTeams if membership worked)
+      let teams = ownedTeams || [];
+      if (memberTeamIds.length > 0) {
+        const missingTeamIds = memberTeamIds.filter(id => !ownedTeamIds.includes(id));
+        if (missingTeamIds.length > 0) {
+          // For non-owned teams (member only), still show active ones
+          const { data: memberTeams } = await supabase
+            .from("teams")
+            .select("*")
+            .in("id", missingTeamIds)
+            .eq("is_active", true);
+          if (memberTeams) {
+            teams = [...teams, ...memberTeams];
+          }
+        }
+      }
+      
+      console.log("Teams before filter:", teams.map(t => ({ id: t.id, name: t.team_name, is_active: t.is_active })));
 
       if (!teams || teams.length === 0) {
         return [];
       }
+
+      console.log("Found teams:", teams.length);
 
       // Get event IDs for fetching event details
       const eventIds = [...new Set(teams.map(t => t.event_id).filter(Boolean))];
@@ -202,33 +258,70 @@ export const supabaseService = {
       // Fetch events if there are any event IDs
       let events = [];
       if (eventIds.length > 0) {
-        const { data: eventsData } = await supabase
+        // Handle both UUID and text event_ids
+        const quotedIds = eventIds.map(id => `"${id}"`).join(',');
+        const { data: eventsData, error: eventsErr } = await supabase
           .from("events")
-          .select("id, event_id, name, category, min_team_size, max_team_size")
-          .in("event_id", eventIds);
-        events = eventsData || [];
+          .select("id, event_id, name, title, category, min_team_size, max_team_size")
+          .or(`event_id.in.(${quotedIds}),id.in.(${quotedIds})`);
+          
+        if (eventsErr) {
+           console.warn("Failed to fetch events:", eventsErr.message);
+           // Fallback: try UUID match
+           const { data: eData } = await supabase.from("events").select("*").in("id", eventIds);
+           if (eData) events = eData;
+        } else {
+           events = eventsData || [];
+        }
       }
 
-      // Fetch all team members for these teams
-      const { data: allMembers } = await supabase
-        .from("team_members")
-        .select(`
-          team_id,
-          user_id,
-          role,
-          status,
-          created_at,
-          profiles (id, full_name, email, roll_no, department, college_name)
-        `)
-        .in("team_id", teamIds)
-        .in("status", ["active", "joined"])
-        .order("role", { ascending: false });
+      // Fetch all team members for these teams (may fail due to RLS)
+      let allMembers = [];
+      try {
+        const { data: membersData, error: membersErr } = await supabase
+          .from("team_members")
+          .select(`
+            team_id,
+            user_id,
+            role,
+            status,
+            created_at,
+            profiles (id, full_name, email, roll_no, department, college_name)
+          `)
+          .in("team_id", allTeamIds)
+          .in("status", ["active", "joined"])
+          .order("role", { ascending: false });
+
+        if (!membersErr && membersData) {
+          allMembers = membersData;
+        }
+      } catch (e) {
+        console.warn("team_members detailed query failed:", e.message);
+      }
+      
+      // Fetch leader profiles for teams where leader might not be in team_members yet
+      const leaderIds = [...new Set(teams.map(t => t.leader_id || t.created_by).filter(Boolean))];
+      let leaderProfiles = {};
+      if (leaderIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, full_name, email, college_name, department, roll_no")
+          .in("id", leaderIds);
+        
+        if (profiles) {
+          profiles.forEach(p => {
+            leaderProfiles[p.id] = p;
+          });
+        }
+      }
 
       // Build the complete team objects
       const teamsWithDetails = teams.map(team => {
-        const membership = teamMemberships.find(tm => tm.team_id === team.id);
-        const event = events.find(e => e.event_id === team.event_id);
+        const isLeader = team.leader_id === userId || team.created_by === userId;
+        const event = events.find(e => e.event_id === team.event_id || e.id === team.event_id);
         const teamMembers = allMembers?.filter(m => m.team_id === team.id) || [];
+        const leaderId = team.leader_id || team.created_by;
+        const leaderProfile = leaderProfiles[leaderId];
         
         // Flatten member data structure for easier access in UI
         const flattenedMembers = teamMembers.map(member => ({
@@ -245,26 +338,73 @@ export const supabaseService = {
           college: member.profiles?.college_name || ''
         }));
 
+        // Determine user's role
+        const userMember = teamMembers.find(m => m.user_id === userId);
+        const userRole = isLeader ? 'leader' : (userMember?.role || 'member');
+        
+        // Check if leader is in members list
+        const leaderInMembers = flattenedMembers.some(m => m.user_id === leaderId && m.role === 'leader');
+        
+        // Build final members list - ensure leader is always included with proper info
+        let finalMembers = flattenedMembers;
+        if (!leaderInMembers && leaderId) {
+          // Add leader at the beginning with their profile info
+          const leaderMember = {
+            user_id: leaderId,
+            role: 'leader',
+            status: 'joined',
+            name: leaderProfile?.full_name || 'Team Leader',
+            email: leaderProfile?.email || '',
+            roll_no: leaderProfile?.roll_no || '',
+            department: leaderProfile?.department || '',
+            college: leaderProfile?.college_name || ''
+          };
+          finalMembers = [leaderMember, ...flattenedMembers];
+        } else if (leaderInMembers) {
+          // Update leader info if we have better profile data
+          finalMembers = flattenedMembers.map(m => {
+            if (m.user_id === leaderId && leaderProfile) {
+              return {
+                ...m,
+                name: leaderProfile.full_name || m.name,
+                email: leaderProfile.email || m.email,
+                college: leaderProfile.college_name || m.college
+              };
+            }
+            return m;
+          });
+        }
+
         return {
           id: team.id,
           name: team.team_name || team.name || 'Unnamed Team',
           event_id: team.event_id,
-          leader_id: team.leader_id || team.created_by,
-          max_members: event?.max_team_size || 10,
+          leader_id: leaderId,
+          max_members: team.max_members || event?.max_team_size || 10,  // Use team's max_members first
           is_active: team.is_active !== undefined ? team.is_active : true,
           created_at: team.created_at,
           events: event ? {
             id: event.id,
-            title: event.name,
+            event_id: event.event_id,
+            title: event.name || event.title,
             category: event.category,
             max_team_size: event.max_team_size,
             min_team_size: event.min_team_size
           } : null,
-          role: membership?.role || 'member',
-          members: flattenedMembers,
+          role: userRole,
+          members: finalMembers,
           is_registered: false
         };
       });
+      
+      // Debug: Log team details
+      console.log('Teams with details:', teamsWithDetails.map(t => ({
+        name: t.name,
+        max_members: t.max_members,
+        members_count: t.members?.length,
+        leader_id: t.leader_id,
+        has_leader_in_members: t.members?.some(m => m.role === 'leader')
+      })));
 
       return teamsWithDetails;
     } catch (error) {

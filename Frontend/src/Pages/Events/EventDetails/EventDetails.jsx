@@ -4,54 +4,85 @@ import { ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
-// Rewind & Crack - cse
-// VoltEdge - eee
-// SEMISPARK(PROJECT PRESENTATION) - vlsi
-// Biotech Shark Tank – Pitch Your Idea - Bio tech - no
-// ROBO SOCCER - MCT
-// Figma Fusion: The UI/UX Design Showdown - CSBS
-// ElectroBuzz - ECE
-// Urban Nourish: Street Food Remix - FT
-// Paper Presentation - mech
-// Designathon - mech
-// WebGenesis (Interactive Web Page Development) - IT
-// codeathon - Aiml
-// Rapid Coding- AIDS
-// Cook with Prompt -AIDS
-// Buildathon - civil
-import Tech2 from "../../../assets/EventsImages/EventDetails/TechnicalImages/IT.png";
-import Tech1 from "../../../assets/EventsImages/EventDetails/TechnicalImages/cse.png";
-import Tech3 from "../../../assets/EventsImages/EventDetails/TechnicalImages/VLSI.png";
-// import Tech4 from "../../../assets/EventsImages/EventDetails/TechnicalImages/ece2.png"
-import Tech5 from "../../../assets/EventsImages/EventDetails/TechnicalImages/MCT.png";
-import Tech6 from "../../../assets/EventsImages/EventDetails/TechnicalImages/CSBS.png";
-import Tech7 from "../../../assets/EventsImages/EventDetails/TechnicalImages/ECE.png";
-import Tech8 from "../../../assets/EventsImages/EventDetails/TechnicalImages/FOOD.png";
-import Tech9 from "../../../assets/EventsImages/EventDetails/TechnicalImages/MECH.png";
-import Tech11 from "../../../assets/EventsImages/EventDetails/TechnicalImages/AIML.png";
-import Tech14 from "../../../assets/EventsImages/EventDetails/TechnicalImages/CIVIL.png";
-import Tech16 from "../../../assets/EventsImages/EventDetails/TechnicalImages/TEXTILE.png";
-import Tech15 from "../../../assets/EventsImages/EventDetails/TechnicalImages/PROJECTEXPO.png";
-import Tech18 from "../../../assets/EventsImages/EventDetails/TechnicalImages/bt.jpg";
-import Tech19 from "../../../assets/EventsImages/EventDetails/TechnicalImages/POSTER.png";
-import Tech20 from "../../../assets/EventsImages/EventDetails/TechnicalImages/EEE.png";
+//'tech-aids': 'AI Mystery Box Challenge – AI & DS',
+  //'tech-aids1': 'STARTUP PITCH – AI & DS',
+  //'tech-aiml': 'Lovable Vibes – AIML',
+
+  //'tech-bt': ' Reel-O-Science– BT',
+  //'tech-bt-1': 'BioNexathon – BT',
+  //'tech-bt-2': 'Bioblitz-Map – BT',
+
+  //'tech-civil': '3D Arena – CIVIL ',
+  //'tech-civil-1': 'Paper Presentation – CIVIL',
+
+  //'tech-cse': 'NeuroHack 2.0 (36-hour) – CSE',
+  //'tech-cse-1': 'BotXhibit – CSE',
+
+  //'tech-ece': 'zero Component – ECE',
+  //'tech-eee': 'trailblazer – ECE',
+
+  //'tech-eee-1': 'Paper Presentation – ECE',
+  //'tech-ft': 'poster Presentation – FT',
+
+  //'tech-it': 'code relay – IT',
+  //'tech-mct': 'Paper Presentation – MCT',
+
+  //'tech-mech': 'Paper Presentation – MECH',
+  //'tech-mech-1': 'Designathon – MECH',
+
+  //'tech-txt': 'DrapeX: Fabric Draping in Action – TXT',
+  //'tech-txt-1': 'Paper Presentation – TXT',
+
+  //'tech-vlsi': 'corex - vlsi',
+  //'tech-57': 'Paper Presentation – MECH',
+  
+
+import Tech1 from "../../../assets/EventsImages/EventDetails/TechnicalImages/aids_tech.png";
+import Tech2 from "../../../assets/EventsImages/EventDetails/TechnicalImages/aids_tech1.png";
+import Tech3 from "../../../assets/EventsImages/EventDetails/TechnicalImages/aiml_tech.png";
+import Tech4 from "../../../assets/EventsImages/EventDetails/TechnicalImages/bt_tech.png";
+import Tech5 from "../../../assets/EventsImages/EventDetails/TechnicalImages/bt_tech1.png";
+import Tech6 from "../../../assets/EventsImages/EventDetails/TechnicalImages/bt_tech2.png";
+import Tech7 from "../../../assets/EventsImages/EventDetails/TechnicalImages/civil_tech.png";
+import Tech8 from "../../../assets/EventsImages/EventDetails/TechnicalImages/civil_tech1.png";
+import Tech9 from "../../../assets/EventsImages/EventDetails/TechnicalImages/cse_tech.png";
+import Tech10 from "../../../assets/EventsImages/EventDetails/TechnicalImages/cse_tech1.png";
+import Tech11 from "../../../assets/EventsImages/EventDetails/TechnicalImages/ece_tech.png";
+import Tech12 from "../../../assets/EventsImages/EventDetails/TechnicalImages/eee_tech.png";
+import Tech13 from "../../../assets/EventsImages/EventDetails/TechnicalImages/eee_tech1.png";
+import Tech14 from "../../../assets/EventsImages/EventDetails/TechnicalImages/ft_tech.png";
+import Tech15 from "../../../assets/EventsImages/EventDetails/TechnicalImages/it_tech.png";
+import Tech16 from "../../../assets/EventsImages/EventDetails/TechnicalImages/mct_tech.png";
+import Tech17 from "../../../assets/EventsImages/EventDetails/TechnicalImages/mech_tech.png";
+import Tech18 from "../../../assets/EventsImages/EventDetails/TechnicalImages/mech_tech1.png";
+import Tech19 from "../../../assets/EventsImages/EventDetails/TechnicalImages/txt_tech.png";
+import Tech20 from "../../../assets/EventsImages/EventDetails/TechnicalImages/txt_tech1.png";
+import Tech21 from "../../../assets/EventsImages/EventDetails/TechnicalImages/vlsi_tech.png";
+import Tech22 from "../../../assets/EventsImages/EventDetails/TechnicalImages/57.png";
 
 
+import NonTech1 from "../../../assets/EventsImages/EventDetails/Nontech/aids_nontech.png";
+import NonTech2 from "../../../assets/EventsImages/EventDetails/Nontech/aids_nontech1.png";
+import NonTech3 from "../../../assets/EventsImages/EventDetails/Nontech/bt_nontech.png";
+import NonTech4 from "../../../assets/EventsImages/EventDetails/Nontech/civil_nontech.png";
+import NonTech5 from "../../../assets/EventsImages/EventDetails/Nontech/csbs_nontech.png";
+import NonTech6 from "../../../assets/EventsImages/EventDetails/Nontech/cse_nontech.png";
+import NonTech7 from "../../../assets/EventsImages/EventDetails/Nontech/cse_nontech1.png";
+import NonTech8 from "../../../assets/EventsImages/EventDetails/Nontech/ece_nontech.png";
+import NonTech9 from "../../../assets/EventsImages/EventDetails/Nontech/ece_nontech1.png";
+import NonTech10 from "../../../assets/EventsImages/EventDetails/Nontech/eee_nontech.png";
+import NonTech11 from "../../../assets/EventsImages/EventDetails/Nontech/eee_nontech1.png";
+import NonTech12 from "../../../assets/EventsImages/EventDetails/Nontech/eee_nontech2.png";
+import NonTech13 from "../../../assets/EventsImages/EventDetails/Nontech/ft_nontech.png";
+import NonTech14 from "../../../assets/EventsImages/EventDetails/Nontech/it_nontech.png";
+import NonTech15 from "../../../assets/EventsImages/EventDetails/Nontech/mca_nontech.png";
+import NonTech16 from "../../../assets/EventsImages/EventDetails/Nontech/mct_nontech.png";
+import NonTech17 from "../../../assets/EventsImages/EventDetails/Nontech/mct_nontech1.png";
+import NonTech18 from "../../../assets/EventsImages/EventDetails/Nontech/mech_nontech.png";
+import NonTech19 from "../../../assets/EventsImages/EventDetails/Nontech/txt_nontech.png";
+import NonTech20 from "../../../assets/EventsImages/EventDetails/Nontech/vlsi_nontech.png";
 
 
-import NonTech1 from "../../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF CSE.jpg";
-import NonTech2 from "../../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF EEE.jpg";
-import NonTech3 from "../../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF VLSI.jpg";
-import NonTech4 from "../../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF BIO TECH.jpg";
-import NonTech5 from "../../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF MECHATRONICS.jpg";
-import NonTech6 from "../../../assets/EventsImages/EventDetails/Nontech/CSBS.jpg";
-import NonTech7 from "../../../assets/EventsImages/EventDetails/Nontech/ft.jpg";
-import NonTech8 from "../../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF MECH.jpg";
-// import NonTech9 from "../../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF AIDS.jpg"
-import NonTech10 from "../../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF ECE.jpg";
-import NonTech11 from "../../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF CIVIL.jpg";
-import NonTech12 from "../../../assets/EventsImages/EventDetails/Nontech/Department of InformationTechnology.jpg";
-import NonTech13 from "../../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF TEXTILE.jpg";
 
 import Workshop1 from "../../../assets/EventsImages/EventDetails/Workshop/vlsi.jpg";
 import Workshop2 from "../../../assets/EventsImages/EventDetails/Workshop/it.jpg";
@@ -148,59 +179,64 @@ const EventDetails = () => {
   }, [rawEventId]);
 
   // Map new database event IDs to old EventDetails IDs
+
+
   const eventIdMap = {
     // Technical Events - Database ID -> Old ID
-    'tech-cse': 'technical-event-1',
-    'tech-it': 'technical-event-2',
-    'tech-vlsi': 'technical-event-3',
-    'tech-mct': 'technical-event-4',
-    'tech-csbs': 'technical-event-5',
-    'tech-ece': 'technical-event-6',
-    'tech-food': 'technical-event-7',
-    'tech-mech': 'technical-event-8',
-    'tech-aiml': 'technical-event-9',
-    'tech-civil': 'technical-event-10',
-    'tech-project-expo': 'technical-event-11',
-    'tech-textile': 'technical-event-12',
-    'tech-biotech': 'technical-event-13',
-    'tech-poster': 'technical-event-14',
-    'tech-eee': 'technical-event-15',
+    'tech-aids': 'technical-event-1',
+    'tech-aids1': 'technical-event-2',
+    'tech-aiml': 'technical-event-3',
+    'tech-bt': 'technical-event-4',
+    'tech-bt-1': 'technical-event-5',
+    'tech-bt-2': 'technical-event-6',
+    'tech-civil': 'technical-event-7',
+    'tech-civil-1': 'technical-event-8',
+    'tech-cse': 'technical-event-9',
+    'tech-cse-1': 'technical-event-10',
+    'tech-ece': 'technical-event-11',
+    'tech-eee': 'technical-event-12',
+    'tech-eee-1': 'technical-event-13',
+    'tech-ft': 'technical-event-14',
+    'tech-it': 'technical-event-15',
+    'tech-mct': 'technical-event-16',
+    'tech-mech': 'technical-event-17',
+    'tech-mech-1': 'technical-event-18',
+    'tech-txt': 'technical-event-19',
+    'tech-txt-1': 'technical-event-20',
+    'tech-vlsi': 'technical-event-21',
+    'tech-57': 'technical-event-22',
+
     // Non-Technical Events
-    'nontech-cse': 'non-technical-event-1',
-    'nontech-it': 'non-technical-event-2',
-    'nontech-eee': 'non-technical-event-3',
-    'nontech-vlsi': 'non-technical-event-4',
-    'nontech-biotech': 'non-technical-event-5',
-    'nontech-mct': 'non-technical-event-6',
-    'nontech-csbs': 'non-technical-event-7',
-    'nontech-food': 'non-technical-event-8',
-    'nontech-mech': 'non-technical-event-9',
-    'nontech-ece': 'non-technical-event-10',
-    'nontech-civil': 'non-technical-event-11',
-    'nontech-textile': 'non-technical-event-12',
+    
+'nontech-aids' :'non-technical-event-1',
+'nontech-aids1': 'non-technical-event-2',
+'nontech-bt' :'non-technical-event-3', 
+'nontech-civil': 'non-technical-event-4',
+'nontech-csbs': 'non-technical-event-5',
+'nontech-cse': 'non-technical-event-6',
+'nontech-cse1': 'non-technical-event-7',
+'nontech-ece':'non-technical-event-8',
+'nontech-ece1': 'non-technical-event-9',
+'nontech-eee': 'non-technical-event-10', 
+'nontech-eee1': 'non-technical-event-11',
+'nontech-eee2': 'non-technical-event-12',
+'nontech-ft': 'non-technical-event-13',
+'nontech-it': 'non-technical-event-14',
+'nontech-mca': 'non-technical-event-15',
+'nontech-mct': 'non-technical-event-16',
+'nontech-mct1': 'non-technical-event-17',
+'nontech-mech': 'non-technical-event-18',
+'nontect-txt': 'non-technical-event-19',
+'nontech-vlsi': 'non-technical-event-20',
     // Cultural Events
     'cultural-musical': 'culturals-event-1',
-    'cultural-instrument': 'culturals-event-2',
-    'cultural-group-dance': 'culturals-event-3',
-    'cultural-solo-dance': 'culturals-event-4',
-    'cultural-short-film': 'culturals-event-5',
+    // Hackathon Events - Maps to Neura Hack
+    'hackathon': 'technical-event-2',
     // Workshop Events
-    'workshop-aids': 'workshop-event-1',
-    'workshop-aiml': 'workshop-event-2',
-    'workshop-biotech': 'workshop-event-3',
-    'workshop-civil': 'workshop-event-4',
-    'workshop-csbs': 'workshop-event-5',
-    'workshop-cse': 'workshop-event-6',
-    'workshop-ece': 'workshop-event-7',
-    'workshop-eee': 'workshop-event-8',
-    'workshop-ft': 'workshop-event-9',
     'workshop-it': 'workshop-event-10',
-    'workshop-mct': 'workshop-event-11',
-    'workshop-mech': 'workshop-event-12',
-    'workshop-textile': 'workshop-event-13',
-    'workshop-vlsi': 'workshop-event-14',
+    // Conference Events - Maps to conference page (handled separately)
+    'conference': 'conference-event-1',
   };
-
   // Reverse map for getting database ID from old ID
   const reverseEventIdMap = Object.fromEntries(
     Object.entries(eventIdMap).map(([key, value]) => [value, key])
@@ -236,7 +272,7 @@ const EventDetails = () => {
   const eventDetails = {
     // Technical Events
     "technical-event-1": {
-      title: "Rewind & Crack",
+      title: "Rewind & Cra",
       description:
         "Rewind & Crack is a reverse coding competition that challenges participants to analyze and reconstruct algorithms. This event tests problem-solving skills, logical thinking, and coding efficiency through three progressive rounds.",
       image: Tech1,
@@ -296,8 +332,7 @@ const EventDetails = () => {
           },
         ],
       },
-
-      registrationLink: "https://forms.gle/2wBfChfRVPiKVw599", // Registration link
+      registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9",
     },
     "technical-event-2": {
       title: "Neura Hack (Hackathon)",
@@ -444,10 +479,71 @@ const EventDetails = () => {
 
       registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
     },
-    "technical-event-5": {
-      title: "ROBO SOCCER",
+
+    "technical-event-4": {
+      title: "Reel-O-Science",
       description:
-        "Participants must design a manually controlled robot without using pre-made kits or commercial robots. Each bot must be exclusive to one team and fit within 30 cm x 30 cm x 30 cm (including wheels) with a maximum weight of 7 kg. Control can be wired or wireless, but only one person may operate the bot. Teams must bring their own power supply for wired bots, and all bots must be electrically powered (no IC engines) with a voltage limit of 24V DC. For safety, a manual emergency disconnect switch is mandatory",
+        "Short technical video presentation event Students showcase innovative engineering ideas Focus on clarity, creativity, and technical understanding  Judged through content quality and explanation skills   ",
+      image: Tech4,
+      rounds: [
+        {
+          title: " ",
+          description: "",
+        },
+      ],
+      rules: [
+        "Video must be short and within the specified time limit.",
+        "Content should be original and based on an engineering or technical concept.",
+        "Explanation must be clear, relevant, and technically accurate.",
+        "Plagiarism or inappropriate content will lead to disqualification.",
+        "Judges’ decision will be final and binding.",  
+      ],
+      schedule: [
+        {
+          round: "Round",
+          date: "February 13, 2026",
+          time: "9.00 AM to 2.00 PM ",
+          location: "Bioprocess Laboratory ",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Dr. S. Sidhra",
+            email: "",
+            phone: "",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "Ms. P. Keerthana",
+            email: " ",
+            phone: "9894484834",
+          },
+          {
+            name: "Mr. K. Sharen",
+            email: "",
+            phone: "9943191499",
+          },
+          {
+            name: "Ms. V. Dhanasree",
+            email: "",
+            phone: " 6374153457",
+          },
+        ],
+      },
+
+      registrationLink: "https://forms.gle/gziLh4EoGaCQLSpg8", // Registration link
+    },
+
+
+
+
+
+    "technical-event-5": {
+      title: "aa",
+      description:
+        "Bioblitz-Map is an exciting treasure hunt event that challenges participants to use logic, observation, and problem-solving skills. Teams navigate through mapped clues and tasks, decoding hints to reach the final destination.The event promotes teamwork, strategic thinking, and quick decision-making in a fun and competitive environment.",
       image: Tech5,
       rounds: [
         {
@@ -456,21 +552,14 @@ const EventDetails = () => {
         },
       ],
       rules: [
-        "Team (maximum 4 members per team)",
-        "Arena size – 10 x 8 feet",
-        "Each match is given a time of 2-4 minutes based on number of teams registered.",
-        "Each match has two halves",
-        "Change of battery will not be allowed during the match",
-        "The team with higher goals is considered winner of that match",
-        "Intentional ramming of opponent bot is considered penalty.",
-        "If each team scored equal points at the end of the match a 1 minute will be add on to the game.",
+        "Participants must follow the given map and clues strictly.",
       ],
       schedule: [
         {
           round: "Round",
-          date: "March 28, 2026",
-          time: "11:00 AM to 1:30 PM",
-          location: "MC 207,Mechatronics Block",
+          date: "February 13, 2026",
+          time: "3hours ",
+          location: "Location need",
         },
       ],
       contact: {
@@ -498,188 +587,181 @@ const EventDetails = () => {
       registrationLink: "https://forms.gle/gziLh4EoGaCQLSpg8", // Registration link
     },
     "technical-event-6": {
-      title: "Figma Fusion: The UI/UX Design Showdown",
+      title: "Bioblitz- Map (Bio Treasure Hunt)",
       description:
-        "Participants will design a user interface (UI) and user experience (UX) for a provided project use case using Figma. 	Figma Account: Ensure you have an active Figma account before the event begins. If you don’t have one, sign up for free at figma.com.",
+        "Bioblitz-Map is an exciting treasure hunt event that challenges participants to use logic, observation, and problem-solving skills. Teams navigate through mapped clues and tasks, decoding hints to reach the final destination.The event promotes teamwork, strategic thinking, and quick decision-making in a fun and competitive environment.",
       image: Tech6,
       rounds: [
         {
-          title: "Round 1: Research & Ideation",
+          title: "",
           description:
-            "Participants must thoroughly research the given use case, define user personas, and outline the design requirements.",
+            "",
         },
         {
-          title: "Round 2: UI/UX Design Creation",
+          title: "",
           description:
-            "High-fidelity UI designs must be created, incorporating user-friendly navigation, accessibility, and consistency. •	Prototypes are required for Round 2; ensure you link your screens to showcase how users interact with your design.",
+            "",
         },
       ],
       rules: [
-        "Participants must submit a Figma file with their design at the end of each round.",
-        "Ensure that all files are well-organized and clearly named.",
-        "Kindly bring your own laptop and use your personal internet connection for the session",
-        "All designs must be original. Any form of plagiarism or copying of existing designs will lead to disqualification.",
-        "Participants may use assets (icons, images, fonts) from free online resources, but they must be properly attributed if necessary.",
+        "Participants must follow the given map and clues strictly.",
+        "Teams should not damage property or disturb others during the hunt.",
+        "Use of unfair means or external help is strictly prohibited.",
+        "All tasks must be completed within the allotted time.",
+        "The organizers’ and judges’ decisions will be final and binding.",
       ],
       schedule: [
         {
-          round: "Round 1",
-          date: "March 28, 2026",
-          time: "9:00 AM to 1:30 PM",
-          location: "Academic Block Lab 2",
+          round : "Round ",
+          date: "February 13, 2026",
+          time: "9:00 AM to 12:00 PM",
+          location: "Protein and Enzyme Engineering Laboratory",
         },
-        {
-          round: "Round 2",
-          date: "March 28, 2026",
-          time: "1:30 PM to 4:00 PM",
-          location: "Academic Block Lab 2",
-        },
+
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Mr. R. Karthik",
-            email: "karthikr@ksrct.ac.in",
-            phone: "9965010204",
+            name: "Dr. S. Sidhra",
+            email: "",
+            phone: "",
           },
         ],
         studentCoordinator: [
           {
-            name: "Dhanush Kumar S",
-            email: "dk255767@gmail.com",
-            phone: "7502218281",
+            name: "Ms. D. Moumitha",
+            email: "",
+            phone: "9952533198",
           },
           {
-            name: "Gokulnath M",
-            email: "mohangokul4469@gmail.com",
-            phone: "9944389099",
+            name: "Mr. M. Ajairaj ",
+            email: "",
+            phone: " 9342070737",
+          },
+          {
+            name: "Ms. Nancy",
+            email: "",
+            phone: "7695890609",
           },
         ],
       },
       registrationLink: "https://forms.gle/2wBfChfRVPiKVw599", // Registration link
     },
     "technical-event-7": {
-      title: "ElectroBuzz",
+      title: "3D Arena (Google SketchUp)",
       description:
-        "The event consists of two stages where teams will compete to demonstrate their proficiency in handling electronic components and solving real-world circuit issues. In the first stage, participants will race against time to sort and organize electronic components, while in the second stage, they will diagnose and fix faults in a given circuit. The event encourages teamwork, quick thinking, and technical expertise, with winners being selected based on performance in each stage. The top three teams will be awarded prizes.",
+        "Transform 2D concepts into immersive 3D environments while demonstrating your mastery of spatialefficiency and creative problem-solving. This challenge tests your ability to visualize volume andtexture in a high-energy setting. Bring your ideas to life, from sleek modern interiors to complexstructural exteriors.",
       image: Tech7,
       rounds: [
         {
-          title: "Round 1:",
+          title: "",
           description: [
-            "Participants will be given a set electronic components, arrange the given electronic components in increasing order within the specified time.",
-            "Duration: 1 hour",
+            "",
           ],
         },
         {
-          title: "Round 2: Circuit Debugging",
+          title: "",
           description: [
-            "Participants will be given a electronic circuit , they want to identify and fix faults in the given circuit within the given time.",
-            "Duration: 1.5 hours",
+            "",
           ],
         },
       ],
       rules: [
-        "Participants can compete individually or in teams of 2-4 members.",
-        "Yes, inter-college team members are allowed",
-        "Yes, inter-specialization team members are allowed.",
-        "No external tools allowed.",
-        "Complete tasks within the given time limit.",
-        "Damaging equipment will lead to disqualification.",
+        "Time Limit: Complete the model within the allotted time.",
+        "No Outside Help: Mobile phones, internet, and external files are strictly prohibited.",
+        "Software Only: Use only the provided Google SketchUp software.",
+        "Solo Entry: Only registered participants allowed; no team support or helpers.",
+        "Judging: Based on accuracy, creativity, and submission time.",
       ],
       schedule: [
         {
-          round: "Round 1",
-          date: "March 28, 2026",
-          time: "9:00 AM to 11:00 AM",
-          location: "Announced Soon!",
-        },
-        {
-          round: "Round 2",
-          date: "March 28, 2026",
-          time: "1:00 PM to 3:00 PM",
-          location: "Announced Soon!",
+          round: "Round",
+          date: "February 13, 2026",
+          time: "",
+          location: "Civil CADD Laboratory",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Mrs.K.Gogiladevi (AP/ECE)",
-            phone: "9715205353",
-            email: "gogiladevi@ksrct.ac.in",
+            name: "Dr. K. Vijaya Sundravel",
+            phone: "9688676665",
+            email: "",
           },
         ],
         studentCoordinator: [
           {
-            name: "Sanjay Kumar R (III-Year/ECE)",
-            phone: "7397031629",
-            email: "sanjaykumar.ramasamy22@gmail.com",
+            name: "Ms. P. Vaishnavi ",
+            phone: "9944108747",
+            email: "",
           },
           {
-            name: "Kowshika K (II-Year/ECE)",
-            phone: "9342806195",
-            email: "kowshika1912@gmail.com",
+            name: "Ms. C. V. Swetha",
+            phone: "7538831885",
+            email: "",
           },
         ],
       },
 
       registrationLink: "https://forms.gle/gziLh4EoGaCQLSpg8", // Registration link
     },
-    // "technical-event-8": {
-    //   title: "Urban Nourish: Street Food Remix",
-    //   description:
-    //     "Revolutionizing Street Food: A Fusion of Nutrition & Flavor This event aims to reinvent street food by integrating health-conscious innovations while maintaining cultural authenticity and taste. The goal is to develop a unique product that enhances nutrition without compromising on flavor.",
-    //   image: Tech8,
-    //   rounds: [
-    //     {
-    //       description: "Description:",
-    //     },
-    //     {
-    //       description:
-    //         "The Food Technology Department hosting a poster presentation on nutrient-infused street foods, focusing on functional foods, fortification, and balanced recipes. Participants have to showcase the innovative ways to enhance traditional street foods with added nutrients. Judges will evaluate posters on scientific accuracy, creativity, and practicality. The event encouraged discussions on nutrition, affordability, and consumer acceptance, promoting healthier eating choices.    ",
-    //     },
-    //   ],
-    //   rules: [
-    //     "Eligibility: Open to all departments. Teams can have a maximum of 2 members.",
-    //     "Product Criteria: The product must be an innovative infusion of nutrition and flavor in street food. It should not be an exact replica of an existing market product.",
-    //     "Poster Guidelines: Size: A2 (420 × 594 mm) , Must include product name, concept, ingredients, nutritional benefits, and uniqueness, Clear visuals, infographics, and creativity are encouraged",
-    //     "Product Display: Each team must bring and showcase their product for evaluation.",
-    //     "Presentation: Time Limit:5 minutes per team ,Must cover product innovation, nutritional benefits, and SDG alignment, Judges may ask questions after the presentation ",
-    //   ],
-    //   schedule: [
-    //     {
-    //       round: "Round",
-    //       date: "May 22, 2026",
-    //       time: "9:00 AM to 11:00 AM",
-    //       location: "Tech Hub, Innovation Center",
-    //     },
-    //   ],
-    //   contact: {
-    //     facultyCoordinator: [
-    //       {
-    //         name: "Mr G Bharath, AP/FT",
-    //         email: "bharathg@ksrct.ac.in",
-    //         phone: "9047976171",
-    //       },
-    //     ],
-    //     studentCoordinator: [
-    //       {
-    //         name: "Surya S, III Year/FT ",
-    //         email: "suryaarjun813@gmail.com",
-    //         phone: "9360492992",
-    //       },
-    //       {
-    //         name: "Yatheeswar R, II Year/FT ",
-    //         email: "r.yatheeswar852@gmail.com",
-    //         phone: "9441236991",
-    //       },
-    //       {
-    //         name: "Vijaya Yugeshwar R, II Year/FT ",
-    //         phone: "9585768184",
-    //       },
-    //     ],
-    //   },
-    "technical-event-10": {
+    "technical-event-8": {
+       title: "Paper Presentation",
+       description:
+         "This presentation provides a clear and structured explanation of the selected concept, covering its basic principles, system design, and real-world relevance. It highlights how the idea can be applied practically, discusses current developments, and points out key challenges and future scope, helping the audience understand both theory and application",
+       image: Tech8,
+       rounds: [
+         {
+           description: "Topics",
+         },
+         {
+           topic: "Smart & Sustainable Infrastructure ",
+           description:
+             "The Food Technology Department hosting a poster presentation on nutrient-infused street foods, focusing on functional foods, fortification, and balanced recipes. Participants have to showcase the innovative ways to enhance traditional street foods with added nutrients. Judges will evaluate posters on scientific accuracy, creativity, and practicality. The event encouraged discussions on nutrition, affordability, and consumer acceptance, promoting healthier eating choices.    ",
+         },
+      ],
+       rules: [
+         "Eligibility: Open to all departments. Teams can have a maximum of 2 members.",
+         "Product Criteria: The product must be an innovative infusion of nutrition and flavor in street food. It should not be an exact replica of an existing market product.",
+         "Poster Guidelines: Size: A2 (420 × 594 mm) , Must include product name, concept, ingredients, nutritional benefits, and uniqueness, Clear visuals, infographics, and creativity are encouraged",
+         "Product Display: Each team must bring and showcase their product for evaluation.",
+         "Presentation: Time Limit:5 minutes per team ,Must cover product innovation, nutritional benefits, and SDG alignment, Judges may ask questions after the presentation ",
+       ],
+       schedule: [
+         {
+           round: "Round",
+           date: "May 22, 2026",
+           time: "9:00 AM to 11:00 AM",
+           location: "Tech Hub, Innovation Center",
+         },
+       ],
+       contact: {
+         facultyCoordinator: [
+           {
+             name: "Mr G Bharath, AP/FT",
+             email: "bharathg@ksrct.ac.in",
+             phone: "9047976171",
+           },
+         ],
+         studentCoordinator: [
+           {
+             name: "Surya S, III Year/FT ",
+             email: "suryaarjun813@gmail.com",
+             phone: "9360492992",
+           },
+           {
+             name: "Yatheeswar R, II Year/FT ",
+             email: "r.yatheeswar852@gmail.com",
+             phone: "9441236991",
+           },
+           {
+             name: "Vijaya Yugeshwar R, II Year/FT ",
+             phone: "9585768184",
+           },
+         ],
+       },
+    },
+    "technical-event-9": {
       title: "Designathon",
       description:
         "A creative design competition where participants transform sketches into 3D models, culminating in real-life product modeling.",
@@ -748,11 +830,11 @@ const EventDetails = () => {
 
       registrationLink: "https://forms.gle/gziLh4EoGaCQLSpg8", // Registration link
     },
-    "technical-event-14": {
+    "technical-event-10": {
       title: "Codathon",
       description:
         "Codathon is a competitive coding event where participants solve programming problems within a time limit. Hosted on the Unstop platform, this event challenges individuals or teams to showcase their coding skills, creativity, and problem-solving abilities. Participants will be judged on the correctness, innovation, and quality of their code.",
-      image: Tech11,
+      image: Tech10,
       rounds: [
         {
           description:"Participants will be given a set of programming problems to solve within a specified time limit.Time Limit: 2 hours",
@@ -800,11 +882,11 @@ const EventDetails = () => {
 
       registrationLink: "https://forms.gle/2wBfChfRVPiKVw599", // Registration link
     },
-    "technical-event-15": {
+    "technical-event-11": {
       title: "Buildathon",
       description:
         "Buildathon is an intensive design competition aimed at fostering innovation, creativity, and problem-solving skills among students. Participants will be challenged to develop innovative design solutions for real-world engineering and architectural problems using advanced design software SketchUp. The event will encourage critical thinking, teamwork, and the application of technical knowledge in a fast-paced environment. This event is designed for individual participants. The competition is structured into multiple rounds, each designed to test various aspects of the participants' design skills, from conceptualization to execution. The event will culminate in a final presentation, where participants will showcase their designs to a panel of industry experts and academicians.",
-      image: Tech14,
+      image: Tech11,
       rounds: [],
       rules: [
         "Are inter-college team members allowed? Yes",
@@ -854,11 +936,11 @@ const EventDetails = () => {
 
       registrationLink: "https://forms.gle/2wBfChfRVPiKVw599", // Registration link
     },
-    "technical-event-16": {
+    "technical-event-12": {
       title: "Eye on Pick Glass",
       description:
         "The Eye on Pick Glass session is an insightful opportunity for textile students and professionals to enhance their expertise in fabric analysis. This workshop focuses on understanding the pick glass (thread counter)—a crucial tool for inspecting fabric construction, weave structure, and yarn density. Participants will learn practical techniques to analyze fabric quality, identify defects, and differentiate between various weaves with precision. Experts will demonstrate real-time fabric evaluation, providing hands-on experience in textile inspection. This session is ideal for those keen on mastering textile microscopy, ensuring quality control, and deepening their understanding of fabric construction.",
-      image: Tech16,
+      image: Tech12,
       rounds: [],
       rules: [
         "Only one participant",
@@ -899,11 +981,11 @@ const EventDetails = () => {
 
       registrationLink: "https://forms.gle/2wBfChfRVPiKVw599", // Registration link
     },
-    "technical-event-17": {
+    "technical-event-13": {
       title: "Paper presentation",
       description:
         "The Paper Presentation Competition is an opportunity for students to explore and present emerging technological advancements while addressing key global challenges. This event encourages innovation, research, and knowledge-sharing among students across various engineering and technology sectors.Participants will prepare and present a research paper on selected topics, demonstrating their understanding of cutting-edge technologies and their real-world applications.",
-      image: Tech15,
+      image: Tech13,
       rounds: [
         {
           title: "TOPICS:",
@@ -956,8 +1038,7 @@ const EventDetails = () => {
         "ii) Creativity & Innovation – 20%",
         "iii) Clarity & Organization – 20%",
         "iv) Visual Appeal – 15%",
-        "v) Presentation & Communication Skills – 20%",
-
+        "v) Presentation & Communication Skills – 20%"
       ],
       schedule: [
         {
@@ -985,11 +1066,11 @@ const EventDetails = () => {
 
       registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
     },
-    "technical-event-18": {
+    "technical-event-14": {
       title: "Bacteriart",
       description:
         " A petri plate innovations where participants present innovative ideas related to life sciences.",
-      image: Tech18,
+      image: Tech14,
       rounds: [
         {
           title: " ",
@@ -1037,11 +1118,11 @@ const EventDetails = () => {
 
       registrationLink: "https://forms.gle/2wBfChfRVPiKVw599", // Registration link
     },
-    "technical-event-19": {
+    "technical-event-15": {
         title: "Poster Presentation",
         description:
           "The Poster Presentation Competition is an opportunity for students to explore and present emerging trends in their respective fields while addressing key global challenges outlined in the Sustainable Development Goals (SDGs).Participants will research and showcase innovative ideas through a visually engaging A1-sized poster, effectively communicating their findings to a diverse audience. This competition aims to foster creativity, critical thinking, and knowledge-sharing among students across multiple disciplines.",
-        image: Tech19,
+        image: Tech15,
         rounds: [
           {
             title: "TOPICS:",
@@ -1145,6 +1226,243 @@ const EventDetails = () => {
   
         registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
       },
+      "technical-event-16": {
+        title: "VoltEdge (PAPER PRESENTATION)",
+        description:
+          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+        image: Tech16,
+        rounds: [
+          
+          {
+            title: "TOPICS:",
+            description: [
+              "Internet of Things",
+            ],
+          },
+        ],
+        rules: [
+          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
+          "Use PowerPoint (PPT) or any specified tool for the slides.",
+          "The number of slides should be 10-15, keeping it clear and concise.",
+          "The presentation should have:",
+          "Title Slide (Paper title, authors, affiliation)",
+          "Introduction (Problem statement, objective)",
+          "Methodology (Approach, technologies used)",
+          "Results & Discussion (Findings, graphs, tables)",
+          "Conclusion & Future Work",
+          "References (if required)",
+        ],
+        schedule: [
+          {
+            round: "Venue",
+            date: "March 28, 2026",
+            time: "9:30AM -10:30AM",
+            location: "announcing soon",
+          },
+        ],
+        contact: {
+          facultyCoordinator: [
+            {
+              name: "RAJASEKARAN N. AP / EEE",
+              email:"rajasekaran.n@ksrct.ac.in",
+              phone: "8056975723",
+            },
+          ],
+          studentCoordinator: [
+            {
+              name: "TIVITH C",
+              email:"tivithpoongodi@gmail.com",
+              phone: "9345426277",
+            },
+            {
+              name: "MOTUPALLI SHEKAR ",
+              email:"shekarmotupalli@gmail.com ",
+              phone: "8838510411",
+            },
+
+          ],
+        },
+  
+        registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
+      },
+
+      "technical-event-17": {
+        title: "VoltEdge (PAPER PRESENTATION)",
+        description:
+          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+        image: Tech17,
+        rounds: [
+          
+          {
+            title: "TOPICS:",
+            description: [
+              "Internet of Things",
+            ],
+          },
+        ],
+        rules: [
+          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
+          "Use PowerPoint (PPT) or any specified tool for the slides.",
+          "The number of slides should be 10-15, keeping it clear and concise.",
+          "The presentation should have:",
+          "Title Slide (Paper title, authors, affiliation)",
+          "Introduction (Problem statement, objective)",
+          "Methodology (Approach, technologies used)",
+          "Results & Discussion (Findings, graphs, tables)",
+          "Conclusion & Future Work",
+          "References (if required)",
+        ],
+        schedule: [
+          {
+            round: "Venue",
+            date: "March 28, 2026",
+            time: "9:30AM -10:30AM",
+            location: "announcing soon",
+          },
+        ],
+        contact: {
+          facultyCoordinator: [
+            {
+              name: "RAJASEKARAN N. AP / EEE",
+              email:"rajasekaran.n@ksrct.ac.in",
+              phone: "8056975723",
+            },
+          ],
+          studentCoordinator: [
+            {
+              name: "TIVITH C",
+              email:"tivithpoongodi@gmail.com",
+              phone: "9345426277",
+            },
+            {
+              name: "MOTUPALLI SHEKAR ",
+              email:"shekarmotupalli@gmail.com ",
+              phone: "8838510411",
+            },
+
+          ],
+        },
+  
+        registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
+      },
+      "technical-event-18": {
+        title: "VoltEdge (PAPER PRESENTATION)",
+        description:
+          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+        image: Tech18,
+        rounds: [
+          
+          {
+            title: "TOPICS:",
+            description: [
+              "Internet of Things",
+            ],
+          },
+        ],
+        rules: [
+          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
+          "Use PowerPoint (PPT) or any specified tool for the slides.",
+          "The number of slides should be 10-15, keeping it clear and concise.",
+          "The presentation should have:",
+          "Title Slide (Paper title, authors, affiliation)",
+          "Introduction (Problem statement, objective)",
+          "Methodology (Approach, technologies used)",
+          "Results & Discussion (Findings, graphs, tables)",
+          "Conclusion & Future Work",
+          "References (if required)",
+        ],
+        schedule: [
+          {
+            round: "Venue",
+            date: "March 28, 2026",
+            time: "9:30AM -10:30AM",
+            location: "announcing soon",
+          },
+        ],
+        contact: {
+          facultyCoordinator: [
+            {
+              name: "RAJASEKARAN N. AP / EEE",
+              email:"rajasekaran.n@ksrct.ac.in",
+              phone: "8056975723",
+            },
+          ],
+          studentCoordinator: [
+            {
+              name: "TIVITH C",
+              email:"tivithpoongodi@gmail.com",
+              phone: "9345426277",
+            },
+            {
+              name: "MOTUPALLI SHEKAR ",
+              email:"shekarmotupalli@gmail.com ",
+              phone: "8838510411",
+            },
+
+          ],
+        },
+  
+        registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
+      },
+      "technical-event-19": {
+        title: "VoltEdge (PAPER PRESENTATION)",
+        description:
+          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+        image: Tech19,
+        rounds: [
+          
+          {
+            title: "TOPICS:",
+            description: [
+              "Internet of Things",
+            ],
+          },
+        ],
+        rules: [
+          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
+          "Use PowerPoint (PPT) or any specified tool for the slides.",
+          "The number of slides should be 10-15, keeping it clear and concise.",
+          "The presentation should have:",
+          "Title Slide (Paper title, authors, affiliation)",
+          "Introduction (Problem statement, objective)",
+          "Methodology (Approach, technologies used)",
+          "Results & Discussion (Findings, graphs, tables)",
+          "Conclusion & Future Work",
+          "References (if required)",
+        ],
+        schedule: [
+          {
+            round: "Venue",
+            date: "March 28, 2026",
+            time: "9:30AM -10:30AM",
+            location: "announcing soon",
+          },
+        ],
+        contact: {
+          facultyCoordinator: [
+            {
+              name: "RAJASEKARAN N. AP / EEE",
+              email:"rajasekaran.n@ksrct.ac.in",
+              phone: "8056975723",
+            },
+          ],
+          studentCoordinator: [
+            {
+              name: "TIVITH C",
+              email:"tivithpoongodi@gmail.com",
+              phone: "9345426277",
+            },
+            {
+              name: "MOTUPALLI SHEKAR ",
+              email:"shekarmotupalli@gmail.com ",
+              phone: "8838510411",
+            },
+
+          ],
+        },
+  
+        registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
+      },
       "technical-event-20": {
         title: "VoltEdge (PAPER PRESENTATION)",
         description:
@@ -1204,6 +1522,183 @@ const EventDetails = () => {
   
         registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
       },
+      "technical-event-21": {
+        title: "VoltEdge (PAPER PRESENTATION)",
+        description:
+          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+        image: Tech21,
+        rounds: [
+          
+          {
+            title: "TOPICS:",
+            description: [
+              "Internet of Things",
+            ],
+          },
+        ],
+        rules: [
+          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
+          "Use PowerPoint (PPT) or any specified tool for the slides.",
+          "The number of slides should be 10-15, keeping it clear and concise.",
+          "The presentation should have:",
+          "Title Slide (Paper title, authors, affiliation)",
+          "Introduction (Problem statement, objective)",
+          "Methodology (Approach, technologies used)",
+          "Results & Discussion (Findings, graphs, tables)",
+          "Conclusion & Future Work",
+          "References (if required)",
+        ],
+        schedule: [
+          {
+            round: "Venue",
+            date: "March 28, 2026",
+            time: "9:30AM -10:30AM",
+            location: "announcing soon",
+          },
+        ],
+        contact: {
+          facultyCoordinator: [
+            {
+              name: "RAJASEKARAN N. AP / EEE",
+              email:"rajasekaran.n@ksrct.ac.in",
+              phone: "8056975723",
+            },
+          ],
+          studentCoordinator: [
+            {
+              name: "TIVITH C",
+              email:"tivithpoongodi@gmail.com",
+              phone: "9345426277",
+            },
+            {
+              name: "MOTUPALLI SHEKAR ",
+              email:"shekarmotupalli@gmail.com ",
+              phone: "8838510411",
+            },
+
+          ],
+        },
+  
+        registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
+      },
+      "technical-event-22": {
+        title: "VoltEdge (PAPER PRESENTATION)",
+        description:
+          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+        image: Tech22,
+        rounds: [
+          
+          {
+            title: "TOPICS:",
+            description: [
+              "Internet of Things",
+            ],
+          },
+        ],
+        rules: [
+          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
+          "Use PowerPoint (PPT) or any specified tool for the slides.",
+          "The number of slides should be 10-15, keeping it clear and concise.",
+          "The presentation should have:",
+          "Title Slide (Paper title, authors, affiliation)",
+          "Introduction (Problem statement, objective)",
+          "Methodology (Approach, technologies used)",
+          "Results & Discussion (Findings, graphs, tables)",
+          "Conclusion & Future Work",
+          "References (if required)",
+        ],
+        schedule: [
+          {
+            round: "Venue",
+            date: "March 28, 2026",
+            time: "9:30AM -10:30AM",
+            location: "announcing soon",
+          },
+        ],
+        contact: {
+          facultyCoordinator: [
+            {
+              name: "RAJASEKARAN N. AP / EEE",
+              email:"rajasekaran.n@ksrct.ac.in",
+              phone: "8056975723",
+            },
+          ],
+          studentCoordinator: [
+            {
+              name: "TIVITH C",
+              email:"tivithpoongodi@gmail.com",
+              phone: "9345426277",
+            },
+            {
+              name: "MOTUPALLI SHEKAR ",
+              email:"shekarmotupalli@gmail.com ",
+              phone: "8838510411",
+            },
+
+          ],
+        },
+  
+        registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
+      },
+      /*"technical-event-16": {
+        title: "VoltEdge (PAPER PRESENTATION)",
+        description:
+          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+        image: Tech16,
+        rounds: [
+          
+          {
+            title: "TOPICS:",
+            description: [
+              "Internet of Things",
+            ],
+          },
+        ],
+        rules: [
+          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
+          "Use PowerPoint (PPT) or any specified tool for the slides.",
+          "The number of slides should be 10-15, keeping it clear and concise.",
+          "The presentation should have:",
+          "Title Slide (Paper title, authors, affiliation)",
+          "Introduction (Problem statement, objective)",
+          "Methodology (Approach, technologies used)",
+          "Results & Discussion (Findings, graphs, tables)",
+          "Conclusion & Future Work",
+          "References (if required)",
+        ],
+        schedule: [
+          {
+            round: "Venue",
+            date: "March 28, 2026",
+            time: "9:30AM -10:30AM",
+            location: "announcing soon",
+          },
+        ],
+        contact: {
+          facultyCoordinator: [
+            {
+              name: "RAJASEKARAN N. AP / EEE",
+              email:"rajasekaran.n@ksrct.ac.in",
+              phone: "8056975723",
+            },
+          ],
+          studentCoordinator: [
+            {
+              name: "TIVITH C",
+              email:"tivithpoongodi@gmail.com",
+              phone: "9345426277",
+            },
+            {
+              name: "MOTUPALLI SHEKAR ",
+              email:"shekarmotupalli@gmail.com ",
+              phone: "8838510411",
+            },
+
+          ],
+        },
+  
+        registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
+      },*/
     // Non-Technical Events
     "non-technical-event-1": {
       title: "trailblazers: The Clue Hunt",
@@ -1700,7 +2195,7 @@ const EventDetails = () => {
       title: "404:Meme Overload (Meme creation based on IT scenarios)",
       description:
         "IT Meme Battle is a fun and creative competition where teams of one or two members create original IT-related memes. Participants can use image + text, GIFs, or even hand-drawn memes for extra creativity. Plagiarized content will lead to disqualification, and all memes must be appropriate and respectful. Submissions must be made within the given time limit. Let your humor and tech knowledge shine in this battle of wit and creativity.",
-      image: NonTech12,
+      image: NonTech9,
       rounds: [],
       rules: [
         "Team Size: Each team can have 1 or 2 members.",
@@ -1742,7 +2237,7 @@ const EventDetails = () => {
       registrationLink: "https://forms.gle/F7ToBuAQk8jMRJe5A", // Registration link
     },
 
-    "non-technical-event-11": {
+    "non-technical-event-10": {
       title: "Mind Maze",
       description:
         "Mind Maze is an exciting non-technical event that challenges participants to decode hidden clues from images using logic, pattern recognition, and creative thinking. Participants will engage their problem-solving skills to uncover the mystery, aiming to be the first to solve the clue within the time limit.",
@@ -1785,7 +2280,7 @@ const EventDetails = () => {
       },
       registrationLink: "https://forms.gle/F7ToBuAQk8jMRJe5A", // Registration link
     },
-    "non-technical-event-12": {
+    "non-technical-event-11": {
       title: "Waste to Wealth 2026",
       description:
         "This event invites Engineering and Polytechnic students to showcase innovative solutions by transforming waste into creative, functional, or technological models. Participants will present their projects in a 5-7 minute pitch, focusing on creativity, sustainability, and practicality. The competition enhances problem-solving, entrepreneurial skills, and environmental awareness, offering career and networking opportunities in sustainability.",
@@ -1827,6 +2322,57 @@ const EventDetails = () => {
             name: "Nithiya Suriyan K",
             email: "viratsuryaviratsurya4@gmail.com",
             phone: "8056603518",
+          },
+        ],
+      },
+      registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
+    },
+    "non-technical-event-12": {
+      title: "Glorify the Face with Colours",
+      description:
+        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
+      image: NonTech12,
+      rounds: [
+        {
+          title: "Single Round",
+          description: [
+            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
+          ],
+        },
+      ],
+      rules: [
+        "Theme:On the Spot",
+        "Two Participants per Team",
+        "Duration:1 Hr",
+        "Participants have to bring their own colours, brushes etc",
+        "Juries Judgement is Final",
+      ],
+      schedule: [
+        {
+          round: "Round ",
+          date: "March 29, 2026",
+          time: "2:00 PM to 3:00 PM",
+          location: "Textile chemical processing laboratory,Textile Block ",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Mr.P. Maheswaran AP/Textile ",
+            email: "pmaheswaran@ksrct.ac.in",
+            phone: "9600589068",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "V.Sandhiya 2nd year / Textile ",
+            email: "sandhiya07082006@gmail.com",
+            phone: "6369670394",
+          },
+          {
+            name: "S.A.Hariharan 2nd year / Textile",
+            email: "harihraran18@gmail.com",
+            phone: "7092102427",
           },
         ],
       },
@@ -1883,6 +2429,366 @@ const EventDetails = () => {
       },
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
+    "non-technical-event-14": {
+      title: "Glorify the Face with Colours",
+      description:
+        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
+      image: NonTech14,
+      rounds: [
+        {
+          title: "Single Round",
+          description: [
+            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
+          ],
+        },
+      ],
+      rules: [
+        "Theme:On the Spot",
+        "Two Participants per Team",
+        "Duration:1 Hr",
+        "Participants have to bring their own colours, brushes etc",
+        "Juries Judgement is Final",
+      ],
+      schedule: [
+        {
+          round: "Round ",
+          date: "March 29, 2026",
+          time: "2:00 PM to 3:00 PM",
+          location: "Textile chemical processing laboratory,Textile Block ",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Mr.P. Maheswaran AP/Textile ",
+            email: "pmaheswaran@ksrct.ac.in",
+            phone: "9600589068",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "V.Sandhiya 2nd year / Textile ",
+            email: "sandhiya07082006@gmail.com",
+            phone: "6369670394",
+          },
+          {
+            name: "S.A.Hariharan 2nd year / Textile",
+            email: "harihraran18@gmail.com",
+            phone: "7092102427",
+          },
+        ],
+      },
+      registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
+    },
+    "non-technical-event-15": {
+      title: "Glorify the Face with Colours",
+      description:
+        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
+      image: NonTech15,
+      rounds: [
+        {
+          title: "Single Round",
+          description: [
+            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
+          ],
+        },
+      ],
+      rules: [
+        "Theme:On the Spot",
+        "Two Participants per Team",
+        "Duration:1 Hr",
+        "Participants have to bring their own colours, brushes etc",
+        "Juries Judgement is Final",
+      ],
+      schedule: [
+        {
+          round: "Round ",
+          date: "March 29, 2026",
+          time: "2:00 PM to 3:00 PM",
+          location: "Textile chemical processing laboratory,Textile Block ",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Mr.P. Maheswaran AP/Textile ",
+            email: "pmaheswaran@ksrct.ac.in",
+            phone: "9600589068",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "V.Sandhiya 2nd year / Textile ",
+            email: "sandhiya07082006@gmail.com",
+            phone: "6369670394",
+          },
+          {
+            name: "S.A.Hariharan 2nd year / Textile",
+            email: "harihraran18@gmail.com",
+            phone: "7092102427",
+          },
+        ],
+      },
+      registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
+    },
+    "non-technical-event-16": {
+      title: "Glorify the Face with Colours",
+      description:
+        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
+      image: NonTech16,
+      rounds: [
+        {
+          title: "Single Round",
+          description: [
+            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
+          ],
+        },
+      ],
+      rules: [
+        "Theme:On the Spot",
+        "Two Participants per Team",
+        "Duration:1 Hr",
+        "Participants have to bring their own colours, brushes etc",
+        "Juries Judgement is Final",
+      ],
+      schedule: [
+        {
+          round: "Round ",
+          date: "March 29, 2026",
+          time: "2:00 PM to 3:00 PM",
+          location: "Textile chemical processing laboratory,Textile Block ",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Mr.P. Maheswaran AP/Textile ",
+            email: "pmaheswaran@ksrct.ac.in",
+            phone: "9600589068",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "V.Sandhiya 2nd year / Textile ",
+            email: "sandhiya07082006@gmail.com",
+            phone: "6369670394",
+          },
+          {
+            name: "S.A.Hariharan 2nd year / Textile",
+            email: "harihraran18@gmail.com",
+            phone: "7092102427",
+          },
+        ],
+      },
+      registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
+    },
+    "non-technical-event-17": {
+      title: "Glorify the Face with Colours",
+      description:
+        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
+      image: NonTech17,
+      rounds: [
+        {
+          title: "Single Round",
+          description: [
+            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
+          ],
+        },
+      ],
+      rules: [
+        "Theme:On the Spot",
+        "Two Participants per Team",
+        "Duration:1 Hr",
+        "Participants have to bring their own colours, brushes etc",
+        "Juries Judgement is Final",
+      ],
+      schedule: [
+        {
+          round: "Round ",
+          date: "March 29, 2026",
+          time: "2:00 PM to 3:00 PM",
+          location: "Textile chemical processing laboratory,Textile Block ",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Mr.P. Maheswaran AP/Textile ",
+            email: "pmaheswaran@ksrct.ac.in",
+            phone: "9600589068",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "V.Sandhiya 2nd year / Textile ",
+            email: "sandhiya07082006@gmail.com",
+            phone: "6369670394",
+          },
+          {
+            name: "S.A.Hariharan 2nd year / Textile",
+            email: "harihraran18@gmail.com",
+            phone: "7092102427",
+          },
+        ],
+      },
+      registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
+    },
+    "non-technical-event-18": {
+      title: "Glorify the Face with Colours",
+      description:
+        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
+      image: NonTech18,
+      rounds: [
+        {
+          title: "Single Round",
+          description: [
+            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
+          ],
+        },
+      ],
+      rules: [
+        "Theme:On the Spot",
+        "Two Participants per Team",
+        "Duration:1 Hr",
+        "Participants have to bring their own colours, brushes etc",
+        "Juries Judgement is Final",
+      ],
+      schedule: [
+        {
+          round: "Round ",
+          date: "March 29, 2026",
+          time: "2:00 PM to 3:00 PM",
+          location: "Textile chemical processing laboratory,Textile Block ",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Mr.P. Maheswaran AP/Textile ",
+            email: "pmaheswaran@ksrct.ac.in",
+            phone: "9600589068",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "V.Sandhiya 2nd year / Textile ",
+            email: "sandhiya07082006@gmail.com",
+            phone: "6369670394",
+          },
+          {
+            name: "S.A.Hariharan 2nd year / Textile",
+            email: "harihraran18@gmail.com",
+            phone: "7092102427",
+          },
+        ],
+      },
+      registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
+    },
+    "non-technical-event-19": {
+      title: "Glorify the Face with Colours",
+      description:
+        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
+      image: NonTech19,
+      rounds: [
+        {
+          title: "Single Round",
+          description: [
+            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
+          ],
+        },
+      ],
+      rules: [
+        "Theme:On the Spot",
+        "Two Participants per Team",
+        "Duration:1 Hr",
+        "Participants have to bring their own colours, brushes etc",
+        "Juries Judgement is Final",
+      ],
+      schedule: [
+        {
+          round: "Round ",
+          date: "March 29, 2026",
+          time: "2:00 PM to 3:00 PM",
+          location: "Textile chemical processing laboratory,Textile Block ",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Mr.P. Maheswaran AP/Textile ",
+            email: "pmaheswaran@ksrct.ac.in",
+            phone: "9600589068",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "V.Sandhiya 2nd year / Textile ",
+            email: "sandhiya07082006@gmail.com",
+            phone: "6369670394",
+          },
+          {
+            name: "S.A.Hariharan 2nd year / Textile",
+            email: "harihraran18@gmail.com",
+            phone: "7092102427",
+          },
+        ],
+      },
+      registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
+    },
+    "non-technical-event-20": {
+      title: "Glorify the Face with Colours",
+      description:
+        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
+      image: NonTech20,
+      rounds: [
+        {
+          title: "Single Round",
+          description: [
+            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
+          ],
+        },
+      ],
+      rules: [
+        "Theme:On the Spot",
+        "Two Participants per Team",
+        "Duration:1 Hr",
+        "Participants have to bring their own colours, brushes etc",
+        "Juries Judgement is Final",
+      ],
+      schedule: [
+        {
+          round: "Round ",
+          date: "March 29, 2026",
+          time: "2:00 PM to 3:00 PM",
+          location: "Textile chemical processing laboratory,Textile Block ",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Mr.P. Maheswaran AP/Textile ",
+            email: "pmaheswaran@ksrct.ac.in",
+            phone: "9600589068",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "V.Sandhiya 2nd year / Textile ",
+            email: "sandhiya07082006@gmail.com",
+            phone: "6369670394",
+          },
+          {
+            name: "S.A.Hariharan 2nd year / Textile",
+            email: "harihraran18@gmail.com",
+            phone: "7092102427",
+          },
+        ],
+      },
+      registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
+    },
+
+
+
     // Culturals
     "culturals-event-1": {
       title: "Musical Maverics",
@@ -2679,7 +3585,8 @@ const EventDetails = () => {
       },
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
-  };
+  };  
+
 
   // Define animation variants
   const itemVariants = {

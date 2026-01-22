@@ -36,6 +36,13 @@ BEGIN
         );
     END IF;
 
+    -- Delete any existing PENDING purchases for this combo (allows retry)
+    -- This must happen BEFORE the PAID check to clean up stale pending records
+    DELETE FROM public.combo_purchases
+    WHERE user_id = p_user_id 
+    AND combo_id = p_combo_id
+    AND payment_status = 'PENDING';
+    
     -- Check if user already has a PAID purchase for this combo
     IF EXISTS (
         SELECT 1 FROM public.combo_purchases
@@ -47,12 +54,6 @@ BEGIN
             'message', 'You have already purchased this combo'
         );
     END IF;
-    
-    -- Delete any existing PENDING purchases for this combo (allows retry)
-    DELETE FROM public.combo_purchases
-    WHERE user_id = p_user_id 
-    AND combo_id = p_combo_id
-    AND payment_status = 'PENDING';
 
     -- Validate event selection
     v_validation_result := public.validate_combo_selection(p_combo_id, p_selected_event_ids);

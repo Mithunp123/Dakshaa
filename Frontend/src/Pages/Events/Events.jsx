@@ -9,56 +9,13 @@ import Workshop from "../../assets/EventsImages/workshop.jpg";
 import HackathonImage from "../../assets/Hackathon.png";
 import ConferenceImage from "../../assets/conference/1.png";
 
-import Tech1 from "../../assets/EventsImages/EventDetails/TechnicalImages/CSE.png";
-import Tech2 from "../../assets/EventsImages/EventDetails/TechnicalImages/IT.png";
-import Tech3 from "../../assets/EventsImages/EventDetails/TechnicalImages/VLSI.png";
-// import Tech4 from "../../assets/EventsImages/EventDetails/TechnicalImages/ece2.png"
-import Tech5 from "../../assets/EventsImages/EventDetails/TechnicalImages/MCT.png";
-import Tech6 from "../../assets/EventsImages/EventDetails/TechnicalImages/CSBS.png";
-import Tech7 from "../../assets/EventsImages/EventDetails/TechnicalImages/ECE.png";
-import Tech8 from "../../assets/EventsImages/EventDetails/TechnicalImages/FOOD.png";
-import Tech9 from "../../assets/EventsImages/EventDetails/TechnicalImages/MECH.png";
-import Tech11 from "../../assets/EventsImages/EventDetails/TechnicalImages/AIML.png";
-import Tech14 from "../../assets/EventsImages/EventDetails/TechnicalImages/CIVIL.png";
-import Tech15 from "../../assets/EventsImages/EventDetails/TechnicalImages/PROJECTEXPO.png";
-import Tech16 from "../../assets/EventsImages/EventDetails/TechnicalImages/TEXTILE.png";
-import Tech18 from "../../assets/EventsImages/EventDetails/TechnicalImages/bt.jpg";
-import Tech19 from "../../assets/EventsImages/EventDetails/TechnicalImages/POSTER.png";
-import Tech20 from "../../assets/EventsImages/EventDetails/TechnicalImages/EEE.png";
-
-import NonTech1 from "../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF CSE.jpg";
-import NonTech2 from "../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF EEE.jpg";
-import NonTech3 from "../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF VLSI.jpg";
-import NonTech4 from "../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF BIO TECH.jpg";
-import NonTech5 from "../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF MECHATRONICS.jpg";
-import NonTech6 from "../../assets/EventsImages/EventDetails/Nontech/CSBS.jpg";
-import NonTech7 from "../../assets/EventsImages/EventDetails/Nontech/ft.jpg";
-import NonTech8 from "../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF MECH.jpg";
-import NonTech10 from "../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF ECE.jpg";
-import NonTech11 from "../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF CIVIL.jpg";
-import NonTech12 from "../../assets/EventsImages/EventDetails/Nontech/Department of InformationTechnology.jpg";
-import NonTech13 from "../../assets/EventsImages/EventDetails/Nontech/DEPARTMENT OF TEXTILE.jpg";
-
-import Workshop1 from "../../assets/EventsImages/EventDetails/Workshop/vlsi.jpg";
-import Workshop2 from "../../assets/EventsImages/EventDetails/Workshop/it.jpg";
-import Workshop3 from "../../assets/EventsImages/EventDetails/Workshop/aids.jpg";
-import Workshop4 from "../../assets/EventsImages/EventDetails/Workshop/aiml.jpg";
-import Workshop5 from "../../assets/EventsImages/EventDetails/Workshop/csbs.jpg";
-import Workshop6 from "../../assets/EventsImages/EventDetails/Workshop/cse.jpg";
-import Workshop7 from "../../assets/EventsImages/EventDetails/Workshop/eee.jpg";
-import Workshop8 from "../../assets/EventsImages/EventDetails/Workshop/biotech.jpg";
-import Workshop9 from "../../assets/EventsImages/EventDetails/Workshop/mechatronics.jpg";
-import Workshop10 from "../../assets/EventsImages/EventDetails/Workshop/ece.jpg";
-import Workshop11 from "../../assets/EventsImages/EventDetails/Workshop/ft.jpg";
-import Workshop12 from "../../assets/EventsImages/EventDetails/Workshop/mech.jpg";
-import Workshop13 from "../../assets/EventsImages/EventDetails/Workshop/civil.jpg";
-import Workshop14 from "../../assets/EventsImages/EventDetails/Workshop/textile.jpg";
-
-import Culturals1 from "../../assets/HORMONICS/MUSICAL.png";
-import Culturals2 from "../../assets/HORMONICS/INSTRUMENT.png";
-import Culturals3 from "../../assets/HORMONICS/GROUP.png";
-import Culturals4 from "../../assets/HORMONICS/SOLO DANCE.png";
-import Culturals5 from "../../assets/HORMONICS/short flim.png";
+// Import event data from separate files
+import { technicalEvents } from "../../data/technicalEvents";
+import { nonTechnicalEvents } from "../../data/nonTechnicalEvents";
+import { culturalEvents } from "../../data/culturalEvents";
+import { hackathonEvents } from "../../data/hackathonEvents";
+import { workshopEvents } from "../../data/workshopEvents";
+import { conferenceEvents } from "../../data/conferenceEvents";
 
 const Events = () => {
   const [selectedEvent, setSelectedEvent] = useState(1);
@@ -71,239 +28,37 @@ const Events = () => {
       id: 1,
       image: TechnicalImage,
       name: "Technical Events",
-      descriptionImages: [
-        {
-          image: Tech1,
-          eventId: "tech-cse",
-        },
-        {
-          image: Tech2,
-          eventId: "tech-it",
-        },
-        {
-          image: Tech3,
-          eventId: "tech-vlsi",
-        },
-        {
-          image: Tech5,
-          eventId: "tech-mct",
-        },
-        {
-          image: Tech6,
-          eventId: "tech-csbs",
-        },
-        {
-          image: Tech7,
-          eventId: "tech-ece",
-        },
-        {
-          image: Tech8,
-          eventId: "tech-food",
-        },
-        {
-          image: Tech9,
-          eventId: "tech-mech",
-        },
-        {
-          image: Tech11,
-          eventId: "tech-aiml",
-        },
-        {
-          image: Tech14,
-          eventId: "tech-civil",
-        },
-        {
-          image: Tech15,
-          eventId: "tech-project-expo",
-        },
-        {
-          image: Tech16,
-          eventId: "tech-textile",
-        },
-        {
-          image: Tech18,
-          eventId: "tech-biotech",
-        },
-        {
-          image: Tech19,
-          eventId: "tech-poster",
-        },
-        {
-          image: Tech20,
-          eventId: "tech-eee",
-        },
-      ],
+      descriptionImages: technicalEvents,
     },
     {
       id: 2,
       image: NonTechnicalImage,
       name: "Non-Technical Events",
-      descriptionImages: [
-        {
-          image: NonTech12,
-          eventId: "nontech-it",
-        },
-        {
-          image: NonTech1,
-          eventId: "nontech-cse",
-        },
-        {
-          image: NonTech2,
-          eventId: "nontech-eee",
-        },
-        {
-          image: NonTech3,
-          eventId: "nontech-vlsi",
-        },
-        {
-          image: NonTech4,
-          eventId: "nontech-biotech",
-        },
-        {
-          image: NonTech5,
-          eventId: "nontech-mct",
-        },
-        {
-          image: NonTech6,
-          eventId: "nontech-csbs",
-        },
-        {
-          image: NonTech7,
-          eventId: "nontech-food",
-        },
-        {
-          image: NonTech8,
-          eventId: "nontech-mech",
-        },
-        {
-          image: NonTech10,
-          eventId: "nontech-ece",
-        },
-        {
-          image: NonTech11,
-          eventId: "nontech-civil",
-        },
-        {
-          image: NonTech13,
-          eventId: "nontech-textile",
-        },
-      ],
+      descriptionImages: nonTechnicalEvents,
     },
     {
       id: 3,
       image: Cultural,
       name: "Harmonicks",
-      descriptionImages: [
-        {
-          image: Culturals2,
-          eventId: "cultural-instrument",
-        },
-        {
-          image: Culturals1,
-          eventId: "cultural-musical",
-        },
-        {
-          image: Culturals3,
-          eventId: "cultural-group-dance",
-        },
-        {
-          image: Culturals4,
-          eventId: "cultural-solo-dance",
-        },
-        {
-          image: Culturals5,
-          eventId: "cultural-short-film",
-        },
-      ],
+      descriptionImages: culturalEvents,
     },
     {
       id: 4,
       image: HackathonImage,
       name: "Hackathon",
-      descriptionImages: [
-        {
-          image: Tech2,
-          eventId: "hackathon",
-        },
-        {
-          image: Tech11,
-          eventId: "codeathon",
-        },
-      ],
+      descriptionImages: hackathonEvents,
     },
     {
       id: 5,
       image: Workshop,
       name: "Workshop",
-      descriptionImages: [
-        {
-          image: Workshop2,
-          eventId: "workshop-it",
-        },
-        {
-          image: Workshop1,
-          eventId: "workshop-vlsi",
-        },
-        {
-          image: Workshop3,
-          eventId: "workshop-aids",
-        },
-        {
-          image: Workshop4,
-          eventId: "workshop-aiml",
-        },
-        {
-          image: Workshop5,
-          eventId: "workshop-csbs",
-        },
-        {
-          image: Workshop6,
-          eventId: "workshop-cse",
-        },
-        {
-          image: Workshop7,
-          eventId: "workshop-eee",
-        },
-        {
-          image: Workshop8,
-          eventId: "workshop-biotech",
-        },
-        {
-          image: Workshop9,
-          eventId: "workshop-mct",
-        },
-        {
-          image: Workshop10,
-          eventId: "workshop-ece",
-        },
-        {
-          image: Workshop11,
-          eventId: "workshop-ft",
-        },
-        {
-          image: Workshop12,
-          eventId: "workshop-mech",
-        },
-        {
-          image: Workshop13,
-          eventId: "workshop-civil",
-        },
-        {
-          image: Workshop14,
-          eventId: "workshop-textile",
-        },
-      ],
+      descriptionImages: workshopEvents,
     },
     {
       id: 6,
       image: ConferenceImage,
       name: "Conference",
-      descriptionImages: [
-        {
-          image: ConferenceImage,
-          eventId: "conference",
-        },
-      ],
+      descriptionImages: conferenceEvents,
     },
   ];
 
@@ -766,8 +521,8 @@ const Events = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity z-10" />
 
                     <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 z-20">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-orbitron text-secondary tracking-widest uppercase">
+                      <div className="flex items-center justify-between bg-secondary/20 border border-secondary/50 rounded-lg px-4 py-2 backdrop-blur-sm">
+                        <span className="text-xs font-orbitron text-secondary tracking-widest uppercase font-bold">
                           Register Now
                         </span>
                         <motion.div

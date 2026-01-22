@@ -9,6 +9,13 @@ const AccommodationBooking = () => {
   const [bookingType, setBookingType] = useState(''); // 'accommodation' or 'lunch'
   const [loading, setLoading] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
+  const [existingBookings, setExistingBookings] = useState({
+    accommodation: null,
+    lunch: null,
+    bookedAccommodationDates: [],
+    bookedLunchDates: []
+  });
+  const [loadingBookings, setLoadingBookings] = useState(true);
   
   const [formData, setFormData] = useState({
     fullName: '',
@@ -22,7 +29,108 @@ const AccommodationBooking = () => {
 
   useEffect(() => {
     fetchUserProfile();
+    fetchExistingBookings();
+
+    // Check for payment success in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    const bookingType = urlParams.get('type');
+    
+    if (paymentStatus === 'success') {
+      if (bookingType === 'accommodation') {
+        toast.success('Accommodation booking confirmed successfully', {
+          duration: 4000,
+          position: 'top-center',
+        });
+      } else if (bookingType === 'lunch') {
+        toast.success('Lunch booking confirmed successfully', {
+          duration: 4000,
+          position: 'top-center',
+        });
+      }
+      
+      // Refresh bookings to show the new one
+      setTimeout(() => {
+        fetchExistingBookings();
+      }, 1000);
+      
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
   }, []);
+
+  const fetchExistingBookings = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Fetch ALL accommodation bookings (can have multiple now)
+        const { data: accDataArray } = await supabase
+          .from('accommodation_requests')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('payment_status', 'PAID');
+
+        // Fetch ALL lunch bookings
+        const { data: lunchDataArray } = await supabase
+          .from('lunch_bookings')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('payment_status', 'PAID');
+
+        // Extract and combine all booked dates
+        const bookedAccDates = [];
+        const bookedLunchDates = [];
+        let totalAccPrice = 0;
+        let totalLunchPrice = 0;
+
+        if (accDataArray && accDataArray.length > 0) {
+          accDataArray.forEach(booking => {
+            try {
+              const data = JSON.parse(booking.special_requests || '{}');
+              if (data.dates) bookedAccDates.push(...data.dates);
+              totalAccPrice += parseFloat(booking.total_price || 0);
+            } catch (e) {}
+          });
+        }
+
+        if (lunchDataArray && lunchDataArray.length > 0) {
+          lunchDataArray.forEach(booking => {
+            if (booking.booked_dates) {
+              const dates = booking.booked_dates.split(', ').map(d => d.trim());
+              bookedLunchDates.push(...dates);
+            }
+            totalLunchPrice += parseFloat(booking.total_price || 0);
+          });
+        }
+
+        // Create combined display object
+        const combinedAcc = accDataArray && accDataArray.length > 0 ? {
+          ...accDataArray[0],
+          total_price: totalAccPrice,
+          number_of_days: bookedAccDates.length.toString(),
+          special_requests: JSON.stringify({ dates: bookedAccDates })
+        } : null;
+
+        const combinedLunch = lunchDataArray && lunchDataArray.length > 0 ? {
+          ...lunchDataArray[0],
+          total_price: totalLunchPrice,
+          total_lunches: bookedLunchDates.length.toString(),
+          booked_dates: bookedLunchDates.join(', ')
+        } : null;
+
+        setExistingBookings({
+          accommodation: combinedAcc,
+          lunch: combinedLunch,
+          bookedAccommodationDates: bookedAccDates,
+          bookedLunchDates: bookedLunchDates
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+    } finally {
+      setLoadingBookings(false);
+    }
+  };
 
   const fetchUserProfile = async () => {
     try {
@@ -89,9 +197,9 @@ const AccommodationBooking = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        toast.error('Please login to book', {
-          icon: '🔒',
+        toast.error('Please login to continue', {
           duration: 3000,
+          position: 'top-center',
         });
         setLoading(false);
         return;
@@ -100,123 +208,124 @@ const AccommodationBooking = () => {
       if (bookingType === 'accommodation') {
         if (formData.accommodationDates.length === 0) {
           toast.error('Please select at least one date', {
-            icon: '📅',
             duration: 3000,
+            position: 'top-center',
           });
           setLoading(false);
           return;
         }
 
-        // Add to backend
+        const totalAmount = calculateTotal();
+        
+        toast.loading('Preparing payment...', {
+          duration: 2000,
+          position: 'top-center',
+        });
+
+        // Initiate payment via backend
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const response = await fetch(`${apiUrl}/add-accommodation`, {
+        const paymentResponse = await fetch(`${apiUrl}/payment/initiate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             user_id: user.id,
-            username: formData.fullName,
+            booking_id: `ACC_${Date.now()}`,
+            booking_type: 'accommodation',
+            amount: totalAmount,
             accommodation_dates: formData.accommodationDates,
-            gender: formData.gender,
-            email_id: formData.email,
+            full_name: formData.fullName,
             mobile_number: formData.mobile,
+            gender: formData.gender,
             college_name: formData.collegeName
           })
         });
 
-        const result = await response.json();
+        const paymentResult = await paymentResponse.json();
 
-        if (response.ok && result.success) {
-          toast.success('Accommodation booked successfully! 🏨', {
-            duration: 4000,
-            icon: '✅',
-            style: {
-              background: '#10b981',
-              color: '#fff',
-            },
-          });
-          // Reset form
-          setFormData({
-            ...formData,
-            accommodationDates: []
-          });
-          setShowModal(false);
-        } else if (result.alreadyBooked) {
-          toast.error('You have already booked accommodation!', {
-            icon: '⚠️',
-            duration: 4000,
-            style: {
-              background: '#f59e0b',
-              color: '#fff',
-            },
-          });
-          setShowModal(false);
-        } else {
-          console.error('Backend error details:', result);
-          throw new Error(result.error || 'Booking failed');
+        if (!paymentResult.success) {
+          throw new Error(paymentResult.error || 'Payment initiation failed');
         }
+
+        // Store pending booking data
+        sessionStorage.setItem('pending_accommodation', JSON.stringify({
+          dates: formData.accommodationDates,
+          amount: totalAmount
+        }));
+
+        toast.success('Redirecting to payment gateway...', {
+          duration: 1000,
+          position: 'top-center',
+        });
+
+        // Redirect to payment gateway
+        setTimeout(() => {
+          window.location.href = paymentResult.payment_url;
+        }, 1000);
+        return;
       } else {
         if (formData.lunchDates.length === 0) {
           toast.error('Please select at least one lunch date', {
-            icon: '📅',
             duration: 3000,
+            position: 'top-center',
           });
           setLoading(false);
           return;
         }
 
-        // Add lunch booking via backend
+        const totalAmount = calculateTotal();
+        
+        toast.loading('Preparing payment...', {
+          duration: 2000,
+          position: 'top-center',
+        });
+
+        // Initiate payment via backend
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const response = await fetch(`${apiUrl}/add-lunch-booking`, {
+        const paymentResponse = await fetch(`${apiUrl}/payment/initiate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             user_id: user.id,
-            full_name: formData.fullName,
-            email: formData.email,
-            mobile: formData.mobile,
+            booking_id: `LUNCH_${Date.now()}`,
+            booking_type: 'lunch',
+            amount: totalAmount,
             lunch_dates: formData.lunchDates,
-            total_price: calculateTotal()
+            full_name: formData.fullName,
+            mobile_number: formData.mobile
           })
         });
 
-        const result = await response.json();
+        const paymentResult = await paymentResponse.json();
 
-        if (response.ok && result.success) {
-          toast.success('Lunch reserved successfully! 🍽️', {
-            duration: 4000,
-            icon: '✅',
-            style: {
-              background: '#f97316',
-              color: '#fff',
-            },
-          });
-          // Reset form
-          setFormData({
-            ...formData,
-            lunchDates: []
-          });
-          setShowModal(false);
-        } else if (result.alreadyBooked) {
-          toast.error('You have already booked lunch!', {
-            icon: '⚠️',
-            duration: 4000,
-            style: {
-              background: '#f59e0b',
-              color: '#fff',
-            },
-          });
-          setShowModal(false);
-        } else {
-          console.error('Backend error details:', result);
-          throw new Error(result.error || 'Booking failed');
+        if (!paymentResult.success) {
+          throw new Error(paymentResult.error || 'Payment initiation failed');
         }
+
+        // Store pending booking data
+        sessionStorage.setItem('pending_lunch', JSON.stringify({
+          dates: formData.lunchDates,
+          amount: totalAmount
+        }));
+
+        toast.success('Redirecting to payment gateway...', {
+          duration: 1000,
+          position: 'top-center',
+        });
+
+        // Redirect to payment gateway
+        setTimeout(() => {
+          window.location.href = paymentResult.payment_url;
+        }, 1000);
+        
+        // Note: After payment success, user will be redirected back and bookings will be fetched
+        return;
       }
     } catch (error) {
       console.error('Booking error:', error);
       
-      toast.error('Booking failed. Please try again.', {
-        icon: '❌',
-        duration: 5000,
+      toast.error(error.message || 'Booking failed. Please try again.', {
+        duration: 4000,
+        position: 'top-center',
         style: {
           background: '#ef4444',
           color: '#fff',
@@ -240,6 +349,61 @@ const AccommodationBooking = () => {
         </h1>
         <p className="text-gray-400">Book your stay and meals for DaKshaa 2026</p>
       </motion.div>
+
+      {/* My Bookings Section */}
+      {!loadingBookings && (existingBookings.accommodation || existingBookings.lunch) && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-6xl mx-auto mb-8"
+        >
+          <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <CheckCircle2 className="text-green-500" size={28} />
+            My Confirmed Bookings
+          </h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            {existingBookings.accommodation && (
+              <div className="bg-blue-500/10 border-2 border-blue-500/50 rounded-xl p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <Hotel className="text-blue-400" size={24} />
+                  <h3 className="text-xl font-bold text-white">Accommodation Booked</h3>
+                </div>
+                <div className="space-y-2 text-gray-300">
+                  <p><strong>Name:</strong> {existingBookings.accommodation.full_name}</p>
+                  <p><strong>Email:</strong> {existingBookings.accommodation.email}</p>
+                  <p><strong>Phone:</strong> {existingBookings.accommodation.phone}</p>
+                  <p><strong>Dates:</strong> {(() => {
+                    try {
+                      const data = JSON.parse(existingBookings.accommodation.special_requests || '{}');
+                      return (data.dates || []).join(', ') || existingBookings.accommodation.number_of_days + ' day(s)';
+                    } catch {
+                      return existingBookings.accommodation.number_of_days + ' day(s)';
+                    }
+                  })()}</p>
+                  <p><strong>Total:</strong> <span className="text-blue-400 font-bold">₹{existingBookings.accommodation.total_price}</span></p>
+                  <p><strong>Status:</strong> <span className="text-green-400 font-bold">PAID ✓</span></p>
+                </div>
+              </div>
+            )}
+            {existingBookings.lunch && (
+              <div className="bg-orange-500/10 border-2 border-orange-500/50 rounded-xl p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <UtensilsCrossed className="text-orange-400" size={24} />
+                  <h3 className="text-xl font-bold text-white">Lunch Booked</h3>
+                </div>
+                <div className="space-y-2 text-gray-300">
+                  <p><strong>Name:</strong> {existingBookings.lunch.full_name}</p>
+                  <p><strong>Email:</strong> {existingBookings.lunch.email}</p>
+                  <p><strong>Phone:</strong> {existingBookings.lunch.phone}</p>
+                  <p><strong>Dates:</strong> {existingBookings.lunch.booked_dates || existingBookings.lunch.total_lunches + ' lunch(es)'}</p>
+                  <p><strong>Total:</strong> <span className="text-orange-400 font-bold">₹{existingBookings.lunch.total_price}</span></p>
+                  <p><strong>Status:</strong> <span className="text-green-400 font-bold">PAID ✓</span></p>
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
 
       {/* Cards Container */}
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
@@ -283,12 +447,25 @@ const AccommodationBooking = () => {
             </div>
           </div>
 
-          <button
-            onClick={() => handleBooking('accommodation')}
-            className="w-full py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg hover:shadow-blue-500/50"
-          >
-            BOOK NOW
-          </button>
+          {existingBookings.accommodation && existingBookings.bookedAccommodationDates.length >= 3 ? (
+            <div className="w-full py-3 bg-green-500/20 border-2 border-green-500/50 text-green-400 rounded-xl font-semibold text-center">
+              ✓ All Dates Booked
+            </div>
+          ) : existingBookings.accommodation ? (
+            <button
+              onClick={() => handleBooking('accommodation')}
+              className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg hover:shadow-green-500/50"
+            >
+              ✓ Modify Booking
+            </button>
+          ) : (
+            <button
+              onClick={() => handleBooking('accommodation')}
+              className="w-full py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg hover:shadow-blue-500/50"
+            >
+              BOOK NOW
+            </button>
+          )}
         </motion.div>
 
         {/* Lunch Card */}
@@ -330,12 +507,25 @@ const AccommodationBooking = () => {
             </div>
           </div>
 
-          <button
-            onClick={() => handleBooking('lunch')}
-            className="w-full py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl font-semibold hover:from-orange-700 hover:to-red-700 transition-all shadow-lg hover:shadow-orange-500/50"
-          >
-            RESERVE NOW
-          </button>
+          {existingBookings.lunch && existingBookings.bookedLunchDates.length >= 3 ? (
+            <div className="w-full py-3 bg-green-500/20 border-2 border-green-500/50 text-green-400 rounded-xl font-semibold text-center">
+              ✓ All Dates Booked
+            </div>
+          ) : existingBookings.lunch ? (
+            <button
+              onClick={() => handleBooking('lunch')}
+              className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg hover:shadow-green-500/50"
+            >
+              ✓ Modify Booking
+            </button>
+          ) : (
+            <button
+              onClick={() => handleBooking('lunch')}
+              className="w-full py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl font-semibold hover:from-orange-700 hover:to-red-700 transition-all shadow-lg hover:shadow-orange-500/50"
+            >
+              RESERVE NOW
+            </button>
+          )}
         </motion.div>
       </div>
 
@@ -452,35 +642,44 @@ const AccommodationBooking = () => {
                       <button
                         type="button"
                         onClick={() => handleDateToggle('February 12', 'accommodation')}
+                        disabled={existingBookings.bookedAccommodationDates.includes('February 12')}
                         className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
-                          formData.accommodationDates.includes('February 12')
+                          existingBookings.bookedAccommodationDates.includes('February 12')
+                            ? 'border-green-500 bg-green-500/20 text-green-400 cursor-not-allowed'
+                            : formData.accommodationDates.includes('February 12')
                             ? 'border-blue-500 bg-blue-500/20 text-blue-400'
                             : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-blue-500/50'
                         }`}
                       >
-                        February 12 Evening
+                        February 12 {existingBookings.bookedAccommodationDates.includes('February 12') ? '✓' : 'Evening'}
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDateToggle('February 13', 'accommodation')}
+                        disabled={existingBookings.bookedAccommodationDates.includes('February 13')}
                         className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
-                          formData.accommodationDates.includes('February 13')
+                          existingBookings.bookedAccommodationDates.includes('February 13')
+                            ? 'border-green-500 bg-green-500/20 text-green-400 cursor-not-allowed'
+                            : formData.accommodationDates.includes('February 13')
                             ? 'border-blue-500 bg-blue-500/20 text-blue-400'
                             : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-blue-500/50'
                         }`}
                       >
-                        February 13 Full Day
+                        February 13 {existingBookings.bookedAccommodationDates.includes('February 13') ? '✓' : 'Full Day'}
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDateToggle('February 14', 'accommodation')}
+                        disabled={existingBookings.bookedAccommodationDates.includes('February 14')}
                         className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
-                          formData.accommodationDates.includes('February 14')
+                          existingBookings.bookedAccommodationDates.includes('February 14')
+                            ? 'border-green-500 bg-green-500/20 text-green-400 cursor-not-allowed'
+                            : formData.accommodationDates.includes('February 14')
                             ? 'border-blue-500 bg-blue-500/20 text-blue-400'
                             : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-blue-500/50'
                         }`}
                       >
-                        February 14 Breakfast
+                        February 14 {existingBookings.bookedAccommodationDates.includes('February 14') ? '✓' : 'Breakfast'}
                       </button>
                     </>
                   ) : (
@@ -488,35 +687,44 @@ const AccommodationBooking = () => {
                       <button
                         type="button"
                         onClick={() => handleDateToggle('February 12', 'lunch')}
+                        disabled={existingBookings.bookedLunchDates.includes('February 12')}
                         className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
-                          formData.lunchDates.includes('February 12')
+                          existingBookings.bookedLunchDates.includes('February 12')
+                            ? 'border-green-500 bg-green-500/20 text-green-400 cursor-not-allowed'
+                            : formData.lunchDates.includes('February 12')
                             ? 'border-orange-500 bg-orange-500/20 text-orange-400'
                             : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-orange-500/50'
                         }`}
                       >
-                        February 12
+                        February 12 {existingBookings.bookedLunchDates.includes('February 12') ? '✓ Booked' : ''}
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDateToggle('February 13', 'lunch')}
+                        disabled={existingBookings.bookedLunchDates.includes('February 13')}
                         className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
-                          formData.lunchDates.includes('February 13')
+                          existingBookings.bookedLunchDates.includes('February 13')
+                            ? 'border-green-500 bg-green-500/20 text-green-400 cursor-not-allowed'
+                            : formData.lunchDates.includes('February 13')
                             ? 'border-orange-500 bg-orange-500/20 text-orange-400'
                             : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-orange-500/50'
                         }`}
                       >
-                        February 13
+                        February 13 {existingBookings.bookedLunchDates.includes('February 13') ? '✓ Booked' : ''}
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDateToggle('February 14', 'lunch')}
+                        disabled={existingBookings.bookedLunchDates.includes('February 14')}
                         className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
-                          formData.lunchDates.includes('February 14')
+                          existingBookings.bookedLunchDates.includes('February 14')
+                            ? 'border-green-500 bg-green-500/20 text-green-400 cursor-not-allowed'
+                            : formData.lunchDates.includes('February 14')
                             ? 'border-orange-500 bg-orange-500/20 text-orange-400'
                             : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-orange-500/50'
                         }`}
                       >
-                        February 14
+                        February 14 {existingBookings.bookedLunchDates.includes('February 14') ? '✓ Booked' : ''}
                       </button>
                     </>
                   )}

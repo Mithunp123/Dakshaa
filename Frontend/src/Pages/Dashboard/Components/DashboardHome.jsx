@@ -63,20 +63,81 @@ const DashboardHome = () => {
   }, []);
 
   const fetchDashboardData = async () => {
+    setLoading(true);
+    
     try {
       const storedUser = getStoredUser();
-      if (storedUser) {
-        // Fetch profile and registrations in parallel for faster load
-        const [profileResponse, regData, teamsData] = await Promise.all([
-          supabase.from('profiles').select('full_name, email, college_name, role').eq('id', storedUser.id).single(),
-          supabaseService.getUserRegistrations(storedUser.id),
-          supabase.from('team_members').select('team_id', { count: 'exact' }).eq('user_id', storedUser.id)
-        ]);
-        
-        setProfile(profileResponse.data);
-        setRegistrations(regData);
-        setTeamsCount(teamsData.count || 0);
+      if (!storedUser) {
+        setLoading(false);
+        return;
       }
+
+      // Check cache first for instant load (but only if valid and recent)
+      const cachedData = sessionStorage.getItem('dashboard_data');
+      let usedCache = false;
+      
+      if (cachedData) {
+        try {
+          const parsed = JSON.parse(cachedData);
+          const cacheAge = Date.now() - parsed.timestamp;
+          // Use cache if less than 10 seconds old (for quick navigation)
+          if (cacheAge < 10000) {
+            setProfile(parsed.profile);
+            setRegistrations(parsed.registrations);
+            setTeamsCount(parsed.teamsCount);
+            setLoading(false);
+            usedCache = true;
+            console.log('✅ Dashboard loaded from cache');
+            return; // Don't fetch again if cache is very fresh
+          }
+        } catch (e) {
+          console.warn('Failed to parse cached dashboard data');
+        }
+      }
+
+      // Fetch profile, registrations, teams with proper error handling
+      const [{ data: profileData, error: profileError }, registrationsData, { count: teamsCountValue, error: teamsError }] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('full_name, email, college_name, role')
+          .eq('id', storedUser.id)
+          .single(),
+        (async () => {
+          try {
+            return await supabaseService.getUserRegistrations(storedUser.id);
+          } catch (err) {
+            console.error('Failed to load registrations:', err);
+            return [];
+          }
+        })(),
+        supabase
+          .from('team_members')
+          .select('team_id', { count: 'exact', head: true })
+          .eq('user_id', storedUser.id)
+      ]);
+
+      if (profileError) {
+        console.warn('Profile fetch error:', profileError.message);
+      }
+      if (teamsError) {
+        console.warn('Teams count fetch error:', teamsError.message);
+      }
+
+      const dashboardData = {
+        profile: profileData || null,
+        registrations: registrationsData || [],
+        teamsCount: teamsCountValue || 0,
+        timestamp: Date.now()
+      };
+
+      // Update state
+      setProfile(dashboardData.profile);
+      setRegistrations(dashboardData.registrations);
+      setTeamsCount(dashboardData.teamsCount);
+
+      // Cache for quick reload (short duration)
+      sessionStorage.setItem('dashboard_data', JSON.stringify(dashboardData));
+      console.log('✅ Dashboard data fetched and cached');
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {

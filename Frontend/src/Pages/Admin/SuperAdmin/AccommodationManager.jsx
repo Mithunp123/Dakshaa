@@ -42,38 +42,74 @@ const AccommodationManager = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch all accommodation bookings with user details
+      // Fetch all accommodation bookings from accommodation_requests table
       const { data, error } = await supabase
-        .from("accommodation")
-        .select(`
-          *,
-          profiles!accommodation_user_id_fkey (
-            full_name,
-            email,
-            college_name,
-            mobile_number,
-            roll_no
-          )
-        `)
+        .from("accommodation_requests")
+        .select("*")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      const formattedBookings = data.map(booking => ({
-        id: booking.id,
-        user_id: booking.user_id,
-        full_name: booking.profiles?.full_name,
-        email: booking.profiles?.email,
-        college: booking.profiles?.college_name,
-        mobile: booking.profiles?.mobile_number,
-        roll_no: booking.profiles?.roll_no,
-        payment_status: booking.payment_status,
-        payment_amount: booking.payment_amount,
-        check_in_status: booking.check_in_status,
-        check_in_time: booking.check_in_time,
-        room_no: booking.room_no,
-        days_booked: booking.days_booked,
-        created_at: booking.created_at
+      // Aggregate bookings by user_id (since users can extend their booking)
+      const userBookingsMap = {};
+      
+      data.forEach(booking => {
+        const userId = booking.user_id;
+        
+        // Parse dates from special_requests
+        let bookingDates = [];
+        try {
+          const specialData = JSON.parse(booking.special_requests || '{}');
+          if (specialData.dates) bookingDates = specialData.dates;
+        } catch (e) {}
+        
+        if (!userBookingsMap[userId]) {
+          // First booking for this user
+          userBookingsMap[userId] = {
+            id: booking.id,
+            ids: [booking.id], // Keep all booking IDs
+            user_id: booking.user_id,
+            full_name: booking.full_name,
+            email: booking.email,
+            college: booking.college_name,
+            mobile: booking.phone,
+            gender: booking.gender,
+            payment_status: booking.payment_status,
+            payment_amount: parseFloat(booking.total_price) || 0,
+            check_in_status: booking.check_in_status,
+            check_in_time: booking.check_in_time,
+            room_no: booking.room_no,
+            booked_dates: bookingDates,
+            created_at: booking.created_at
+          };
+        } else {
+          // Additional booking for same user - aggregate
+          userBookingsMap[userId].ids.push(booking.id);
+          userBookingsMap[userId].payment_amount += parseFloat(booking.total_price) || 0;
+          userBookingsMap[userId].booked_dates = [...userBookingsMap[userId].booked_dates, ...bookingDates];
+          
+          // Update status to PAID if any booking is paid
+          if (booking.payment_status === 'PAID') {
+            userBookingsMap[userId].payment_status = 'PAID';
+          }
+          
+          // Keep the room assignment if any booking has it
+          if (booking.room_no && !userBookingsMap[userId].room_no) {
+            userBookingsMap[userId].room_no = booking.room_no;
+          }
+          
+          // Keep check-in status if any booking is checked in
+          if (booking.check_in_status) {
+            userBookingsMap[userId].check_in_status = true;
+            userBookingsMap[userId].check_in_time = booking.check_in_time;
+          }
+        }
+      });
+
+      // Convert to array and calculate days_booked from unique dates
+      const formattedBookings = Object.values(userBookingsMap).map(booking => ({
+        ...booking,
+        days_booked: booking.booked_dates.length || 1
       }));
 
       setBookings(formattedBookings);
@@ -105,24 +141,27 @@ const AccommodationManager = () => {
     }
 
     if (statusFilter === "paid_unassigned") {
-      filtered = filtered.filter(b => b.payment_status === "paid" && !b.room_no);
+      filtered = filtered.filter(b => b.payment_status === "PAID" && !b.room_no);
     } else if (statusFilter === "assigned") {
       filtered = filtered.filter(b => b.room_no);
     } else if (statusFilter === "checked_in") {
       filtered = filtered.filter(b => b.check_in_status);
     } else if (statusFilter === "pending_payment") {
-      filtered = filtered.filter(b => b.payment_status === "pending");
+      filtered = filtered.filter(b => b.payment_status === "PENDING");
     }
 
     setFilteredBookings(filtered);
   };
 
-  const handleAssignRoom = async (bookingId, room) => {
+  const handleAssignRoom = async (booking, room) => {
     try {
+      // Update all booking records for this user
+      const bookingIds = booking.ids || [booking.id];
+      
       const { error } = await supabase
-        .from("accommodation")
+        .from("accommodation_requests")
         .update({ room_no: room })
-        .eq("id", bookingId);
+        .in("id", bookingIds);
 
       if (error) throw error;
 
@@ -135,15 +174,18 @@ const AccommodationManager = () => {
     }
   };
 
-  const handleCheckIn = async (bookingId) => {
+  const handleCheckIn = async (booking) => {
     try {
+      // Update all booking records for this user
+      const bookingIds = booking.ids || [booking.id];
+      
       const { error } = await supabase
-        .from("accommodation")
+        .from("accommodation_requests")
         .update({
           check_in_status: true,
           check_in_time: new Date().toISOString()
         })
-        .eq("id", bookingId);
+        .in("id", bookingIds);
 
       if (error) throw error;
 
@@ -162,7 +204,7 @@ const AccommodationManager = () => {
     );
   }
 
-  const paidUnassigned = bookings.filter(b => b.payment_status === "paid" && !b.room_no).length;
+  const paidUnassigned = bookings.filter(b => b.payment_status === "PAID" && !b.room_no).length;
 
   return (
     <div className="space-y-6">
@@ -294,7 +336,7 @@ const AccommodationManager = () => {
                     </span>
                   </td>
                   <td className="p-4">
-                    {booking.payment_status === "paid" ? (
+                    {booking.payment_status === "PAID" ? (
                       <span className="flex items-center gap-2 text-green-500 text-sm">
                         <CheckCircle2 size={14} />
                         ₹{booking.payment_amount}
@@ -317,7 +359,7 @@ const AccommodationManager = () => {
                           className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-secondary text-sm w-32"
                         />
                         <button
-                          onClick={() => handleAssignRoom(booking.id, roomNumber)}
+                          onClick={() => handleAssignRoom(booking, roomNumber)}
                           className="p-1 bg-green-500/20 hover:bg-green-500/30 text-green-500 rounded transition-colors"
                         >
                           <Save size={14} />
@@ -356,7 +398,7 @@ const AccommodationManager = () => {
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-2">
-                      {!booking.room_no && booking.payment_status === "paid" && (
+                      {!booking.room_no && booking.payment_status === "PAID" && (
                         <button
                           onClick={() => {
                             setEditingRoom(booking.id);
@@ -369,7 +411,7 @@ const AccommodationManager = () => {
                       )}
                       {booking.room_no && !booking.check_in_status && (
                         <button
-                          onClick={() => handleCheckIn(booking.id)}
+                          onClick={() => handleCheckIn(booking)}
                           className="px-3 py-1 bg-green-500/10 hover:bg-green-500/20 text-green-500 rounded-lg transition-colors text-sm flex items-center gap-1"
                         >
                           <UserCheck size={14} />

@@ -18,6 +18,7 @@ BEGIN
     year_of_study,
     roll_number,
     mobile_number,
+    referred_by,
     role,
     created_at
   )
@@ -31,6 +32,7 @@ BEGIN
     COALESCE(NEW.raw_user_meta_data->>'year_of_study', ''),
     COALESCE(NEW.raw_user_meta_data->>'roll_number', ''),
     COALESCE(NEW.raw_user_meta_data->>'mobile_number', ''),
+    NULLIF(COALESCE(NEW.raw_user_meta_data->>'referred_by', ''), ''),
     'student', -- Default role
     NOW()
   );

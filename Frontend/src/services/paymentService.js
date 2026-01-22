@@ -1,12 +1,58 @@
 import { supabase } from '../supabase';
 
+// Use localhost for development, ngrok for production/testing
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 /**
  * Payment Service
- * Manages unified payment transactions across the platform
+ * Manages unified payment transactions with local payment gateway
  */
 const paymentService = {
   /**
-   * Create a payment transaction record
+   * Initiate payment with local payment gateway
+   */
+  initiatePayment: async ({
+    userId,
+    bookingId,
+    bookingType, // 'accommodation', 'lunch', 'event', 'combo'
+    amount,
+  }) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/payment/initiate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          booking_id: bookingId,
+          booking_type: bookingType,
+          amount: amount,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Payment initiation failed');
+      }
+
+      return {
+        success: true,
+        payment_data: result.payment_data,
+        transaction_id: result.transaction_id,
+      };
+    } catch (error) {
+      console.error('Error initiating payment:', error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Create a payment transaction record (legacy - keeping for compatibility)
    */
   createPaymentTransaction: async ({
     userId,
@@ -161,7 +207,7 @@ const paymentService = {
   },
 
   /**
-   * Initiate Razorpay payment
+   * Initiate Razorpay payment (legacy - replaced with initiatePayment)
    * Returns order details for frontend to open Razorpay modal
    */
   initiateRazorpayPayment: async ({
@@ -172,32 +218,15 @@ const paymentService = {
     description = '',
   }) => {
     try {
-      // Create payment transaction record
-      const transactionResult = await paymentService.createPaymentTransaction({
+      // Use new payment gateway instead
+      return await paymentService.initiatePayment({
         userId,
-        transactionType,
-        referenceId: purchaseId,
+        bookingId: purchaseId,
+        bookingType: transactionType.toLowerCase(),
         amount,
       });
-
-      if (!transactionResult.success) {
-        throw new Error(transactionResult.error);
-      }
-
-      // In production, call backend API to create Razorpay order
-      // For now, return mock order data
-      const orderId = `order_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-
-      return {
-        success: true,
-        orderId,
-        amount: amount * 100, // Razorpay expects amount in paise
-        currency: 'INR',
-        transactionId: transactionResult.transactionId,
-        description,
-      };
     } catch (error) {
-      console.error('Error initiating Razorpay payment:', error);
+      console.error('Error initiating payment:', error);
       return {
         success: false,
         error: error.message,
@@ -206,40 +235,25 @@ const paymentService = {
   },
 
   /**
-   * Handle Razorpay payment success callback
+   * Handle payment success callback
    */
-  handleRazorpaySuccess: async ({
-    razorpayPaymentId,
-    razorpayOrderId,
-    razorpaySignature,
+  handlePaymentSuccess: async ({
+    orderId,
     transactionId,
+    paymentMethod = 'gateway',
+    gatewayResponse = {},
   }) => {
     try {
-      // Update payment transaction
-      const updateResult = await paymentService.updatePaymentStatus(
-        transactionId,
-        'PAID',
-        {
-          transactionId: razorpayPaymentId,
-          orderId: razorpayOrderId,
-          gateway: 'razorpay',
-          method: 'UNKNOWN', // Will be updated from webhook
-          metadata: {
-            signature: razorpaySignature,
-          },
-        }
-      );
-
-      if (!updateResult.success) {
-        throw new Error(updateResult.error);
-      }
-
+      // Backend callback handler will update the status
+      // This is just for frontend confirmation
       return {
         success: true,
         message: 'Payment recorded successfully',
+        orderId,
+        transactionId,
       };
     } catch (error) {
-      console.error('Error handling Razorpay success:', error);
+      console.error('Error handling payment success:', error);
       return {
         success: false,
         error: error.message,
@@ -270,6 +284,66 @@ const paymentService = {
         error: error.message,
       };
     }
+  },
+  
+  /**
+   * Initiate team payment
+   */
+  initiateTeamPayment: async ({
+    userId,
+    eventId,
+    teamName,
+    memberCount,
+    amount, // Optional, backend recalculates
+  }) => {
+    try {
+      // Use the main payment/initiate endpoint which now handles team logic
+      const response = await fetch(`${BACKEND_URL}/payment/initiate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          booking_type: 'team',
+          // team_id is null for new team
+          team_name: teamName,
+          event_id: eventId,
+          member_count: memberCount,
+          amount: amount, 
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Payment initiation failed');
+      }
+
+      // Result should contain payment_url from the custom gateway response
+      // Structure based on server.js: 
+      // res.json({ success: true, payment_url: paymentUrl, transaction_id: ... })
+      return {
+        success: true,
+        payment_url: result.payment_url || result.data?.payment_url || result.payment_data?.payment_url,
+        transaction_id: result.transaction_id
+      };
+    } catch (error) {
+      console.error('Error initiating team payment:', error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Verify team payment (Legacy/Razorpay - Deprecated)
+   * The custom gateway handles verification via callback
+   */
+  verifyTeamPayment: async () => {
+     console.warn("verifyTeamPayment is deprecated. Verification happens via backend callback.");
+     return { success: true };
   },
 };
 

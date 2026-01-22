@@ -1,9 +1,10 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState } from "react";
+import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
   Users,
-  DollarSign,
+  IndianRupee,
   Clock,
   CheckCircle2,
   AlertTriangle,
@@ -14,8 +15,23 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistered }) => {
+const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistered, isPendingPayment, allowTeamSelection = false }) => {
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+
+  const handleDescriptionClick = (e) => {
+    e.stopPropagation();
+    setShowModal(true);
+  };
+
+  const formatDescription = (text) => {
+    if (!text) return [];
+    let processed = text;
+    // Only split on colon if followed by whitespace (avoids breaking URLs or times like 10:00)
+    processed = processed.replace(/:\s+/g, ":\n");
+    processed = processed.replace(/([*•])/g, "\n$1");
+    return processed.split('\n').filter(line => line.trim().length > 0);
+  };
   
   // Normalize event data - ensure numeric types
   const capacity = parseInt(event.capacity) || 100;
@@ -39,6 +55,15 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistere
         bgColor: "bg-blue-500/10",
         textColor: "text-blue-400",
         borderColor: "border-blue-500/30",
+      };
+    }
+    if (isPendingPayment) {
+      return {
+        icon: Clock,
+        text: "Payment Pending",
+        bgColor: "bg-purple-500/10",
+        textColor: "text-purple-400",
+        borderColor: "border-purple-500/30",
       };
     }
     if (!isOpen) {
@@ -83,26 +108,31 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistere
 
   // Handle card click - redirect to dashboard for team events
   const handleCardClick = () => {
-    // Prevent interaction if already registered, disabled, or not open
-    if (isAlreadyRegistered || isDisabled || !canRegister) {
-      if (isAlreadyRegistered) {
-        // Optional: show a toast message
-        console.log('Event already registered');
-      }
+    // Check if already registered first - allow viewing details
+    if (isAlreadyRegistered) {
+      setShowModal(true);
+      return;
+    }
+    
+    // Prevent interaction if disabled or not open
+    if (isDisabled || !canRegister) {
       return;
     }
     
     // If it's a team event, redirect to dashboard team creation
-    if (isTeamEvent) {
+    if (isTeamEvent && !allowTeamSelection) {
+      // Prioritize title, then formatted ID
+      const displayTitle = event.title || event.name || (event.event_id ? event.event_id.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'Unknown Event');
+      
       navigate('/dashboard/teams', { 
         state: { 
           createTeam: true,
           eventId: event.event_id || event.id,
-          eventName: event.name || event.title || event.event_name
+          eventName: displayTitle
         } 
       });
     } else {
-      // For individual events, use the original onSelect handler
+      // For individual events OR team events in mixed mode, use the original onSelect handler
       if (onSelect) onSelect();
     }
   };
@@ -111,11 +141,11 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistere
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={!isDisabled && !isAlreadyRegistered && canRegister ? { y: -5 } : {}}
+      whileHover={(!isDisabled && canRegister) || isAlreadyRegistered ? { y: -5 } : {}}
       onClick={handleCardClick}
       className={`group relative bg-gradient-to-br from-white/5 to-white/[0.02] border rounded-3xl overflow-hidden transition-all duration-300 ${
         isAlreadyRegistered
-          ? "border-blue-500/30 opacity-60 cursor-not-allowed"
+          ? "border-blue-500/30 opacity-100 cursor-pointer"
           : isSelected
           ? "border-secondary shadow-lg shadow-secondary/20 scale-[1.02] cursor-pointer"
           : isDisabled || !canRegister
@@ -141,9 +171,18 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistere
               {event.name || event.title || event.event_name || "Unnamed Event"}
             </h3>
             {event.description && (
-              <p className="text-sm text-gray-400 line-clamp-2">
-                {event.description}
-              </p>
+              <div 
+                onClick={handleDescriptionClick} 
+                className="group/desc cursor-pointer hover:bg-white/5 -mx-2 px-2 py-1 rounded-lg transition-colors"
+                title="Click to view full description"
+              >
+                <p className="text-sm text-gray-400 line-clamp-2">
+                  {event.description}
+                </p>
+                <p className="text-[10px] text-secondary font-medium opacity-0 group-hover/desc:opacity-100 transition-opacity h-0 group-hover/desc:h-auto">
+                  Read more...
+                </p>
+              </div>
             )}
           </div>
 
@@ -162,7 +201,7 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistere
         <div className="grid grid-cols-2 gap-3">
           {/* Price */}
           <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-xl">
-            <DollarSign size={16} className="text-green-400 flex-shrink-0" />
+            <IndianRupee size={16} className="text-green-400 flex-shrink-0" />
             <div className="min-w-0">
               <p className="text-xs text-gray-500">
                 {isTeamEvent ? "Per Person" : "Price"}
@@ -188,7 +227,8 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistere
           </div>
         </div>
 
-        {/* Capacity Bar */}
+        {/* Capacity Bar - REMOVED */}
+        {/*
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="text-gray-400">
@@ -218,6 +258,7 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistere
             />
           </div>
         </div>
+        */}
 
         {/* Status Badge */}
         <div
@@ -254,6 +295,112 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistere
       {!isDisabled && canRegister && !isSelected && (
         <div className="absolute inset-0 border-2 border-transparent group-hover:border-secondary/30 rounded-3xl transition-all pointer-events-none" />
       )}
+
+      {/* Description Modal - Portal to body */}
+      {createPortal(
+        <AnimatePresence>
+          {showModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowModal(false);
+              }}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-gray-900 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden shadow-2xl relative flex flex-col"
+              >
+                {/* Modal Header */}
+                <div className="p-6 border-b border-white/10 flex items-start justify-between bg-gray-900/95 backdrop-blur sticky top-0 z-10">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white font-orbitron mb-2">
+                      {event.name || event.title || event.event_name}
+                    </h3>
+                    <div className="flex flex-wrap gap-2 text-xs text-gray-400">
+                       <span className="bg-white/5 px-2.5 py-1 rounded-full border border-white/10">
+                         {isTeamEvent ? "Team Event" : "Individual Event"}
+                       </span>
+                       <span className="bg-white/5 px-2.5 py-1 rounded-full border border-white/10 text-green-400">
+                         ₹{price}
+                       </span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setShowModal(false)}
+                    className="p-2 -mr-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+                  >
+                    <XCircle size={24} />
+                  </button>
+                </div>
+                
+                {/* Modal Content */}
+                <div className="p-6 overflow-y-auto custom-scrollbar">
+                   <div className="space-y-2 text-gray-300 leading-relaxed text-justify">
+                      {formatDescription(event.description).map((line, i) => (
+                        <p key={i} className={line.trim().startsWith('*') || line.trim().startsWith('•') ? "pl-4 text-gray-400" : ""}>
+                          {line}
+                        </p>
+                      ))}
+                   </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="p-4 border-t border-white/10 bg-gray-900/50 flex justify-end gap-3">
+                    <button
+                        onClick={() => setShowModal(false)}
+                        className="px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white rounded-lg transition-colors text-sm font-medium"
+                    >
+                        Close
+                    </button>
+                    {isAlreadyRegistered && (
+                      <button
+                        disabled
+                        className="px-4 py-2 bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-lg cursor-default flex items-center gap-2"
+                      >
+                        <CheckCircle2 size={16} />
+                        Registered
+                      </button>
+                    )}
+                    {!isDisabled && canRegister && !isAlreadyRegistered && (
+                         <button
+                         onClick={() => {
+                             setShowModal(false);
+                             if (isTeamEvent) {
+                                // Prioritize title, then formatted ID
+                                const displayTitle = event.title || event.name || (event.event_id ? event.event_id.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'Unknown Event');
+                                
+                                navigate('/dashboard/teams', { 
+                                  state: { 
+                                    createTeam: true,
+                                    eventId: event.event_id || event.id,
+                                    eventName: displayTitle
+                                  } 
+                                });
+                              } else {
+                                if (onSelect) onSelect();
+                              }
+                         }}
+                         className="px-4 py-2 bg-secondary hover:bg-secondary/80 text-white rounded-lg transition-colors text-sm font-bold shadow-lg shadow-secondary/20"
+                     >
+                         {isSelected ? "Selected" : "Select Event"}
+                     </button>
+                    )}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
     </motion.div>
   );
 };

@@ -480,8 +480,8 @@ const UltraHeroSection = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.5 }}
           >
-            <span className="text-cyan-400">"</span>
-            Where Innovation Meets Excellence
+            <span className="text-cyan-400">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"</span>
+            <span className="text-white animate-blink">Where Innovation Meets Excellence</span>
             <span className="text-cyan-400">"</span>
           </motion.p>
           <motion.div

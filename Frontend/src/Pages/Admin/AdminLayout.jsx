@@ -19,7 +19,8 @@ import {
   Bed,
   Radio,
   ShieldCheck,
-  Package
+  Package,
+  Trophy
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../supabase';
@@ -89,6 +90,7 @@ const AdminLayout = () => {
         { label: 'Participant CRM', icon: Mail, path: '/admin/crm' },
         { label: 'Waitlist', icon: Clock, path: '/admin/waitlist' },
         { label: 'Accommodation', icon: Bed, path: '/admin/accommodation' },
+        { label: 'Referrals', icon: Trophy, path: '/admin/referrals' },
         { label: 'Event Controller', icon: Radio, path: '/admin/event-controller' }
       );
     }

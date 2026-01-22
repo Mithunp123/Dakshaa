@@ -16,9 +16,10 @@ const ComboCard = ({ combo, onSelect, isSelected, userPurchasedCombos = [] }) =>
   const isPurchased = userPurchasedCombos.includes(comboId);
   const isAvailable = combo.is_active && !isPurchased;
 
-  // Calculate discount percentage if individual event prices were higher
-  const individualTotal = combo.events?.reduce((sum, e) => sum + (e.price || 0), 0) || 0;
-  const discount = individualTotal > combo.price ? Math.round(((individualTotal - combo.price) / individualTotal) * 100) : 0;
+  // Calculate discount percentage based on original_price if available
+  const originalPrice = parseFloat(combo.original_price) || 0;
+  const comboPrice = parseFloat(combo.price) || 0;
+  const discount = originalPrice > comboPrice ? Math.round(((originalPrice - comboPrice) / originalPrice) * 100) : 0;
 
   return (
     <motion.div
@@ -89,56 +90,38 @@ const ComboCard = ({ combo, onSelect, isSelected, userPurchasedCombos = [] }) =>
 
         {/* Price Section */}
         <div className="flex items-end gap-3">
-          {discount > 0 && (
-            <span className="text-xl text-gray-500 line-through">₹{individualTotal}</span>
+          {discount > 0 && originalPrice > 0 && (
+            <span className="text-xl text-gray-500 line-through">₹{originalPrice}</span>
           )}
           <div>
             <span className="text-4xl font-bold bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">
-              ₹{combo.price}
+              ₹{comboPrice}
             </span>
           </div>
         </div>
 
-        {/* Category Quotas */}
+        {/* Category Quotas - Shows how many events to select from each category */}
         {combo.category_quotas && Object.keys(combo.category_quotas).length > 0 && (
           <div className="space-y-2">
-            <p className="text-xs text-gray-500 uppercase tracking-wider">Category Selections</p>
+            <p className="text-xs text-gray-500 uppercase tracking-wider">Select Events From</p>
             <div className="flex flex-wrap gap-2">
-              {Object.entries(combo.category_quotas).map(([category, count]) => (
-                <div
-                  key={category}
-                  className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs"
-                >
-                  <span className="font-bold text-secondary">{count}</span>
-                  <span className="text-gray-400 ml-1 capitalize">{category}</span>
-                </div>
-              ))}
+              {Object.entries(combo.category_quotas).map(([category, count]) => {
+                // Handle both number counts and any other format
+                const displayCount = typeof count === 'number' ? count : 1;
+                return (
+                  <div
+                    key={category}
+                    className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs"
+                  >
+                    <span className="font-bold text-secondary">{displayCount}</span>
+                    <span className="text-gray-400 ml-1 capitalize">{category}</span>
+                  </div>
+                );
+              })}
             </div>
-          </div>
-        )}
-
-        {/* Events Included */}
-        {combo.events && combo.events.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-xs text-gray-500 uppercase tracking-wider">
-              {combo.events.length} Events Included
+            <p className="text-xs text-gray-400 italic">
+              You'll choose {Object.values(combo.category_quotas).reduce((sum, c) => sum + (typeof c === 'number' ? c : 1), 0)} events after selecting this combo
             </p>
-            <div className="space-y-1 max-h-32 overflow-y-auto custom-scrollbar">
-              {combo.events.slice(0, 5).map((event, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-2 text-sm"
-                >
-                  <div className="w-1.5 h-1.5 bg-secondary rounded-full" />
-                  <span className="text-gray-300">{event.name || event.event_name}</span>
-                </div>
-              ))}
-              {combo.events.length > 5 && (
-                <p className="text-xs text-gray-500 pl-3.5">
-                  +{combo.events.length - 5} more events
-                </p>
-              )}
-            </div>
           </div>
         )}
 

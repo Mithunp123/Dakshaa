@@ -86,72 +86,22 @@ const FinanceManager = () => {
     try {
       setLoading(true);
       
-      // Fetch all registrations with event details
-      const { data: regs, error } = await supabase
-        .from('registrations')
-        .select(`
-          *,
-          profiles (full_name, college_name),
-          events (event_id, category, price),
-          combos (combo_id, name, price)
-        `)
-        .order('created_at', { ascending: false });
+      // Use Backend API to bypass RLS issues
+      const response = await fetch('http://localhost:3000/api/admin/finance');
+      const result = await response.json();
 
-      if (error) throw error;
-
-      // Process Stats
-      let total = 0;
-      let online = 0;
-      let cash = 0;
-      let pending = 0;
+      if (!result.success) throw new Error(result.error);
       
-      const categories = {};
-      const hourly = {};
+      const { stats: apiStats, transactions: apiTransactions, categoryData: apiCatData, hourlyData: apiHourly } = result;
 
-      regs.forEach(reg => {
-        const price = reg.combos?.price || reg.events?.price || 0;
-        const status = reg.payment_status;
-        const mode = reg.payment_mode || 'online';
-
-        if (status === 'completed' || status === 'approved') {
-          total += Number(price);
-          if (mode === 'online') online += Number(price);
-          else cash += Number(price);
-
-          // Category breakdown
-          const cat = reg.combos ? 'Combo' : (reg.events?.category || 'Other');
-          categories[cat] = (categories[cat] || 0) + Number(price);
-        } else if (status === 'pending' && mode === 'cash') {
-          pending += Number(price);
-        }
-
-        // Hourly breakdown
-        const hour = new Date(reg.created_at).getHours();
-        hourly[hour] = (hourly[hour] || 0) + 1;
-      });
-
-      setStats({
-        totalRevenue: total,
-        onlineRevenue: online,
-        cashRevenue: cash,
-        pendingCash: pending,
-        totalRegistrations: regs.length
-      });
-
-      setTransactions(regs);
-      
-      setCategoryData(Object.keys(categories).map(name => ({
-        name,
-        value: categories[name]
-      })));
-
-      setHourlyData(Object.keys(hourly).map(hour => ({
-        hour: `${hour}:00`,
-        count: hourly[hour]
-      })));
+      setStats(apiStats);
+      setTransactions(apiTransactions);
+      setCategoryData(apiCatData);
+      setHourlyData(apiHourly);
 
     } catch (error) {
       console.error('Error fetching finance data:', error);
+      // Fallback to empty states or error toast
     } finally {
       setLoading(false);
     }

@@ -29,6 +29,23 @@ export const createTeam = async (teamData) => {
       maxMembers
     } = teamData;
 
+    // Check if team name already exists for this event
+    const { data: existingTeam, error: checkError } = await supabase
+      .from('teams')
+      .select('id, team_name')
+      .eq('event_id', eventId)
+      .ilike('team_name', teamName.trim())
+      .maybeSingle();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('Error checking team name:', checkError);
+      throw new Error('Failed to validate team name');
+    }
+
+    if (existingTeam) {
+      throw new Error(`Team name "${teamName}" already exists for this event. Please choose a different name.`);
+    }
+
     // Create team
     const { data: team, error: teamError } = await supabase
       .from('teams')

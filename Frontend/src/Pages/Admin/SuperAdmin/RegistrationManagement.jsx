@@ -18,7 +18,9 @@ import {
   Trash2,
   UserPlus,
   ChevronRight,
-  Package
+  Package,
+  Phone,
+  ArrowRight
 } from "lucide-react";
 import { supabase } from "../../../supabase";
 
@@ -30,6 +32,18 @@ const RegistrationManagement = () => {
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+
+  // Transfer Logic States
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [transferSearch, setTransferSearch] = useState('');
+  const [transferUser, setTransferUser] = useState(null);
+  const [userRegistrations, setUserRegistrations] = useState([]);
+  const [selectedSourceReg, setSelectedSourceReg] = useState(null);
+  const [availableTargetEvents, setAvailableTargetEvents] = useState([]);
+  const [selectedTargetEvent, setSelectedTargetEvent] = useState(null);
+  const [transferLoading, setTransferLoading] = useState(false);
+  const [transferError, setTransferError] = useState('');
+  const [transferSuccess, setTransferSuccess] = useState('');
 
   useEffect(() => {
     loadEventStats();
@@ -54,6 +68,202 @@ const RegistrationManagement = () => {
       supabase.removeChannel(registrationChannel);
     };
   }, [selectedEvent]);
+
+  const handleTransferClose = () => {
+    setShowTransferModal(false);
+    setTransferSearch('');
+    setTransferUser(null);
+    setUserRegistrations([]);
+    setSelectedSourceReg(null);
+    setAvailableTargetEvents([]);
+    setSelectedTargetEvent(null);
+    setTransferError('');
+    setTransferSuccess('');
+  };
+
+  const handleUserSearch = async () => {
+    if (!transferSearch) return;
+    setTransferLoading(true);
+    setTransferError('');
+    setTransferUser(null);
+    setUserRegistrations([]);
+    
+    try {
+      // 1. Find user by phone OR email
+      // We use ilike for loose matching, checking both fields
+      const { data: userData, error: userError } = await supabase
+        .from('profiles')
+        .select('*')
+        .or(`mobile_number.ilike.%${transferSearch.trim()}%,email.ilike.%${transferSearch.trim()}%`)
+        .limit(1)
+        .single();
+      
+      if (userError || !userData) {
+        setTransferError('User not found. Try entering exact Phone or Email.');
+        setTransferLoading(false);
+        return;
+      }
+
+      setTransferUser(userData);
+
+      // 2. Find user's registrations 
+      // Strategy: Check BOTH 'event_registrations_config' (New System) and 'registrations' (Old System)
+      let allRegistrations = [];
+      const paymentStatuses = ['PAID', 'paid', 'completed', 'COMPLETED', 'verified', 'VERIFIED'];
+      
+      // A. Check New System (event_registrations_config)
+      const { data: newRegs, error: newRegError } = await supabase
+        .from('event_registrations_config')
+        .select(`
+          *,
+          events (
+             id,
+             name,
+             price,
+             event_key
+          )
+        `)
+        .eq('user_id', userData.id)
+        .in('payment_status', paymentStatuses);
+
+      if (!newRegError && newRegs) {
+        // Tag them
+        const taggedNew = newRegs.map(r => ({ ...r, sourceTable: 'event_registrations_config', tableId: 'new' }));
+        allRegistrations = [...allRegistrations, ...taggedNew];
+      }
+
+      // B. Check Old System (registrations)
+      const { data: oldRegs, error: oldRegError } = await supabase
+        .from('registrations')
+        .select(`
+          *,
+          events (
+            event_id,
+            name,
+            price,
+            event_key
+          )
+        `)
+        .eq('user_id', userData.id)
+        .in('payment_status', paymentStatuses);
+
+       if (!oldRegError && oldRegs) {
+         // Tag them
+         const taggedOld = oldRegs.map(r => ({ ...r, sourceTable: 'registrations', tableId: 'old' }));
+         allRegistrations = [...allRegistrations, ...taggedOld];
+       }
+
+      if (allRegistrations.length === 0) {
+         console.warn("No regs found. Errors:", newRegError, oldRegError);
+         setTransferError('No paid registrations found for this user');
+      } else {
+        // De-duplicate if necessary (based on event_id or something) - usually not needed if migration didn't duplicate
+        setUserRegistrations(allRegistrations);
+      }
+
+    } catch (err) {
+      console.error(err);
+      setTransferError('An error occurred during search');
+    } finally {
+      setTransferLoading(false);
+    }
+  };
+
+  const handleSelectSourceReg = (reg) => {
+    setSelectedSourceReg(reg);
+    setSelectedTargetEvent(null);
+    
+    // Logic: 
+    // Target event must:
+    // 1. Have SAME price (current fee == transfer event fee)
+    // 2. NOT be the current event
+    // 3. Be OPEN/Available
+    
+    // 'reg.events' might be array or object depending on relationship. 
+    // Assuming object based on select.
+    const currentPrice = reg.events?.price || 0;
+    const currentEventKey = reg.events?.event_key; // Using event_key for comparison if used in 'events' table
+
+    const compatibleEvents = eventStats.filter(ev => 
+      ev.price === currentPrice && 
+      ev.event_key !== currentEventKey && 
+      ev.is_open
+    );
+    
+    setAvailableTargetEvents(compatibleEvents);
+  };
+
+  const executeTransfer = async () => {
+    if (!selectedSourceReg || !selectedTargetEvent) return;
+    
+    setTransferLoading(true);
+    setTransferError('');
+
+    try {
+      // Get current admin user for logging
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+
+      // 1. Get current registration details
+      const oldEventName = selectedSourceReg.events?.name || selectedSourceReg.event_name || 'Unknown';
+      const userEmail = transferUser.email;
+
+      // 2. Perform Transfer Update
+      // Determine which table to update based on the source
+      const tableToUpdate = selectedSourceReg.sourceTable || 'event_registrations_config'; // Default to new if unknown
+      
+      let updatePayload = {
+          event_name: selectedTargetEvent.name
+      };
+
+      // Handle ID differences
+      if (tableToUpdate === 'registrations') {
+          // 'registrations' uses text event_id (event_key)
+          updatePayload.event_id = selectedTargetEvent.event_key;
+      } else {
+          // 'event_registrations_config' uses UUID event_id (id)
+          updatePayload.event_id = selectedTargetEvent.id;
+      }
+
+      const { error: updateError } = await supabase
+        .from(tableToUpdate)
+        .update(updatePayload)
+        .eq('id', selectedSourceReg.id);
+
+      if (updateError) throw updateError;
+      
+      // If updating 'registrations', we might want to also TRY updating 'event_registrations_config' just in case of sync,
+      // but usually stick to the source is safer.
+
+      // 4. Log Action
+      if (adminUser) {
+        try {
+            await supabase.from('admin_logs').insert({
+                admin_id: adminUser.id,
+                action_type: 'transfer_registration',
+                target_user_id: transferUser.id, 
+                details: `Transferred from ${oldEventName} to ${selectedTargetEvent.name} for user ${userEmail}`
+            });
+        } catch (logError) {
+            console.error('Failed to log admin action:', logError);
+        }
+      }
+
+      setTransferSuccess(`Successfully transferred registration from "${oldEventName}" to "${selectedTargetEvent.name}"`);
+      
+      // Refresh
+      await loadEventStats();
+      
+      setTimeout(() => {
+        handleTransferClose();
+      }, 2000);
+
+    } catch (err) {
+      console.error('Transfer failed:', err);
+      setTransferError('Transfer failed. Please check logs.');
+    } finally {
+      setTransferLoading(false);
+    }
+  };
 
   const loadEventStats = async () => {
     setLoading(true);
@@ -170,6 +380,14 @@ const RegistrationManagement = () => {
               </span>
             </div>
           </div>
+
+          <button
+            onClick={() => setShowTransferModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-xl hover:bg-secondary/90 transition-colors shadow-lg shadow-secondary/20"
+          >
+            <ArrowRightLeft size={20} />
+            Transfer Event
+          </button>
         </div>
 
         {/* Stats Cards */}
@@ -327,6 +545,173 @@ const RegistrationManagement = () => {
             </div>
           )}
         </div>
+
+        {/* Transfer Modal */}
+        {showTransferModal && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div 
+               initial={{ opacity: 0, scale: 0.95 }}
+               animate={{ opacity: 1, scale: 1 }}
+               className="bg-[#1a1f37] border border-white/10 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+            >
+              <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/5">
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  <ArrowRightLeft className="text-secondary" />
+                  Transfer User Event
+                </h3>
+                <button 
+                  onClick={handleTransferClose}
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                >
+                  <XCircle size={24} className="text-gray-400" />
+                </button>
+              </div>
+
+              <div className="p-6 overflow-y-auto custom-scrollbar space-y-6">
+                
+                {/* 1. Find User */}
+                <div className="space-y-4">
+                  <label className="text-sm text-gray-400 uppercase font-bold">1. Find User (Phone or Email)</label>
+                  <div className="flex gap-4">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
+                      <input
+                        type="text"
+                        placeholder="Enter phone or email..."
+                        value={transferSearch}
+                        onChange={(e) => setTransferSearch(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-secondary"
+                        onKeyDown={(e) => e.key === 'Enter' && handleUserSearch()}
+                      />
+                    </div>
+                    <button
+                      onClick={handleUserSearch}
+                      disabled={transferLoading}
+                      className="px-6 py-3 bg-secondary text-white rounded-xl font-medium hover:bg-secondary/90 transition-colors disabled:opacity-50"
+                    >
+                      {transferLoading ? <Loader2 className="animate-spin" /> : 'Search'}
+                    </button>
+                  </div>
+                  
+                  {transferError && (
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm">
+                      {transferError}
+                    </div>
+                  )}
+
+                  {transferSuccess && (
+                    <div className="p-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-xl text-sm flex items-center gap-2">
+                       <CheckCircle2 size={16} />
+                       {transferSuccess}
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. User & Registrations */}
+                {transferUser && (
+                  <div className="space-y-4 pt-4 border-t border-white/10">
+                   <div className="flex items-start justify-between bg-white/5 p-4 rounded-xl">
+                      <div>
+                        <h4 className="font-bold text-lg">{transferUser.full_name}</h4>
+                        <p className="text-gray-400">{transferUser.college_name}</p>
+                        <p className="text-sm text-gray-500 mt-1">{transferUser.email} • {transferUser.mobile_number}</p>
+                      </div>
+                      <div className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-bold">
+                        User Found
+                      </div>
+                   </div>
+
+                   <label className="text-sm text-gray-400 uppercase font-bold block mt-4">2. Select Registration to Transfer</label>
+                   {userRegistrations.length > 0 ? (
+                     <div className="grid gap-3">
+                       {userRegistrations.map(reg => (
+                         <div 
+                           key={reg.id}
+                           onClick={() => handleSelectSourceReg(reg)}
+                           className={`p-4 border rounded-xl cursor-pointer transition-all ${
+                             selectedSourceReg?.id === reg.id 
+                               ? 'bg-secondary/20 border-secondary' 
+                               : 'bg-white/5 border-white/10 hover:border-white/30'
+                           }`}
+                         >
+                           <div className="flex justify-between items-center">
+                             <div>
+                               <p className="font-bold">{reg.events?.name || 'Unknown Event'}</p>
+                               <p className="text-sm text-gray-400">{reg.events?.event_key || 'N/A'}</p>
+                             </div>
+                             <div className="text-right">
+                               <p className="font-bold text-lg">₹{reg.events?.price || 0}</p>
+                               <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">PAID</span>
+                             </div>
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                   ) : (
+                     <p className="text-gray-500 italic">No paid registrations found.</p>
+                   )}
+                  </div>
+                )}
+
+                {/* 3. Target Events */}
+                {selectedSourceReg && (
+                  <div className="space-y-4 pt-4 border-t border-white/10">
+                    <label className="text-sm text-gray-400 uppercase font-bold block">
+                        3. Select New Event (Same Fee: ₹{selectedSourceReg.events?.price})
+                    </label>
+                    
+                    {availableTargetEvents.length > 0 ? (
+                      <div className="grid gap-3 max-h-48 overflow-y-auto custom-scrollbar">
+                        {availableTargetEvents.map(ev => (
+                           <div 
+                             key={ev.id}
+                             onClick={() => setSelectedTargetEvent(ev)}
+                             className={`p-4 border rounded-xl cursor-pointer transition-all flex justify-between items-center ${
+                               selectedTargetEvent?.id === ev.id 
+                                 ? 'bg-green-500/20 border-green-500' 
+                                 : 'bg-white/5 border-white/10 hover:border-white/30'
+                             }`}
+                           >
+                             <div>
+                               <p className="font-bold text-white">{ev.name}</p>
+                               <p className="text-xs text-gray-400">{ev.category} • Capacity: {ev.fillRate}% Full</p>
+                             </div>
+                             {selectedTargetEvent?.id === ev.id && <CheckCircle2 className="text-green-500" />}
+                           </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-xl text-sm">
+                        No other open events found with the same price (₹{selectedSourceReg.events?.price}).
+                      </div>
+                    )}
+                  </div>
+                )}
+
+              </div>
+
+              <div className="p-6 border-t border-white/10 bg-white/5 flex justify-end gap-3">
+                <button
+                  onClick={handleTransferClose}
+                  className="px-6 py-2 rounded-xl hover:bg-white/10 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={executeTransfer}
+                  disabled={!selectedTargetEvent || transferLoading}
+                  className="px-6 py-2 bg-secondary text-white rounded-xl font-bold hover:bg-secondary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {transferLoading ? <Loader2 className="animate-spin" size={18} /> : (
+                     <>
+                       Confirm Transfer <ArrowRight size={18} />
+                     </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
     );
   }

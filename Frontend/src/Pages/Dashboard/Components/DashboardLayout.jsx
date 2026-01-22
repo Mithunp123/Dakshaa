@@ -46,10 +46,23 @@ const DashboardLayout = ({ children }) => {
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      // If we already have cached profile, skip loading
+      // If we already have cached profile, skip loading immediately
       if (userProfile) {
         setLoading(false);
         return;
+      }
+
+      // Check sessionStorage first
+      const cached = sessionStorage.getItem('userProfile');
+      if (cached) {
+        try {
+          const parsedProfile = JSON.parse(cached);
+          setUserProfile(parsedProfile);
+          setLoading(false);
+          return; // Don't fetch from server if we have cache
+        } catch (e) {
+          console.warn('Failed to parse cached profile');
+        }
       }
 
       try {
@@ -75,7 +88,7 @@ const DashboardLayout = ({ children }) => {
     };
 
     fetchUserProfile();
-  }, [userProfile]);
+  }, []); // Run only once on mount
 
   // Close sidebar when route changes on mobile
   useEffect(() => {

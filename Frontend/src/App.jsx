@@ -85,6 +85,7 @@ const EventRegistrationManager = lazy(() => import("./Pages/Admin/SuperAdmin/Eve
 const AccommodationManager = lazy(() => import("./Pages/Admin/SuperAdmin/AccommodationManager"));
 const EventController = lazy(() => import("./Pages/Admin/SuperAdmin/EventController"));
 const RoleManagement = lazy(() => import("./Pages/Admin/SuperAdmin/RoleManagement"));
+const ReferralManager = lazy(() => import("./Pages/Admin/SuperAdmin/ReferralManager"));
 const RegistrationAdminDashboard = lazy(() => import("./Pages/Admin/RegAdmin/RegistrationAdminDashboard"));
 const EventCoordinatorDashboard = lazy(() => import("./Pages/Admin/Coordinator/EventCoordinatorDashboard"));
 const AttendanceScanner = lazy(() => import("./Pages/Admin/Volunteer/AttendanceScanner"));
@@ -100,6 +101,7 @@ function AppContent() {
   const isScan = location.pathname === "/scan";
   const isLogin = location.pathname === "/login";
   const isRegisterEvents = location.pathname === "/register-events";
+  const isHome = location.pathname === "/";
 
   // Check if bottom navbar should be shown (mobile only, non-admin pages)
   const showBottomNav = !isDashboard && !isAdmin && !isScan && !isLogin;
@@ -127,6 +129,11 @@ function AppContent() {
 
   return (
     <div className="min-h-screen min-h-screen-safe" style={{ minHeight: '100vh', position: 'relative' }}>
+      {isHome && (
+        <Suspense fallback={null}>
+          <ParticlesComponent id="particlesBG" />
+        </Suspense>
+      )}
       {!isDashboard && !isAdmin && !isScan && !isLogin && <Navbar />}
       {!isDashboard && !isAdmin && !isScan && !isLogin && <Tags />}
       <AnimatePresence>
@@ -299,6 +306,14 @@ function AppContent() {
                 }
               />
               <Route
+                path="referrals"
+                element={
+                  <ProtectedRoute allowedRoles={["super_admin"]}>
+                    <ReferralManager />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="event-controller"
                 element={
                   <ProtectedRoute allowedRoles={["super_admin", "coordinator"]}>
@@ -394,9 +409,6 @@ function App() {
       />
       <SupabaseHealthCheck>
         <Router>
-          <Suspense fallback={null}>
-            <ParticlesComponent id="particlesBG" />
-          </Suspense>
           <AppContent />
         </Router>
       </SupabaseHealthCheck>

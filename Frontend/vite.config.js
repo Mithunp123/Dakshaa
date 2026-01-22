@@ -5,4 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   assetsInclude: ['**/*.heic'],
+  server: {
+    host: true,
+    allowedHosts: ['faec88edfa59.ngrok-free.app']
+  }
 })

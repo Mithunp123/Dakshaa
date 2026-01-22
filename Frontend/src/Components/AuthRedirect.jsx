@@ -11,25 +11,37 @@ const AuthRedirect = ({ children }) => {
   const returnTo = location.state?.returnTo;
 
   useEffect(() => {
+    let mounted = true;
+    
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
+      // Set ready immediately for non-login pages
+      if (location.pathname !== '/login') {
         setIsReady(true);
         return;
       }
 
-      // Fetch role from profiles table
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        
+        if (!mounted) return;
+        
+        if (error || !user) {
+          setIsReady(true);
+          return;
+        }
 
-      const role = profile?.role || 'student';
+        // Fetch role from profiles table
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
 
-      // Only redirect if user is on login page
-      if (location.pathname === '/login') {
+        if (!mounted) return;
+
+        const role = profile?.role || 'student';
+
+        // Redirect based on role
         if (role === 'super_admin') {
           navigate('/admin', { replace: true });
         } else if (role === 'registration_admin') {
@@ -41,23 +53,30 @@ const AuthRedirect = ({ children }) => {
         } else {
           navigate(returnTo || '/', { replace: true });
         }
-        return; // Don't set ready if redirecting from login
+      } catch (error) {
+        console.error('AuthRedirect error:', error);
+        if (mounted) {
+          setIsReady(true);
+        }
       }
-      
-      setIsReady(true);
     };
 
     checkUser();
+
+    return () => {
+      mounted = false;
+    };
   }, [navigate, returnTo, location.pathname]);
 
-  // For home page and other pages, render children immediately while checking auth in background
-  // This prevents blank screen while auth loads
+  // For non-login pages, render immediately
   if (location.pathname !== '/login') {
     return <>{children}</>;
   }
 
-  // For login page, wait until we know if we should redirect
-  if (!isReady) return null;
+  // For login page, show children once ready
+  if (!isReady) {
+    return null;
+  }
 
   return <>{children}</>;
 };

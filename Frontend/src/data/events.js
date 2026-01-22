@@ -8,21 +8,8 @@ export const EVENTS_DATA = {
   // TECHNICAL EVENTS (15 events) - ₹100 each
   // ============================================
   technical: [
-    { id: 'tech-cse', title: 'CSE Technical Quiz', department: 'Computer Science & Engineering', price: 100 },
-    { id: 'tech-it', title: 'IT Technical Quiz', department: 'Information Technology', price: 100 },
-    { id: 'tech-vlsi', title: 'VLSI Design Challenge', department: 'VLSI Design', price: 100 },
-    { id: 'tech-mct', title: 'Mechatronics Challenge', department: 'Mechatronics', price: 100 },
-    { id: 'tech-csbs', title: 'CSBS Tech Event', department: 'CS & Business Systems', price: 100 },
-    { id: 'tech-ece', title: 'ECE Technical Quiz', department: 'Electronics & Communication', price: 100 },
-    { id: 'tech-food', title: 'Food Tech Event', department: 'Food Technology', price: 100 },
-    { id: 'tech-mech', title: 'Mechanical Challenge', department: 'Mechanical Engineering', price: 100 },
-    { id: 'tech-aiml', title: 'AI/ML Challenge', department: 'AI & Machine Learning', price: 100 },
-    { id: 'tech-civil', title: 'Civil Tech Event', department: 'Civil Engineering', price: 100 },
-    { id: 'tech-project-expo', title: 'Project Expo', department: 'All Departments', price: 150 },
-    { id: 'tech-textile', title: 'Textile Tech Event', department: 'Textile Technology', price: 100 },
-    { id: 'tech-biotech', title: 'Biotech Challenge', department: 'Bio Technology', price: 100 },
-    { id: 'tech-poster', title: 'Poster Presentation', department: 'All Departments', price: 100 },
-    { id: 'tech-eee', title: 'EEE Technical Quiz', department: 'Electrical & Electronics', price: 100 },
+    { id: 'tech-aids', title: 'CSE Technical Quiz', department: 'AIDS', price: 100 },
+    //{ id: },
   ],
 
   // ============================================

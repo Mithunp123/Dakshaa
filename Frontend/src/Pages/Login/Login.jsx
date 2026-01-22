@@ -154,6 +154,21 @@ const Login = () => {
       
       console.log('✅ Email verified, proceeding with login');
 
+      // Clear all cached data to ensure fresh load after login
+      try {
+        // Clear event cache
+        localStorage.removeItem('dakshaa_events_cache');
+        localStorage.removeItem('dakshaa_events_static');
+        // Clear dashboard cache
+        sessionStorage.removeItem('dashboard_data');
+        sessionStorage.removeItem('userProfile');
+        // Clear combos cache
+        localStorage.removeItem('dakshaa_combos_cache');
+        console.log('🧹 Cleared all cached data for fresh login');
+      } catch (e) {
+        console.warn('Failed to clear cache:', e);
+      }
+
       // Fetch user role and name from profiles table
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
@@ -215,13 +230,13 @@ const Login = () => {
               exit={{ opacity: 0, scale: 0.8 }}
               className="text-center py-6 sm:py-8"
             >
-              <div className={`w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-full bg-${loginSuccess.info.color}-500/20 flex items-center justify-center`}>
-                <CheckCircle2 className={`w-8 h-8 sm:w-10 sm:h-10 text-${loginSuccess.info.color}-500`} />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-full bg-blue-500/20 flex items-center justify-center">
+                <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-blue-500" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Welcome, {loginSuccess.name}!</h3>
-              <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-${loginSuccess.info.color}-500/20 border border-${loginSuccess.info.color}-500/40`}>
-                <loginSuccess.info.icon className={`w-4 h-4 sm:w-5 sm:h-5 text-${loginSuccess.info.color}-500`} />
-                <span className={`font-bold text-sm sm:text-base text-${loginSuccess.info.color}-500`}>{loginSuccess.info.label}</span>
+              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-blue-500/20 border border-blue-500/40">
+                {loginSuccess.info.icon && <loginSuccess.info.icon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />}
+                <span className="font-bold text-sm sm:text-base text-blue-500">{loginSuccess.info.label}</span>
               </div>
               <p className="text-gray-400 mt-4 text-xs sm:text-sm">Redirecting to your dashboard...</p>
               <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-gray-500 mx-auto mt-3" />

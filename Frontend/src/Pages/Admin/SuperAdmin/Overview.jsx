@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users,
   CreditCard,
@@ -9,9 +9,16 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  X,
+  Download,
+  FileSpreadsheet,
+  FileText
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
+import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const Overview = () => {
   const [stats, setStats] = useState({
@@ -24,6 +31,10 @@ const Overview = () => {
   });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [loadingEvents, setLoadingEvents] = useState(false);
+  const [downloadingReport, setDownloadingReport] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -201,6 +212,264 @@ const Overview = () => {
     }
   };
 
+  // Fetch events for report modal
+  const fetchEventsForReport = async () => {
+    setLoadingEvents(true);
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .select('id, event_id, name, category')
+        .order('name');
+
+      if (error) throw error;
+      setEvents(data || []);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    } finally {
+      setLoadingEvents(false);
+    }
+  };
+
+  // Open report modal
+  const handleOpenReportModal = () => {
+    setShowReportModal(true);
+    fetchEventsForReport();
+  };
+
+  // Generate PDF for single event
+  const downloadSingleEventReport = async (event) => {
+    setDownloadingReport(true);
+    try {
+      // Fetch registrations for this event - use event.id (UUID) not event_id (text)
+      const { data: registrations, error } = await supabase
+        .from('event_registrations_config')
+        .select('*')
+        .eq('event_id', event.id);
+
+      console.log('Fetching registrations for event:', event.name, 'ID:', event.id, 'Result:', registrations);
+
+      if (error) throw error;
+
+      // Fetch user profiles
+      const userIds = [...new Set(registrations?.map(r => r.user_id) || [])];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, mobile_number, college_name, department, roll_number')
+        .in('id', userIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+      // Format data
+      const tableData = registrations?.map((reg, index) => {
+        const profile = profileMap.get(reg.user_id) || {};
+        return {
+          sno: index + 1,
+          name: profile.full_name || reg.participant_name || 'N/A',
+          email: profile.email || reg.participant_email || 'N/A',
+          mobile: profile.mobile_number || 'N/A',
+          college: profile.college_name || 'N/A',
+          department: profile.department || 'N/A',
+          rollNumber: profile.roll_number || 'N/A',
+          signature: ''
+        };
+      }) || [];
+
+      // Generate PDF using jsPDF
+      const doc = new jsPDF('landscape', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      
+      // Load logos as base64 with high quality - returns image with dimensions
+      const loadImageAsBase64 = (url) => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'Anonymous';
+          img.onload = () => {
+            // Use higher resolution canvas for better quality
+            const scale = 4; // Higher scale for sharper image
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            const ctx = canvas.getContext('2d');
+            // Disable smoothing to preserve sharp edges for logos
+            ctx.imageSmoothingEnabled = false;
+            ctx.scale(scale, scale);
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+            resolve({
+              data: canvas.toDataURL('image/png', 1.0),
+              width: img.width,
+              height: img.height
+            });
+          };
+          img.onerror = () => resolve(null);
+          img.src = url;
+        });
+      };
+
+      // Try to load logos
+      const dakshaaLogoData = await loadImageAsBase64('/dakshaa_logo.png');
+      const ksrctLogoData = await loadImageAsBase64('/ksrct_logo2.png');
+
+      // Header vertical center baseline
+      const headerY = 22;
+      // Dakshaa logo (left)
+      if (dakshaaLogoData) {
+        const logoHeight = 30;
+        const aspectRatio = dakshaaLogoData.width / dakshaaLogoData.height;
+        const logoWidth = logoHeight * aspectRatio;
+        doc.addImage(dakshaaLogoData.data, 'PNG', 32, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+      }
+      // KSRCT logo (right)
+      if (ksrctLogoData) {
+        const logoHeight = 14;
+        const aspectRatio = ksrctLogoData.width / ksrctLogoData.height;
+        const logoWidth = logoHeight * aspectRatio;
+        doc.addImage(ksrctLogoData.data, 'PNG', pageWidth - logoWidth - 32, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+      }
+      // Header text block (centered)
+      doc.setFontSize(18);
+      doc.setTextColor(26, 54, 93);
+      doc.setFont('helvetica', 'bold');
+      doc.text('K.S.Rangasamy College of Technology', pageWidth / 2, headerY - 4, { align: 'center' });
+      doc.setFontSize(11);
+      doc.setTextColor(230, 126, 34);
+      doc.text('AUTONOMOUS | TIRUCHENGODE', pageWidth / 2, headerY + 2, { align: 'center' });
+      doc.setFontSize(14);
+      doc.setTextColor(197, 48, 48);
+      doc.text(event.name, pageWidth / 2, headerY + 10, { align: 'center' });
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text('Attendance Sheet', pageWidth / 2, headerY + 16, { align: 'center' });
+
+      // Add table using autoTable function
+      autoTable(doc, {
+        startY: headerY + 22,
+        head: [['S.No', 'Name', 'Roll Number', 'Department', 'College', 'Mobile', 'Signature']],
+        body: tableData.map(row => [
+          row.sno,
+          row.name,
+          row.rollNumber,
+          row.department,
+          row.college,
+          row.mobile,
+          ''
+        ]),
+        theme: 'grid',
+        headStyles: {
+          fillColor: [240, 240, 240],
+          textColor: [0, 0, 0],
+          fontStyle: 'bold',
+          fontSize: 10,
+          halign: 'center',
+        },
+        bodyStyles: {
+          fontSize: 9,
+          textColor: [0, 0, 0],
+          valign: 'middle',
+        },
+        columnStyles: {
+          0: { cellWidth: 16, halign: 'center' },
+          1: { cellWidth: 44 },
+          2: { cellWidth: 38 },
+          3: { cellWidth: 38 },
+          4: { cellWidth: 60 },
+          5: { cellWidth: 32 },
+          6: { cellWidth: 32 },
+        },
+        margin: { left: 14, right: 14 },
+        tableWidth: 'auto',
+        styles: {
+          overflow: 'linebreak',
+        },
+      });
+
+      // Download the PDF
+      doc.save(`${event.name.replace(/[^a-zA-Z0-9]/g, '_')}_Attendance.pdf`);
+      
+      // Close report modal after download
+      setShowReportModal(false);
+    } catch (error) {
+      console.error('Error generating report:', error);
+      alert('Failed to generate report');
+    } finally {
+      setDownloadingReport(false);
+    }
+  };
+
+  // Download all events report as Excel with separate sheets
+  const downloadAllEventsReport = async () => {
+    setDownloadingReport(true);
+    try {
+      const wb = XLSX.utils.book_new();
+      let hasData = false;
+
+      for (const event of events) {
+        // Fetch registrations for this event - use event.id (UUID) not event_id (text)
+        const { data: registrations } = await supabase
+          .from('event_registrations_config')
+          .select('*')
+          .eq('event_id', event.id);
+
+        if (!registrations || registrations.length === 0) continue;
+
+        hasData = true;
+
+        // Fetch user profiles
+        const userIds = [...new Set(registrations.map(r => r.user_id))];
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, email, mobile_number, college_name, department, roll_number')
+          .in('id', userIds);
+
+        const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+        // Format data for Excel
+        const excelData = registrations.map((reg, index) => {
+          const profile = profileMap.get(reg.user_id) || {};
+          return {
+            'S.No': index + 1,
+            'Name': profile.full_name || reg.participant_name || 'N/A',
+            'Email': profile.email || reg.participant_email || 'N/A',
+            'Mobile': profile.mobile_number || 'N/A',
+            'College': profile.college_name || 'N/A',
+            'Department': profile.department || 'N/A',
+            'Roll Number': profile.roll_number || 'N/A',
+            'Registration Type': reg.registration_type || 'individual',
+            'Team Name': reg.team_name || '-',
+            'Payment Status': reg.payment_status || 'PENDING',
+            'Payment Amount': reg.payment_amount || 0,
+            'Registered At': reg.registered_at ? new Date(reg.registered_at).toLocaleString() : 'N/A'
+          };
+        });
+
+        // Create worksheet with event name (max 31 chars for Excel sheet name)
+        const sheetName = event.name.substring(0, 31).replace(/[\\/*?[\]]/g, '');
+        const ws = XLSX.utils.json_to_sheet(excelData);
+
+        // Set column widths
+        ws['!cols'] = [
+          { wch: 5 }, { wch: 25 }, { wch: 30 }, { wch: 15 }, { wch: 30 },
+          { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 15 },
+          { wch: 15 }, { wch: 20 }
+        ];
+
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      }
+
+      if (!hasData) {
+        alert('No registration data found for any event');
+        return;
+      }
+
+      // Download
+      XLSX.writeFile(wb, `All_Events_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
+    } catch (error) {
+      console.error('Error generating all events report:', error);
+      alert('Failed to generate report');
+    } finally {
+      setDownloadingReport(false);
+    }
+  };
+
   const statCards = [
     {
       label: 'Total Registrations',
@@ -337,8 +606,11 @@ const Overview = () => {
           <div className="bg-gradient-to-br from-secondary/20 to-primary/20 border border-white/10 rounded-3xl p-8">
             <h3 className="text-xl font-bold mb-4">Quick Actions</h3>
             <div className="space-y-3">
-              <button className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
-                <TrendingUp size={18} /> Generate Revenue Report
+              <button 
+                onClick={handleOpenReportModal}
+                className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2"
+              >
+                <FileSpreadsheet size={18} /> Generate Report
               </button>
               <button className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
                 <Users size={18} /> Export User List
@@ -371,6 +643,111 @@ const Overview = () => {
           </div>
         </div>
       </div>
+
+      {/* Report Generation Modal */}
+      <AnimatePresence>
+        {showReportModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowReportModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between p-6 border-b border-white/10">
+                <div>
+                  <h2 className="text-xl font-bold">Generate Report</h2>
+                  <p className="text-sm text-gray-400 mt-1">Select an event to download its registration report</p>
+                </div>
+                <button
+                  onClick={() => setShowReportModal(false)}
+                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Modal Content */}
+              <div className="p-6 overflow-y-auto max-h-[60vh]">
+                {loadingEvents ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-8 h-8 animate-spin text-secondary" />
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {/* Download All Events Button */}
+                    <button
+                      onClick={downloadAllEventsReport}
+                      disabled={downloadingReport || events.length === 0}
+                      className="w-full p-4 bg-gradient-to-r from-secondary/20 to-primary/20 hover:from-secondary/30 hover:to-primary/30 border border-secondary/30 rounded-xl transition-all flex items-center justify-between group disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-secondary/20 flex items-center justify-center">
+                          <FileSpreadsheet className="text-secondary" size={20} />
+                        </div>
+                        <div className="text-left">
+                          <p className="font-bold">All Events</p>
+                          <p className="text-xs text-gray-400">Download all events in separate sheets</p>
+                        </div>
+                      </div>
+                      {downloadingReport ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <Download size={20} className="text-gray-400 group-hover:text-secondary transition-colors" />
+                      )}
+                    </button>
+
+                    <div className="relative py-4">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-white/10"></div>
+                      </div>
+                      <div className="relative flex justify-center">
+                        <span className="px-3 bg-slate-900 text-sm text-gray-400">or select individual event (PDF)</span>
+                      </div>
+                    </div>
+
+                    {/* Individual Events */}
+                    {events.map((event) => (
+                      <button
+                        key={event.id}
+                        onClick={() => downloadSingleEventReport(event)}
+                        disabled={downloadingReport}
+                        className="w-full p-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-all flex items-center justify-between group disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+                            <FileText className="text-red-400" size={20} />
+                          </div>
+                          <div className="text-left">
+                            <p className="font-medium">{event.name}</p>
+                            <p className="text-xs text-gray-500">{event.category} • Attendance Sheet</p>
+                          </div>
+                        </div>
+                        <Download size={18} className="text-gray-400 group-hover:text-white transition-colors" />
+                      </button>
+                    ))}
+
+                    {events.length === 0 && (
+                      <div className="text-center py-8 text-gray-400">
+                        <Calendar size={40} className="mx-auto mb-3 opacity-50" />
+                        <p>No events found</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

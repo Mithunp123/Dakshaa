@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Users, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, Users, Loader2, CheckCircle2, AlertCircle, CreditCard } from 'lucide-react';
 import { supabase } from '../../../supabase';
 import { createTeam } from '../../../services/teamService';
+import paymentService from '../../../services/paymentService'; // Import payment service
 
 const CreateTeamModal = ({ isOpen, onClose, onTeamCreated, preSelectedEventId, preSelectedEventName }) => {
   const [formData, setFormData] = useState({
     teamName: '',
     eventId: '',
-    maxMembers: 4
+    memberCount: '',
+    maxMembers: 4,
+    minMembers: 2
   });
   const [events, setEvents] = useState([]);
+  const [selectedEventObj, setSelectedEventObj] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetchingEvents, setFetchingEvents] = useState(true);
   const [error, setError] = useState('');
@@ -25,35 +29,39 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated, preSelectedEventId, p
   // Pre-select event if provided via navigation
   useEffect(() => {
     if (preSelectedEventId) {
-      // Set eventId immediately, don't wait for events array
+      // Set eventId immediately
       setFormData(prev => ({
         ...prev,
         eventId: preSelectedEventId
       }));
-      
-      // Update maxMembers once events are loaded
-      if (events.length > 0) {
-        const selectedEvent = events.find(e => e.event_id === preSelectedEventId);
-        if (selectedEvent) {
-          setFormData(prev => ({
-            ...prev,
-            maxMembers: selectedEvent.max_team_size || 4
-          }));
-        }
+    }
+  }, [preSelectedEventId]);
+
+  // Update selectedEventObj when events or eventId changes
+  useEffect(() => {
+    if (events.length > 0 && formData.eventId) {
+      const selected = events.find(e => e.event_id === formData.eventId);
+      if (selected) {
+        setSelectedEventObj(selected);
+        setFormData(prev => ({
+          ...prev,
+          maxMembers: selected.max_team_size || 4,
+          minMembers: selected.min_team_size || 2
+        }));
       }
     }
-  }, [preSelectedEventId, events]);
+  }, [formData.eventId, events]);
 
   const fetchTeamEvents = async () => {
     try {
       setFetchingEvents(true);
-      // Fetch events that allow teams (is_team_event = 'true' for TEXT field)
+      // Fetch events that allow teams with price
       const { data, error } = await supabase
         .from('events')
-        .select('event_id, title, max_team_size, min_team_size')
+        .select('event_id, title, name, event_name, max_team_size, min_team_size, price')
         .eq('is_team_event', 'true')
         .eq('is_active', 'true')
-        .order('title');
+        .order('title'); 
 
       if (error) throw error;
 
@@ -69,17 +77,12 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated, preSelectedEventId, p
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Update max members based on selected event
-    if (name === 'eventId') {
-      const selectedEvent = events.find(e => e.event_id === value);
-      if (selectedEvent) {
-        setFormData(prev => ({ 
-          ...prev, 
-          maxMembers: selectedEvent.max_team_size || 4 
-        }));
-      }
-    }
+  };
+
+  const calculateTotal = () => {
+    if (!selectedEventObj || !formData.memberCount) return 0;
+    const price = selectedEventObj.price || 0;
+    return price * parseInt(formData.memberCount);
   };
 
   const handleSubmit = async (e) => {
@@ -101,36 +104,60 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated, preSelectedEventId, p
       return;
     }
 
+    if (!formData.memberCount) {
+      setError('Please enter team member count');
+      setLoading(false);
+      return;
+    }
+
+    const count = parseInt(formData.memberCount);
+    const min = selectedEventObj?.min_team_size || 2;
+    const max = selectedEventObj?.max_team_size || 4;
+
+    if (count < min || count > max) {
+      setError(`Team size must be between ${min} and ${max} members`);
+      setLoading(false);
+      return;
+    }
+
     try {
-      const result = await createTeam({
-        teamName: formData.teamName,
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setError("You need to be logged in.");
+        setLoading(false);
+        return;
+      }
+
+      // Initiate Payment Flow
+      const amount = calculateTotal();
+      
+      const result = await paymentService.initiateTeamPayment({
+        userId: user.id,
         eventId: formData.eventId,
-        maxMembers: formData.maxMembers
+        teamName: formData.teamName,
+        memberCount: count,
+        amount: amount
       });
 
-      if (result.success) {
-        setSuccess('Team created successfully! 🎉');
-        setFormData({ teamName: '', eventId: '', maxMembers: 4 });
-        
-        // Wait a bit to show success message
-        setTimeout(() => {
-          if (onTeamCreated) onTeamCreated();
-          onClose();
-        }, 1500);
+      if (result.success && result.payment_url) {
+        // Redirect to custom payment gateway
+        window.location.href = result.payment_url;
       } else {
-        setError(result.error || 'Failed to create team. Please try again.');
+        setError(result.error || 'Failed to initiate payment.');
+        setLoading(false); 
       }
     } catch (err) {
-      console.error('Error creating team:', err);
-      setError('An unexpected error occurred. Please try again.');
-    } finally {
+      console.error('Error initiating team registration:', err);
+      // setError('An unexpected error occurred. Please try again.');
+      // For debugging, show error
+      setError(err.message || 'An unexpected error occurred.');
       setLoading(false);
     }
   };
 
   const handleClose = () => {
     if (!loading) {
-      setFormData({ teamName: '', eventId: '', maxMembers: 4 });
+      setFormData({ teamName: '', eventId: '', memberCount: '', maxMembers: 4, minMembers: 2 });
       setError('');
       setSuccess('');
       onClose();
@@ -162,8 +189,8 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated, preSelectedEventId, p
                 <Users className="text-secondary" size={20} />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Create New Team</h2>
-                <p className="text-xs text-gray-400">Form your team for a group event</p>
+                <h2 className="text-xl font-bold text-white">Register Team</h2>
+                <p className="text-xs text-gray-400">Team Event Registration</p>
               </div>
             </div>
             <button
@@ -184,7 +211,7 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated, preSelectedEventId, p
                 <div>
                   <p className="text-sm font-bold text-blue-400">Event Selected</p>
                   <p className="text-xs text-gray-300 mt-1">
-                    Creating team for: <span className="font-semibold">{preSelectedEventName}</span>
+                    Registration for: <span className="font-semibold">{preSelectedEventName}</span>
                   </p>
                 </div>
               </div>
@@ -231,25 +258,53 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated, preSelectedEventId, p
                     required
                   >
                     <option value="" className="bg-slate-900">Select an event</option>
-                    {events.map(event => (
-                      <option key={event.event_id} value={event.event_id} className="bg-slate-900">
-                        {event.title} (Team size: {event.min_team_size || 2}-{event.max_team_size || 4})
-                      </option>
-                    ))}
+                    {events.map(event => {
+                      const eventName = event.title || event.name || event.event_name || (event.event_id ? event.event_id.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'Unknown Event');
+                      return (
+                        <option key={event.event_id} value={event.event_id} className="bg-slate-900">
+                          {eventName}
+                        </option>
+                      );
+                    })}
                   </select>
                 )}
               </div>
             )}
 
-            {/* Max Members Info */}
-            {formData.eventId && (
-              <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4">
-                <p className="text-sm text-gray-300">
-                  <span className="font-bold text-secondary">Max Team Size:</span> {formData.maxMembers} members
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  You can add up to {formData.maxMembers - 1} more member(s) after creating the team
-                </p>
+            {/* Member Count & Price Info */}
+            {formData.eventId && selectedEventObj && (
+              <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Number of Team Members <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="memberCount"
+                      value={formData.memberCount}
+                      onChange={handleChange}
+                      min={formData.minMembers}
+                      max={formData.maxMembers}
+                      placeholder={`Between ${formData.minMembers} and ${formData.maxMembers}`}
+                      disabled={loading}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all disabled:opacity-50"
+                      required
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      Min: {formData.minMembers}, Max: {formData.maxMembers}
+                    </p>
+                  </div>
+
+                  <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4">
+                    <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm text-gray-300">Price per head:</span>
+                        <span className="text-sm font-bold text-white">₹{selectedEventObj.price || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-2 border-t border-secondary/20">
+                        <span className="text-base font-bold text-secondary">Total Amount:</span>
+                        <span className="text-xl font-bold text-secondary">₹{calculateTotal()}</span>
+                    </div>
+                  </div>
               </div>
             )}
 
@@ -281,18 +336,18 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated, preSelectedEventId, p
               </button>
               <button
                 type="submit"
-                disabled={loading || fetchingEvents || events.length === 0}
+                disabled={loading || fetchingEvents || events.length === 0 || !formData.memberCount}
                 className="flex-1 px-4 py-3 bg-secondary hover:bg-secondary-dark text-white font-bold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Creating...
+                    Processing...
                   </>
                 ) : (
                   <>
-                    <Users size={18} />
-                    Create Team
+                    <CreditCard size={18} />
+                    Pay ₹{calculateTotal()}
                   </>
                 )}
               </button>
