@@ -90,8 +90,8 @@ import Workshop2 from "../../../assets/EventsImages/EventDetails/Workshop/it.jpg
 import Workshop3 from "../../../assets/EventsImages/EventDetails/Workshop/aids.jpg";
 import Workshop4 from "../../../assets/EventsImages/EventDetails/Workshop/aiml.jpg";
 import Workshop5 from "../../../assets/EventsImages/EventDetails/Workshop/csbs.jpg";
-import Workshop6 from "../../../assets/EventsImages/EventDetails/Workshop/cse.jpg";
-import Workshop7 from "../../../assets/EventsImages/EventDetails/Workshop/eee.jpg";
+import Workshop6 from "../../../assets/EventsImages/EventDetails/Workshop/CSE.jpg";
+import Workshop7 from "../../../assets/EventsImages/EventDetails/Workshop/EEE.jpg";
 import Workshop8 from "../../../assets/EventsImages/EventDetails/Workshop/biotech.jpg";
 import Workshop9 from "../../../assets/EventsImages/EventDetails/Workshop/mechatronics.jpg";
 import Workshop10 from "../../../assets/EventsImages/EventDetails/Workshop/ece.jpg";
