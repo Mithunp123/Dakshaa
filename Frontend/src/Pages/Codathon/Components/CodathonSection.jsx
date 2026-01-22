@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, ArrowLeft } from "lucide-react"; // Assuming you're using Lucide icons
 import { useNavigate } from "react-router-dom";
 import EboxLogo from "../../../assets/Codethon/EBOX_logo.png";
-import Tech11 from "../../../assets/EventsImages/EventDetails/TechnicalImages/AIML.png";
+import Tech11 from "../../../assets/EventsImages/EventDetails/TechnicalImages/aiml_tech.png";
 const CodathonSection = () => {
   const navigate = useNavigate();
   // Example data as an array of objects

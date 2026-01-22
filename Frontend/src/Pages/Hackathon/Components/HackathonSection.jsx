@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, ArrowLeft } from "lucide-react"; 
 import { useNavigate } from "react-router-dom";
 
-import Tech2 from "../../../assets/EventsImages/EventDetails/TechnicalImages/IT.png";
+import Tech2 from "../../../assets/EventsImages/EventDetails/TechnicalImages/aiml_tech.png";
 import guvi from "../../Sponsors/assets/guvi.jpg";
 
 const HackathonSection = () => {
