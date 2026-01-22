@@ -19,7 +19,7 @@ import ScrollToTop from "./Pages/Layout/ScrollToTop";
 import FloatingCallButton from "./Pages/Layout/FloatingCallButton";
 import FloatingDashboardButton from "./Pages/Layout/FloatingDashboardButton";
 import BottomNavbar from "./Pages/Layout/BottomNavbar";
-import SupabaseHealthCheck from "./components/SupabaseHealthCheck";
+import SupabaseHealthCheck from "./Components/SupabaseHealthCheck";
 
 // Lazy Load Pages with preload functions for faster navigation
 const Home = lazy(() => import("./Pages/Home/Home"));
