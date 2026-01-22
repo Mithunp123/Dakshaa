@@ -5,29 +5,56 @@
 
 export const EVENTS_DATA = {
   // ============================================
-  // TECHNICAL EVENTS (15 events) - ₹100 each
+  // TECHNICAL EVENTS (22 events)
   // ============================================
   technical: [
-    { id: 'tech-aids', title: 'CSE Technical Quiz', department: 'AIDS', price: 100 },
-    //{ id: },
+    { id: 'tech-aids', title: 'Rewind & Crack', department: 'AI & Data Science', price: 300 },
+    { id: 'tech-aiml', title: 'SEMISPARK (Project Presentation)', department: 'AI & Machine Learning', price: 300 },
+    { id: 'tech-bt', title: 'Reel-O-Science', department: 'Bio Technology', price: 100 },
+    { id: 'tech-bt-1', title: 'BioNexathon', department: 'Bio Technology', price: 100 },
+    { id: 'tech-bt-2', title: 'Bioblitz-Map', department: 'Bio Technology', price: 100 },
+    { id: 'tech-civil', title: '3D Arena (Google SketchUp)', department: 'Civil Engineering', price: 100 },
+    { id: 'tech-civil-1', title: 'Paper Presentation', department: 'Civil Engineering', price: 100 },
+    { id: 'tech-cse', title: 'NeuroHack 2.0 (36-hour)', department: 'Computer Science & Engineering', price: 100 },
+    { id: 'tech-cse-1', title: 'BotXhibit', department: 'CS & Business Systems', price: 100 },
+    { id: 'tech-ece', title: 'Zero Component', department: 'Electronics & Communication', price: 100 },
+    { id: 'tech-eee', title: 'Trailblazer', department: 'Electrical & Electronics', price: 100 },
+    { id: 'tech-eee-1', title: 'Paper Presentation', department: 'Electrical & Electronics', price: 100 },
+    { id: 'tech-ft', title: 'Bacteriart', department: 'Food Technology', price: 100 },
+    { id: 'tech-it', title: 'Code Relay', department: 'Information Technology', price: 100 },
+    { id: 'tech-mct', title: 'VoltEdge (Paper Presentation)', department: 'Mechatronics', price: 100 },
+    { id: 'tech-mech', title: 'Paper Presentation', department: 'Mechanical Engineering', price: 100 },
+    { id: 'tech-mech-1', title: 'Designathon', department: 'Mechanical Engineering', price: 100 },
+    { id: 'tech-txt', title: 'DrapeX: Fabric Draping in Action', department: 'Textile Technology', price: 100 },
+    { id: 'tech-txt-1', title: 'Paper Presentation', department: 'Textile Technology', price: 100 },
+    { id: 'tech-vlsi', title: 'CoreX', department: 'VLSI Design', price: 100 },
+    { id: 'tech-57', title: 'Paper Presentation', department: 'Mechanical Engineering', price: 100 },
   ],
 
   // ============================================
-  // NON-TECHNICAL EVENTS (12 events) - ₹50 each
+  // NON-TECHNICAL EVENTS (20 events) - ₹50 each
   // ============================================
   'non-technical': [
-    { id: 'nontech-cse', title: 'CSE Fun Event', department: 'Computer Science & Engineering', price: 50 },
-    { id: 'nontech-it', title: 'IT Fun Event', department: 'Information Technology', price: 50 },
-    { id: 'nontech-eee', title: 'EEE Fun Event', department: 'Electrical & Electronics', price: 50 },
-    { id: 'nontech-vlsi', title: 'VLSI Fun Event', department: 'VLSI Design', price: 50 },
-    { id: 'nontech-biotech', title: 'Biotech Fun Event', department: 'Bio Technology', price: 50 },
-    { id: 'nontech-mct', title: 'Mechatronics Fun Event', department: 'Mechatronics', price: 50 },
-    { id: 'nontech-csbs', title: 'CSBS Fun Event', department: 'CS & Business Systems', price: 50 },
-    { id: 'nontech-food', title: 'Food Tech Fun Event', department: 'Food Technology', price: 50 },
-    { id: 'nontech-mech', title: 'Mechanical Fun Event', department: 'Mechanical Engineering', price: 50 },
-    { id: 'nontech-ece', title: 'ECE Fun Event', department: 'Electronics & Communication', price: 50 },
-    { id: 'nontech-civil', title: 'Civil Fun Event', department: 'Civil Engineering', price: 50 },
-    { id: 'nontech-textile', title: 'Textile Fun Event', department: 'Textile Technology', price: 50 },
+    { id: 'nontech-aids', title: 'AI MEME CONTEST', department: 'AI & Data Science', price: 50 },
+    { id: 'nontech-aids1', title: 'IPL AUCTION', department: 'AI & Data Science', price: 50 },
+    { id: 'nontech-bt', title: 'JUST-A-MINUTE (JAM)', department: 'Bio Technology', price: 50 },
+    { id: 'nontech-civil', title: 'CIVIL CIRCUIT', department: 'Civil Engineering', price: 50 },
+    { id: 'nontech-csbs', title: 'EMOJI PICTIONARY', department: 'CS & Business Systems', price: 50 },
+    { id: 'nontech-cse', title: 'ARANGAM ATHIRA', department: 'Computer Science & Engineering', price: 50 },
+    { id: 'nontech-cse1', title: 'BATTLE ARENA', department: 'Computer Science & Engineering', price: 50 },
+    { id: 'nontech-ece', title: 'LINE X', department: 'Electronics & Communication', price: 50 },
+    { id: 'nontech-ece1', title: 'Kahoot Quiz', department: 'Electronics & Communication', price: 50 },
+    { id: 'nontech-eee', title: 'TWISTED TILES', department: 'Electrical & Electronics', price: 50 },
+    { id: 'nontech-eee1', title: 'LOGO QUIZ', department: 'Electrical & Electronics', price: 500   },
+    { id: 'nontech-eee2', title: 'UNIT WARS', department: 'Electrical & Electronics', price: 50 },
+    { id: 'nontech-ft', title: 'UNMASKING BRANDS & FLAVOURS', department: 'Food Technology', price: 50 },
+    { id: 'nontech-it', title: 'TREASURE HUNT', department: 'Information Technology', price: 50 },
+    { id: 'nontech-mca', title: 'FACE PAINTING', department: 'MCA', price: 50 },
+    { id: 'nontech-mct', title: 'MIND SPARK', department: 'Mechatronics', price: 50 },
+    { id: 'nontech-mct1', title: 'TECH WITHOUT TECH', department: 'Mechatronics', price: 50 },
+    { id: 'nontech-mech', title: 'FREEZEFRAME', department: 'Mechanical Engineering', price: 50 },
+    { id: 'nontect-txt', title: 'T2T-Trash 2 Textile', department: 'Textile Technology', price: 50 },
+    { id: 'nontech-vlsi', title: 'BlindBites: Taste it. Find it', department: 'VLSI Design', price: 50 },
   ],
 
   // ============================================

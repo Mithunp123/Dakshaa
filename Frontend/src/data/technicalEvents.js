@@ -1,5 +1,5 @@
 import Tech1 from "../assets/EventsImages/EventDetails/TechnicalImages/aids_tech.png";
-import Tech2 from "../assets/EventsImages/EventDetails/TechnicalImages/aids_tech1.png";
+//import Tech2 from "../assets/EventsImages/EventDetails/TechnicalImages/aids_tech1.png";
 import Tech3 from "../assets/EventsImages/EventDetails/TechnicalImages/aiml_tech.png";
 import Tech4 from "../assets/EventsImages/EventDetails/TechnicalImages/bt_tech.png";
 import Tech5 from "../assets/EventsImages/EventDetails/TechnicalImages/bt_tech1.png";
@@ -28,10 +28,10 @@ export const technicalEvents = [
     image: Tech1,
     eventId: "tech-aids",
   },
-  {
+  /*{
     image: Tech2,
     eventId: "tech-aids-1",
-  },
+  },*/
   {
     image: Tech3,
     eventId: "tech-aiml",

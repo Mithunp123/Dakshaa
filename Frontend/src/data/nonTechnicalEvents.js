@@ -25,25 +25,25 @@ import nontech20 from "../assets/EventsImages/EventDetails/Nontech/vlsi_nontech.
 
 /*
   nontech-aids :AI MEME CONTEST
-nontech-aids1: IPL AUCTION
-nontech-bt : JUST-A-MINUTE (JAM)
-nontech-civil: CIVIL CIRCUIT
-nontech-csbs: EMOJI PICTIONARY
-nontech-cse: ARANGAM ATHIRA
-nontech-cse1: BATTLE ARENA
-nontech-ece:LINE X
-nontech-ece1: Kahoot Quiz
-nontech-eee: TWISTED TILES
-nontech-eee1: LOGO QUIZ
-nontech-eee2:UNIT WARS
-nontech-ft: UNMASKING BRANDS & FLAVOURS
-nontech-it: TREASURE HUNT
-nontech-mca:FACE PAINTING
-nontech-mct: MIND SPARK
-nontech-mct1: TECH WITHOUT TECH
-nontech-mech:FREEZEFRAME
-nontect-txt: T2T-Trash 2 Textile
-nontech-vlsi: BlindBites: Taste it. Find it
+  nontech-aids1: IPL AUCTION
+  nontech-bt : JUST-A-MINUTE (JAM)
+  nontech-civil: CIVIL CIRCUIT
+  nontech-csbs: EMOJI PICTIONARY
+  nontech-cse: ARANGAM ATHIRA
+  nontech-cse1: BATTLE ARENA
+  nontech-ece:LINE X
+  nontech-ece1: Kahoot Quiz
+  nontech-eee: TWISTED TILES
+  nontech-eee1: LOGO QUIZ
+  nontech-eee2:UNIT WARS
+  nontech-ft: UNMASKING BRANDS & FLAVOURS
+  nontech-it: TREASURE HUNT
+  nontech-mca:FACE PAINTING
+  nontech-mct: MIND SPARK
+  nontech-mct1: TECH WITHOUT TECH
+  nontech-mech:FREEZEFRAME
+  nontect-txt: T2T-Trash 2 Textile
+  nontech-vlsi: BlindBites: Taste it. Find it
 */
 export const nonTechnicalEvents = [
   {

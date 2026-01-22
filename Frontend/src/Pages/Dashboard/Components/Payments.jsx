@@ -12,10 +12,10 @@ import {
   Loader2
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
-import { supabaseService } from '../../../services/supabaseService';
+import { getUserTransactions } from '../../../services/dashboardService';
 
 const Payments = () => {
-  const [registrations, setRegistrations] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
 
@@ -34,7 +34,7 @@ const Payments = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'registrations',
+          table: 'payment_transactions',
           filter: `user_id=eq.${userId}`
         },
         (payload) => {
@@ -54,8 +54,10 @@ const Payments = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUserId(user.id);
-        const data = await supabaseService.getUserRegistrations(user.id);
-        setRegistrations(data);
+        const result = await getUserTransactions();
+        if (result.success) {
+          setTransactions(result.data);
+        }
       }
     } catch (error) {
       console.error('Error fetching payments:', error);
@@ -64,21 +66,35 @@ const Payments = () => {
     }
   };
 
-  const totalSpent = registrations
-    .filter(r => r.payment_status?.toUpperCase() === 'PAID')
-    .reduce((sum, r) => sum + (r.events?.price || 0), 0);
+  const totalSpent = transactions
+    .filter(t => t.status?.toUpperCase() === 'SUCCESS')
+    .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
 
-  const successfulPayments = registrations.filter(r => r.payment_status?.toUpperCase() === 'PAID').length;
-  const pendingPayments = registrations.filter(r => r.payment_status?.toUpperCase() === 'PENDING').length;
+  const successfulPayments = transactions.filter(t => t.status?.toUpperCase() === 'SUCCESS').length;
+  const pendingPayments = transactions.filter(t => t.status?.toUpperCase() === 'PENDING' || t.status?.toUpperCase() === 'INITIATED').length;
 
   const getStatusStyles = (status) => {
     const statusUpper = status?.toUpperCase();
     switch (statusUpper) {
+      case 'SUCCESS': return 'text-green-500 bg-green-500/10 border-green-500/20';
       case 'PAID': return 'text-green-500 bg-green-500/10 border-green-500/20';
       case 'PENDING': return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
+      case 'INITIATED': return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
       case 'FAILED': return 'text-red-500 bg-red-500/10 border-red-500/20';
       default: return 'text-gray-500 bg-gray-500/10 border-gray-500/20';
     }
+  };
+
+  const getBookingTypeLabel = (type) => {
+    const types = {
+      'event': 'Event',
+      'combo': 'Combo',
+      'accommodation': 'Accommodation',
+      'lunch': 'Lunch',
+      'team': 'Team Event',
+      'mixed_registration': 'Mixed Registration'
+    };
+    return types[type] || type;
   };
 
   if (loading) {
@@ -162,33 +178,38 @@ const Payments = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {registrations.map((reg) => (
-                <tr key={reg.id} className="hover:bg-white/[0.02] transition-colors">
-                  <td className="p-6 font-mono text-sm text-gray-400">{reg.payment_id || 'N/A'}</td>
+              {transactions.map((txn) => (
+                <tr key={txn.id} className="hover:bg-white/[0.02] transition-colors">
+                  <td className="p-6 font-mono text-sm text-gray-400">{txn.transaction_id || txn.order_id || 'N/A'}</td>
                   <td className="p-6">
-                    <p className="font-bold text-white">{reg.events?.title || 'Event'}</p>
-                    <p className="text-xs text-gray-500 capitalize">{reg.events?.category}</p>
+                    <p className="font-bold text-white">{getBookingTypeLabel(txn.booking_type)}</p>
+                    <p className="text-xs text-gray-500 capitalize">{txn.payment_method || 'Online'}</p>
                   </td>
-                  <td className="p-6 font-bold text-white">₹{reg.events?.price || 0}</td>
+                  <td className="p-6 font-bold text-white">₹{parseFloat(txn.amount).toFixed(2)}</td>
                   <td className="p-6 text-sm text-gray-400">
-                    {new Date(reg.created_at).toLocaleDateString()}
+                    {new Date(txn.created_at).toLocaleDateString('en-IN', { 
+                      day: '2-digit', 
+                      month: '2-digit', 
+                      year: 'numeric' 
+                    })}
                   </td>
                   <td className="p-6">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${getStatusStyles(reg.payment_status)}`}>
-                      {reg.payment_status}
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${getStatusStyles(txn.status)}`}>
+                      {txn.status}
                     </span>
                   </td>
                   <td className="p-6">
                     <button 
-                      disabled={reg.payment_status?.toUpperCase() !== 'PAID'}
+                      disabled={txn.status?.toUpperCase() !== 'SUCCESS'}
                       className="p-2 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-secondary disabled:opacity-30"
+                      title="Download Receipt"
                     >
                       <Download size={18} />
                     </button>
                   </td>
                 </tr>
               ))}
-              {registrations.length === 0 && (
+              {transactions.length === 0 && (
                 <tr>
                   <td colSpan="6" className="p-12 text-center text-gray-500">
                     No transactions found.

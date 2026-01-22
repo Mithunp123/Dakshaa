@@ -7,6 +7,7 @@ import { useInView } from "react-intersection-observer";
 //'tech-aids': 'AI Mystery Box Challenge – AI & DS',
   //'tech-aids1': 'STARTUP PITCH – AI & DS',
   //'tech-aiml': 'Lovable Vibes – AIML',
+  //'tech-csbs' : 'System Sense',
 
   //'tech-bt': ' Reel-O-Science– BT',
   //'tech-bt-1': 'BioNexathon – BT',
@@ -19,9 +20,9 @@ import { useInView } from "react-intersection-observer";
   //'tech-cse-1': 'BotXhibit – CSE',
 
   //'tech-ece': 'zero Component – ECE',
-  //'tech-eee': 'trailblazer – ECE',
+  //'tech-eee': 'trailblazer – EEE',
 
-  //'tech-eee-1': 'Paper Presentation – ECE',
+  //'tech-eee-1': 'Paper Presentation – EEE',
   //'tech-ft': 'poster Presentation – FT',
 
   //'tech-it': 'code relay – IT',
@@ -38,7 +39,7 @@ import { useInView } from "react-intersection-observer";
   
 
 import Tech1 from "../../../assets/EventsImages/EventDetails/TechnicalImages/aids_tech.png";
-import Tech2 from "../../../assets/EventsImages/EventDetails/TechnicalImages/aids_tech1.png";
+//import Tech2 from "../../../assets/EventsImages/EventDetails/TechnicalImages/aids_tech1.png";
 import Tech3 from "../../../assets/EventsImages/EventDetails/TechnicalImages/aiml_tech.png";
 import Tech4 from "../../../assets/EventsImages/EventDetails/TechnicalImages/bt_tech.png";
 import Tech5 from "../../../assets/EventsImages/EventDetails/TechnicalImages/bt_tech1.png";
@@ -184,7 +185,7 @@ const EventDetails = () => {
   const eventIdMap = {
     // Technical Events - Database ID -> Old ID
     'tech-aids': 'technical-event-1',
-    'tech-aids1': 'technical-event-2',
+    //'tech-aids1': 'technical-event-2',
     'tech-aiml': 'technical-event-3',
     'tech-bt': 'technical-event-4',
     'tech-bt-1': 'technical-event-5',
@@ -334,7 +335,7 @@ const EventDetails = () => {
       },
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9",
     },
-    "technical-event-2": {
+    /*"technical-event-2": {
       title: "Neura Hack (Hackathon)",
       description:
         "Neura Hack 2026 is a 36-hour innovation marathon where brilliant minds unite to tackle pressing global challenges aligned with the UN Sustainable Development Goals (SDGs). Participants will collaborate, ideate, and build cutting-edge solutions leveraging technology to address issues like climate action, equality, health, and more. Join us to code, create, and catalyze change for a sustainable future!",
@@ -397,7 +398,7 @@ const EventDetails = () => {
         ],
       },
       registrationLink: "https://forms.gle/rdVwYuEvx9Bpi5zk9", // Registration link
-    },
+    },*/
 
     "technical-event-3": {
       title: "SEMISPARK(PROJECT PRESENTATION) ",
@@ -715,17 +716,24 @@ const EventDetails = () => {
            description: "Topics",
          },
          {
-           topic: "Smart & Sustainable Infrastructure ",
+           title: "1) Smart & Sustainable Infrastructure ",
            description:
-             "The Food Technology Department hosting a poster presentation on nutrient-infused street foods, focusing on functional foods, fortification, and balanced recipes. Participants have to showcase the innovative ways to enhance traditional street foods with added nutrients. Judges will evaluate posters on scientific accuracy, creativity, and practicality. The event encouraged discussions on nutrition, affordability, and consumer acceptance, promoting healthier eating choices.    ",
+             "",
          },
+         {
+            title: "2) AI and Digital Technologies in Civil Engineering ",
+            description:"",
+         },
+         {
+            title: "3) Future Trends in Construction and Structural Engineering ",
+            description:"",
+         }
       ],
        rules: [
-         "Eligibility: Open to all departments. Teams can have a maximum of 2 members.",
-         "Product Criteria: The product must be an innovative infusion of nutrition and flavor in street food. It should not be an exact replica of an existing market product.",
-         "Poster Guidelines: Size: A2 (420 × 594 mm) , Must include product name, concept, ingredients, nutritional benefits, and uniqueness, Clear visuals, infographics, and creativity are encouraged",
-         "Product Display: Each team must bring and showcase their product for evaluation.",
-         "Presentation: Time Limit:5 minutes per team ,Must cover product innovation, nutritional benefits, and SDG alignment, Judges may ask questions after the presentation ",
+         " Each team must consist of 2 to 3 members only. ",
+         "Participants must Present their Paper under any one of the three given Themes.",
+         "Only registered participants are allowed to be present. ",
+         "The team with the best innovative and creative presentation will be selected as the winner. ",
        ],
        schedule: [
          {
@@ -738,243 +746,216 @@ const EventDetails = () => {
        contact: {
          facultyCoordinator: [
            {
-             name: "Mr G Bharath, AP/FT",
-             email: "bharathg@ksrct.ac.in",
-             phone: "9047976171",
+             name: "Dr. K. Vijaya Sundravel",
+             email: "",
+             phone: "9688676665",
            },
          ],
          studentCoordinator: [
            {
-             name: "Surya S, III Year/FT ",
-             email: "suryaarjun813@gmail.com",
-             phone: "9360492992",
+             name: " Ms. P. Vaishnavi ",
+             email: "",
+             phone: "9944108747",
            },
            {
-             name: "Yatheeswar R, II Year/FT ",
-             email: "r.yatheeswar852@gmail.com",
-             phone: "9441236991",
-           },
-           {
-             name: "Vijaya Yugeshwar R, II Year/FT ",
-             phone: "9585768184",
+             name: ". Ms. C. V. Swetha",
+             email: "",
+             phone: "7538831885",
            },
          ],
        },
     },
     "technical-event-9": {
-      title: "Designathon",
+      title: " NEUROHACK 2.O",
       description:
-        "A creative design competition where participants transform sketches into 3D models, culminating in real-life product modeling.",
+        " NeuroHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, 	Defend, and Secure technology to shape the future of digital innovation.",
       image: Tech9,
       rounds: [
         {
-          title: "Round 1",
-          description: "Participants will work on 2D sketching.",
+          title: "",
+          description: "",
         },
         {
-          title: "Round 2",
+          title: "",
           description:
-            "Participants will be given a 2D sketch to convert into a 3D model.",
+            "",
         },
         {
-          title: "Round 3",
+          title: "",
           description:
-            "Participants will receive a real-life product and model it on their own.",
+            "",
         },
       ],
       rules: [
-        "Students can bring their own laptops; computers are also available.",
-        "Participants should use only SolidWorks, Fusion 360, or NX CAD software.",
-        "Participants must follow the college’s instructions.",
+        "Each team shall consist of three (3) to four (4) members.",
+        "NeuroHack 2.O is a continuous 36-hour hackathon with no breaks in development time.",
+        " A total of two (2) evaluation rounds will be conducted during the hackathon period.",
+        "Participants must bring their own laptops, peripherals, and required accessories.",
+        "At least one team member must be present and actively working at all times throughout the 36-hour duration.",
+        "All solutions must be developed during the hackathon period only.",
+        "The decision of the judging panel shall be final and binding.",
       ],
       schedule: [
         {
-          round: "Round 1",
-          date: "March 28, 2026",
-          time: "9:00 AM to 11:00 AM",
-          location: "Design Center,Mechanical Block",
-        },
-        {
-          round: "Round 2",
-          date: "March 28, 2026",
-          time: "1:00 PM to 3:00 PM",
-          location: "Design Center,Mechanical Block",
+          round: "Round",
+          date: "February 13, 2026",
+          time: "",
+          location: " IT PARK",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Mr. C. Ramesh",
-            email: "rameshc@ksrct.ac.in",
-            phone: "9629767778",
+            name: "S.VADIVEL",
+            email: "",
+            phone: "9790632171",
           },
-          {
-            name: "Mr. M. Prasath",
-            email: "prasathm@ksrct.ac.in",
-            phone: "9788206877",
-          },
+  
         ],
         studentCoordinator: [
           {
-            name: "K P Arunachalam",
-            email: "arunachalam122004@gmail.com",
-            phone: "9025972365",
+            name: "SHANMUGESHWARA A",
+            email: "",
+            phone: "9487119381",
           },
-          {
-            name: "Jaganathbalaaji N",
-            email: "jbbalaaji74181@gmail.com",
-            phone: "7418155343",
-          },
+          
         ],
       },
 
       registrationLink: "https://forms.gle/gziLh4EoGaCQLSpg8", // Registration link
     },
     "technical-event-10": {
-      title: "Codathon",
+      title: "BOTXHIBIT",
       description:
-        "Codathon is a competitive coding event where participants solve programming problems within a time limit. Hosted on the Unstop platform, this event challenges individuals or teams to showcase their coding skills, creativity, and problem-solving abilities. Participants will be judged on the correctness, innovation, and quality of their code.",
+        "A showcase-based technical event where participants present pre-developed software or hardware bots demonstrating innovation, functionality, and real-world application. Teams must explain the concept, design, working principle, and technology stack of their bot and perform a live demonstration within the allotted time. Evaluation will be based on originality, technical complexity, problem-solving approach, performance, and presentation quality. The team that best demonstrates a functional, innovative, and impactful bot will be declared the winner.",
       image: Tech10,
       rounds: [
         {
-          description:"Participants will be given a set of programming problems to solve within a specified time limit.Time Limit: 2 hours",
+          description:"",
 
         },
         
       ],
       rules: [
-        "No pre-written code or external help is allowed.",
-        "Participants must adhere to the time limit.",
-        "Any form of plagiarism will lead to disqualification.",
-        "No specialization is required.",
-        "All domains are allowed to participate.",
+        " A team may consist of a maximum of two (2) participants",
+        "Only pre-developed bots (software or hardware) are permitted for demonstration.",
+        "On-site coding, modification, or fabrication of bots is strictly prohibited.",
+        " Mobile phones and external references are not allowed during evaluation, except when required for bot operation.",
+        " Each team must demonstrate a fully functional bot to be eligible for full evaluation.",
+        "Teams must bring all required components, equipment, and accessories for their bot.",
+        " Bots must comply with basic safety standards; unsafe hardware may lead to disqualification.",
+        "Any damage to equipment, venue property, or safety violations may result in disqualification.",
+        "The decision of the jury shall be final and binding.",
       ],
       schedule: [
         {
           round: "Round",
-          date: "March 28, 2026",
-          time: "9:30 AM",
-          location: "Announced Soon!",
+          date: "February 13, 2026",
+          time: "",
+          location: "IT PARK ",
         },
       
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Ms. R.P. Harshini (AP/CSE(AIML))",
-            email: "harshinirp@ksrct.ac.in",
-            phone: "9361446506",
+            name: "Dr. K .PONNGODI",
+            email: "",
+            phone: "97886 80616",
           },
         ],
         studentCoordinator: [
           {
-            name: "Praveen S (II-Year/CSE(AIML))",
-            email: "saravananpraveen1157@gmail.com",
-            phone: "6369493352 ",
+            name: "JEEVANYA R ",
+            email: "",
+            phone: "9385781083",
           },
-          {
-            name: "Pavithran G (II-Year/CSE(AIML))",
-            email: "techpavithran18@gmail.com",
-            phone: "9363575964",
-          },
+          
         ],
       },
 
       registrationLink: "https://forms.gle/2wBfChfRVPiKVw599", // Registration link
     },
     "technical-event-11": {
-      title: "Buildathon",
+      title: "Zero component",
       description:
-        "Buildathon is an intensive design competition aimed at fostering innovation, creativity, and problem-solving skills among students. Participants will be challenged to develop innovative design solutions for real-world engineering and architectural problems using advanced design software SketchUp. The event will encourage critical thinking, teamwork, and the application of technical knowledge in a fast-paced environment. This event is designed for individual participants. The competition is structured into multiple rounds, each designed to test various aspects of the participants' design skills, from conceptualization to execution. The event will culminate in a final presentation, where participants will showcase their designs to a panel of industry experts and academicians.",
+        "An engaging electronics-based technical event where participants are given only component symbols without component names. Participants must identify the correct components and build the complete circuit within a limited time. The participant who successfully builds a correct and working circuit in the shortest time is declared the winner.",
       image: Tech11,
       rounds: [],
       rules: [
-        "Are inter-college team members allowed? Yes",
-        "Are inter-specialization team members allowed? Yes",
-        "The design brief, which will include the task, theme, and specific requirements, will be provided at the start of the Designathon.  Participants must create their design based on the provided brief, focusing on originality and creative solutions",
-        "The design process is limited to a total duration of one hour. Only Google SketchUp can be used to create the design for this competition",
-        "The judging will be based on the following criteria: Creativity, Time Management, Technical Execution, and Adherence to the Design brief. The jury's decision will be final and binding.",
-        "Participation Type: Individual",
-        "Charge per Person/Team: Rs.350",
-        "Any form of plagiarism will lead to disqualification.",
+        "Maximum 2 players per team.",
+        "Components provided by the team.",
+        "Mobile phones, books, or external references are strictly prohibited.",
+        "The circuit must be fully functional to earn full points.",
+        "Damaging components or equipment may result in disqualification.,"
       ],
       schedule: [
         {
-          round: "Round 1",
-          date: "March 28, 2026",
-          time: "9:00 AM to 11:00 AM",
-          location: "Announced Soon!",
-        },
-        {
-          round: "Round 2",
-          date: "March 28, 2026",
-          time: "1:00 PM to 3:00 PM",
-          location: "Announced Soon!",
+          round: "Round",
+          date: "February 13, 2026",
+          time: "9:00 AM to 1:00 PM",
+          location: "Electronic Devices Laboratory",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Dr.K.Vijaya Sundravel",
-            email: "vijayasundravel@ksrct.ac.in",
-            phone: "9688676665",
+            name: "Mrs V P Kalaiarasi",
+            email: "",
+            phone: "9500241234",
           },
         ],
         studentCoordinator: [
           {
-            name: "T.Rithiga",
-            email: "trithika36@gmail.com ",
-            phone: "9344868518 ",
+            name: "Harish K",
+            email: " ",
+            phone: "9385781083",
           },
-          {
-            name: "S.Sandhiya",
-            email: "sandiyas704@gmail.comm",
-            phone: "9659953151",
-          },
+          
         ],
       },
 
       registrationLink: "https://forms.gle/2wBfChfRVPiKVw599", // Registration link
     },
     "technical-event-12": {
-      title: "Eye on Pick Glass",
+      title: "Trailblazer",
       description:
-        "The Eye on Pick Glass session is an insightful opportunity for textile students and professionals to enhance their expertise in fabric analysis. This workshop focuses on understanding the pick glass (thread counter)—a crucial tool for inspecting fabric construction, weave structure, and yarn density. Participants will learn practical techniques to analyze fabric quality, identify defects, and differentiate between various weaves with precision. Experts will demonstrate real-time fabric evaluation, providing hands-on experience in textile inspection. This session is ideal for those keen on mastering textile microscopy, ensuring quality control, and deepening their understanding of fabric construction.",
+        "The Trailblazer event challenges participants to design and operate a robot that follows a predefined path accurately and efficiently. The robot must track a line from start to finish with minimal deviation.",
       image: Tech12,
       rounds: [],
       rules: [
-        "Only one participant",
-        "Have to detect the given fabric",
-        "Counting glass will be provided and has to be returned Safely",
-        "Duration:15 Minutes",
-        "Juries Judgement is Final.",
+        "Maximum team size: 3 members.",
+        "Robot must be autonomous (no remote control).",
+        "Manual interference during the run leads to disqualification.",
+        "Only one restart is allowed in case of technical failure.",
+        
       ],
       schedule: [
         {
-          round: "",
-          date: "March 28, 2026",
-          time: "9:30AM -10:30AM",
-          location: "Fabric manufacturing laboratory,TEXTILE BLOCK",
+          round: "Round",
+          date: "February 13, 2026",
+          time: "4 Hours",
+          location: "Location need",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Mr.M.Arunkumar ",
-            email: "arunkumar@ksrct.ac.in",
-            phone: "8056989930",
+            name: "Mr. N Rajasekaran",
+            email: "",
+            phone: "",
           },
         ],
         studentCoordinator: [
           {
-            name: "A.V. Raghavendhar ",
-            email: "a.v.raghavendhar516@gmail.com",
-            phone: "8778239221",
+            name: "Mr. Vishwanathan K ",
+            email: "",
+            phone: "9025081987",
           },
           {
-            name: "K.Harini ",
-            email: "mailto:harinikumar25102005@gmail.com",
-            phone: "8667393828",
+            name: "Mr. Gowri Shankar S ",
+            email: "",
+            phone: "9629239567",
           },
         ],
       },
@@ -984,81 +965,58 @@ const EventDetails = () => {
     "technical-event-13": {
       title: "Paper presentation",
       description:
-        "The Paper Presentation Competition is an opportunity for students to explore and present emerging technological advancements while addressing key global challenges. This event encourages innovation, research, and knowledge-sharing among students across various engineering and technology sectors.Participants will prepare and present a research paper on selected topics, demonstrating their understanding of cutting-edge technologies and their real-world applications.",
+        "Paper Presentation is a technical event that provides a platform for students and researchers to present their innovative ideas, research findings, and technical knowledge in front of an expert panel. Participants are required to prepare and present a research or review paper related to engineering, science, technology, or management domains.",
       image: Tech13,
       rounds: [
         {
           title: "TOPICS:",
         },
         {
-          title: "Computer & IT Sector:",
-          description: [
-            "Cybersecurity in the Age of AI: Threats and Solutions",
-            "Metaverse and Its Impact on Virtual Collaboration",
-            "Homomorphic Encryption: The Future of Data Privacy",
-          ],
+          title: "themes need",
+          
         },
         {
-          title: "Electrical & Electronics Sector:",
-          description: [
-            "Energy Harvesting from Ambient Sources for IoT Devices",
-            "AI-Driven Chip Design for Next-Gen Processors",
-            "Flexible and Wearable Electronics: The Future of Smart Devices",
-          ],
+          title: "themes need",
+          
         },
         {
-          title: "Building & Mechanical Sector:",
-          description: [
-            "Self-Healing Materials for Infrastructure Longevity",
-            "Autonomous Construction Robots: The Future of Smart Buildings",
-            "Hybrid Air Vehicles: The Next Evolution in Aviation",
-          ],
+          title: "themes need",
+          
         },
         {
-          title: "Artificial Intelligence & IoT Sector:",
-          description: [
-            "AI-Powered Emotion Recognition for Human-Machine Interaction",
-            "Digital Twins: The Future of Predictive Maintenance",
-            "AI-Based Disaster Prediction and Response Systems",
-          ],
+          title: "themes need",
+          
         },
       ],
       rules: [
-        "1) Eligibility:",
-        "i) Open to all UG, PG students, and Research Scholars.",
-        "ii) Participants can register individually or in teams of up to 3 members.",
-        "2)Paper Guidelines:",
-        "i) The paper must include Abstract, Introduction, Literature Review, Methodology, Results, and Conclusion.",
-        "3) Presentation:",
-        "i) Time Limit: 10 minutes per team (7 minutes for presentation + 3 minutes for Q&A).",
-        "ii) Slide Limit: Maximum of 10 slides, including the title and conclusion. ",
-        "iii) Presentations must include technical insights, real-world applications, and SDG alignment.",
-        "4)Judging Criteria:",
-        "i) Content Relevance & Accuracy – 25%",
-        "ii) Creativity & Innovation – 20%",
-        "iii) Clarity & Organization – 20%",
-        "iv) Visual Appeal – 15%",
-        "v) Presentation & Communication Skills – 20%"
+        "The paper must be original, plagiarism-free, and relevant to the chosen technical domain.",
+        "A maximum of 2–3 participants per team is allowed; individual participation is also permitted.",
+        "Each team will be given 8–10 minutes for presentation followed by a short Q&A session.",
+        "Judges’ decision will be final, and any form of malpractice will lead to disqualification.",
       ],
       schedule: [
         {
-          round: "Venue",
-          date: "March 28, 2026",
-          time: "9:30AM -10:30AM",
-          location: "announcing soon",
+          round: "Round",
+          date: "February 13, 2026",
+          time: "4 Hours",
+          location: "Location need",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Mr. Jayamani S (AP/ECE) ",
-            phone: "9629297054",
+            name: "Dr. M. K. Elango ",
+            phone: "",
           },
         ],
         studentCoordinator: [
           {
-            name: "Rohith R ",
-            phone: "93455 80330",
+            name: "Ms. Dharseni Santhiya Sampath Kumar ",
+            phone: "9344415565",
+          },
+          {
+            name: "Ms. Hema Vardhini S P",
+            phone: "7200904682",
           },
         
         ],
@@ -1067,51 +1025,52 @@ const EventDetails = () => {
       registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
     },
     "technical-event-14": {
-      title: "Bacteriart",
+      title: "POSTER PRESENTATION",
       description:
-        " A petri plate innovations where participants present innovative ideas related to life sciences.",
+        "This poster presentation provides students a platform to showcase innovative ideas and research on emerging food processing technologies. Participants will visually present advanced techniques, applications, and benefits that enhance food quality, safety, and sustainability. The session encourages knowledge sharing, creativity, and scientific discussion among students and experts.",
       image: Tech14,
       rounds: [
         {
           title: " ",
           description:
-            "Participants can compete individually; group submissions are not allowed.Displaying the petri art and providing description about your art work",
+            "",
         },
       ],
       rules: [
-        "Participants must submit a visible art work without contamination along with a brief description (100–200 words) explaining the scientific relevance.",
-        "Each participant can submit only one artwork",
-        "Artwork must be submitted with a protective covering.",
-        "judging criteria: Creativity & originality, relevance to theme artistic technique, presentation and concept clarity",
-        "No inter-college team members allowed",
-        "No inter-specialization team members allowed",
+        "Participants must register before the event.",
+        " Posters should be original and student-created.",
+        "Each team/student must be present during the presentation.",
+        " Time limits for presenting must be strictly followed.",
+        "Proper citation of references is mandatory.",
+        "Posters should be neat, clear, and visually appealing.",
+        "Judges’ decisions will be final and binding.",
       ],
       schedule: [
         {
-          round: "Venue",
-          date: "March 28, 2026",
-          time: "9:30AM -10:30AM",
-          location: "announcing soon",
+          round: "Round",
+          date: "February 13, 2026",
+          time: "",
+          location: " Baking and Confectionery Laboratory",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Dr.M.Nithya",
-            email: "nithyam@ksrct.ac.in",
-            phone: " 7708844446",
+            name: "Mr.P.Kalai Rajan",
+            email: "",
+            phone: "7010841881 ",
           },
         ],
         studentCoordinator: [
           {
-            name: "Sankar R",
-            email: "sankarragu832@gmail.com",
-            phone: "7397534931",
+            name: "Ms.S.Trishna",
+            email: "",
+            phone: "9843867406",
           },
           {
-            name: "Mridula Dev D ",
-            email: "mriduladev2004@gmail.com",
-            phone: "8754184017",
+            name: "Ms.V.Madhushree ",
+            email: "",
+            phone: "6379704086",
           },
         ],
       },
