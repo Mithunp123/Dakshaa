@@ -49,6 +49,7 @@ const TestConnection = lazy(() => import("./Pages/TestConnection"));
 const MyRegistrations = lazy(() => import("./Pages/MyRegistrations/MyRegistrations"));
 const AdminDashboard = lazy(() => import("./Pages/Admin/AdminDashboard"));
 const PaymentSimulation = lazy(() => import("./Pages/Register/Components/PaymentSimulation"));
+const TermsAndConditions = lazy(() => import("./Pages/TermsAndConditions/TermsAndConditions"));
 const NotFound = lazy(() => import("./Pages/NotFound"));
 
 // Preload functions for critical pages - call these on hover
@@ -177,6 +178,7 @@ function AppContent() {
             <Route path="/event/codeathon" element={<Codathon />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/feedback" element={<Feedback />} />
+            <Route path="/terms" element={<TermsAndConditions />} />
             <Route path="/signup" element={<Register />} />
             <Route path="/register-events" element={<EventRegistration />} />
             <Route path="/scan" element={<Scan />} />

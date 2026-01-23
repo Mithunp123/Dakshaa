@@ -46,3 +46,11 @@ public/
 *.swp
 *.swo
 
+# Project folders to ignore
+docs/
+database/
+scripts/
+new_db/
+.docs/
+.new_db/
+.scripts/
