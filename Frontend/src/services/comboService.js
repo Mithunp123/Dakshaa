@@ -119,7 +119,7 @@ const comboService = {
    * Get active combos for students (with availability checks)
    * @param {string} userId - The user ID (passed from caller, no re-auth needed)
    */
-  getActiveCombosForStudents: async (userId) => {
+  getActiveCombosForStudents: async (userId, forceRefresh = false) => {
     try {
       console.log('🔵 [comboService] getActiveCombosForStudents called with userId:', userId);
       
@@ -133,23 +133,20 @@ const comboService = {
         };
       }
 
-      // Try cache first for instant display
+      // Try cache first for instant display - RETURN IMMEDIATELY if valid cache
       const cachedCombos = getCachedCombos();
-      
-      // Ensure Supabase session is initialized before querying
-      // This restores the session from localStorage if needed
-      let sessionReady = false;
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        sessionReady = !!session;
-        console.log('🔵 [comboService] Session ready:', sessionReady);
-      } catch (e) {
-        console.warn('🔵 [comboService] Session check failed:', e.message);
-        // If session check fails but we have cache, return cache
-        if (cachedCombos) {
-          console.log('🔵 [comboService] Returning cached combos due to session issue');
-          return { success: true, data: cachedCombos };
+      if (cachedCombos && !forceRefresh) {
+        // Return cache immediately, trigger background refresh if older than 2 min
+        const cached = localStorage.getItem(COMBOS_CACHE_KEY);
+        if (cached) {
+          const { timestamp } = JSON.parse(cached);
+          const age = Date.now() - timestamp;
+          if (age > 2 * 60 * 1000) {
+            // Trigger background refresh
+            setTimeout(() => comboService.getActiveCombosForStudents(userId, true), 100);
+          }
         }
+        return { success: true, data: cachedCombos, fromCache: true };
       }
 
       // Query combos table
