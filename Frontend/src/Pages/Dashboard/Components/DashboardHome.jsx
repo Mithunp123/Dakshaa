@@ -34,6 +34,7 @@ const DashboardHome = () => {
   const [profile, setProfile] = useState(null);
   const [registrations, setRegistrations] = useState([]);
   const [teamsCount, setTeamsCount] = useState(0);
+  const [referralCount, setReferralCount] = useState(0);
   const [loading, setLoading] = useState(true);
   
   // Ref to prevent double-fetch in React StrictMode
@@ -90,6 +91,7 @@ const DashboardHome = () => {
           setProfile(parsed.profile);
           setRegistrations(parsed.registrations);
           setTeamsCount(parsed.teamsCount);
+          setReferralCount(parsed.referralCount || 0);
           setLoading(false);
           hasValidCache = true;
           console.log(`✅ Dashboard loaded from cache (${Math.round(cacheAge / 1000)}s old)`);
@@ -147,10 +149,26 @@ const DashboardHome = () => {
         console.warn('Teams count fetch error:', teamsError.message);
       }
 
+      // Fetch referral count for this user's referral code
+      let referralUsageCount = 0;
+      if (profileData?.id) {
+        const referralCode = `DAK26-${profileData.id.substring(0, 8).toUpperCase()}`;
+        const { data: referralData, error: referralError } = await supabase
+          .from('referral_code')
+          .select('usage_count')
+          .eq('referral_id', referralCode)
+          .maybeSingle();
+        
+        if (!referralError && referralData) {
+          referralUsageCount = referralData.usage_count || 0;
+        }
+      }
+
       const dashboardData = {
         profile: profileData || null,
         registrations: registrationsData || [],
         teamsCount: teamsCountValue || 0,
+        referralCount: referralUsageCount,
         timestamp: Date.now()
       };
 
@@ -158,6 +176,7 @@ const DashboardHome = () => {
       setProfile(dashboardData.profile);
       setRegistrations(dashboardData.registrations);
       setTeamsCount(dashboardData.teamsCount);
+      setReferralCount(dashboardData.referralCount);
 
       // Cache for quick reload (short duration)
       sessionStorage.setItem('dashboard_data', JSON.stringify(dashboardData));
@@ -251,7 +270,7 @@ const DashboardHome = () => {
           
           {/* Referral Code - shown directly under college name */}
           {profile?.id && (
-            <motion.div variants={itemVariants} className="mt-2 flex items-center gap-2">
+            <motion.div variants={itemVariants} className="mt-2 flex items-center gap-2 flex-wrap">
               <span className="text-gray-500 text-sm">Referral Code:</span>
               <span className="text-secondary font-mono font-bold">
                 DAK26-{profile.id.substring(0, 8).toUpperCase()}
@@ -275,6 +294,10 @@ const DashboardHome = () => {
               >
                 <Copy size={14} className="text-secondary" />
               </button>
+              <span className="text-gray-500 text-sm ml-2">|</span>
+              <span className="text-gray-400 text-sm">
+                Referrals: <span className="text-secondary font-bold">{referralCount}</span>
+              </span>
             </motion.div>
           )}
 

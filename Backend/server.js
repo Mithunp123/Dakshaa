@@ -1783,6 +1783,71 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
         console.error("❌ Failed to send payment email:", err);
       }
 
+      // 🎁 REFERRAL TRACKING - Increment referral usage count on successful payment
+      try {
+        // Get user's referred_by from profile
+        const { data: userProfileForReferral } = await supabase
+          .from('profiles')
+          .select('referred_by')
+          .eq('id', paymentRecord.user_id)
+          .single();
+
+        const referredBy = userProfileForReferral?.referred_by?.trim();
+
+        if (referredBy) {
+          console.log('🎁 Processing referral for:', referredBy);
+
+          // Check if it's a 10-digit mobile number (KSRCT student) or alphanumeric ID (outside student)
+          const isMobileNumber = /^\d{10}$/.test(referredBy);
+          const usageLimit = isMobileNumber ? 50 : 25;
+
+          // Fetch current referral code record
+          const { data: referralRecord, error: referralFetchError } = await supabase
+            .from('referral_code')
+            .select('*')
+            .eq('referral_id', referredBy)
+            .maybeSingle();
+
+          if (referralFetchError) {
+            console.error('❌ Error fetching referral code:', referralFetchError);
+          } else if (referralRecord) {
+            // Check if within usage limit
+            if (referralRecord.usage_count < usageLimit) {
+              // Increment the usage count
+              const { error: updateError } = await supabase
+                .from('referral_code')
+                .update({ usage_count: referralRecord.usage_count + 1 })
+                .eq('referral_id', referredBy);
+
+              if (updateError) {
+                console.error('❌ Error incrementing referral count:', updateError);
+              } else {
+                console.log(`✅ Referral count incremented for ${referredBy}: ${referralRecord.usage_count + 1}/${usageLimit}`);
+              }
+            } else {
+              console.log(`⚠️ Referral limit reached for ${referredBy}: ${referralRecord.usage_count}/${usageLimit} - bypassing increment`);
+            }
+          } else {
+            // Referral code not found in table - create it with count 1
+            const { error: insertError } = await supabase
+              .from('referral_code')
+              .insert({
+                referral_id: referredBy,
+                usage_count: 1
+              });
+
+            if (insertError) {
+              console.error('❌ Error creating referral code record:', insertError);
+            } else {
+              console.log(`✅ New referral code created and counted for ${referredBy}: 1/${usageLimit}`);
+            }
+          }
+        }
+      } catch (referralErr) {
+        console.error('❌ Error processing referral:', referralErr);
+        // Don't fail the payment process if referral tracking fails
+      }
+
       // Localhost notification removed as per request
       console.log("✅ Payment successful handling complete.");
     } else {
