@@ -240,6 +240,29 @@ const EventDetails = () => {
 
     // Non-Technical Events
     
+
+    /*
+  nontech-aids :AI MEME CONTEST
+  nontech-aids1: IPL AUCTION
+  nontech-bt : JUST-A-MINUTE (JAM)
+  nontech-civil: CIVIL CIRCUIT
+  nontech-csbs: EMOJI PICTIONARY
+  nontech-cse: ARANGAM ATHIRA
+  nontech-cse1: BATTLE ARENA
+  nontech-ece:LINE X
+  nontech-ece1: Kahoot Quiz
+  nontech-eee: TWISTED TILES
+  nontech-eee1: LOGO QUIZ
+  nontech-eee2:UNIT WARS
+  nontech-ft: UNMASKING BRANDS & FLAVOURS
+  nontech-it: TREASURE HUNT
+  nontech-mca:FACE PAINTING
+  nontech-mct: MIND SPARK
+  nontech-mct1: TECH WITHOUT TECH
+  nontech-mech:FREEZEFRAME
+  nontect-txt: T2T-Trash 2 Textile
+  nontech-vlsi: BlindBites: Taste it. Find it
+*/
 'nontech-aids' :'non-technical-event-1',
 'nontech-aids1': 'non-technical-event-2',
 'nontech-bt' :'non-technical-event-3', 
@@ -269,6 +292,11 @@ const EventDetails = () => {
       'cultural-3': 'culturals-event-3',
       'cultural-4': 'culturals-event-4',
       'cultural-5': 'culturals-event-5',
+
+      /*
+      
+
+      */
     
 
 
@@ -1811,10 +1839,34 @@ const EventDetails = () => {
         registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
       },*/
     // Non-Technical Events
+
+    /*
+  nontech-aids :AI MEME CONTEST
+  nontech-aids1: IPL AUCTION
+  nontech-bt : JUST-A-MINUTE (JAM)
+  nontech-civil: CIVIL CIRCUIT
+  nontech-csbs: EMOJI PICTIONARY
+  nontech-cse: ARANGAM ATHIRA
+  nontech-cse1: BATTLE ARENA
+  nontech-ece:LINE X
+  nontech-ece1: Kahoot Quiz
+  nontech-eee: TWISTED TILES
+  nontech-eee1: LOGO QUIZ
+  nontech-eee2:UNIT WARS
+  nontech-ft: UNMASKING BRANDS & FLAVOURS
+  nontech-it: TREASURE HUNT
+  nontech-mca:FACE PAINTING
+  nontech-mct: MIND SPARK
+  nontech-mct1: TECH WITHOUT TECH
+  nontech-mech:FREEZEFRAME
+  nontect-txt: T2T-Trash 2 Textile
+  nontech-vlsi: BlindBites: Taste it. Find it
+*/
+
     "non-technical-event-1": {
-      title: "trailblazers: The Clue Hunt",
+      title: "AI Meme Contest",
       description:
-        "Trailblazers is an interactive clue hunt event designed to test participants' problem-solving and teamwork skills. Teams will solve riddles, puzzles, and locate QR codes to progress through the challenge.",
+        "The AI Meme Contest is a fun-filled one-day non-technical event that combines creativity, humor, and artificial intelligence concepts through visually engaging memes. Participants will create original memes based on given AI-related themes using either AI-based tools or manual editing, with a strong focus on originality and ethical content creation. The event encourages innovative thinking and expressive digital creativity in a light-hearted competitive environment. It will be conducted at AB 408, with a registration fee of ₹150, and is open to both individuals and teams.",
       image: NonTech1,
       rounds: [
         {
@@ -1827,134 +1879,153 @@ const EventDetails = () => {
         },
       ],
       rules: [
-        "Teams must stay together during the hunt.",
-        "No use of external help or mobile devices for assistance.",
-        "Duration: 60 Minutes & Team : 2-3 Members",
-        "Teams will solve riddles, find clues to unlock the next challenge.",
-        "Participants must collect tokens or codes at each location as proof of completion.",
-        "The team that collects the most treasures in the shortest time wins.",
+        "The meme must be related to the content that are given to you.The meme must be related to the content that are given to you.",
+        "Participants may use AI tools or manual design, but the concept must be original.",
+        "Each participant/team may submit only one meme.",
+        "Memes must be appropriate, ethical, and non-offensive; content that is vulgar, political, or discriminatory will be disqualified.",
+        "The meme should be in image format only (JPG/PNG); videos or GIFs are not allowed.",
+        "Plagiarized or previously published memes are strictly prohibited.",
+        "Judges’ decision will be final, based on creativity, relevance, and humor.",
       ],
       schedule: [
         {
-          round: "Round",
-          date: "March 29, 2026",
+          round: "Round 1",
+          date: "February 14, 2026",
           time: "10:00 AM to 12:00 PM",
-          location: "IT Park",
+          location: "AB 408",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Mrs B.Janani",
-            phone: "9345215112",
-            email: "janani@ksrct.ac.in",
+            name: "Mr.S.Raja",
+            phone: "7502821440",
+            email: " ",
           },
+          {
+            name: "Mrs.A.Eswari",
+            phone: "9443181818",
+            email: " ",
+          }
         ],
         studentCoordinator: [
           {
-            name: "Aswin K",
-            phone: "6382491543",
-            email: "aswinkannan0606@gmail.com",
+            name: "Mr.A.Akash",
+            phone: " 6369551324",
+            email: " ",
           },
           {
-            name: "Arun K ",
-            phone: "9345784766",
-            email: "ksarun459@gmail.com",
+            name: "Mr.D.Gobinath",
+            phone: "6382932242",
+            email: " ",
+          },
+          {
+            name: "Mr.K.Selvabharathi",
+            phone: "8428635597",
+            email: " ",
+          },
+          {
+            name: "Mr.Dhilip Shanmugam",
+            phone: "9363336136",
+            email: " ",
           },
         ],
       },
       registrationLink: "https://forms.gle/F7ToBuAQk8jMRJe5A", // Registration link
     },
     "non-technical-event-2": {
-      title: "Blind Maze",
+      title: "IPL AUCTION",
       description:
         "Blind Maze Challenge encourages creative thinking and teamwork to tackle complex challenges in a fun and engaging way.",
       image: NonTech2,
       rounds: [
         {
           title: "Round",
-          description: "Offline Blind Maze Challenge will be conducted.",
+          description: "The IPL Auction is an exciting strategy-based event that simulates the real Indian Premier League player auction experience, where participants act as franchise owners and build a balanced cricket team by analyzing player statistics and bidding within a limited virtual budget. The event emphasizes teamwork, financial planning, and quick decision-making, making it engaging for cricket enthusiasts and strategy lovers alike. It will be conducted for a duration of *3 hours at AB 410, with **free registration* for participants who have registered for any Technical Event, Non-Technical Event, or Workshop.",
         },
         
       ],
       rules: [
-        "Each team contain 2 students.",
-        "Some obstacles are placed in floor, you need to reach the destination without hit on obstacles",
-        "One student will be blindfold & another one will guide their teammate.",
-        "Simultaneously two teams will be play, blindfold student has to observe their teammate guidance and has to finish the race quickly.",
-        "Hitting on obstacles reduce your score, try to finish the race without hitting on obstacles",
-        "The team to finish the race with less time will be announced as winner.",
+        "Teams must consist of exactly 3 members.",
+        "Each team will be provided with a fixed virtual budget.",
+        "Mobile phones are not allowed during the auction. ",
+        "Players once sold cannot be re-auctioned or exchanged.",
+        "Teams must adhere to minimum and maximum player category limits.",
+        "Any form of unfair practice or misbehavior will lead to immediate disqualification.",
       ],
       schedule: [
         {
           round: "Round 1",
-          date: "March 29, 2026",
-          time: "11:00 AM to 12:00 PM",
-          location: "EEE 305,EEE 306 ,EEE Block",
-        },
-        {
-          round: "Round 2",
-          date: "March 29, 2026",
+          date: "February 14, 2026",
           time: "1:30 PM to 3:00 PM",
-          location: "EEE 305,EEE 306 ,EEE Block",
+          location: " AB 410",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Dhanapal M",
-            phone: "8012181649",
+            name: "Ms.J.K.Shalini",
+            phone: "9894970113",
             email: "dhanpalm@ksrct.ac.in",
           },
         ],
         studentCoordinator: [
           {
-            name: "Nivitha V P",
-            email: "nivithapalanisamy88@gmail.com",
-            phone: "9003344108",
+            name: "Mr.A.Athityaa",
+            email: " ",
+            phone: "9345664042",
           },
           {
-            name: "Mujamil S",
-            phone: "7502968410",
-            email: "mujamilsulai2006@gmail.com ",
+            name: "Mr.P.Mithun",
+            phone: "8122762374",
+            email: " ",
+          },
+          {
+            name: "Mr.R.Kowshik",
+            phone: "9342556848",
+            email: " ",
+          },
+          {
+            name: "Mr.K.Sanjay",
+            phone: "7550321307",
+            email: " ",
           },
         ],
       },
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
     "non-technical-event-3": {
-      title: "CONNEXION",
+      title: "Just-a-Minute (JAM)",
       description:
-        "We are delighted to present CONNEXION, a fun and engaging non-tech game that challenges your imagination, observation, and quick thinking. The game consists of three thrilling rounds, where the players connect the clues in the given images to reach the correct conclusion.",
+        "Just-A-Minute (JAM) is a fast-paced speaking event where participants must speak on a given topic for one full minute without hesitation, repetition, or deviation. It tests quick thinking, clarity of thought, confidence, and effective communication skills in a fun and engaging way.",
       image: NonTech3,
       rounds: [
-        {
-          title: "Round 1 – Guess Similar Words:",
-          description:
-            "Image will be shown to the team player they have to identify the represent a word or phrase by correlating the images within 30 seconds",
-        },
-        {
-          title: "Round 2 – Guess the Movie Name: ",
-          description:
-            "Clue images will be given to the team. They have to connect the clue image and identify the movie name correctly within 40 seconds.",
-        },
-        {
-          title: "Round 3 – Guess the Song:",
-          description:
-            "Prepare the challenge your music knowledge here clue images will be shown, providing clues for the popular song. Contestants should identify the song within a minute.",
-        },
-        {
-          title: "All the Movie names, Songs and Words are tamil.",
-          description: "",
-        },
+        // {
+        //   title: "Round 1 – Guess Similar Words:",
+        //   description:
+        //     "Image will be shown to the team player they have to identify the represent a word or phrase by correlating the images within 30 seconds",
+        // },
+        // {
+        //   title: "Round 2 – Guess the Movie Name: ",
+        //   description:
+        //     "Clue images will be given to the team. They have to connect the clue image and identify the movie name correctly within 40 seconds.",
+        // },
+        // {
+        //   title: "Round 3 – Guess the Song:",
+        //   description:
+        //     "Prepare the challenge your music knowledge here clue images will be shown, providing clues for the popular song. Contestants should identify the song within a minute.",
+        // },
+        // {
+        //   title: "All the Movie names, Songs and Words are tamil.",
+        //   description: "",
+        // },
       ],
       rules: [
-        "Maximum Two per team.",
-        "The team will be given with three images with 30 seconds of time ",
-        "The team has to identify the correct answer by connecting the pictures within the given time.",
-        "Based on their performance they will lead to the next Rounds.",
-        "In case of tie, they have to Compete another Round as Rapid-Fire Round",
-        "The attendance is mandatory for all section to getting certificate.",
+        "Participants will be given a topic and must speak for exactly one minute.",
+        "No repetition, deviation, or hesitation is allowed.",
+        "Preparation time before speaking will be limited (as per organizers).",
+        "Decisions of the judges regarding rule violations or timing are final.",
+        "Participants should maintain appropriate language and content.",
       ],
       schedule: [
         {
@@ -1963,23 +2034,23 @@ const EventDetails = () => {
           time: "10:00 AM to 12:00 PM",
           location: "Art Gallery, Creative Center",
         },
-        {
-          round: "Round 2",
-          date: "March 29, 2026",
-          time: "2:00 PM to 4:00 PM",
-          location: "Art Gallery, Creative Center",
-        },
-        {
-          round: "Round 3",
-          date: "March 28, 2026",
-          time: "2:00 PM to 4:00 PM",
-          location: "Art Gallery, Creative Center",
-        },
+        // {
+        //   round: "Round 2",
+        //   date: "March 29, 2026",
+        //   time: "2:00 PM to 4:00 PM",
+        //   location: "Art Gallery, Creative Center",
+        // },
+        // {
+        //   round: "Round 3",
+        //   date: "March 28, 2026",
+        //   time: "2:00 PM to 4:00 PM",
+        //   location: "Art Gallery, Creative Center",
+        // },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Dr. N.Lalithamani ",
+            name: "Ms.R.Krishnaveni",
             email: "lalithamani@ksrct.ac.in",
             phone: "8925568867",
           },
@@ -1991,14 +2062,19 @@ const EventDetails = () => {
         ],
         studentCoordinator: [
           {
-            name: "Sathiya Jeeva M ",
-            email: "sathiyajeevamtp@gmail.com",
-            phone: "6380343664",
+            name: "Ms.A.Lydia Percy",
+            email: "",
+            phone: "9150436190",
           },
           {
-            name: "Deepasri M ",
-            email: "deepasrimanikandan@gmail.com",
-            phone: "7695945259",
+            name: "Ms.V.Aagarshini",
+            email: " ",
+            phone: "7603959518",
+          },
+          {
+            name: "Ms.D.Laavanya ",
+            email: " ",
+            phone: "6380696174",
           },
         ],
       },
@@ -2902,22 +2978,22 @@ const EventDetails = () => {
 
     // Culturals
     "culturals-event-1": {
-      title: "Musical Maverics",
+      title: "INFINITE STEP",
       description:
-        "A talented vocalist who mesmerizes the audience with a soulful performance, adding emotion and energy to the event.",
+        "Solo dance is a personal expression of rhythm, emotion, and creativity through graceful movements. It captivates audiences with unique styles and storytelling.",
       image: Culturals1,
-      rules: [
-        "Time limit: 3–5 minutes per performance",
-        "Languages & Genres: Participants can sing in any language and genre",
-        "Music: Karaoke track or self-accompanied instrument is allowed (no pre-recorded vocals)",
-        "Prohibited: No auto-tune or vocal effects allowed",
-        "Judging Criteria: Voice Quality, Pitch, Rhythm, Expression, Song Selection",
+        rules: [
+        "Song Duration should be between 3 to 4 min",
+        "Song should be in mp3 format and must be brought by the participants in pen drive.",
+        "Register before the final date",
+        "Props: Allowed but should be pre-approved",
+        "Winners will be judged by jury based on Choreography, Costumes, Stage Presence,Overall Impact ",
       ],
 
       schedule: [
         {
-          round: "Event Timing",
-          date: "March 29, 2026",
+          round: "Round 1",
+          date: "February 14, 2026",
           time: "10:00 AM to 3:00 PM",
           location: "KSRCT",
         },
@@ -2925,93 +3001,102 @@ const EventDetails = () => {
       contact: {
         facultyCoordinator: [
           {
-            name: "Dr.M.Malarvizhi",
-            phone: "9095792265",
-            email: "malarvizhi@ksrct.ac.in",
+            name: "Dr.K.Kiruthika",
+            phone: "9842661683",
+            email: " ",
+          },
+          {
+            name: "Dr.N.Ramesh",
+            phone: "8610499148",
+            email: " ",
           },
         ],
         studentCoordinator: [
           {
-            name: "Mouriya S",
-            email: "balamouriya07@gmail.com",
-            phone: "8903689846",
+            name: "Mr.S.Bala",
+            email: " ",
+            phone: "9363280575",
           },
           {
-            name: "vishwanth V ",
-            email: "wanthvish9894@gmail.com",
-            phone: "9080012267",
+            name: "Ms.P.K.Senthamil",
+            email: "",
+            phone: "9442845337",
           },
           {
-            name: "B.S. Akshaya ",
-            email: "Akshayasrini007@gmail.com",
-            phone: "7871969769",
+            name: "Ms.R.Tarunika",
+            email: " ",
+            phone: "8946086757",
           },
         ],
       },
       registrationLink: "https://forms.gle/3pXHgWk3HHYvFqoP8", // Registration link
     },
     "culturals-event-2": {
-      title: "Mastro Mania",
+      title: "BEAT MODE",
       description:
-        "A skilled musician who enhances the event with a captivating performance, creating a memorable musical experience.",
+        "A thrilling showcase of teamwork, rhythm, and creativity as groups compete with electrifying dance performances!",
       image: Culturals2,
 
       schedule: [
         {
-          round: "Event Timing",
-          date: "March 29, 2026",
+          round: "Round 1",
+          date: "February 14, 2026",
           time: "10:00 AM to 3:00 PM",
           location: "KSRCT",
         },
       ],
       rules: [
-        "Participants must bring their own instruments (guitar, keyboard, drums, violin, flute, or any other instrument).",
-        "However, a keyboard will be provided by the organizers for those who need it.",
-        "Time limit: 3–5 minutes per performance.",
-        "Only instrumental music is allowed (no vocals).",
-        "Pre-recorded background tracks are not permitted.",
-        "Instruments requiring amplifiers (e.g., electric guitar, keyboard) should be self-arranged.",
-        "Genre: Classical, Rock, Jazz, or any musical style.",
-        "Judges will evaluate Technique, Creativity, Clarity, Stage Presence, and Overall Performance.",
+        "Song Duration should be between 4 to 5 min.",
+        "Team size should be between 2 to 10 members.",
+        "Song should be in mp3 format and must be brought by the participants in pen drive.",
+        "Register before the final date.",
+        "Props: Allowed but should be pre-approved.",
+        "Winners will be judged by jury based on Coordination,Choreography, Costumes, Stage Presence, Overall Impact.",
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Dr. M. Mohanraj",
-            email: "mohanrajm@ksrct.ac.in",
-            phone: "8807515919",
+            name: "Dr.K.Kiruthika",
+            email: " ",
+            phone: "9842661683",
+          },
+          {
+            name: "Dr.N.Ramesh",
+            email: " ",
+            phone: "8610499148",
           },
         ],
         studentCoordinator: [
           {
-            name: "Karthikeyan D",
-            email: "karthikeyan40@gmail.com",
-            phone: "9790080274",
+            name: "Mr.A.Athityaa",
+            email: " ",
+            phone: "9345664042",
           },
           {
-            name: "Athisaya Raj",
-            email: "athisayaraj869@gmail.com",
-            phone: "9566315990",
+            name: "Ms.T.R.Ramitha",
+            email: "",
+            phone: "9345283931",
           },
           {
-            name: "Lithisri. S",
-            phone: "9363661955",
-            email: "misslithi4326@gmail.com",
+            name: "Ms.G.S.Harsha Prabha",
+            email: "",
+            phone: "9442218288",
+            
           },
         ],
       },
       registrationLink: "https://forms.gle/3pXHgWk3HHYvFqoP8", // Registration link
     },
     "culturals-event-3": {
-      title: "Beat Battle",
+      title: "CINE FEST",
       description:
-        "A thrilling showcase of teamwork, rhythm, and creativity as groups compete with electrifying dance performances!",
+        "A thrilling showcase of teamwork, rhythm, and creativity as groups compete with electrifying dance performances! ",
       image: Culturals3,
 
       schedule: [
         {
-          round: "Event Timing",
-          date: "March 29, 2026",
+          round: "Round 1",
+          date: "February 14, 2026",
           time: "10:00 AM to 03:00 PM",
           // location: "AI Lab, Mechatronics Block",
         },
@@ -3021,47 +3106,55 @@ const EventDetails = () => {
         "Team size should be between 3 to 8 members",
         "Song should be in mp3 format and must be brought by the participants",
         "Register before the final date",
-        "Props: Allowed but should be pre-approved",
-        "Winners will be judged by jury based on Coordination,Choreography, Costumes, Stage Presence, Overall Impact",
+        "Props: AlloweDuration up to 10 minutes.",
+        "WiAll films must be submitted in video file format (MP4, MOV, or AVI).",
+        "Winners will be judged based on creativity, storytelling, and overall impact.",
+        "No 18 +, bad words and adult content.",
       ],
       contact: {
-        facultyCoordinator: [
+        facultyCoordinator:
+        [
           {
-            name: "Ms.V.Indumathi ",
-            phone: "9965137001",
+            name: "Dr.K.Kiruthika",
+            phone: "9842661683",
+          },
+          {
+            name: "Dr.N.Ramesh",
+            phone: "8610499148",
           },
         ],
         studentCoordinator: [
           {
-            name: "Ramitha TR ",
-            email: "ramithakavin@gmail.com",
-            phone: "9345283931",
+            name: "Mr. C.Tamilselvan",
+            email: " ",
+            phone: "6374148544",
           },
           {
-            name: "Gowshika M",
-            email: "mgowshika22@gmail.com",
-            phone: "8870593850",
+            name: "Ms.P.Sudheksha",
+            email: " ",
+            phone: "6381283352",
           },
           {
-            name: "Vasu K",
-            phone: "9342396464",
-            email: "vkvasukumar2002@gmail.com",
+            name: "Mr.K.S.Prem",
+            email: " ",
+            phone: "9500057711",
+            
           },
         ],
       },
       registrationLink: "https://forms.gle/vgcbHJpHuwMzxvpu8", // Registration link
     },
     "culturals-event-4": {
-      title: "Spotlight Stepper",
+      title: "MUSICAL MAVERICKS",
       description:
-        "Solo dance is a personal expression of rhythm, emotion, and creativity through graceful movements. It captivates audiences with unique styles and storytelling.",
+        "A talented vocalist who mesmerizes the audience with a soulful performance, adding emotion and energy to the event.",
       image: Culturals4,
       rules: [
-        "Song Duration should be between 3 to 4 min",
-        "Song should be in mp3 format and must be brought by the participants",
-        "Register before the final date",
-        "Props: Allowed but should be pre-approved",
-        "Winners will be judged by jury based on Choreography, Costumes, Stage Presence, Overall Impact",
+        "Time limit: 3–5 minutes per performance ",
+        "Languages & Genres: Participants can sing in any language and genre",
+        "Music: Karaoke track or self-accompanied instrument is allowed (no pre-recorded vocals)",
+        "Prohibited: No auto-tune or vocal effects allowed",
+        "Judging Criteria: Voice Quality, Pitch, Rhythm, Expression, Song Selection ",
       ],
       // rounds: [
       //     {
@@ -3076,8 +3169,8 @@ const EventDetails = () => {
       // ],
       schedule: [
         {
-          round: "Event Timing",
-          date: "March 29, 2026",
+          round: "Round 1",
+          date: "February 14, 2026",
           time: "10:00 AM to 03:00 PM",
           location: "KSRCT",
         },
@@ -3085,71 +3178,90 @@ const EventDetails = () => {
       contact: {
         facultyCoordinator: [
           {
-            name: "Ms.S.Srinithi",
-            phone: "9600404607",
-            email: "srinithi@ksrct.ac.in",
+            name: "Dr.K.Kiruthika",
+            phone: "9842661683",
+            email: " ",
+            
+          },
+          {
+            name: "Dr.N.Ramesh",
+            phone: "8610499148",
+            email: " ",
           },
         ],
         studentCoordinator: [
           {
-            name: "Athityaa A",
-            email: "athikuti4@gmail.com",
-            phone: "9345664042",
+            name: "Mr. Kavin",
+            email: " ",
+            phone: "8610475412",
           },
           {
-            name: "Nithin R",
-            email: "nithuraj0000@gmail.com",
-            phone: "9025496002",
+            name: "Ms.Aashitha Firdous A",
+            email: " ",
+            phone: "8838873452",
           },
-          {
-            name: "Liji Samyukthaa S K ",
-            email: "skliji04@gmail.com",
-            phone: "9342381500",
-          },
+          
         ],
       },
       registrationLink: "https://forms.gle/3pXHgWk3HHYvFqoP8", // Registration link
     },
     "culturals-event-5": {
-      title: "flick fest",
+      title: "SPOTLIGHT",
       description:
-        "theme : beyond the bell - the college life other than studies,Common for all teams",
+        "SPOTLIGHT is a special cultural event that celebrates unique and extraordinary talents of participants. This platform is open for performances such as magic shows, musical instrument performances, Silambam, martial arts, beatboxing, mimicry, and other creative skills. Participants will be judged based on originality, stage presence, skill level, and overall impact. SPOTLIGHT aims to recognize and encourage diverse talents by giving them a stage to shine.",
       image: Culturals5,
       schedule: [
         {
-          round: "Event Timing",
-          date: "March 29, 2026",
+          round: "Round 1",
+          date: "February, 2026",
           time: "10:00 AM to 03:00 PM",
           location: "KSRCT",
         },
       ],
       rules: [
-        "The event is open to all individual participants and teams. Teams may consist of 1 to 3 members.",
-        "The Short films can be based on the Theme : Beyond the Bell –  The college life other than studies",
-        "The short film should be original",
-        "Duration upto 15 minutes.",
-        "All films must be submitted in video file format (MP4, MOV, or AVI).",
-        "Winners will be judged based on creativity, storytelling, and overall impact",
-        "No 18 + ,badwords and adult content",
+        "The event is open to all registered participants of the cultural fest.",
+        "Each participant must showcase one special talent only (e.g., magic, musical instrument, Silambam, martial arts, mimicry, etc.).",
+        "Performance duration must be strictly followed",
+        "Participants must report to the venue at least 30 minutes before the event starts.",
+        "Vulgarity, offensive content, or any form of inappropriate performance is strictly prohibited.",
+        "Use of dangerous props, fire, sharp weapons, or hazardous materials is not allowed.",
+        "Participants are responsible for bringing their own instruments, props, or materials required for the performance.",
+        "Background music (if any) must be submitted to the coordinators before the event in the specified format.",
+        "Background music (if any) must be submitted to the coordinators before the event in the specified format.",
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Raja S",
-            phone: "7502871440",
-            email: "rajas@ksrct.ac.in",
+            name: "Dr.K.Kiruthika",
+            phone: "9842661683",
+            email: "",
+          },
+          {
+            name: "Dr.N.Ramesh",
+            phone: "8610499148",
+            email: "",
           },
         ],
         studentCoordinator: [
           {
-            name: "Karthikeyan S A",
-            email: "karthikeyansa8@gmail.com",
-            phone: "7358996885",
+            name: "Mr. Vijay Chandru",
+            email: "",
+            phone: "7397181421",
           },
           {
-            name: "Tamilselvan C",
-            email: "tamilambani056@gmail.com",
-            phone: "6374148544",
+            name: "Mr. Derik Austin",
+            email: "",
+            phone: "9788945834",
+          },
+          {
+            name: "Mr. Sakthivel",
+            email: "",
+            phone: "8056947128",
+          },
+          {
+            name: "Ms. Dhivya Sree",
+            email: "",
+            phone: "6369392124",
           },
         ],
       },
@@ -3906,6 +4018,10 @@ image: workshop5,
     eventId.startsWith("non-technical-event");
   const isCultural = eventId.startsWith("culturals-event");
 
+  // Check if event has valid rounds data
+  const hasRounds = event?.rounds && event.rounds.length > 0 && 
+    event.rounds.some(round => round.title || round.description);
+
   // Get price from database data instead of hardcoded values
   const eventPrice = getEventPrice();
   const registrationFee = eventPrice !== null ? `₹${eventPrice}` : (
@@ -4016,8 +4132,9 @@ image: workshop5,
           <>
             <ScrollAnimation>
               <div className="flex flex-col md:flex-row justify-between my-10 gap-4">
-                {["Description", "Rounds", "Rules", "Schedule", "Contact"].map(
-                  (item, index) => (
+                {["Description", "Rounds", "Rules", "Schedule", "Contact"]
+                  .filter(item => item !== "Rounds" || hasRounds)
+                  .map((item, index) => (
                     <motion.div
                       key={index}
                       className="border-2 border-primary-dark p-1"
@@ -4039,40 +4156,42 @@ image: workshop5,
             </ScrollAnimation>
 
             {/* Rounds Section */}
-            <ScrollAnimation>
-              <div className="border border-primary-dark p-2" id="Rounds">
-                <div className="border border-primary-dark shadow-lg p-4 md:p-10">
-                  <h2 className="text-center font-semibold text-2xl md:text-3xl mb-5 text-primary border border-primary-dark bg-primary-dark/30 px-3 py-3">
-                    Rounds
-                  </h2>
-                  <div className="flex flex-col gap-7">
-                    {event.rounds.map((round, index) => (
-                      <motion.div
-                        key={index}
-                        className="flex flex-col gap-3"
-                        variants={itemVariants}
-                      >
-                        <h1 className="font-semibold text-xl md:text-2xl text-primary">
-                          {round.title}
-                        </h1>
-                        {/* Check if description is an array and render as a list */}
-                        {Array.isArray(round.description) ? (
-                          <ul className="list-disc pl-6 text-lg md:text-xl text-primary">
-                            {round.description.map((point, i) => (
-                              <li key={i}>{point}</li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="text-lg md:text-xl text-justify text-primary">
-                            {round.description}
-                          </p>
-                        )}
-                      </motion.div>
-                    ))}
+            {hasRounds && (
+              <ScrollAnimation>
+                <div className="border border-primary-dark p-2" id="Rounds">
+                  <div className="border border-primary-dark shadow-lg p-4 md:p-10">
+                    <h2 className="text-center font-semibold text-2xl md:text-3xl mb-5 text-primary border border-primary-dark bg-primary-dark/30 px-3 py-3">
+                      Rounds
+                    </h2>
+                    <div className="flex flex-col gap-7">
+                      {event.rounds.map((round, index) => (
+                        <motion.div
+                          key={index}
+                          className="flex flex-col gap-3"
+                          variants={itemVariants}
+                        >
+                          <h1 className="font-semibold text-xl md:text-2xl text-primary">
+                            {round.title}
+                          </h1>
+                          {/* Check if description is an array and render as a list */}
+                          {Array.isArray(round.description) ? (
+                            <ul className="list-disc pl-6 text-lg md:text-xl text-primary">
+                              {round.description.map((point, i) => (
+                                <li key={i}>{point}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-lg md:text-xl text-justify text-primary">
+                              {round.description}
+                            </p>
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </ScrollAnimation>
+              </ScrollAnimation>
+            )}
 
             {/* Rules Section */}
             <ScrollAnimation>

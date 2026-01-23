@@ -99,6 +99,9 @@ const RegistrationForm = () => {
   
   // State for Mixed Registration (Team Details per Event)
   const [teamDetailsMap, setTeamDetailsMap] = useState({});
+  
+  // State for Terms and Conditions
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Ref to track footer visibility
   const footerObserverRef = useRef(null);
@@ -585,6 +588,16 @@ const RegistrationForm = () => {
 
     fetchTeamAmountPreview();
   }, [registrationMode, currentStep, teamData, selectedEvents]);
+
+  // Check if user can proceed based on current step and terms acceptance
+  const canProceedBasedOnTerms = useMemo(() => {
+    // On confirmation step (step 3 for non-combo, step 4 for combo), require terms acceptance
+    if ((currentStep === 3 && registrationMode !== "combo") || 
+        (currentStep === 4 && registrationMode === "combo")) {
+      return termsAccepted;
+    }
+    return true; // Other steps don't require terms
+  }, [currentStep, registrationMode, termsAccepted]);
 
   // Memoized total amount
   const totalAmount = useMemo(() => {
@@ -1506,8 +1519,13 @@ const RegistrationForm = () => {
       return selectedEvents.length > 0;
     if (currentStep === 3 && registrationMode === "team")
       return teamData !== null;
+    // On confirmation step, require terms acceptance
+    if ((currentStep === 3 && registrationMode !== "combo") || 
+        (currentStep === 4 && registrationMode === "combo")) {
+      return termsAccepted;
+    }
     return true;
-  }, [currentStep, registrationMode, selectedCombo, selectedEvents.length, teamData]);
+  }, [currentStep, registrationMode, selectedCombo, selectedEvents.length, teamData, termsAccepted]);
 
   if (loading) {
     return (
@@ -2419,6 +2437,41 @@ const RegistrationForm = () => {
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Terms and Conditions Checkbox */}
+                  <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-5">
+                    <div className="flex items-start gap-3">
+                      <label className="cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={termsAccepted}
+                          onChange={(e) => setTermsAccepted(e.target.checked)}
+                          className="mt-1 w-5 h-5 rounded border-gray-600 text-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 focus:ring-offset-gray-900 cursor-pointer"
+                        />
+                      </label>
+                      <div className="flex-1">
+                        <p className="text-gray-300 text-sm leading-relaxed">
+                          I have read and agree to the{' '}
+                          <a
+                            href="/terms"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:text-blue-300 underline font-medium"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Payment Terms & Conditions
+                          </a>
+                          , including the <strong className="text-red-400">no refund policy</strong> and payment amount verification requirements.
+                        </p>
+                        {!termsAccepted && (
+                          <p className="text-yellow-400 text-xs mt-2 flex items-center gap-1">
+                            <span>⚠️</span>
+                            You must accept the terms to proceed with registration
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </>
             )}
@@ -2539,6 +2592,41 @@ const RegistrationForm = () => {
                         <p className="text-xs text-green-400">
                           Includes all selected events
                         </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Terms and Conditions Checkbox */}
+                  <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-5">
+                    <div className="flex items-start gap-3">
+                      <label className="cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={termsAccepted}
+                          onChange={(e) => setTermsAccepted(e.target.checked)}
+                          className="mt-1 w-5 h-5 rounded border-gray-600 text-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 focus:ring-offset-gray-900 cursor-pointer"
+                        />
+                      </label>
+                      <div className="flex-1">
+                        <p className="text-gray-300 text-sm leading-relaxed">
+                          I have read and agree to the{' '}
+                          <a
+                            href="/terms"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:text-blue-300 underline font-medium"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Payment Terms & Conditions
+                          </a>
+                          , including the <strong className="text-red-400">no refund policy</strong> and payment amount verification requirements.
+                        </p>
+                        {!termsAccepted && (
+                          <p className="text-yellow-400 text-xs mt-2 flex items-center gap-1">
+                            <span>⚠️</span>
+                            You must accept the terms to proceed with registration
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>

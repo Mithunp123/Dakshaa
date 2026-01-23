@@ -261,11 +261,11 @@ const UltraFooter = () => {
               Privacy Policy
             </motion.a>
             <motion.a 
-              href="#" 
+              href="/terms" 
               className="hover:text-cyan-400 transition-colors"
               whileHover={{ scale: 1.05 }}
             >
-              Terms of Service
+              Terms & Conditions
             </motion.a>
           </div>
         </motion.div>
