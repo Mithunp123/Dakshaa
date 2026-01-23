@@ -136,7 +136,7 @@ const UltraCountdown = () => {
 
   useEffect(() => {
     // Event registration ends on February 10, 2026
-    const targetDate = new Date('February 10, 2026 23:59:59');
+    const targetDate = new Date('February 1, 2026 23:59:59');
     const targetTime = targetDate.getTime();
     
     // Start date for progress calculation (e.g., when registrations opened)
@@ -209,7 +209,7 @@ const UltraCountdown = () => {
           }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          ⚡ Registration Begins In ⚡
+          ⚡ Registration Starts In ⚡
         </motion.p>
 
         {/* Timer Grid */}
