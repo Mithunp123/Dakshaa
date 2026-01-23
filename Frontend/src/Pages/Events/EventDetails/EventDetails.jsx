@@ -665,7 +665,7 @@ const EventDetails = () => {
         {
           round : "Round ",
           date: "February 13, 2026",
-          time: "9:00 AM to 12:00 PM",
+          time: " 3hours ",
           location: "Protein and Enzyme Engineering Laboratory",
         },
 
@@ -1128,9 +1128,9 @@ const EventDetails = () => {
       registrationLink: "https://forms.gle/2wBfChfRVPiKVw599", // Registration link
     },
     "technical-event-15": {
-        title: "Poster Presentation",
+        title: "CODE RELAY",
         description:
-          "The Poster Presentation Competition is an opportunity for students to explore and present emerging trends in their respective fields while addressing key global challenges outlined in the Sustainable Development Goals (SDGs).Participants will research and showcase innovative ideas through a visually engaging A1-sized poster, effectively communicating their findings to a diverse audience. This competition aims to foster creativity, critical thinking, and knowledge-sharing among students across multiple disciplines.",
+          "Code Relay is a team-based web design challenge where a reference website design is provided.Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
         image: Tech15,
         rounds: [
           {
@@ -1236,57 +1236,54 @@ const EventDetails = () => {
         registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
       },
       "technical-event-16": {
-        title: "VoltEdge (PAPER PRESENTATION)",
+        title: "Paper Presentation",
         description:
-          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+          "This presentation provides a clear and structured explanation of the selected concept, covering its basic principles, system design, and real-world relevance. It highlights how the idea can be applied practically, discusses current developments, and points out key challenges and future scope, helping the audience understand both theory and application.",
         image: Tech16,
         rounds: [
           
           {
             title: "TOPICS:",
             description: [
-              "Internet of Things",
+              "Next-Gen Robotics",
+              "Industry 5.0",
+              "Digital Twin Technology",
             ],
+            
           },
         ],
         rules: [
-          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
-          "Use PowerPoint (PPT) or any specified tool for the slides.",
-          "The number of slides should be 10-15, keeping it clear and concise.",
-          "The presentation should have:",
-          "Title Slide (Paper title, authors, affiliation)",
-          "Introduction (Problem statement, objective)",
-          "Methodology (Approach, technologies used)",
-          "Results & Discussion (Findings, graphs, tables)",
-          "Conclusion & Future Work",
-          "References (if required)",
+          "Compete individually or in teams of 2-3 members.",
+          "No External help allowed.",
+          "Clarity of Presentation",
+          "Innovation / Contribution",
         ],
         schedule: [
           {
-            round: "Venue",
-            date: "March 28, 2026",
-            time: "9:30AM -10:30AM",
-            location: "announcing soon",
+            round: "Round",
+            date: "February 13, 2026",
+            time: "time need",
+            location: "Homi J Baba Hall (Conference Hall) (MCT Block)",
           },
         ],
         contact: {
           facultyCoordinator: [
             {
-              name: "RAJASEKARAN N. AP / EEE",
-              email:"rajasekaran.n@ksrct.ac.in",
-              phone: "8056975723",
+              name: "Mr. M. Sanjay",
+              email:"",
+              phone: "7092821630",
             },
           ],
           studentCoordinator: [
             {
-              name: "TIVITH C",
-              email:"tivithpoongodi@gmail.com",
-              phone: "9345426277",
+              name: "M r. B. Aakash ",
+              email:"",
+              phone: "7010696233",
             },
             {
-              name: "MOTUPALLI SHEKAR ",
-              email:"shekarmotupalli@gmail.com ",
-              phone: "8838510411",
+              name: "Mr. D. Nishanth",
+              email:"",
+              phone: "9600352820",
             },
 
           ],
@@ -1296,58 +1293,63 @@ const EventDetails = () => {
       },
 
       "technical-event-17": {
-        title: "VoltEdge (PAPER PRESENTATION)",
+        title: "PAPER PRESENTATION",
         description:
-          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+          "This event allows students to present technical ideas and research in engineering fields. Participants showcase innovation, analysis, and problem-solving through structured presentations.A Q&A session helps evaluate technical depth and communication skills.",
         image: Tech17,
         rounds: [
           
           {
             title: "TOPICS:",
             description: [
-              "Internet of Things",
+              "Any Topics Related to Mechanical Domain .",
+              "Upcoming revolutionary technologies in Manufacturing industries.",
             ],
           },
         ],
         rules: [
-          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
-          "Use PowerPoint (PPT) or any specified tool for the slides.",
-          "The number of slides should be 10-15, keeping it clear and concise.",
-          "The presentation should have:",
-          "Title Slide (Paper title, authors, affiliation)",
-          "Introduction (Problem statement, objective)",
-          "Methodology (Approach, technologies used)",
-          "Results & Discussion (Findings, graphs, tables)",
-          "Conclusion & Future Work",
-          "References (if required)",
+          "Team of maximum two members is allowed.",
+          "Format: PPT / PDF format",
+          "PPT must contain 8-12 slides and be presented within 6-8 minutes.",
+          "Q&A session is compulsory for evaluation",
         ],
         schedule: [
           {
-            round: "Venue",
-            date: "March 28, 2026",
-            time: "9:30AM -10:30AM",
-            location: "announcing soon",
+            round: "Round",
+            date: "February 13, 2026",
+            time: "9:30AM -2:00PM",
+            location: "Smart Class Room [ Mechanical ]",
           },
         ],
         contact: {
           facultyCoordinator: [
             {
-              name: "RAJASEKARAN N. AP / EEE",
-              email:"rajasekaran.n@ksrct.ac.in",
-              phone: "8056975723",
+              name: "Dr. P.Sampath",
+              email:"",
+              phone: "",
             },
+            {
+              name: "Dr. S. Jeyaprakasam",
+              email:"",
+              phone: "",
+            }
           ],
           studentCoordinator: [
             {
-              name: "TIVITH C",
-              email:"tivithpoongodi@gmail.com",
-              phone: "9345426277",
+              name: "Mr.N. Surya",
+              email:"",
+              phone: "9025223203",
             },
             {
-              name: "MOTUPALLI SHEKAR ",
-              email:"shekarmotupalli@gmail.com ",
-              phone: "8838510411",
+              name: "Mr. S.Harish ",
+              email:" ",
+              phone: "7010963539",
             },
+            {
+              name: "Ms.V.A.Santhanalakshimi ",
+              email:" ",
+              phone: "",
+            }
 
           ],
         },
@@ -1355,57 +1357,60 @@ const EventDetails = () => {
         registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
       },
       "technical-event-18": {
-        title: "VoltEdge (PAPER PRESENTATION)",
+        title: "DESIGNATHON",
         description:
-          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+          "Designathon challenges individuals to solve an engineering problem within a limited time.Participants develop creative design solutions using logical and technical thinking. Originality, feasibility, and time management are key evaluation criteria.",
         image: Tech18,
         rounds: [
           
           {
-            title: "TOPICS:",
-            description: [
-              "Internet of Things",
-            ],
+            title: "",
+            
           },
         ],
         rules: [
-          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
-          "Use PowerPoint (PPT) or any specified tool for the slides.",
-          "The number of slides should be 10-15, keeping it clear and concise.",
-          "The presentation should have:",
-          "Title Slide (Paper title, authors, affiliation)",
-          "Introduction (Problem statement, objective)",
-          "Methodology (Approach, technologies used)",
-          "Results & Discussion (Findings, graphs, tables)",
-          "Conclusion & Future Work",
-          "References (if required)",
+          "This is an individual (solo) participation event. Open to all participants of any displinary.",
+          "Participants must carry a valid ID card. The total duration of the designathon is 3 hours.",
+          "Participants must start and end within the given time frame.",
+          "Late submissions will not be considered. Any form of plagiarism will lead to immediate disqualification. Internet usage are restricted",
+          "Any misconduct may result in disqualification. The decision of the judges will be final and binding.",
         ],
         schedule: [
           {
-            round: "Venue",
-            date: "March 28, 2026",
-            time: "9:30AM -10:30AM",
-            location: "announcing soon",
+            round: "Round",
+            date: "February 13, 2026",
+            time: "3hours",
+            location: "Idea lab [ Main Building ]",
           },
         ],
         contact: {
           facultyCoordinator: [
             {
-              name: "RAJASEKARAN N. AP / EEE",
-              email:"rajasekaran.n@ksrct.ac.in",
-              phone: "8056975723",
+              name: "Dr.K.Santhanam ",
+              email:"",
+              phone: "",
             },
+            {
+              name: "Mr.S.Venkatesan ",
+              email:"",
+              phone: "",
+            }
           ],
           studentCoordinator: [
             {
-              name: "TIVITH C",
-              email:"tivithpoongodi@gmail.com",
-              phone: "9345426277",
+              name: "Mr.G.S.Priyan",
+              email:"",
+              phone: "8668057985",
             },
             {
-              name: "MOTUPALLI SHEKAR ",
-              email:"shekarmotupalli@gmail.com ",
-              phone: "8838510411",
+              name: "Mr. S.Vijayaragavan",
+              email:" ",
+              phone: "8124547760",
+            },
+            {
+              name: "Ms. M.Nabishka ",
+              email:" ",
+              phone: "",
             },
 
           ],
@@ -1414,57 +1419,53 @@ const EventDetails = () => {
         registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
       },
       "technical-event-19": {
-        title: "VoltEdge (PAPER PRESENTATION)",
+        title: "Drape X: Fabric Draping in Action",
         description:
-          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+          "DrapeX: Fabric Draping in Action offers hands-on practice in both basic and advanced fabric draping techniques using dress forms. Participants will understand fabric behavior such as fall, flow, and structure through the use of different fabrics, while applying creativity and technical skills to create original draped designs. The event also focuses on translating draped forms into garment silhouettes and design concepts, analyzing fabric properties that influence drape and appearance, and enhancing practical skills, creativity, and confidence in fabric manipulation.",
         image: Tech19,
         rounds: [
           
           {
-            title: "TOPICS:",
-            description: [
-              "Internet of Things",
-            ],
+            title: "",
+            
           },
         ],
         rules: [
-          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
-          "Use PowerPoint (PPT) or any specified tool for the slides.",
-          "The number of slides should be 10-15, keeping it clear and concise.",
-          "The presentation should have:",
-          "Title Slide (Paper title, authors, affiliation)",
-          "Introduction (Problem statement, objective)",
-          "Methodology (Approach, technologies used)",
-          "Results & Discussion (Findings, graphs, tables)",
-          "Conclusion & Future Work",
-          "References (if required)",
+          "The event is open to students of textile and related disciplines; prior individual registration is mandatory.",
+          "Participation is allowed individual or in teams of 2 members.",
+          "Participants must bring their own fabric for draping; basic tools and dress forms will be provided.",
+          "The draping activity must be completed within the stipulated time.",
+          "Designs should be original; use of pre-stitched or pre-draped materials is not permitted.",
+          "Participants must maintain discipline and follow instructions given by the coordinators.",
+          "Judging will be based on creativity, fabric utilization, draping technique, and overall presentation.",
+          "The decision n of the judges and organizing committee will be final.",
         ],
         schedule: [
           {
-            round: "Venue",
-            date: "March 28, 2026",
-            time: "9:30AM -10:30AM",
-            location: "announcing soon",
+            round: "Round",
+            date: "February 13, 2026",
+            time: "3 hours ",
+            location: "Garment Lab -Textile Block",
           },
         ],
         contact: {
           facultyCoordinator: [
             {
-              name: "RAJASEKARAN N. AP / EEE",
-              email:"rajasekaran.n@ksrct.ac.in",
-              phone: "8056975723",
+              name: "Dr.K.Saravanan ",
+              email:"",
+              phone: "98421 03201",
             },
           ],
           studentCoordinator: [
             {
-              name: "TIVITH C",
-              email:"tivithpoongodi@gmail.com",
-              phone: "9345426277",
+              name: "Ms. Subhalakshmi B ",
+              email:"",
+              phone: " 95977 78936",
             },
             {
-              name: "MOTUPALLI SHEKAR ",
-              email:"shekarmotupalli@gmail.com ",
-              phone: "8838510411",
+              name: "Ms. Abirama Selvi R J ",
+              email:" ",
+              phone: "96882 41151",
             },
 
           ],
@@ -1473,57 +1474,61 @@ const EventDetails = () => {
         registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
       },
       "technical-event-20": {
-        title: "VoltEdge (PAPER PRESENTATION)",
+        title: "PAPER PRESENTATION",
         description:
-          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+          "The paper presentation focuses on providing an overview of sustainability and its growing importance in the textile industry, along with recent trends and innovations in textile technology and manufacturing. It addresses key issues related to textile waste and discusses methods such as recycling, reuse, and upcycling to promote sustainable practices. Participants will also be introduced to smart textiles and their basic applications in daily life, eco-friendly practices including water, energy, and chemical conservation, and the future scope, emerging areas, and career opportunities in textile engineering.",
         image: Tech20,
         rounds: [
           
           {
             title: "TOPICS:",
             description: [
-              "Internet of Things",
+              "Sustainability in the Textile Industry: An Overview",
+              "Recent Trends and Innovations in Textile Technology",
+              "Textile Waste: Problems, Solutions, and Opportunities",
+              "Smart Textiles: Concepts and Everyday Applications",
+              "Eco-Friendly Practices in Textile Manufacturing",
+              "Future Scope of Textile Engineering in a Sustainable World",
             ],
           },
         ],
         rules: [
-          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
-          "Use PowerPoint (PPT) or any specified tool for the slides.",
-          "The number of slides should be 10-15, keeping it clear and concise.",
-          "The presentation should have:",
-          "Title Slide (Paper title, authors, affiliation)",
-          "Introduction (Problem statement, objective)",
-          "Methodology (Approach, technologies used)",
-          "Results & Discussion (Findings, graphs, tables)",
-          "Conclusion & Future Work",
-          "References (if required)",
+          "Team of maximum two members is allowed.",
+          "Format: PPT / PDF format",
+          "PPT must contain 8-12 slides and be presented within 6-8 minutes.",
+          "Q&A session is compulsory for evaluation",
         ],
         schedule: [
           {
-            round: "Venue",
-            date: "March 28, 2026",
-            time: "9:30AM -10:30AM",
-            location: "announcing soon",
+            round: "Round",
+            date: "February 13, 2026",
+            time: "9.00 AM to 2.00 PM",
+            location: "Smart Class Room MBA Block",
           },
         ],
         contact: {
           facultyCoordinator: [
             {
-              name: "RAJASEKARAN N. AP / EEE",
-              email:"rajasekaran.n@ksrct.ac.in",
-              phone: "8056975723",
+              name: "Dr. K.R.NandagopalE",
+              email:"",
+              phone: "90034 36705",
             },
+            {
+              name: "Dr. C.Premalatha",
+              email:"",
+              phone: " 97502 06161",
+            }
           ],
           studentCoordinator: [
             {
-              name: "TIVITH C",
-              email:"tivithpoongodi@gmail.com",
-              phone: "9345426277",
+              name: "Mr.Dinu",
+              email:"",
+              phone: "82206 76049",
             },
             {
-              name: "MOTUPALLI SHEKAR ",
-              email:"shekarmotupalli@gmail.com ",
-              phone: "8838510411",
+              name: "Mr.Raaghul Khanna V ",
+              email:" ",
+              phone: "96008 88788",
             },
 
           ],

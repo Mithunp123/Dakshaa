@@ -1,33 +1,38 @@
 import React from "react";
 import { motion } from "framer-motion";
-import abb from "./assets/abb.png";
-import guvi from "./assets/guvi.jpg";
-import toepl from "./assets/toepl.jpg";
-import aiml from "./assets/aiml.jpg";
-import csbs from "./assets/CSBS1.jpg";
-import garuda from "./assets/garuda.jpg";
-import infinity from "./assets/infinity.jpg";
-import it from "./assets/it.png";
-import mech from "./assets/mech.jpg";
-import millet from "./assets/millet.jpg";
-import txt from "./assets/txt.jpg";
-import uipath from "./assets/uipath.jpg";
-import bt from "./assets/bt.jpeg";
-import vlsi from "./assets/vlsi.jpg";
-import cse from "./assets/cse.jpg";
-import ict from "./assets/ict.jpg";
-import EEE from "./assets/EEE.jpg";
-import iste from "./assets/ISTE.jpg";
-import unstop from "./assets/unstop.png";
-import ECE1 from "./assets/ECE1.jpg";
+
+
+import aidswk from "./assets/aidswk.png";
+import aimlwk from "./assets/aimlwk.png";
+import btwk from "./assets/btwk.jpg";
+import civilwk from "./assets/civilwk.png";
+import csbswk from "./assets/csbswk.png";
+import csewk from "./assets/csewk.png";
+import ecewk from "./assets/ecewk.png";
+import eeewk from "./assets/eeewk.jpeg";
+import ftwk from "./assets/ftwk.jpg";
+import iprwk from "./assets/iprwk.jpeg";
+import itwk from "./assets/itwk.jpeg";
+import mcawk from "./assets/mcawk.png";
+import mctwk from "./assets/mctwk.png";
+import mechwk from "./assets/mechwk.png";
+import txtwk from "./assets/txtwk.jpeg";
+import vlsiwk from "./assets/vlsiwk.jpeg";
+import comingsoon from "./assets/comingsoon.jpg";
+import startuptn from "./assets/startuptn.png";
+
+
 
 import AOS from "aos";
 import "aos/dist/aos.css";
 
 function Sponsors() {
-  const eventSponsors = [guvi,abb, iste];
-  const sponsors = [toepl];
-  const workshopSponsors = [aiml, ict, csbs, it, cse, EEE, bt, mech, unstop, millet, infinity, garuda, uipath, vlsi, txt,ECE1];
+  const titlesponser =[comingsoon];
+  const cosponser=[comingsoon];
+  const ecosystem=[startuptn];
+
+  const eventSponsors = [aidswk,aimlwk,btwk,civilwk,csbswk,csewk,ecewk,eeewk,ftwk,iprwk,itwk,mcawk,mctwk,mechwk,txtwk,vlsiwk ];
+  const stallsponsors = [comingsoon];
 
   const letter = "Sponsors";
   const letters = letter.split("");
@@ -69,10 +74,64 @@ function Sponsors() {
         ))}
       </h1>
 
-      {/* Event Partner Section */}
+      {/* Title Sponsors Section */}
       <div className="text-center w-full">
-        <h2 className="text-3xl font-bold mb-10">Event Partner</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 place-items-center">
+        <h2 className="text-3xl font-bold mb-10">Title Sponsers</h2>
+        <div className="flex justify-center flex-wrap gap-6">
+          {titlesponser.map((image, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0.8, rotateY: 180 }}
+              animate={cardEntryAnimation(index)}
+              whileHover={{ scale: 1.15, rotateY: 5 }}
+              className="shadow-lg flex justify-center items-center bg-gray-800 w-48 h-48 rounded-lg border-2 border-secondary shadow-secondary"
+            >
+              <img className="w-40 h-40 object-contain rounded-lg" src={image} alt={`Event Partner ${index + 1}`} />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Co-Sponsor Section */}
+      <div className="text-center w-full">
+        <h2 className="text-3xl font-bold mb-10">Co-Sponsor</h2>
+        <div className="flex justify-center">
+          {cosponser.map((image, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0.8, rotateY: 180 }}
+              animate={cardEntryAnimation(index)}
+              whileHover={{ scale: 1.15, rotateY: 5 }}
+              className="shadow-lg flex justify-center items-center bg-gray-800 w-48 h-48 rounded-lg border-2 border-secondary shadow-secondary"
+            >
+              <img className="w-40 h-40 object-contain rounded-lg" src={image} alt={`Sponsor ${index + 1}`} />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Eco-System Partner Section */}
+      <div className="text-center w-full">
+        <h2 className="text-3xl font-bold m-10">Eco-System Partner</h2>
+        <div className="flex justify-center flex-wrap gap-6">
+          {ecosystem.map((image, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0.8, rotateY: 180 }}
+              animate={cardEntryAnimation(index)}
+              whileHover={{ scale: 1.15, rotateY: 5 }}
+              className="shadow-lg flex justify-center items-center bg-gray-800 w-48 h-48 rounded-lg border-2 border-secondary shadow-secondary"
+            >
+              <img className="w-40 h-40 object-contain rounded-lg" src={image} alt={`Co-Partner ${index + 1}`} />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Event Partners Section */}
+      <div className="text-center w-full">
+        <h2 className="text-3xl font-bold mb-10">Event Partners</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 place-items-center justify-center">
           {eventSponsors.map((image, index) => (
             <motion.div
               key={index}
@@ -87,11 +146,12 @@ function Sponsors() {
         </div>
       </div>
 
-      {/* Sponsor Section */}
+
+      {/* Stall Sponsors Section */}
       <div className="text-center w-full">
-        <h2 className="text-3xl font-bold mb-10">Sponsor</h2>
-        <div className="flex justify-center">
-          {sponsors.map((image, index) => (
+        <h2 className="text-3xl font-bold mb-10">Stall Sponsors</h2>
+        <div className="flex justify-center flex-wrap gap-6">
+          {stallsponsors.map((image, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.8, rotateY: 180 }}
@@ -99,29 +159,13 @@ function Sponsors() {
               whileHover={{ scale: 1.15, rotateY: 5 }}
               className="shadow-lg flex justify-center items-center bg-gray-800 w-48 h-48 rounded-lg border-2 border-secondary shadow-secondary"
             >
-              <img className="w-40 h-40 object-contain rounded-lg" src={image} alt={`Sponsor ${index + 1}`} />
+              <img className="w-40 h-40 object-contain rounded-lg" src={image} alt={`Event Partner ${index + 1}`} />
             </motion.div>
           ))}
         </div>
       </div>
 
-      {/* Co-Partner Section */}
-      <div className="text-center w-full">
-        <h2 className="text-3xl font-bold m-10">Co-Partner</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 place-items-center">
-          {workshopSponsors.map((image, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.8, rotateY: 180 }}
-              animate={cardEntryAnimation(index)}
-              whileHover={{ scale: 1.15, rotateY: 5 }}
-              className="shadow-lg flex justify-center items-center bg-gray-800 w-48 h-48 rounded-lg border-2 border-secondary shadow-secondary"
-            >
-              <img className="w-40 h-40 object-contain rounded-lg" src={image} alt={`Co-Partner ${index + 1}`} />
-            </motion.div>
-          ))}
-        </div>
-      </div>
+
     </div>
   );
 }
