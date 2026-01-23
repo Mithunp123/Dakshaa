@@ -7,7 +7,7 @@ import { useInView } from "react-intersection-observer";
 //'tech-aids': 'AI Mystery Box Challenge – AI & DS',
   //'tech-csbs': 'System Sense – CSBS',
   //'tech-aiml': 'Lovable Vibes – AIML',
-  //'tech-csbs' : 'System Sense',
+  
 
   //'tech-bt': ' Reel-O-Science– BT',
   //'tech-bt-1': 'BioNexathon – BT',
@@ -105,13 +105,21 @@ import workshop15 from "../../../assets/EventsImages/EventDetails/Workshop/vlsi_
 //import workshop16 from "../../../assets/EventsImages/EventDetails/Workshop/mca_wk1.png";
 
 
-import Culturals1 from "../../../assets/HORMONICS/MUSICAL.png";
-import Culturals2 from "../../../assets/HORMONICS/INSTRUMENT.png";
-import Culturals3 from "../../../assets/HORMONICS/GROUP.png";
-import Culturals4 from "../../../assets/HORMONICS/SOLO DANCE.png";
-import Culturals5 from "../../../assets/HORMONICS/short flim.png";
+
+
+import Culturals1 from "../../../assets/HORMONICS/hr1.png";
+import Culturals2 from "../../../assets/HORMONICS/hr2.png";
+import Culturals3 from "../../../assets/HORMONICS/hr3.png";
+import Culturals4 from "../../../assets/HORMONICS/hr4.png";
+import Culturals5 from "../../../assets/HORMONICS/hr5.png";
+
+
+
+
+
 import { supabase } from "../../../supabase";
 import { EVENTS_DATA } from "../../../data/events";
+import { culturalEvents } from "../../../data/culturalEvents";
 
 const EventDetails = () => {
   const { eventId: rawEventId } = useParams(); // Get the dynamic parameter from the URL
@@ -238,8 +246,13 @@ const EventDetails = () => {
 
 
     // Cultural Events
-    'cultural-musical': 'culturals-event-1',
-
+    
+      'cultural-1': 'culturals-event-1',
+      'cultural-2': 'culturals-event-2',
+      'cultural-3': 'culturals-event-3',
+      'cultural-4': 'culturals-event-4',
+      'cultural-5': 'culturals-event-5',
+    
 
 
     // Hackathon Events - Maps to Neura Hack
@@ -302,127 +315,143 @@ const EventDetails = () => {
   const eventDetails = {
     // Technical Events
     "technical-event-1": {
-      title: "Rewind & Cra",
+      title: "AI Mystery Box Challenge",
       description:
-        "Rewind & Crack is a reverse coding competition that challenges participants to analyze and reconstruct algorithms. This event tests problem-solving skills, logical thinking, and coding efficiency through three progressive rounds.",
+        "The AI Mystery Box Challenge is a one-day technical event designed to test participants’ analytical thinking, creativity, and practical skills in Artificial Intelligence and Machine Learning. This event offers a unique, problem-solving experience where teams are challenged with an unknown AI task revealed only at the start of the competition. Participants will receive a mystery box containing a real-world dataset and a problem statement. Once the box is opened upon official announcement, teams must quickly analyze the problem, design an appropriate machine learning solution, and develop a working model within the given time. To enhance practical applicability, teams are also required to integrate their model with a functional web interface, simulating industry-level AI deployment.The event encourages collaborative teamwork, effective time management, and hands- on implementation of AI concepts such as data preprocessing, model selection, training, evaluation, and deployment. With internet access permitted, participants can explore libraries, frameworks, and documentation to refine their solutions.The AI Mystery Box Challenge will be conducted at AI Lab 2 with a registration fee of ₹250 per head. This event is ideal for students who are passionate about AI, Data Science, and real-time problem solving, and who wish to showcase their technical expertise in a competitive environment.",
       image: Tech1,
       rounds: [
         {
-          title: "Round 1",
+          title: "",
           description: [
-            "Duration: 30 Minutes",
-            "Participants will solve basic machine learning problems and submit their solutions.",
+            "",
+            
           ],
         },
-        {
-          title: "Round-2: Intermediate Challenges",
-          description: [
-            "Duration: 45 Minutes",
-            "Medium difficulty questions involving loops, conditions, and sorting logic. Some problems may include hidden test cases.",
-          ],
-        },
-        {
-          title: "Round-3: Advanced Reverse Coding",
-          description: [
-            "Duration: 60 Minutes",
-            "Complex problems requiring data structure manipulations, encryption, or algorithm reconstruction.",
-          ],
-        },
+        
       ],
       rules: [
-        "The jury's decision is final.",
-        "Any form of malpractice will lead to disqualification.",
+        "Participants must bring their own laptop; a minimum Intel i5 processor is required to ensure smooth model development and execution.",
+        "Teams must consist of 2 to 3 members, and all members must be present throughout the event.",
+        "The mystery box may be opened only after the official announcement by the coordinators.",
+        "Teams must work exclusively on the dataset and problem statement provided inside their assigned mystery box.",
+        "Internet access is permitted .",
+        "The final solution must include a working machine learning model integrated with a functional web interface.",
       ],
       schedule: [
         {
           round: "Round",
-          date: "March 28, 2026",
-          time: "10:00 AM to 12:00 PM",
-          location: "CSE lab 1,IT Park",
+          date: "February 13, 2026",
+          time: "1 day",
+          location: "AI Lab 2",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Mrs M.Varshana Devi",
-            phone: "9597604228",
-            email: "varshanadevi@ksrct.ac.in",
+            name: "Mr. J. Karthick",
+            phone: "8056408054",
+            email: "",
+          },
+          {
+            name: "Ms. J. K. Shalini",
+            phone: "9894970113",
+            email: "",
           },
         ],
         studentCoordinator: [
           {
-            name: "Alyushra A",
-            phone: "6369548280",
-            email: "alyushra96@gmail.com",
+            name: "Mr. M.Harish",
+            phone: "6369303123",
+            email: "",
           },
           {
-            name: "Peranandha KL",
-            phone: "8148537603",
-            email: "peranandha17@gmail.com",
+            name: "Mr. T.Vikas",
+            phone: "6381459911",
+            email: "",
+          },
+          {
+            name: "Ms. S.Obulakshmi",
+            Phone: "8124225197",
+            email: "",
+          },
+          {
+            name: "Ms. M.Raufama",
+            phone: "9345064140",
+            email: "",
           },
         ],
       },
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9",
     },
     "technical-event-2": {
-      title: "Neura Hack (Hackathon)",
+      title: "System Sense – Usability & Analysis Challenge",
       description:
-        "Neura Hack 2026 is a 36-hour innovation marathon where brilliant minds unite to tackle pressing global challenges aligned with the UN Sustainable Development Goals (SDGs). Participants will collaborate, ideate, and build cutting-edge solutions leveraging technology to address issues like climate action, equality, health, and more. Join us to code, create, and catalyze change for a sustainable future!",
+        "System Sense is a technical challenge designed to evaluate heuristic principles, identify design and interaction issues, and propose effective improvements within a limited time. Where participants assess systems based on established usability guidelines such as clarity, consistency, feedback, and user control. By applying these principles, participants develop practical solutions that enhance both user experience and business efficiency.",
       image: Tech2,
       rounds: [
         {
-          title: "Round 1",
+          title: "Round 1 – System Analysis Round",
           description: [
-            "Duration: 30 Minutes",
-            "Participants will solve basic machine learning problems and submit their solutions.",
+            "Participants must analyze the given system, identify key usability or design issues, and propose a logical improvement using heuristic principles.",
+            "Evaluation will be based on accuracy of problem identification, relevance of the proposed solution, and clarity of analysis.",
           ],
         },
         {
-          title: "Round-2: Intermediate Challenges",
+          title: "Round-2 – Justification & Final Round",
           description: [
-            "Duration: 45 Minutes",
-            "Medium difficulty questions involving loops, conditions, and sorting logic. Some problems may include hidden test cases.",
+            "Shortlisted participants will be given a new and more complex system scenario.",
+            "Participants must analyze the system and justify their proposed solution within the allotted time as per the One-Minute Justification Rule.",
           ],
         },
         {
-          title: "Round-3: Advanced Reverse Coding",
+          title: "Additional Features",
           description: [
-            "Duration: 60 Minutes",
-            "Complex problems requiring data structure manipulations, encryption, or algorithm reconstruction.",
+            "Participants are encouraged to apply heuristic principles and system-thinking approaches to arrive at effective solutions.",
+          ],
+        },
+        {
+          title: "Plagiarism and Fair Conduct",
+          description: [
+            "All analyses and solutions must be original and developed during the event.",
+            "Copying, sharing answers, or using unfair means in any form is strictly prohibited.",
+            "Any instance of malpractice or violation of rules will result in immediate disqualification.",
+            "The decision of the judges will be final and binding in all matters related to evaluation and conduct.",
           ],
         },
       ],
       rules: [
-        "The jury's decision is final.",
-        "Any form of malpractice will lead to disqualification.",
-        "Team: 2-3 Members",
+        "The competition consists of two rounds, conducted within a total duration of 2–3 hours.",
+        "Participants may compete individually or in teams of two.",
+        "Participants must analyze given system scenarios and identify usability or design issues using heuristic principles.",
+        "Solutions should emphasize system understanding, logical reasoning, and practical improvements, rather than coding.",
+        "Each participant or team must justify their proposed solution within the specified time limit as announced by the organizers.",
       ],
       schedule: [
         {
-          round: "Round 1",
-          date: "March 28, 2026",
-          time: "10:00 AM to 12:00 PM",
-          location: "CSE lab 1,IT Park",
+          round: "Round",
+          date: "February 13, 2026",
+          time: " 2-3 hrs",
+          location: " AB Lab 4",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Mrs M.Varshana Devi",
-            phone: "9597604228",
-            email: "varshanadevi@ksrct.ac.in",
+            name: "Dr . M .Tamilarasi",
+            phone: "9750037023",
+            email: "",
           },
         ],
         studentCoordinator: [
           {
-            name: "Alyushra A",
-            phone: "6369548280",
-            email: "alyushra96@gmail.com",
+            name: "Miss . R. Mythra",
+            phone: "9345968826",
+            email: "",
           },
           {
-            name: "Peranandha KL",
-            phone: "8148537603",
-            email: "peranandha17@gmail.com",
+            name: "Miss . K. Saimohana",
+            phone: "",
+            email: "",
           },
         ],
       },
@@ -430,80 +459,67 @@ const EventDetails = () => {
     },
 
     "technical-event-3": {
-      title: "SEMISPARK(PROJECT PRESENTATION) ",
+      title: " VibeCode’26 (Vibe coding partnered with Lovable.AI) ",
       description:
-        "Project Presentation in the fields of IoT (Internet of Things),AI (Artificial Intelligence),Embedded Systems,E-Vehicle and Autonomous Vehicle, VLSI (Very Large Scale Integration), 3D Printing",
+        " “Launch Something Lovable” in 24 Hours is a high-energy, in-person vibe coding hackathon where teams build and ship real MVPs using Lovable, focusing on product thinking, usability, and real-world impact.",
       image: Tech3,
       rounds: [
         {
-          title: "TOPICS:",
+          title: "",
           description: [
-            "IoT (Internet of Things).",
-            "AI (Artificial Intelligence).",
-            "Embedded Systems.",
-            "E-Vehicle and Autonomous Vehicle.",
-            "VLSI (Very Large Scale Integration).",
-            "3D Printing."
+            ""
           ],
         },
         {
           title: "",
           description:
-            "A technical project presentation competition where teams (1-3 members) showcase innovative projects in engineering, technology, or innovation. Each team gets 10 minutes to present and 5 minutes for Q&A, with originality being crucial. The winning team gets Rs. 1000, and attendance is mandatory for certification.",
+            "",
         },
 
       ],
       rules: [
-        "Each team consist of 1 to 3 members",
-        "Each team will have 10 minutes to present their project.",
-        "An additional 5 minutes will be allocated for Q&A.",
-        "All projects be based on engineering, technology, or innovation",
-        "Any form of plagiarism or copied work will result in immediate disqualification",
-        "The attendance is mandatory for all session to getting certificate",
-        "Winner Prize Amount is Rs. 1000 will be awarded to the winning team",
-        "Presentation Structure:",
-        "1.	Title Slide: Include the project title, team name, team members' names, institution/company and date.",
-        "2. Methodology: Describe the approach, tools and techniques used.",
-        "3.	Results & Findings: Present key data, graphs and observations.",
-        "4. Conclusion & Future Work: Summarize key takeaways and propose future improvements.",
-        "5.	References: List sources and citations used in the project.",
-        "6.	Q&A Slide: Be prepared for audience questions.",
-        "Submission Requirements:",
-        "The hardware be demonstrated as part of the submission. (if applicable)",
-        "Two copies of the Powerpoint presentation be submitted to the Student Coordinators.",
+        "Only registered participants are permitted to attend the workshop.",
+        "Participants must bring their own laptop with internet access.",
+        "Full-day attendance and punctuality are mandatory.",
+        "All participants must follow the instructions of the Lovable.AI team and organizers.",
       ],
       schedule: [
         {
-          round: "Round 1",
-          date: "March 28, 2026",
-          time: "9:00 AM to 3:00 PM",
-          location: "Announced Soon!",
+          round: "Round",
+          date: "February 13, 2026",
+          time: "1Day",
+          location: "AB lab 3",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Mr. D. Poornakumar",
-            email: "poornakumard@ksrct.ac.in",
-            phone: "9003645614",
+            name: "Mr. S.Insol Rajasekar",
+            email: "",
+            phone: "8220512436",
           },
           {
-            name: "Mrs. C. Saranya",
-            email: "saranyac@ksrct.ac.in",
-            phone: "9994588990",
+            name: "Mr.K.Praveen",
+            email: "",
+            phone: " 9500918101",
           },
         ],
         studentCoordinator: [
           {
-            name: "Moulishwaran V",
-            email: "moulishmoulishwaran44@gmail.com",
-            phone: "8940451977",
+            name: "Ms.Dhinesha G",
+            email: "",
+            phone: "9942687393",
           },
           {
-            name: "Jaishree A",
-            email: "jaishreea2005@gmail.com",
-            phone: "9994371445",
+            name: "Ms.Monika R",
+            email: "",
+            phone: "9363607816",
           },
+          {
+            name: "Mr.Adith D",
+            email: "",
+            phone: "7094278374",
+          }
         ],
       },
 

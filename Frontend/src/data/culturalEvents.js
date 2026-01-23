@@ -1,8 +1,37 @@
-import Culturals1 from "../assets/HORMONICS/MUSICAL.png";
+import hr1 from "../assets/HORMONICS/hr1.png";
+import hr2 from "../assets/HORMONICS/hr2.png";
+import hr3 from "../assets/HORMONICS/hr3.png";
+import hr4 from "../assets/HORMONICS/hr4.png";
+import hr5 from "../assets/HORMONICS/hr5.png";
 
+
+
+/*
+hr1: infinite step
+hr2: cine fest
+hr3:spotlight
+hr4: musical maverics
+hr5:beat mode
+*/
 export const culturalEvents = [
   {
-    image: Culturals1,
-    eventId: "cultural-musical",
+    image: hr1,
+    eventId: "cultural-1",
+  },
+  {
+    image: hr2,
+    eventId: "cultural-2",
+  },
+  {
+    image: hr3,
+    eventId: "cultural-3",
+  },
+  {
+    image: hr4,
+    eventId: "cultural-4",
+  },
+  {
+    image: hr5,
+    eventId: "cultural-5",
   },
 ];

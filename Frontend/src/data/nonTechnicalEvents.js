@@ -20,9 +20,6 @@ import nontech18 from "../assets/EventsImages/EventDetails/Nontech/mech_nontech.
 import nontech19 from "../assets/EventsImages/EventDetails/Nontech/txt_nontech.png";
 import nontech20 from "../assets/EventsImages/EventDetails/Nontech/vlsi_nontech.png";
 
-
-
-
 /*
   nontech-aids :AI MEME CONTEST
   nontech-aids1: IPL AUCTION
