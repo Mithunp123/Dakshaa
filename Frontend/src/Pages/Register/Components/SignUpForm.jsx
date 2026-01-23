@@ -4,6 +4,7 @@ import { supabase } from '../../../supabase';
 import { motion } from 'framer-motion';
 import { User, Mail, Lock, Phone, School, BookOpen, GraduationCap, ChevronRight, Loader2 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
+import { trackReferralCode } from '../../../services/referralService';
 
 const SignUpForm = () => {
   const navigate = useNavigate();
@@ -118,6 +119,21 @@ const SignUpForm = () => {
       if (authError) throw authError;
 
       if (authData.user) {
+        // Track referral code if provided (mobile number or unique ID)
+        if (formData.referredBy && formData.referredBy.trim() !== '') {
+          const referralResult = await trackReferralCode(formData.referredBy);
+          if (referralResult.success) {
+            if (referralResult.alreadyExists) {
+              console.log('✓ Referral code already tracked:', referralResult.data);
+            } else {
+              console.log('✓ New referral code tracked with count=0:', referralResult.data);
+            }
+          } else {
+            console.warn('⚠️ Failed to track referral code:', referralResult.error);
+            // Don't block signup if referral tracking fails
+          }
+        }
+
         // Sign out the user immediately (they must verify email first)
         await supabase.auth.signOut();
         

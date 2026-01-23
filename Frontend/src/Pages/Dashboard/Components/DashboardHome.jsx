@@ -9,10 +9,12 @@ import {
   ArrowRight,
   Calendar,
   MapPin,
-  Loader2
+  Loader2,
+  Copy
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
 import { supabaseService } from '../../../services/supabaseService';
+import toast from 'react-hot-toast';
 
 const DashboardHome = () => {
   // Get user from localStorage synchronously for instant load
@@ -121,7 +123,7 @@ const DashboardHome = () => {
       const [{ data: profileData, error: profileError }, registrationsData, { count: teamsCountValue, error: teamsError }] = await Promise.all([
         supabase
           .from('profiles')
-          .select('full_name, email, college_name, role')
+          .select('id, full_name, email, college_name, role')
           .eq('id', storedUser.id)
           .single(),
         (async () => {
@@ -243,10 +245,40 @@ const DashboardHome = () => {
           <motion.h1 variants={itemVariants} className="text-3xl md:text-4xl font-bold mb-2">
             Welcome, {profile?.full_name || 'Student'} 👋
           </motion.h1>
-          <motion.p variants={itemVariants} className="text-gray-400 max-w-2xl">
+          <motion.p variants={itemVariants} className="text-gray-400">
             {profile?.college_name || 'College Name'}
           </motion.p>
-          <motion.div variants={itemVariants} className="mt-6 flex flex-wrap gap-3">
+          
+          {/* Referral Code - shown directly under college name */}
+          {profile?.id && (
+            <motion.div variants={itemVariants} className="mt-2 flex items-center gap-2">
+              <span className="text-gray-500 text-sm">Referral Code:</span>
+              <span className="text-secondary font-mono font-bold">
+                DAK26-{profile.id.substring(0, 8).toUpperCase()}
+              </span>
+              <button
+                onClick={() => {
+                  const referralCode = `DAK26-${profile.id.substring(0, 8).toUpperCase()}`;
+                  navigator.clipboard.writeText(referralCode);
+                  toast.success('Referral code copied!', {
+                    icon: '📋',
+                    style: {
+                      background: '#0ea5e9',
+                      color: '#fff',
+                      borderRadius: '10px',
+                      padding: '12px',
+                    }
+                  });
+                }}
+                className="p-1.5 rounded-lg bg-secondary/20 hover:bg-secondary/30 transition-colors"
+                title="Copy referral code"
+              >
+                <Copy size={14} className="text-secondary" />
+              </button>
+            </motion.div>
+          )}
+
+          <motion.div variants={itemVariants} className="mt-4 flex flex-wrap gap-3">
             {registrations.some(r => r.combo_id) && (
               <span className="px-4 py-1.5 rounded-full bg-secondary/20 border border-secondary/30 text-secondary text-sm font-medium">
                 Combo Pass Holder
