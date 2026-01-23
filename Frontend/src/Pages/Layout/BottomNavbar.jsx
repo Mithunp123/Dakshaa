@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Calendar, Clock, User } from 'lucide-react';
+import { Home, Calendar, Gift, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const BottomNavbar = () => {
@@ -10,7 +10,7 @@ const BottomNavbar = () => {
   const navItems = [
     { icon: Home, label: 'Home', path: '/' },
     { icon: Calendar, label: 'Events', path: '/events' },
-    { icon: Clock, label: 'Schedule', path: '/schedule' },
+    { icon: Gift, label: 'Referral', path: '/referral' },
     { icon: User, label: 'Dashboard', path: '/dashboard' },
   ];
 

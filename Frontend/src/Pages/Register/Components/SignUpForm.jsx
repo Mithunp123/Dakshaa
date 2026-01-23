@@ -303,12 +303,12 @@ const SignUpForm = () => {
               <input
                 type="text"
                 name="referredBy"
-                placeholder="Enter referrer's Roll Number (e.g., 7377212CS101)"
+                placeholder="KSRCT: enter mobile number | Others: enter DaKhaa T26 ID (DAK26-XXXXXXXX)"
                 value={formData.referredBy}
                 onChange={handleChange}
                 className="w-full bg-gray-900/50 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
               />
-              <p className="text-[9px] sm:text-[10px] text-gray-500 ml-1 italic">Enter the roll number of the person who referred you to earn them points!</p>
+              <p className="text-[9px] sm:text-[12px] text-gray-500 ml-1 italic">“Enter KSRCT student mobile number (for KSRCT referrals) or DaKhaa T26 referral ID (DAK26-XXXXXXXX) for other participants!</p>
             </div>
           </div>
         </div>

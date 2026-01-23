@@ -1,0 +1,212 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Search, Gift, Users, AlertCircle, Loader2 } from 'lucide-react';
+import { supabase } from '../../supabase';
+import DakshaaCoin from '../../assets/DakshaaCoin.png';
+
+const Referral = () => {
+  const [referralCode, setReferralCode] = useState('');
+  const [searchResult, setSearchResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
+
+  const handleSearch = async () => {
+    if (!referralCode.trim()) return;
+
+    setLoading(true);
+    setSearched(true);
+    setSearchResult(null);
+
+    try {
+      console.log('Searching for referral ID:', referralCode.trim().toUpperCase());
+      
+      const { data, error } = await supabase
+        .from('referral_code')
+        .select('referral_id, usage_count')
+        .eq('referral_id', referralCode.trim().toUpperCase())
+        .maybeSingle();
+
+      console.log('Supabase response:', { data, error });
+
+      if (error) {
+        console.error('Error fetching referral:', error);
+        setSearchResult(null);
+      } else if (data) {
+        setSearchResult(data);
+      } else {
+        setSearchResult(null);
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      setSearchResult(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  // Calculate coins: Mobile numbers (10 digits) get 2 coins per referral, others get 4
+  const isMobileNumber = searchResult && /^\d{10}$/.test(searchResult.referral_id);
+  const coinsPerReferral = isMobileNumber ? 2 : 4;
+  const coins = searchResult ? searchResult.usage_count * coinsPerReferral : 0;
+  const maxCoins = isMobileNumber ? 100 : 100;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 pt-24 pb-32 px-4">
+      <div className="max-w-lg mx-auto">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Gift className="w-8 h-8 text-secondary" />
+            <h1 className="text-3xl font-orbitron font-bold text-white">
+              Referral Lookup
+            </h1>
+          </div>
+          <p className="text-gray-400 text-sm">
+            Enter a referral ID to check how many people have signed up
+          </p>
+        </motion.div>
+
+        {/* Search Box */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 mb-6"
+        >
+          <div className="flex gap-3">
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                onKeyPress={handleKeyPress}
+                placeholder="Enter Referral ID (e.g., DAK26-XXXXXXXX)"
+                className="w-full bg-slate-700/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-secondary/50 focus:ring-2 focus:ring-secondary/20 font-mono uppercase"
+              />
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleSearch}
+              disabled={loading || !referralCode.trim()}
+              className="px-5 py-3 bg-gradient-to-r from-secondary to-cyan-500 rounded-xl text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Search className="w-5 h-5" />
+              )}
+            </motion.button>
+          </div>
+        </motion.div>
+
+        {/* Results */}
+        {searched && !loading && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          >
+            {searchResult ? (
+              <div className="bg-gradient-to-br from-emerald-900/30 to-cyan-900/30 backdrop-blur-xl rounded-2xl p-8 border border-emerald-500/20">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <Users className="w-6 h-6 text-emerald-400" />
+                    <h3 className="text-lg font-orbitron text-emerald-400">
+                      Referral Found!
+                    </h3>
+                  </div>
+                  
+                  <p className="text-gray-400 text-sm mb-6">
+                    Referral ID: <span className="text-white font-mono">{searchResult.referral_id}</span>
+                  </p>
+
+                  <div className="bg-slate-800/50 rounded-xl p-8">
+                    <p className="text-gray-400 text-sm mb-4">Coins Earned</p>
+                    
+                    {/* Animated Coin */}
+                    <div className="flex flex-col items-center justify-center gap-4">
+                      <motion.div
+                        animate={{ 
+                          rotateY: [0, 360],
+                          scale: [1, 1.1, 1]
+                        }}
+                        transition={{ 
+                          rotateY: { duration: 3, repeat: Infinity, ease: "linear" },
+                          scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                        }}
+                        className="relative"
+                      >
+                        <motion.div
+                          animate={{
+                            boxShadow: [
+                              "0 0 20px rgba(234, 179, 8, 0.3)",
+                              "0 0 40px rgba(234, 179, 8, 0.6)",
+                              "0 0 20px rgba(234, 179, 8, 0.3)"
+                            ]
+                          }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="rounded-full"
+                        >
+                          <img 
+                            src={DakshaaCoin} 
+                            alt="DakshaaCoin" 
+                            className="w-24 h-24 md:w-32 md:h-32 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]"
+                          />
+                        </motion.div>
+                      </motion.div>
+                      
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+                      >
+                        <span className="text-5xl md:text-6xl font-bold text-secondary">
+                          {coins}
+                          <span className="text-2xl text-gray-400">/{maxCoins}</span>
+                        </span>
+                      </motion.div>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-gray-500 mt-4">
+                    {isMobileNumber 
+                      ? "Mobile referrals earn 2 DakshaaCoins per signup (max 100 coins)"
+                      : "Each signup earns 4 DakshaaCoins (max 100 coins)"
+                    }
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-gradient-to-br from-orange-900/30 to-red-900/30 backdrop-blur-xl rounded-2xl p-6 border border-orange-500/20">
+                <div className="text-center">
+                  <AlertCircle className="w-12 h-12 text-orange-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-orbitron text-orange-400 mb-2">
+                    No Referrals Yet
+                  </h3>
+                  <p className="text-gray-400 text-sm">
+                    No one has signed up with this referral ID yet. Share your referral code to earn DakshaaCoins!
+                  </p>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Info Section */}
+      </div>
+    </div>
+  );
+};
+
+export default Referral;

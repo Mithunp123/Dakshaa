@@ -15,6 +15,7 @@ import {
 import { supabase } from '../../../supabase';
 import { supabaseService } from '../../../services/supabaseService';
 import toast from 'react-hot-toast';
+import DakshaaCoin from '../../../assets/DakshaaCoin.png';
 
 const DashboardHome = () => {
   // Get user from localStorage synchronously for instant load
@@ -295,8 +296,10 @@ const DashboardHome = () => {
                 <Copy size={14} className="text-secondary" />
               </button>
               <span className="text-gray-500 text-sm ml-2">|</span>
-              <span className="text-gray-400 text-sm">
-                Referrals: <span className="text-secondary font-bold">{referralCount}</span>
+              <span className="text-gray-400 text-sm flex items-center gap-2">
+                <img src={DakshaaCoin} alt="Dakshaa Coin" className="w-10 h-10 md:w-12 md:h-12 object-contain" />
+                <span className="text-yellow-400 font-bold text-lg md:text-xl">{referralCount * 4}</span>
+                <span className="text-gray-500 text-base">/100</span>
               </span>
             </motion.div>
           )}

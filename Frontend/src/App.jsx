@@ -39,6 +39,7 @@ const Register = lazy(() => import("./Pages/Register/Register.jsx"));
 const EventRegistration = lazy(() => import("./Pages/Register/EventRegistration.jsx"));
 const Dashboard = lazy(() => import("./Pages/Dashboard/Dashboard.jsx"));
 const Schedule = lazy(() => import("./Pages/Schedule/Schedule"));
+const Referral = lazy(() => import("./Pages/Referral/Referral"));
 const Feedback = lazy(() => import("./Pages/Feedback/Feedback"));
 const Scan = lazy(() => import("./Pages/Scan/Scan"));
 const Login = lazy(() => import("./Pages/Login/Login"));
@@ -57,6 +58,7 @@ export const preloadPages = {
   home: () => import("./Pages/Home/Home"),
   events: () => import("./Pages/Events/Events"),
   schedule: () => import("./Pages/Schedule/Schedule"),
+  referral: () => import("./Pages/Referral/Referral"),
   sponsors: () => import("./Pages/Sponsors/Sponsors"),
   teams: () => import("./Pages/Teams/Teams"),
   contact: () => import("./Pages/Home/Components/Contact"),
@@ -183,6 +185,7 @@ function AppContent() {
             <Route path="/accomodation" element={<Accomodation />} />
             <Route path="/event/codeathon" element={<Codathon />} />
             <Route path="/schedule" element={<Schedule />} />
+            <Route path="/referral" element={<Referral />} />
             <Route path="/feedback" element={<Feedback />} />
             <Route path="/terms" element={<TermsAndConditions />} />
             <Route path="/signup" element={<Register />} />
