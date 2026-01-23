@@ -26,9 +26,9 @@ const HackathonSection = () => {
   const hackathonEventDetails = {
     "hackathon-1": {
       id: "hackathon-1",
-      title: "Neura-Hack 2026",
-      registrationLink: "https://forms.gle/DH6Su1b3y2YPfuvDA",
-      description: "Neura Hack - 36-Hour Hackathon is powered by GUVI where teams develop solutions to problem statements provided by the organizers. Participants must register in advance and complete their projects within the 36-hour timeframe, using only original work. Open-source tools are allowed, but plagiarism and pre-existing solutions are prohibited. Submissions must include code, documentation, and a working demo. Projects are judged on innovation, technical implementation, impact, and presentation.",
+      title: "Neura-Hack 2.0 (36 Hours Hackathon)",
+      registrationLink: "",
+      description: "NeuroHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, 	Defend, and Secure technology to shape the future of digital innovation.",
       rewards: [
         {
           position: "1st Prize",
@@ -46,44 +46,44 @@ const HackathonSection = () => {
           amount: "₹10,000",
         },
       ],
+      
       rounds: [
         {
-          title: "Topics",
+          title: "",
           description: [
-            "Artificial Intelligence and Machine Learning",
+            ,
           ],
         },
         {
-          title: "Round: Ideation",
+          title: "",
           description: [
-            "Problem Statement: On-the-spot selection from 20 topics.",
-            "Submit your project idea.",
-            "Present a brief pitch.",
-            "Develop a working prototype.",
-            "Submit a demo video.",
-            "The top 10 finalists will give a presentation on 29th March, and the top 3 will be selected as the final winners.",
-            "Winners will be announced.",
+            
           ],
         },
-      ],
+      ], 
       rules: [
-        "Teams must consist of 3 members.",
-        "All code must be written during the hackathon.",
-        "Plagiarism will result in disqualification.",
+        " Each team shall consist of three (3) to four (4) members.",
+        "NeuroHack 2.O is a continuous 36-hour hackathon with no breaks in development time.",
+        "A total of two (2) evaluation rounds will be conducted during the hackathon period.",
+        "Participants must bring their own laptops, peripherals, and required accessories.",
+        "At least one team member must be present and actively working at all times throughout the 36-hour duration.",
+        "All solutions must be developed during the hackathon period only.",
+        "The decision of the judging panel shall be final and binding.",
+
       ],
       schedule: [
         {
           round: "Venue",
           date: "March 28, 2026",
           time: "10:00 AM",
-          location: "IT-Lab 1, IT Park",
+          location: "IT PARK",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Mr. K.Senthil Kumar",
-            phone: "+91 95666 66124",
+            name: "S.VADIVEL  ",
+            phone: "+91 97906 32171",
             email: "senthilkumark@ksrct.ac.in",
           },
           {

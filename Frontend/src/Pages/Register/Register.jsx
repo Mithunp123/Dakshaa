@@ -39,7 +39,7 @@ const Register = () => {
           className="mt-12 sm:mt-24 text-center p-4 sm:p-8 bg-gray-800/50 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-sm border border-white/10"
         >
           <p className="text-gray-400 text-sm sm:text-base">
-            Need help? Contact our support team at <span className="text-secondary">support@dakshaa.org</span>
+            Need help? Contact our support team at <span className="text-secondary">dakshaa@ksrct.ac.in</span>
           </p>
         </motion.div>
       </div>

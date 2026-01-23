@@ -27,9 +27,8 @@ const Schedule = () => {
           time: "09:00 AM – 12:30 PM",
           title: "Morning Sessions",
           items: [
-            { name: "Workshops (5 parallel)", icon: <Lightbulb className="w-4 h-4" />, type: "Workshop" },
-            { name: "Technical Events – Round 1 (5 events)", icon: <Code className="w-4 h-4" />, type: "Technical" },
-            { name: "Registration help desk & QR attendance", icon: <Users className="w-4 h-4" />, type: "General" }
+            { name: "Registration help desk & QR attendance", icon: <Users className="w-4 h-4" />, type: "General" },
+            { name: "Workshops ", icon: <Lightbulb className="w-4 h-4" />, type: "Workshop" },
           ]
         },
         {
@@ -43,9 +42,7 @@ const Schedule = () => {
           time: "01:30 PM – 04:30 PM",
           title: "Afternoon Sessions",
           items: [
-            { name: "Workshops (4 parallel)", icon: <Lightbulb className="w-4 h-4" />, type: "Workshop" },
-            { name: "Non-Technical Events (5 events – FREE)", icon: <Zap className="w-4 h-4" />, type: "Non-Technical" },
-            { name: "Tech event prelims continue", icon: <Code className="w-4 h-4" />, type: "Technical" }
+            { name: "Workshops ", icon: <Lightbulb className="w-4 h-4" />, type: "Workshop" },
           ]
         },
         {
@@ -66,9 +63,7 @@ const Schedule = () => {
           time: "09:00 AM – 12:30 PM",
           title: "Morning Competitions",
           items: [
-            { name: "Workshops (5 parallel)", icon: <Lightbulb className="w-4 h-4" />, type: "Workshop" },
-            { name: "Technical Events – Finals (5 events)", icon: <Code className="w-4 h-4" />, type: "Technical" },
-            { name: "Non-Technical Events (5 events – FREE)", icon: <Zap className="w-4 h-4" />, type: "Non-Technical" }
+            { name: "Technical Events ", icon: <Code className="w-4 h-4" />, type: "Technical" },
           ]
         },
         {
@@ -105,8 +100,7 @@ const Schedule = () => {
           time: "09:00 AM – 12:00 PM",
           title: "Morning Finals",
           items: [
-            { name: "Workshops (Remaining 4)", icon: <Lightbulb className="w-4 h-4" />, type: "Workshop" },
-            { name: "Non-Technical Events (Remaining 4 – FREE)", icon: <Zap className="w-4 h-4" />, type: "Non-Technical" }
+            { name: "Non-Technical Events ", icon: <Zap className="w-4 h-4" />, type: "Non-Technical" }
           ]
         },
         {
@@ -121,7 +115,6 @@ const Schedule = () => {
           title: "Grand Finals",
           items: [
             { name: "Hackathon final demo & jury evaluation", icon: <Trophy className="w-4 h-4" />, type: "Hackathon" },
-            { name: "Tech event grand finals", icon: <Code className="w-4 h-4" />, type: "Technical" }
           ]
         },
         {
@@ -285,9 +278,9 @@ const Schedule = () => {
               </thead>
               <tbody className="text-gray-300 text-xs sm:text-sm">
                 {[
-                  { cat: "Workshops", d1: "5+4", d2: "5", d3: "4", total: "18" },
-                  { cat: "Tech Events", d1: "5", d2: "5", d3: "4", total: "14" },
-                  { cat: "Non-Tech (Free)", d1: "5", d2: "5", d3: "4", total: "14" },
+                  { cat: "Workshops", d1: "16", d2: "-", d3: "-", total: "16" },
+                  { cat: "Tech Events", d1: "-", d2: "24", d3: "-", total: "24" },
+                  { cat: "Non-Tech (Free)", d1: "-", d2: "-", d3: "20", total: "20" },
                   { cat: "Hackathon", d1: "Start", d2: "Continue", d3: "End", total: "1" },
                   { cat: "Codeathon", d1: "-", d2: "✔", d3: "-", total: "1" },
                   { cat: "Cultural", d1: "Light", d2: "Major", d3: "Closing", total: "3" },

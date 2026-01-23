@@ -2030,9 +2030,9 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Round 1",
-          date: "March 29, 2026",
-          time: "10:00 AM to 12:00 PM",
-          location: "Art Gallery, Creative Center",
+          date: "February 14, 2026",
+          time: "1 hour",
+          location: " Dr. M S. Swaminathan Biotech Seminar Hall",
         },
         // {
         //   round: "Round 2",
@@ -2051,14 +2051,10 @@ const EventDetails = () => {
         facultyCoordinator: [
           {
             name: "Ms.R.Krishnaveni",
-            email: "lalithamani@ksrct.ac.in",
-            phone: "8925568867",
+            email: "",
+            phone: "",
           },
-          {
-            name: "Dr. P.Suthanthirakumar",
-            email: "suthanthirakumar@ksrct.ac.in",
-            phone: "9500825738",
-          },
+          
         ],
         studentCoordinator: [
           {
@@ -2081,896 +2077,1051 @@ const EventDetails = () => {
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
     "non-technical-event-4": {
-      title: "Dumb Charades - Act It Out!",
+  title: "Civil Circuit (Connection)",
+  description:
+    "Civil Circuit (Connection) is an engaging non-technical event designed to test participants’ speed, logical thinking, and basic technical understanding of civil engineering concepts. Through multiple interactive rounds, participants will identify connections between civil engineering terms, categorize materials and processes, and recognize logos of construction brands and government agencies. The event encourages teamwork, quick thinking, and industry awareness in a competitive yet fun environment.",
+  image: NonTech4,
+  rounds: [
+    {
+      title: "Round 1: Quick Link",
       description:
-        "A fun and engaging event where participants act out biotech-related words or phrases without speaking",
-      image: NonTech4,
-      rounds: [
-        {
-          title: "Round 1 – Qualifiers:",
-          description:
-            "Each team gets 60 seconds per turn to act out and guess a word/phrase. Teams must guess at least 3 words to qualify for the next round",
-        },
-        {
-          title: "Round 2 – Semi-Finals: ",
-          description:
-            "Difficulty level increases with phrases, movie titles, or scientific terms. Teams get 45 seconds per turn. Top teams proceed to the final round.",
-        },
-        {
-          title: "Final Round:",
-          description:
-            "Teams must guess as many words/phrases as possible within 1 minutes. The team with the highest correct guesses wins",
-        },
-      ],
-      rules: [
-        "2 members per team",
-        "No speaking, lip movement, or writing is allowed while acting",
-        "Teams can pass a word but will lose points",
-        "Use of gestures, facial expressions, and body language is encouraged",
-      ],
-      schedule: [
-        {
-          round: "Round 1",
-          date: "March 29, 2026",
-          time: "10:00 AM to 12:00 PM",
-          location: "Art Gallery, Creative Center",
-        },
-        {
-          round: "Round 2",
-          date: "March 29, 2026",
-          time: "2:00 PM to 4:00 PM",
-          location: "Art Gallery, Creative Center",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr. R. Arulvel",
-            email: "arulvelr@ksrct.ac.in",
-            phone: "8870921600",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Pradeep Kumar A",
-            email: "pradeeplatha16@gmail.com",
-            phone: "8825656199",
-          },
-          {
-            name: "Manoj R",
-            email: "ravimano672@gmail.com",
-            phone: "9345286006",
-          },
-        ],
+        "Participants must identify the common link between given civil engineering words or images. This round tests speed, observation skills, and basic civil engineering knowledge.",
+    },
+    {
+      title: "Round 2: Build the Connection",
+      description:
+        "Participants categorize or sequence materials, processes, and structures correctly. This round focuses on logical thinking and technical understanding.",
+    },
+    {
+      title: "Round 3: Logo Find (Finals)",
+      description:
+        "Participants identify logos of construction brands and government agencies and link them to their respective services. The team with the highest score wins.",
+    },
+  ],
+  rules: [
+    "The event consists of three rounds.",
+    "Use of mobile phones, smart watches, or any electronic gadgets is strictly prohibited during the event.",
+    "Participants must maintain discipline and decorum throughout the event.",
+    "Each team must consist of exactly two participants.",
+    "A participant is allowed to be part of only one team.",
+  ],
+  eligibility: [
+    "The event is open to all departments and years.",
+    "Each team must consist of 2 participants only.",
+  ],
+  schedule: [
+    {
+      round: "All Rounds",
+      date: "February 14, 2026",
+      time: "To be announced",
+      location: "Civil CADD Laboratory",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Dr. M. Velumani",
+        phone: "9787978886",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Ms. J. Serlin Maria",
+        phone: "7200887993",
+        email: " ",
+      },
+      {
+        name: "Ms. A. Gopika",
+        phone: "6369819735",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
     "non-technical-event-5": {
-      title: "Its Talk Time",
+  title: "Emoji Pictionary",
+  description:
+    "Emoji Pictionary is a fast-paced and entertaining non-technical event where participants decode famous movie titles, book plots, or well-known phrases represented entirely through emoji sequences. This event adds a digital twist to the classic game of Pictionary by replacing drawings with emojis, challenging participants’ creativity, interpretation skills, and quick thinking. Teams race against time to correctly guess the answers based on visual emoji clues, making the event both fun and intellectually stimulating.",
+  image: NonTech5,
+  rounds: [
+    {
+      title: "Round 1 – Easy Decode",
       description:
-        "Two teams face off, taking turns to continue a given sentence within 5 seconds. Each team starts with 3 lives and failing to respond in time or providing an illogical continuation results in losing a life. The game continues until one team loses all three lives and gets eliminated. With pressure mounting and stories taking unexpected turns, teams must stay sharp and work together to keep the narrative flowing. The last team standing wins, proving their mastery of words and quick wit!",
-      image: NonTech5,
-      rounds: [
-        {
-          title: "",
-          description: "",
-        },
-      ],
-      rules: [
-        "Teams & Lives: Each team (3 or fewer members) starts with 3 lives per round.",
-        "Turn Time: Teams must continue the given sentence within 5 seconds or lose a life.",
-        "Elimination: The first team to lose all 3 lives is eliminated",
-        "Match Duration: If the round reaches 10 minutes, the team with more lives moves forward. If both teams have the same lives, the round restarts, but each team gets only 1 life.",
-        "Language: Sentences must be in English or Tamil only.",
-        "Originality: No repeating sentences, every response must be unique and meaningful.",
-        "Final Round: Rules for the final round will be revealed on the spot",
-      ],
-      schedule: [
-        {
-          round: "Round",
-          date: "March 29, 2026",
-          time: "10:00 AM to 12:00 PM",
-          location: "HPC LAB,Mechatronics Block",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Dr. C. Vijayakumar",
-            email: "vijayakumarc@ksrct.ac.in",
-            phone: "6379112939",
-          },
-          {
-            name: "Dr. R Senthilmurugan",
-            email: "senthilmurugan@ksrct.ac.in",
-            phone: "9843488996",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Akash Raam S",
-            email: "akashadthi.sd@gmail.com",
-            phone: "6381279741",
-          },
-          {
-            name: "Deva S",
-            email: "sivadeva2203@gmail.com",
-            phone: "9976438984",
-          },
-        ],
+        "Participants solve simple emoji clues that directly represent popular movies or books using literal meanings.",
+    },
+    {
+      title: "Round 2 – Plot Twist",
+      description:
+        "Emoji strings describe the main storyline or key scenes of movies or books, requiring deeper interpretation.",
+    },
+    {
+      title: "Round 3 – Symbolic Challenge",
+      description:
+        "Participants face challenging emoji clues that use symbolic or indirect meanings to represent titles or plots.",
+    },
+  ],
+  rules: [
+    "Each team may consist of 1 or 2 participants.",
+    "Participants must guess the answer within the given time limit of 30 seconds.",
+    "The first team to give the correct answer will be awarded the point.",
+    "If no team answers correctly, a hint such as actor name, genre, or release year will be provided.",
+    "Use of mobile phones or any external assistance is strictly prohibited.",
+    "Participants must maintain discipline and fair play throughout the event.",
+    "Judges’ decisions will be final and binding.",
+  ],
+  schedule: [
+    {
+      round: "All Rounds",
+      date: "February 14, 2026",
+      time: "2–3 Hours",
+      location: "AB 110",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. S. Vignesh",
+        designation: "Assistant Professor",
+        phone: "9944820102",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Akash A",
+        department: "Computer Science and Business Systems",
+        year: "III Year",
+        phone: "9363283385",
+        email: " ",
+      },
+      {
+        name: "Guruchandhar D",
+        department: "Computer Science and Business Systems",
+        year: "III Year",
+        phone: "9500446351",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/cgwAsboW12c9pWXFA", // Registration link
     },
     "non-technical-event-6": {
-      title: "Auction Arena",
+  title: "Arangam Athira",
+  description:
+    "Arangam Athira is a fun-filled musical entertainment event designed to test participants’ love for music, memory, and spontaneity. Set in a lively DJ atmosphere, the event creates an energetic and engaging environment where rhythm meets challenge. Participants enjoy interactive music sessions focused purely on enjoyment, crowd interaction, and spontaneous performance rather than competition.",
+  image: NonTech6,
+  rounds: [
+    {
+      title: "DJ Stop & Sing",
       description:
-        "Auction Arena is a thrilling and interactive event designed to bring out the strategist in you! This fun-filled IPL-themed auction challenges participants to think analytically, bid smartly, and build the ultimate cricket squad. Participants must bid wisely, manage their budgets effectively, and build a well-balanced squad to outshine their competitors.",
-      image: NonTech6,
-      rounds: [],
-      rules: [
-        "Minimum Requirements: 2 Batters, 2 Bowlers, 1 Wicketkeeper, 5 Players who can bowl (e.g., 2 Bowlers + 3 All-rounders or 3 Bowlers + 2 All-rounders)",
-        "Maximum 4 Foreign Players Allowed in the playing XI:",
-        "Final Squad Composition: 11 Main Players, 1 Impact Player",
-      ],
-      schedule: [
-        {
-          round: "Slot1",
-          date: "March 29, 2026",
-          time: "10:00 AM to 12:00 PM",
-          location: "AB(211),AB Block",
-        },
-        {
-          round: "Slot2",
-          date: "March 29, 2026",
-          time: "1:00 PM to 4:00 PM",
-          location: "AB(211),AB Block",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mrs.T.Udhaya",
-            email: "udhaya@ksrct.ac.in",
-            phone: "8675587180",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Kishorekumar S",
-            email: "kishoresenthilkumar25@gmail.com",
-            phone: "9344276110",
-          },
-          {
-            name: "Gogul J",
-            email: "goguljeyaraj04@gmail.com",
-            phone: "8807614376",
-          },
-        ],
+        "The DJ plays songs and pauses them at random points. Participants must continue singing the lyrics correctly from the exact point where the music stops.",
+    },
+  ],
+  rules: [
+    "Participation is open to students from all departments of the institution.",
+    "This is an individual participation event; team participation is not allowed.",
+    "Participation fee is ₹100 per participant.",
+    "Participants must report to the venue at least 15 minutes before their allotted slot for attendance verification.",
+    "The event follows a DJ stop–sing-along format with random stoppage points.",
+    "Participants must continue the song lyrics correctly from where the music stops.",
+    "Song selection, stoppage points, and difficulty level will be decided by the DJ and organizing committee.",
+    "Use of mobile phones, lyric sheets, or any external assistance is strictly prohibited during the performance.",
+    "This event is conducted purely for fun and entertainment; no prizes, rankings, or certificates will be awarded.",
+    "Any form of misbehavior or misconduct will result in immediate disqualification.",
+    "Participants must carry a valid college identity card and produce it upon request.",
+    "Participants are responsible for the safety of their personal belongings.",
+    "The decision of the organizing committee shall be final and binding.",
+  ],
+  schedule: [
+    {
+      round: "Event Session",
+      date: "February 14, 2026",
+      time: "To be announced",
+      location: "Quadrangle Triangle, Main Building",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Dr. K. Senthilvadivu",
+        department: "Mathematics",
+        phone: "9865024343",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Tharneish K",
+        department: "Computer Science and Engineering",
+        year: "III Year",
+        phone: "9514211199",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/F7ToBuAQk8jMRJe5A", // Registration link
     },
     "non-technical-event-7": {
-      title: "A Guess Challenge ",
+  title: "Battle Arena",
+  description:
+    "Battle Arena is a high-intensity eSports competition designed to bring together skilled gamers in a professional and competitive environment. Participants compete in popular gaming titles such as EA Sports FC and Free Fire, showcasing precision, strategy, reflexes, and real-time decision-making. The event follows a structured knockout tournament format to identify and crown the ultimate champions of the arena.",
+  image: NonTech7,
+  rounds: [
+    {
+      title: "Tournament Battles",
       description:
-        "Unmasking Brands & Flavors: A Journey Through Corporate Identities & Culinary Secrets This event is designed to challenge participantsknowledge of corporate branding and food recognition through an interactive three-level game. It tests awareness, teamwork, and quick thinking in a fun and engaging way.",
-      image: NonTech7,
-      rounds: [
-        {
-          title: "Round 1: Logo Guessing Challenge",
-          description: [
-            "Teams will be shown blurred or partial logos of food brands and must identify them.",
-            "Each correct answer earns points; the top teams progress to the next level.",
-          ],
-        },
-        {
-          title: "Round 2: Food Dumb Charades",
-          description: [
-            "One team member will be given a food-related word/brand and must enact it without speaking.",
-            "The other members must guess the word within a given time.",
-            "Teams with the highest scores move to the final level",
-          ],
-        },
-        {
-          title: "Round 3: Guess the Ingredient",
-          description: [
-            "Teams will be presented with a mystery dish or product and must identify key ingredients.",
-            "Limited time will be given for each guess.",
-            "The team with the most correct ingredient identifications wins.",
-          ],
-        },
-      ],
-      rules: [
-        "Use of mobile phones or external help is strictly prohibited.",
-        "Teams must answer within the time limit for each round.",
-        "Judges' decisions are final and binding",
-      ],
-      schedule: [
-        {
-          round: "Round 1",
-          date: "March 29, 2026",
-          time: "10:00 AM to 12:00 PM",
-          location: "Art Gallery, Creative Center",
-        },
-        {
-          round: "Round 2",
-          date: "March 29, 2026",
-          time: "2:00 PM to 4:00 PM",
-          location: "Art Gallery, Creative Center",
-        },
-        {
-          round: "Round 3",
-          date: "March 29, 2026",
-          time: "2:00 PM to 4:00 PM",
-          location: "Art Gallery, Creative Center",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mrs. K. Kavitha , AP/Maths",
-            phone: "9600933007",
-            email: "kavithak@ksrct.ac.in",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Lega C, III Year/FT ",
-            phone: "9360115935",
-            email: "lega.chandhrasekar07@gmail.com",
-          },
-          {
-            name: "Pavithra R, II Year/FT",
-            phone: "9345894830",
-            email: "rppavithra2006@gmail.com",
-          },
-          {
-            name: "Hariprasath K, II Year/FT",
-            phone: "9080753031",
-            email: "prasath202hari@gmail.com",
-          },
-        ],
+        "Participants compete in knockout-style matches across selected eSports titles. Winners advance through successive rounds until the final champion is determined.",
+    },
+  ],
+  rules: [
+    "Participation is open to students from all departments of the institution.",
+    "This is an individual participation event; team participation is not allowed.",
+    "The competition will be conducted in a knockout tournament format.",
+    "Matches will be held in EA Sports FC (FIFA) and Free Fire as decided by the organizers.",
+    "Participants must strictly adhere to fair-play rules; any form of cheating or exploitation will result in disqualification.",
+    "Match schedules and game settings will be decided by the organizing committee.",
+    "Use of unauthorized devices, hacks, or any external assistance is strictly prohibited.",
+    "Participants must report to the venue on time as per their allotted slot.",
+    "Participants must carry a valid college identity card and produce it upon request.",
+    "The decision of the organizers and referees shall be final and binding.",
+  ],
+  schedule: [
+    {
+      round: "Tournament Matches",
+      date: "February 14, 2026",
+      time: "To be announced",
+      location: "IT Park",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Dr. A. Gnanabaskaran",
+        department: "Computer Science and Engineering",
+        phone: "9865024343",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Shanmugeshwara A",
+        department: "Computer Science and Engineering",
+        year: "III Year",
+        phone: "9487119381",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
     "non-technical-event-8": {
-      title: "one Click",
+  title: "LineX",
+  description:
+    "LineX is a robotics-based non-technical event where participants compete head-to-head by controlling robots using a remote control. The robots must navigate through a predefined track filled with multiple obstacles. The participant who completes the track in the shortest time is declared the winner. This event focuses on testing speed, precision, control skills, and the ability to handle robots effectively under competitive conditions.",
+  image: NonTech8,
+  rounds: [
+    {
+      title: "Obstacle Track Challenge",
       description:
-        "Capture the beauty of our campus and showcase your photography skills in this exciting contest! Post your photo on social media with #ksrct1994 to gain bonus points based on likes. Participants receive certificates, and winners get a cash prize! 📸✨",
-      image: NonTech8,
-      rounds: [],
-      rules: [
-        "The photographs should be taken only within the campus.",
-        "The photographs can be taken with any camera, i.e. DSLR, Mobile camera.",
-        "Photo enhancements is allowed, but not allowed to manipulate the content.",
-        "Photographs should be minimum 1MB in size.",
-        "The originality of the photos will be checked.",
-        "The participants have to post the photo in their social media handle using the hashtag #ksrct1994. Additional of five points will be awarded for the likes they got for the photo.",
-        "For Individual 50 rupees",
-      ],
-      schedule: [
-        {
-          round: "Round",
-          date: "March 29, 2026",
-          time: "9:00 AM to 12:30 PM",
-          location: "Mechanical Block",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr.S.Karthik",
-            email: "skarthik@ksrct.ac.in",
-            phone: "9790667321",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Harshad Gajanan Shivpuje ",
-            email: "harshadshivpujeg@gmail.com",
-            phone: "7708927651",
-          },
-          {
-            name: "Rajesh Kumar S ",
-            email: "rajesh2342005@gmail.com",
-            phone: "9361688130",
-          },
-        ],
+        "Participants control their robots through a predefined obstacle track. Performance is evaluated based on time, accuracy, and obstacle handling.",
+    },
+  ],
+  rules: [
+    "Participants compete in a head-to-head format.",
+    "Robots must strictly follow the given track and pass through all obstacles.",
+    "If a robot goes off the track, it must be repositioned at the last checkpoint.",
+    "Damaging the track or any obstacles will lead to immediate disqualification.",
+    "Winners are judged based on completion time, accuracy, and obstacle handling.",
+    "Participants must follow the instructions given by the organizers at all times.",
+    "The decision of the judges and organizing committee shall be final and binding.",
+  ],
+  schedule: [
+    {
+      round: "Event Session",
+      date: "February 14, 2026",
+      time: "2:30 PM to 4:30 PM",
+      location: "Quadrangle Triangle, Main Building",
+    },
+  ],
+  
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mrs. U. Shayamaldevi",
+        department: "Electronics and Communication Engineering",
+        phone: "9566356428",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Muthuraj S",
+        department: "Electronics and Communication Engineering",
+        year: "II Year",
+        phone: "6380275179",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/cgwAsboW12c9pWXFA", // Registration link
     },
     "non-technical-event-9": {
-      title: "404:Meme Overload (Meme creation based on IT scenarios)",
+  title: "Kahoot! Quiz",
+  description:
+    "The Kahoot! Quiz Challenge is an exciting and interactive quiz event designed to test participants’ knowledge, speed, and teamwork. Using the Kahoot platform, participants answer multiple-choice questions in real time through their smartphones. The quiz includes a mix of technical topics, general knowledge, and fun questions, making it both competitive and engaging. Accuracy and quick thinking are the key factors for success.",
+  image: NonTech9,
+  rounds: [
+    {
+      title: "Live Kahoot Quiz",
       description:
-        "IT Meme Battle is a fun and creative competition where teams of one or two members create original IT-related memes. Participants can use image + text, GIFs, or even hand-drawn memes for extra creativity. Plagiarized content will lead to disqualification, and all memes must be appropriate and respectful. Submissions must be made within the given time limit. Let your humor and tech knowledge shine in this battle of wit and creativity.",
-      image: NonTech9,
-      rounds: [],
-      rules: [
-        "Team Size: Each team can have 1 or 2 members.",
-        "Originality Matters – Memes should be original and creative. Plagiarized content will lead to disqualification.",
-        "Appropriate Content – No offensive and inappropriate memes. Keep it fun and respectful.",
-        "Format Flexibility – Participants can create memes using:  Image + Text (classic meme style) ,  GIFs  ,Hand-drawn memes (for extra creativity!)",
-        "Submission Time – Memes must be submitted within the given time limit.",
-      ],
-      schedule: [
-        {
-          round: "venue",
-          date: "March 29, 2026",
-          time: "9:30 PM to 12:00 PM",
-          location: "IT lab 2,IT Park ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr.P.Dinesh Kumar",
-            email: "p.dineshkumar@ksrct.ac.in",
-            phone: "9688837873",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Sandhiya M ",
-            email: "sandhiyamanikandan17@gmail.com",
-            phone: "9344806015",
-          },
-          {
-            name: "Vignesh K ",
-            email: "vigneshblue3162@gmail.com",
-            phone: "6381083683",
-          },
-        ],
+        "Participants answer real-time multiple-choice questions on the Kahoot platform within a limited time. Scores are calculated based on accuracy and response speed.",
+    },
+  ],
+  rules: [
+    "The quiz will be conducted using the Kahoot mobile app or website.",
+    "Each team must have at least one smartphone with an active internet connection.",
+    "The quiz consists of multiple-choice questions that must be answered within the given time limit.",
+    "Participants must follow the instructions provided by the quiz host throughout the event.",
+    "Winners will be decided based on the final Kahoot leaderboard.",
+    "The decision of the organizers shall be final and binding.",
+  ],
+  schedule: [
+    {
+      round: "Quiz Session",
+      date: "February 14, 2026",
+      time: "2:30 PM to 4:30 PM",
+      location: "Smart Classroom, Main Block",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mrs. Padmavathi D",
+        department: "Electronics and Communication Engineering",
+        phone: "9942868893",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Saran G D",
+        department: "Electronics and Communication Engineering",
+        year: "III Year",
+        phone: "9489178522",
+        email: " ",
+      },
+    ],
+  },
+
 
       registrationLink: "https://forms.gle/F7ToBuAQk8jMRJe5A", // Registration link
     },
 
     "non-technical-event-10": {
-      title: "Mind Maze",
+  title: "Twisted Tiles",
+  description:
+    "Twisted Tiles is a puzzle-based non-technical event designed to challenge participants’ logical thinking and problem-solving abilities. Participants must analyze patterns, think critically, and solve puzzles within a limited time, making it an engaging test of focus, reasoning, and mental agility.",
+  image: NonTech10,
+  rounds: [
+    {
+      title: "Puzzle Challenge",
       description:
-        "Mind Maze is an exciting non-technical event that challenges participants to decode hidden clues from images using logic, pattern recognition, and creative thinking. Participants will engage their problem-solving skills to uncover the mystery, aiming to be the first to solve the clue within the time limit.",
-      image: NonTech10,
-      rounds: [
-        {
-          title: "Single Round",
-          description: [
-            "Participants will decode a hidden clue within an image.",
-            "Speed, accuracy, and logical reasoning used to decipher the clue.",
-          ],
-        },
-      ],
-      rules: [
-        "Participants must complete the task within the 15-minute time limit",
-        "Only the first participant to solve the clue will be declared the winner.",
-        "No external help or resources can be used during the event.",
-      ],
-      schedule: [],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: " Dr. D. Mugilan (AP/ECE))",
-            email: "mugilan@ksrct.ac.in",
-            phone: "98946 07523",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Prathipa T (II-Year/ECE)",
-            email: "thangavelprathiba@gmail.com",
-            phone: "9342626157",
-          },
-          {
-            name: "Harish V(III-Year/ECE)",
-            email: "harishpvr23@gmail.com ",
-            phone: "8825508742",
-          },
-        ],
+        "Participants solve a series of logical and tile-based puzzles within the given time limit. Accuracy and completion within time are key to success.",
+    },
+  ],
+  rules: [
+    "This is an individual participation event.",
+    "No external help or assistance is allowed during the event.",
+    "Participants must strictly adhere to the given time limit.",
+    "Participants must maintain discipline throughout the event.",
+    "The decision of the organizers shall be final and binding.",
+  ],
+  schedule: [
+    {
+      round: "Event Session",
+      date: "February 14, 2026",
+      time: "2 Hours",
+      location: "EE301",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. A. Thangadurai",
+        designation: "Assistant Professor",
+        department: "Electrical and Electronics Engineering",
+        phone: "",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Mr. Harishwaran R",
+        department: "Electrical and Electronics Engineering",
+        year: "III Year",
+        phone: "9360002523",
+        email: " ",
+      },
+      {
+        name: "Mr. Sri Dharan B",
+        department: "Electrical and Electronics Engineering",
+        year: "II Year",
+        phone: "8438986010",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/F7ToBuAQk8jMRJe5A", // Registration link
     },
     "non-technical-event-11": {
-      title: "Waste to Wealth 2026",
+  title: "Logo Quiz",
+  description:
+    "Logo Quiz is a non-technical event that tests participants’ ability to identify logos related to brands, technology companies, and general knowledge. The event challenges visual recognition, memory, and quick recall skills in a fun and engaging quiz-based format.",
+  image: NonTech11,
+  rounds: [
+    {
+      title: "Logo Identification Round",
       description:
-        "This event invites Engineering and Polytechnic students to showcase innovative solutions by transforming waste into creative, functional, or technological models. Participants will present their projects in a 5-7 minute pitch, focusing on creativity, sustainability, and practicality. The competition enhances problem-solving, entrepreneurial skills, and environmental awareness, offering career and networking opportunities in sustainability.",
-      image: NonTech11,
-      rounds: [
-        {
-          title: "Single Round",
-          description: [
-            "Each participant/team will get 5-7 minutes to present their project",
-            "Craft and Art – Creative decorative items from waste.",
-            "Utility and Innovation – Functional products from waste.",
-            "Technology & Science Models – Prototypes for environmental sustainability",
-          ],
-        },
-      ],
-      rules: [
-        "A poster or short PowerPoint presentation explaining the idea is recommended",
-        "A short demonstration of the product/model is encouraged.",
-        "All work must be original. Plagiarism or copied designs will lead to disqualification.",
-        "The decision of the judges will be final and binding.",
-        "Participants should ensure cleanliness and dispose of leftover waste properly.",
-      ],
-      schedule: [],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Dr.M.Velumani/AP/Civil",
-            email: "velumani@ksrct.ac.in",
-            phone: "9787978886",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "R.K.Aswin",
-            email: "rkaswin07@gmail.com",
-            phone: "8148934756",
-          },
-          {
-            name: "Nithiya Suriyan K",
-            email: "viratsuryaviratsurya4@gmail.com",
-            phone: "8056603518",
-          },
-        ],
+        "Participants are shown a series of logos and must identify them correctly by writing or speaking the answers as instructed.",
+    },
+  ],
+  rules: [
+    "This is an individual participation event.",
+    "Use of mobile phones or any electronic devices is strictly prohibited.",
+    "Answers must be written or spoken as instructed by the organizers.",
+    "Participants must maintain discipline throughout the event.",
+    "The decision of the organizers and judges shall be final and binding.",
+  ],
+  schedule: [
+    {
+      round: "Event Session",
+      date: "February 14, 2026",
+      time: "2 Hours",
+      location: "EE302",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. M. Dhanapal",
+        designation: "Assistant Professor",
+        department: "Electrical and Electronics Engineering",
+        phone: "",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Mr. Aadithya N",
+        department: "Electrical and Electronics Engineering",
+        year: "III Year",
+        phone: "6384363866",
+        email: " ",
+      },
+      {
+        name: "Ms. Nirmala D V",
+        department: "Electrical and Electronics Engineering",
+        year: "II Year",
+        phone: "8248282714",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
     "non-technical-event-12": {
-      title: "Glorify the Face with Colours",
+  title: "Unit Wars",
+  description:
+    "Unit Wars is an educational quiz-based non-technical event focusing on fundamental and derived SI units used in science and engineering. The event challenges participants’ conceptual understanding, memory, and speed, making it both informative and competitive.",
+  image: NonTech12,
+  rounds: [
+    {
+      title: "SI Units Challenge",
       description:
-        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
-      image: NonTech12,
-      rounds: [
-        {
-          title: "Single Round",
-          description: [
-            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
-          ],
-        },
-      ],
-      rules: [
-        "Theme:On the Spot",
-        "Two Participants per Team",
-        "Duration:1 Hr",
-        "Participants have to bring their own colours, brushes etc",
-        "Juries Judgement is Final",
-      ],
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr.P. Maheswaran AP/Textile ",
-            email: "pmaheswaran@ksrct.ac.in",
-            phone: "9600589068",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "V.Sandhiya 2nd year / Textile ",
-            email: "sandhiya07082006@gmail.com",
-            phone: "6369670394",
-          },
-          {
-            name: "S.A.Hariharan 2nd year / Textile",
-            email: "harihraran18@gmail.com",
-            phone: "7092102427",
-          },
-        ],
+        "Participants answer questions related to fundamental and derived SI units within a limited time. Accuracy and speed determine performance.",
+    },
+  ],
+  rules: [
+    "This is an individual participation event.",
+    "Use of calculators, reference materials, or any external aids is strictly prohibited.",
+    "A time limit will be applied for each round.",
+    "Participants must follow all instructions given by the organizers.",
+    "The decision of the organizers and judges shall be final and binding.",
+  ],
+  schedule: [
+    {
+      round: "Event Session",
+      date: "February 14, 2026",
+      time: "2 Hours",
+      location: "EE303",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Ms. N. Kayalvizhi",
+        designation: "Assistant Professor",
+        department: "Electrical and Electronics Engineering",
+        phone: "",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Mr. Surendhar S",
+        department: "Electrical and Electronics Engineering",
+        year: "III Year",
+        phone: "7904015088",
+        email: " ",
+      },
+      {
+        name: "Ms. Mahitha P",
+        department: "Electrical and Electronics Engineering",
+        year: "II Year",
+        phone: "8122108363",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
     "non-technical-event-13": {
-      title: "Glorify the Face with Colours",
+  title: "Unmasking Brands & Flavours",
+  description:
+    "Unmasking Brands & Flavours is an interactive non-technical event that challenges participants’ knowledge of corporate branding and food recognition. Through a fun, three-level game format, the event tests awareness, teamwork, and quick thinking by combining logo identification, performance-based guessing, and culinary knowledge in an engaging and competitive environment.",
+  image: NonTech13,
+  rounds: [
+    {
+      title: "Level 1: Logo Guessing Challenge",
       description:
-        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
-      image: NonTech13,
-      rounds: [
-        {
-          title: "Single Round",
-          description: [
-            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
-          ],
-        },
-      ],
-      rules: [
-        "Theme:On the Spot",
-        "Two Participants per Team",
-        "Duration:1 Hr",
-        "Participants have to bring their own colours, brushes etc",
-        "Juries Judgement is Final",
-      ],
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr.P. Maheswaran AP/Textile ",
-            email: "pmaheswaran@ksrct.ac.in",
-            phone: "9600589068",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "V.Sandhiya 2nd year / Textile ",
-            email: "sandhiya07082006@gmail.com",
-            phone: "6369670394",
-          },
-          {
-            name: "S.A.Hariharan 2nd year / Textile",
-            email: "harihraran18@gmail.com",
-            phone: "7092102427",
-          },
-        ],
+        "Teams are shown blurred or partial logos of food brands and must identify them correctly. Teams with the highest scores advance to the next level.",
+    },
+    {
+      title: "Level 2: Food Dumb Charades",
+      description:
+        "One team member enacts a food-related word or brand without speaking, while the other member guesses within the given time limit.",
+    },
+    {
+      title: "Level 3: Guess the Ingredient",
+      description:
+        "Teams are presented with a mystery dish or product and must identify its key ingredients within a limited time. The team with the most correct identifications wins.",
+    },
+  ],
+  rules: [
+    "The event is open to students from all disciplines.",
+    "Each team must consist of exactly two participants.",
+    "Use of mobile phones or any external assistance is strictly prohibited.",
+    "Teams must answer within the time limit specified for each round.",
+    "Use of unfair means such as internet searches or external hints will lead to disqualification.",
+    "Any form of disrespect towards fellow participants or judges will result in disqualification.",
+    "Failure to adhere to time limits may lead to disqualification.",
+    "Judges’ decisions shall be final and binding.",
+  ],
+  schedule: [
+    {
+      round: "All Levels",
+      date: "February 14, 2026",
+      time: "To be announced",
+      location: "To be announced",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. T. G. N. Nagarjun",
+        department: "",
+        phone: "8754394242",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Mr. K. Hariprasath",
+        department: "Food Technology",
+        year: "III Year",
+        phone: "9080753031",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
     "non-technical-event-14": {
-      title: "Glorify the Face with Colours",
+  title: "Treasure Hunt",
+  description:
+    "Treasure Hunt is an exciting team-based non-technical event that challenges participants to think creatively, solve clues, and work together under time pressure. Teams navigate through multiple checkpoints by cracking riddles, puzzles, physical tasks, and observation-based challenges spread across the campus. The first team to successfully complete all challenges and uncover the final treasure is declared the winner.",
+  image: NonTech14,
+  rounds: [
+    {
+      title: "Clue Trail Challenge",
       description:
-        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
-      image: NonTech14,
-      rounds: [
-        {
-          title: "Single Round",
-          description: [
-            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
-          ],
-        },
-      ],
-      rules: [
-        "Theme:On the Spot",
-        "Two Participants per Team",
-        "Duration:1 Hr",
-        "Participants have to bring their own colours, brushes etc",
-        "Juries Judgement is Final",
-      ],
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr.P. Maheswaran AP/Textile ",
-            email: "pmaheswaran@ksrct.ac.in",
-            phone: "9600589068",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "V.Sandhiya 2nd year / Textile ",
-            email: "sandhiya07082006@gmail.com",
-            phone: "6369670394",
-          },
-          {
-            name: "S.A.Hariharan 2nd year / Textile",
-            email: "harihraran18@gmail.com",
-            phone: "7092102427",
-          },
-        ],
+        "Teams solve a series of clues and tasks to move from one checkpoint to another. Each solved clue leads to the next location, and teams must follow the correct sequence to reach the final treasure.",
+    },
+  ],
+  rules: [
+    "Each team must consist of exactly three members.",
+    "Team members cannot be changed once the event starts.",
+    "All team members must be present throughout the event.",
+    "Teams must solve clues in the correct order and must not skip any checkpoint.",
+    "Clues may include riddles, puzzles, physical tasks, and observation challenges.",
+    "The event will be conducted within a fixed time limit.",
+    "In case of a tie, fewer hints used, shorter completion time, and fair play behavior will be considered.",
+    "Participants must follow all instructions given by the coordinators.",
+    "Any form of misbehavior, cheating, or unfair means will result in disqualification.",
+    "The decision of the organizers shall be final and binding.",
+  ],
+  schedule: [
+    {
+      round: "Event Session",
+      date: "February 14, 2026",
+      time: "1 Hour",
+      location: "KSRCT IT Park",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. M. Thilakraj",
+        designation: "Assistant Professor",
+        department: "",
+        phone: "",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Mr. M. Pravin Kumar",
+        department: "Information Technology",
+        year: "III Year",
+        phone: "8667474397",
+        email: " ",
+      },
+      {
+        name: "Ms. Linesha",
+        department: "Information Technology",
+        year: "II Year",
+        phone: "9944623923",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
-    "non-technical-event-15": {
-      title: "Glorify the Face with Colours",
+   "non-technical-event-15": {
+  title: "Face Painting",
+  description:
+    "Face Painting is a fun, creative, and engaging non-technical event that brings out the artistic talents of participants. This event offers a platform for students to express their imagination through colors, designs, and meaningful themes painted on faces. Participants can showcase styles such as cartoons, abstract art, nature-inspired patterns, cultural motifs, and message-driven creativity.",
+  image: NonTech15,
+  rounds: [
+    {
+      title: "Creative Expression Round",
       description:
-        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
-      image: NonTech15,
-      rounds: [
-        {
-          title: "Single Round",
-          description: [
-            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
-          ],
-        },
-      ],
-      rules: [
-        "Theme:On the Spot",
-        "Two Participants per Team",
-        "Duration:1 Hr",
-        "Participants have to bring their own colours, brushes etc",
-        "Juries Judgement is Final",
-      ],
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr.P. Maheswaran AP/Textile ",
-            email: "pmaheswaran@ksrct.ac.in",
-            phone: "9600589068",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "V.Sandhiya 2nd year / Textile ",
-            email: "sandhiya07082006@gmail.com",
-            phone: "6369670394",
-          },
-          {
-            name: "S.A.Hariharan 2nd year / Textile",
-            email: "harihraran18@gmail.com",
-            phone: "7092102427",
-          },
-        ],
+        "Participants create face painting designs based on given themes such as nature, creativity and fantasy, or social awareness. Designs should creatively convey a message through art.",
+    },
+  ],
+  rules: [
+    "Participants must bring their own materials including paints, brushes, sponges, mirrors, and tissues.",
+    "Only skin-safe and non-toxic paints must be used.",
+    "Designs must be decent, appropriate, and strictly follow the given themes.",
+    "The face painting must be completed within the given time limit.",
+    "Participants must maintain discipline and cleanliness throughout the event.",
+    "Judges’ decisions shall be final and binding.",
+  ],
+  schedule: [
+    {
+      round: "Event Session",
+      date: "February 14, 2026",
+      time: "1 Hour",
+      location: "KSRCT F Block",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. MohanKumar R",
+        department: "Master of Computer Applications",
+        phone: "9790070708",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "SriNaveen R",
+        department: "Master of Computer Applications",
+        year: "I Year",
+        phone: "9606422181",
+        email: " ",
+      },
+      {
+        name: "Vikas M S",
+        department: "Master of Computer Applications",
+        year: "I Year",
+        phone: "6380088208",
+        email: " ",
+      },
+      {
+        name: "Madhumitha Devi Sri K",
+        department: "Master of Computer Applications",
+        year: "I Year",
+        phone: "7812837347",
+        email: " ",
+      },
+      {
+        name: "Suvetha S",
+        department: "Master of Computer Applications",
+        year: "I Year",
+        phone: "8807737000",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
     "non-technical-event-16": {
-      title: "Glorify the Face with Colours",
+  title: "Mind Spark",
+  description:
+    "Mind Spark Arena is a three-round knowledge-based non-technical event designed to test participants’ intelligence, observation skills, and brand awareness. Teams compete through a general quiz, a visual picture connection round, and a logo & brand tagline identification challenge. Participants must think fast, connect ideas smartly, and demonstrate their mental agility to win.",
+  image: NonTech16,
+  rounds: [
+    {
+      title: "Round 1: General Quiz",
       description:
-        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
-      image: NonTech16,
-      rounds: [
-        {
-          title: "Single Round",
-          description: [
-            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
-          ],
-        },
-      ],
-      rules: [
-        "Theme:On the Spot",
-        "Two Participants per Team",
-        "Duration:1 Hr",
-        "Participants have to bring their own colours, brushes etc",
-        "Juries Judgement is Final",
-      ],
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr.P. Maheswaran AP/Textile ",
-            email: "pmaheswaran@ksrct.ac.in",
-            phone: "9600589068",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "V.Sandhiya 2nd year / Textile ",
-            email: "sandhiya07082006@gmail.com",
-            phone: "6369670394",
-          },
-          {
-            name: "S.A.Hariharan 2nd year / Textile",
-            email: "harihraran18@gmail.com",
-            phone: "7092102427",
-          },
-        ],
+        "Teams answer objective or short-answer questions. Each question carries equal marks unless specified. Top-scoring teams qualify for the next round. Tie-breakers are conducted in case of equal scores.",
+    },
+    {
+      title: "Round 2: Picture Connection",
+      description:
+        "Teams are shown a set of images and must identify the correct connection or concept within the allotted time. Points are awarded based on accuracy and response speed. Selected teams advance to the final round.",
+    },
+    {
+      title: "Round 3: Logo & Brand Tagline Challenge",
+      description:
+        "Teams identify logos and their corresponding brands. For tagline questions, partial answers may carry partial marks if applicable. No hints are provided in this round. The team with the highest cumulative score wins.",
+    },
+  ],
+  rules: [
+    "The event consists of three rounds.",
+    "Use of mobile phones, smart watches, or any electronic gadgets is strictly prohibited.",
+    "Participants must maintain discipline and decorum throughout the game.",
+    "Teams must register before the event starts. On-spot registrations are allowed subject to availability.",
+    "Once registered, team members cannot be changed.",
+    "The event is open to all departments and years.",
+    "Each team must consist of exactly 2 participants.",
+    "A participant can be part of only one team.",
+    "Judges’ decisions are final and binding.",
+  ],
+  schedule: [
+    {
+      round: "All Rounds",
+      date: "February 14, 2026",
+      time: "To be announced",
+      location: "Hall No: MC 306",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mrs. V. Indumathi",
+        department: "",
+        phone: "9965137001",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Mr. P. Sridhar",
+        department: "",
+        year: "",
+        phone: "9677996590",
+        email: " ",
+      },
+      {
+        name: "Mr. Bharath",
+        department: "",
+        year: "",
+        phone: "8012355633",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
     "non-technical-event-17": {
-      title: "Glorify the Face with Colours",
+  title: "Tech Without Tech",
+  description:
+    "Tech Without Tech is a non-technical team event where participants are given a common technology or everyday system and must explain how it works without using any technical terms. Using simple language, real-life examples, gestures, or storytelling, participants make complex concepts understandable to a non-technical audience. The event tests creativity, communication skills, and the ability to simplify ideas effectively.",
+  image: NonTech17,
+  rounds: [
+    {
+      title: "Explanation Challenge",
       description:
-        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
-      image: NonTech17,
-      rounds: [
-        {
-          title: "Single Round",
-          description: [
-            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
-          ],
-        },
-      ],
-      rules: [
-        "Theme:On the Spot",
-        "Two Participants per Team",
-        "Duration:1 Hr",
-        "Participants have to bring their own colours, brushes etc",
-        "Juries Judgement is Final",
-      ],
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr.P. Maheswaran AP/Textile ",
-            email: "pmaheswaran@ksrct.ac.in",
-            phone: "9600589068",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "V.Sandhiya 2nd year / Textile ",
-            email: "sandhiya07082006@gmail.com",
-            phone: "6369670394",
-          },
-          {
-            name: "S.A.Hariharan 2nd year / Textile",
-            email: "harihraran18@gmail.com",
-            phone: "7092102427",
-          },
-        ],
+        "Organizers display a picture of a system or gadget. One team member explains its working within a limited time using non-technical language, examples, and gestures. Creativity, clarity, and effectiveness of explanation are evaluated.",
+    },
+  ],
+  rules: [
+    "This is a team event.",
+    "Technical terms are strictly not allowed.",
+    "Mobile phones or external assistance are strictly prohibited during the event.",
+    "Only one team member may explain the answer.",
+    "Participants must maintain discipline throughout the event.",
+    "Judges’ decisions are final and binding.",
+  ],
+  schedule: [
+    {
+      round: "Event Session",
+      date: "February 14, 2026",
+      time: "To be announced",
+      location: "Robotics Laboratory",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Dr. M. Sasikumar",
+        department: "",
+        phone: "9965167895",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Mr. K. M. Dharaneesh",
+        department: "",
+        year: "",
+        phone: "9943452438",
+        email: " ",
+      },
+      {
+        name: "Mr. T. Bhuvanesh",
+        department: "",
+        year: "",
+        phone: "6369436709",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
     "non-technical-event-18": {
-      title: "Glorify the Face with Colours",
+  title: "Freezeframe",
+  description:
+    "Freezeframe is a creative photography contest focused on visual storytelling and awareness. Participants capture meaningful moments within the college campus without any editing or filters. The event promotes observational skills, creativity, and the ability to convey a message through a single photograph.",
+  image: NonTech18,
+  rounds: [
+    {
+      title: "Photography Challenge",
       description:
-        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
-      image: NonTech18,
-      rounds: [
-        {
-          title: "Single Round",
-          description: [
-            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
-          ],
-        },
-      ],
-      rules: [
-        "Theme:On the Spot",
-        "Two Participants per Team",
-        "Duration:1 Hr",
-        "Participants have to bring their own colours, brushes etc",
-        "Juries Judgement is Final",
-      ],
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr.P. Maheswaran AP/Textile ",
-            email: "pmaheswaran@ksrct.ac.in",
-            phone: "9600589068",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "V.Sandhiya 2nd year / Textile ",
-            email: "sandhiya07082006@gmail.com",
-            phone: "6369670394",
-          },
-          {
-            name: "S.A.Hariharan 2nd year / Textile",
-            email: "harihraran18@gmail.com",
-            phone: "7092102427",
-          },
-        ],
+        "Participants take one natural photograph within the campus that expresses a meaningful concept or awareness theme. Additional points are awarded based on social media engagement using the hashtag #ksrct1994.",
+    },
+  ],
+  rules: [
+    "This is an individual participation event.",
+    "Only one photograph per participant is allowed, submitted without any edits or filters.",
+    "Images must be captured within the college campus.",
+    "Photographs should express a meaningful message or awareness theme.",
+    "Participants can post their photo on social media using the hashtag #ksrct1994. Extra points will be awarded for likes received.",
+    "Participants must maintain discipline and follow instructions from the organizers.",
+    "Judges’ decisions are final and binding.",
+  ],
+  schedule: [
+    {
+      round: "Event Session",
+      date: "February 14, 2026",
+      time: "1 Hour",
+      location: "KSRCT Campus",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. P. Prakash",
+        designation: "Assistant Professor",
+        department: "",
+        phone: "",
+        email: " ",
       },
+      {
+        name: "Mr. S. Karthick",
+        designation: "Assistant Professor",
+        department: "",
+        phone: "",
+        email: " ",
+      },
+    ],
+    studentCoordinator: [
+      {
+        name: "Mr. M. Rajkumar",
+        department: "Mechanical Engineering",
+        year: "III Year",
+        phone: "9894745652",
+        email: " ",
+      },
+      {
+        name: "Ms. D. Vijayalakshimi",
+        department: "Mechanical Engineering",
+        year: "III Year",
+        phone: "9994747296",
+        email: " ",
+      },
+      {
+        name: "Mr. S. Mohanraj",
+        department: "Mechanical Engineering",
+        year: "III Year",
+        phone: "",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
     "non-technical-event-19": {
-      title: "Glorify the Face with Colours",
+  title: "T2T – Trash 2 Textile",
+  description:
+    "T2T – Trash 2 Textile is a creative non-technical event that focuses on transforming textile waste into innovative and useful products. Participants explore techniques for recycling, upcycling, and repurposing discarded fabrics, old garments, and textile scraps. The event encourages sustainability, hands-on creativity, and understanding how to turn waste into value in an eco-friendly manner.",
+  image: NonTech19,
+  rounds: [
+    {
+      title: "Creative Recycling Challenge",
       description:
-        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
-      image: NonTech19,
-      rounds: [
-        {
-          title: "Single Round",
-          description: [
-            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
-          ],
-        },
-      ],
-      rules: [
-        "Theme:On the Spot",
-        "Two Participants per Team",
-        "Duration:1 Hr",
-        "Participants have to bring their own colours, brushes etc",
-        "Juries Judgement is Final",
-      ],
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr.P. Maheswaran AP/Textile ",
-            email: "pmaheswaran@ksrct.ac.in",
-            phone: "9600589068",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "V.Sandhiya 2nd year / Textile ",
-            email: "sandhiya07082006@gmail.com",
-            phone: "6369670394",
-          },
-          {
-            name: "S.A.Hariharan 2nd year / Textile",
-            email: "harihraran18@gmail.com",
-            phone: "7092102427",
-          },
-        ],
+        "Participants individually or in teams of two create unique products from textile waste materials provided or brought by them. Judging is based on creativity, sustainability, effective use of materials, and overall presentation within the allotted time.",
+    },
+  ],
+  rules: [
+    "The event is open to students of all disciplines.",
+    "Participants may register individually or in teams of 2 members.",
+    "Participants may bring their own textile waste materials such as fabric scraps, old garments, and trims.",
+    "All creations must be original and made during the event; pre-made items are not allowed.",
+    "The transformation activity must be completed within the allotted time.",
+    "Judging is based on creativity, effective use of materials, sustainability, and presentation.",
+    "Participants must maintain discipline and follow instructions given by the coordinators.",
+    "Judges’ and organizing committee decisions are final and binding.",
+  ],
+  schedule: [
+    {
+      round: "Event Session",
+      date: "February 14, 2026",
+      time: "1 Hour",
+      location: "Wet Processing Lab – Textile Department",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Dr. M. B. Sampath",
+        designation: "Professor",
+        department: "Textile Technology",
+        phone: "",
+        email: " ",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Mr. Arthanareshwaran P",
+        department: "Textile Technology",
+        year: "III Year",
+        phone: "7604832897",
+        email: " ",
+      },
+      {
+        name: "Ms. Abirami S",
+        department: "Textile Technology",
+        year: "II Year",
+        phone: "8610658433",
+        email: " ",
+      },
+    ],
+  },
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
+
     "non-technical-event-20": {
-      title: "Glorify the Face with Colours",
+  title: "BlindBites: Taste It. Find It.",
+  description:
+    "BlindBites is a fun and interactive team-based non-technical event where participants work in pairs to identify mystery food items. One member tastes the food while the other listens to hints and guesses the item. The event tests teamwork, communication, and sensory observation. The winning team is determined by the least time taken to correctly identify all items.",
+  image: NonTech20,
+  rounds: [
+    {
+      title: "Blind Taste Challenge",
       description:
-        "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. This session delves into color theory, skin tone analysis, and the impact of hues on facial appearance, focusing on textile-based cosmetics, fashion coordination, and makeup artistry. Participants will learn how to enhance facial features using the right color palettes, understand psychological effects of colors, and experiment with practical applications. Ideal for those interested in fashion, styling, and personal grooming, this workshop blends creativity with scientific principles for a transformative experience.",
-      image: NonTech20,
-      rounds: [
-        {
-          title: "Single Round",
-          description: [
-            "The Glorify the Face with Colours workshop is an exciting opportunity for students and enthusiasts to explore the art and science of facial aesthetics through color application. ",
-          ],
-        },
-      ],
-      rules: [
-        "Theme:On the Spot",
-        "Two Participants per Team",
-        "Duration:1 Hr",
-        "Participants have to bring their own colours, brushes etc",
-        "Juries Judgement is Final",
-      ],
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr.P. Maheswaran AP/Textile ",
-            email: "pmaheswaran@ksrct.ac.in",
-            phone: "9600589068",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "V.Sandhiya 2nd year / Textile ",
-            email: "sandhiya07082006@gmail.com",
-            phone: "6369670394",
-          },
-          {
-            name: "S.A.Hariharan 2nd year / Textile",
-            email: "harihraran18@gmail.com",
-            phone: "7092102427",
-          },
-        ],
+        "Teams of two stand back-to-back with the tasting member blindfolded. The tasting member gives verbal hints without naming the item, and the other member must identify the food item correctly within the given time. Points are awarded based on accuracy and speed.",
+    },
+  ],
+  rules: [
+    "Each team must consist of exactly two members.",
+    "Team members must remain back-to-back and blindfolded throughout the game.",
+    "Only the tasting member is allowed to taste the food item.",
+    "Hints must be given verbally; directly saying the food name is not allowed.",
+    "Use of offensive or inappropriate content is strictly prohibited.",
+    "The time starts when the first item is given and stops after the last correct answer.",
+    "Participants must maintain discipline and follow all instructions from the organizers.",
+    "Judges’ decisions are final and binding.",
+  ],
+  schedule: [
+    {
+      round: "Event Session",
+      date: "February 14, 2026",
+      time: "3 Hours",
+      location: "Electronic Devices Laboratory, J Block 4th Floor",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Dr. S. Pradeep",
+        designation: "Assistant Professor",
+        department: "",
+        phone: "",
+        email: " ",
       },
+      {
+        name: "Dr. N. Lalithamani",
+        designation: "Professor",
+        department: "",
+        phone: "",
+        email: " ",
+      },
+    ],
+    studentCoordinator: [
+      {
+        name: "Mr. S. Hardeep",
+        department: "Electronics Engineering (VLSIDT)",
+        year: "II Year",
+        phone: "9976048999",
+        email: " ",
+      },
+      {
+        name: "Ms. P. Dhivyadharshini",
+        department: "Electronics Engineering (VLSIDT)",
+        year: "II Year",
+        phone: "8489253710",
+        email: " ",
+      },
+      {
+        name: "Ms. G. Jeevaranjani",
+        department: "Electronics Engineering (VLSIDT)",
+        year: "I Year",
+        phone: "",
+        email: " ",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
     },
 
@@ -3277,7 +3428,7 @@ const EventDetails = () => {
       image: workshop1,
       schedule: [
         {
-          round: "Round  ",
+          round: "Timing", 
           date: "February 12, 2026",
           time: "1 day",
           location: "AB Lab 2",
@@ -3331,7 +3482,7 @@ const EventDetails = () => {
       image: workshop2,
       schedule: [
         {
-          round: "Workshop",
+          round: "Timing",
           duration: "1 Day",
           venue: "AB Lab 1",
           registrationFee: "₹300",
@@ -3396,7 +3547,7 @@ const EventDetails = () => {
 
      schedule: [
     {
-      round: "Workshop",
+      round: "Timing",
       date:"February 12, 2026",
       time: "1 Day",
       location: "Dr. M S Swaminathan Biotech Seminar Hall",
@@ -3450,6 +3601,7 @@ const EventDetails = () => {
   image: workshop4,
   schedule: [
     {
+      round:"Timing",
       location: "Civil CADD Laboratory",
       time: "1 Day",
       date: "February 12, 2026",
@@ -3490,6 +3642,7 @@ const EventDetails = () => {
 image: workshop5,
   schedule: [
     {
+      round:"Timing",
       location: "AB LAB-4",
       duration: "1 Day",
       date: "February 12, 2026",
@@ -3533,6 +3686,7 @@ image: workshop5,
   image: workshop6,
   schedule: [
     {
+      round:"Timing",
       location: "CSE LAB 1",
       duration: "1 Day",
       date: "February 12, 2026",
@@ -3570,6 +3724,7 @@ image: workshop5,
 
   schedule: [
     {
+      round:"Timing",
       location: "Embedded System Laboratory",
       duration: "9:00 AM to 4:00 PM",
       date: "February 12, 2026",
@@ -3605,6 +3760,7 @@ image: workshop5,
 
   schedule: [
     {
+      round:"Timing",
       location: "EEE Project Lab",
       duration: "2 Days",
       date: "February 12, 2026",
@@ -3647,6 +3803,7 @@ image: workshop5,
   image: workshop9,
   schedule: [
     {
+      round:"Timing",
       location: "Baking and Confectionery Laboratory",
       duration: "1 Day",
       date: "February 12, 2026",
@@ -3686,7 +3843,7 @@ image: workshop5,
       image: workshop10,
       schedule: [
         {
-          round: "Round ",
+          round: "Timing", 
           date: "March 29, 2026",
           time: "2:00 PM to 3:00 PM",
           location: "Textile chemical processing laboratory,Textile Block ",
@@ -3716,238 +3873,306 @@ image: workshop5,
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
     "workshop-11": {
-      title: "",
-      description:
-        "'Value Addition in Millet': Millets are highly nutritious, climate-resilient grains that offer immense potential for health benefits and economic growth. This workshop aims to explore innovative ways to enhance the value of millets through processing, product development, and marketing strategies.",
-      image: workshop11,
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr. S. Nithishkumar, AP/FT",
-            email: "nithishkumar@ksrct.ac.in",
-            phone: "8973333396",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Pugazh Vendhan R, III Year/FT",
-            phone: "7550348891",
-            email: "vendhanpugazh0@gmail.com",
-          },
-          {
-            name: "Shahana B, II Year/FT",
-            phone: "7418883634",
-            email: "shahanabhaskaran041@gmail.com",
-          },
-          {
-            name: "Santhosh S, II Year/FT",
-            phone: "7305844895",
-            email: "santhoshhaterz05@gmail.com",
-          },
-        ],
+  title: "Github Essentials: Code Commit Collaborate",
+
+  description: "This hands-on workshop introduces college students to Git and GitHub for efficient version control and team-based development, covering repositories, commits, branching, merging, and conflict resolution through live demos and practice, while engaging participants in real-world workflows like collaboration and code reviews, ultimately preparing them to confidently use Git and GitHub for academic, internship, hackathon, and industry-level projects.",
+
+  image: workshop11,
+
+  schedule: [
+    {
+      round:"Timing",
+      location: "Computer Lab (high spec)",
+      time: "1 Day",
+      date: "February 12, 2026",
+    },
+  ],
+
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. R.T. Dineshkumar",
+        designation: "Assistant Professor",
+        phone: "",
+        email: "",
       },
+    ],
+
+    studentCoordinator: [
+      {
+        name: "Mr. S. Deepan",
+        year: "III Year",
+        department: "Information Technology",
+        phone: "8015441715",
+        email: "",
+      },
+      {
+        name: "Ms. P.D. Malathi",
+        year: "III Year",
+        department: "Information Technology",
+        phone: "8072844465",
+        email: "",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
     "workshop-12": {
-      title:
-        "Design and development of automotive Product By Mr.K.Santhosh Kumar, Support Manger, Macbro Technology Pvt Ltd, Erode.",
-      description:
-        "The Design and Development of Automotive Products is a comprehensive process that combines innovation, engineering, and cutting-edge technology to create high-performance vehicles and components. From conceptualization and prototyping to testing and manufacturing, this process ensures safety, efficiency, and sustainability in automotive solutions. Engineers and designers work collaboratively to optimize aerodynamics, materials, and electronic systems, integrating advanced technologies like AI, IoT, and automation. Whether developing electric vehicles, smart mobility solutions, or high-performance car components, this field plays a crucial role in shaping the future of transportation. ",
-      image: workshop12,
-      schedule: [
-        {
-          round: "Round",
-          date: "March 28, 2026",
-          time: "9:00 AM to 3:00 PM",
-          location: "Idea lab,Main Block",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Dr.K.Raja",
-            email: "rajak@ksrct.ac.in",
-            phone: "9842314481",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Lingeshwaran S L",
-            email: "lingeshwaransl04@gmail.com",
-            phone: "8012439250",
-          },
-          {
-            name: "Raghunath E",
-            email: "raghunath10091@gmail.com",
-            phone: "8248732445",
-          },
-        ],
+  title: "Flight mode: ON",
+
+  description: "Flight modes help control how a drone flies, making it safer and easier to operate. This workshop also includes simple drone assembly, covering basic parts, motor fixing, wiring, and controller setup.",
+  image: workshop12,
+  schedule: [
+    {
+      round:"Timing",
+      location: "PLC Laboratory",
+      time: "1 Day",
+      date: "February 12, 2026",
+    },
+  ],
+
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. S. HariPrasadh",
+        phone: "7092821630",
+        email: "",
       },
+    ],
+
+    studentCoordinator: [
+      {
+        name: "Mr. G. Harish",
+        phone: "6382905603",
+        email: "",
+      },
+      {
+        name: "Mr. V. Gowtham",
+        phone: "7448428784",
+        email: "",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
     "workshop-13": {
-      title:
-        "Building Information Modeling (BIM) By ICT Academy, Chennai, Tamil Nadu",
-      description:
-        "The Building Information Modeling (BIM) workshop aims to introduce participants to the fundamentals of BIM technology and its applications in the construction industry. Participants will gain hands-on experience with BIM software tools and learn how to effectively utilize BIM for project planning, design, construction, and management. The Workshop “BIM in structural Design Development’ focused on enhancing architectural design skills through hands-on activities and software training. Participants utilized BIM Revit Architecture software to create 3D plans, elevations, and views. The workshop featured a building plan as exercise and emphasized innovation and creativity in design solutions. Mentors provided guidance and feedback throughout the workshop to refine participants, architectural concepts. Overall, the Workshop inspired participants to push the boundaries of architectural design and pursue excellence in their craft.",
-      image: workshop13,
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Dr. S. Gunasekar",
-            email: "gunasekar@ksrct.ac.in",
-            phone: "9976876238",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "B. Susimitha",
-            email: "bsusimitha18@gmail.com",
-            phone: "6374735128",
-          },
-          {
-            name: "S. Suja",
-            email: "sujavishalini234@gmail.com",
-            phone: "9500534225",
-          },
-        ],
+  title: "Development of Next Gen Vehicle",
+
+  description: "This workshop introduces emerging technologies used in modern and future vehicles. Participants gain industry-oriented knowledge on advanced vehicle systems and design trends. The session connects engineering theory with real-time automotive applications.",
+
+  image: workshop13,
+
+  schedule: [
+    {
+      round:"Timing",
+      location: "Bhaskara Block [Mechanical]",
+      time: "1 Day",
+      date: "February 12, 2026",
+    },
+  ],
+
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Dr. K. Raja",
+        
+        phone: "",
+        email: "",
       },
+      {
+        name: "Mr. C. Ramesh",
+        
+        phone: "",
+        email: "",
+      },
+    ],
+
+    studentCoordinator: [
+      {
+        name: "Ms. A. Harini",
+        phone: "6379414177",
+        email: "",
+      },
+      {
+        name: "Mr. M. Marushini",
+        phone: "9786904315",
+        email: "",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
     "workshop-14": {
-      title:
-        "Medi Tex By Mr.T.Sureshram, Proprietor Care 4 U India Pvt, Ltd.,Tirupur",
-      description:
-        "The Medi-Tex Workshop is a valuable opportunity for students, researchers, and professionals in textile technology to explore advancements in medical textiles. This workshop will cover key topics such as smart textiles for healthcare, antibacterial fabrics, wound care materials, compression garments, and innovations in bio-textiles. Experts from the industry and academia will provide insights into material selection, fabrication techniques, and applications in medical fields. Participants will gain hands-on experience, engage in discussions on sustainability and regulations, and network with professionals. This workshop is ideal for those looking to enhance their knowledge and explore career opportunities in the growing field of medical textiles.",
-      image: workshop14,
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Dr.K.R.Nanadagopal AP/Textile ",
-            email: "nandagopakr@ksrct.ac.in",
-            phone: "9003436705",
-          },
-          {
-            name: "Mr.G.Devanand, AP / Textile",
-            email: "devanandg@ksrct.ac.in ",
-            phone: "9952841869",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Akshaya , 3rd  /Textile ",
-            email: "akshayasrini007@gmail.com",
-            phone: "7871969769",
-          },
-          {
-            name: "R.Hiruthik , 2nd /Textile ",
-            email: "hiruthik4463@gmail.com",
-            phone: "9965227394",
-          },
-        ],
-        
+  title: "AI Integrated Smart Medi Tech",
+
+  description: "The workshop provides an introduction to AI concepts and their role in smart medical and healthcare technologies, along with an overview of medical textiles, smart fabrics, and sensor-integrated textile systems. Participants will gain exposure to AI-enabled health monitoring, diagnostics, and wearable medical applications through demonstrations and real-world case studies. The program also offers insights into emerging trends, innovations, and career opportunities in AI-driven medical textiles and healthcare technology.",
+
+  image: workshop14,
+
+  schedule: [
+   
+    {
+      round:"Timing",
+      location: "MBA Seminar Hall",
+      time: "1 Day",
+      date: "February 12, 2026",
+    },
+  ],
+
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. G. Devanand",
+        designation: "Assistant Professor",
+        department: "Textile Technology",
+        phone: "9952841869",
+        email: "",
       },
+    ],
+
+    studentCoordinator: [
+      {
+        name: "Mr. Hariharan S A",
+        year: "III Year",
+        department: "Textile Technology",
+        phone: "7092102427",
+        email: "",
+      },
+      {
+        name: "Ms. Monika P T",
+        year: "II Year",
+        department: "Textile Technology",
+        phone: "9344714198",
+        email: "",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
 
 
     "workshop-15": {
-      title:
-        "Building Information Modeling (BIM) By ICT Academy, Chennai, Tamil Nadu",
-      description:
-        "The Building Information Modeling (BIM) workshop aims to introduce participants to the fundamentals of BIM technology and its applications in the construction industry. Participants will gain hands-on experience with BIM software tools and learn how to effectively utilize BIM for project planning, design, construction, and management. The Workshop “BIM in structural Design Development’ focused on enhancing architectural design skills through hands-on activities and software training. Participants utilized BIM Revit Architecture software to create 3D plans, elevations, and views. The workshop featured a building plan as exercise and emphasized innovation and creativity in design solutions. Mentors provided guidance and feedback throughout the workshop to refine participants, architectural concepts. Overall, the Workshop inspired participants to push the boundaries of architectural design and pursue excellence in their craft.",
-      image: workshop15,
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Dr. S. Gunasekar",
-            email: "gunasekar@ksrct.ac.in",
-            phone: "9976876238",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "B. Susimitha",
-            email: "bsusimitha18@gmail.com",
-            phone: "6374735128",
-          },
-          {
-            name: "S. Suja",
-            email: "sujavishalini234@gmail.com",
-            phone: "9500534225",
-          },
-        ],
+  title: "Chip2Test",
+
+  description: "This hands-on workshop will guide students through the journey of VLSI design, from logic design to the implementation of test patterns using DFT techniques. Participants will gain practical experience in identifying faults, creating test strategies, and understanding how DFT ensures reliability and efficiency in modern chip design. By the end of the session, students will have a clear understanding of the role of DFT in bridging design and verification in real-world VLSI circuits.",
+
+  image: workshop15,
+
+  schedule: [
+    {
+      round:"Timing",
+      location: "VLSI Lab, J Block 1st Floor",
+      duration: "1 Day",
+      date: "February 12, 2026",
+    },
+  ],
+
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. A. Suresh Kumar",
+        designation: "Assistant Professor",
+        phone: "",
+        email: "",
       },
+      {
+        name: "Dr. P. Suthanthira Kumar",
+        designation: "Assistant Professor",
+        phone: "",
+        email: "",
+      },
+    ],
+
+    studentCoordinator: [
+      {
+        name: "Ms. S. Srikiruthika",
+        year: "III Year",
+        department: "Electronics Engineering (VLSIDT)",
+        phone: "9042231825",
+        email: "",
+      },
+      {
+        name: "Mr. S. Gowtham",
+        year: "II Year",
+        department: "Electronics Engineering (VLSIDT)",
+        phone: "9787831624",
+        email: "",
+      },
+      {
+        name: "Ms. S. Kalaimagal",
+        year: "II Year",
+        department: "Electronics Engineering (VLSIDT)",
+        phone: "8870671141",
+        email: "",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
     /*
     "workshop-16": {
-      title:
-        "Building Information Modeling (BIM) By ICT Academy, Chennai, Tamil Nadu",
-      description:
-        "The Building Information Modeling (BIM) workshop aims to introduce participants to the fundamentals of BIM technology and its applications in the construction industry. Participants will gain hands-on experience with BIM software tools and learn how to effectively utilize BIM for project planning, design, construction, and management. The Workshop “BIM in structural Design Development’ focused on enhancing architectural design skills through hands-on activities and software training. Participants utilized BIM Revit Architecture software to create 3D plans, elevations, and views. The workshop featured a building plan as exercise and emphasized innovation and creativity in design solutions. Mentors provided guidance and feedback throughout the workshop to refine participants, architectural concepts. Overall, the Workshop inspired participants to push the boundaries of architectural design and pursue excellence in their craft.",
-      image: workshop16,
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Dr. S. Gunasekar",
-            email: "gunasekar@ksrct.ac.in",
-            phone: "9976876238",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "B. Susimitha",
-            email: "bsusimitha18@gmail.com",
-            phone: "6374735128",
-          },
-          {
-            name: "S. Suja",
-            email: "sujavishalini234@gmail.com",
-            phone: "9500534225",
-          },
-        ],
+  title: "Code, Click, Done: Mobile App Development in a Day",
+
+  description: "Code, Click, Done is a hands-on mobile app development workshop designed to introduce participants to the fundamentals of building functional mobile applications in just one day. This tech event focuses on transforming ideas into real mobile apps through guided coding, interactive demonstrations, and practical exercises.",
+
+  image: workshop16,
+
+  schedule: [
+    {
+      round:"Timing",
+      location: "MCA Laboratory",
+      duration: "1 Day",
+      date: "February 12, 2026",
+    },
+  ],
+
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. MohanKumar R",
+        department: "MCA",
+        phone: "9790070708",
+        email: "",
       },
+    ],
+
+    studentCoordinator: [
+      {
+        name: "SriNaveen R",
+        year: "I Year",
+        department: "MCA",
+        phone: "9606422181",
+        email: "",
+      },
+      {
+        name: "Vikas M S",
+        year: "I Year",
+        department: "MCA",
+        phone: "6380088208",
+        email: "",
+      },
+      {
+        name: "Madhumitha Devi Sri K",
+        year: "I Year",
+        department: "MCA",
+        phone: "7812837347",
+        email: "",
+      },
+      {
+        name: "Suvetha S",
+        year: "I Year",
+        department: "MCA",
+        phone: "8807737000",
+        email: "",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },*/
   };  
@@ -4055,36 +4280,7 @@ image: workshop5,
           </div>
         )}
 
-        {/* Display Registration Count */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-gray-800/50 rounded-lg border border-primary-dark/50">
-            <div className="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-              </svg>
-              <span className="text-gray-300 text-lg">Registered:</span>
-            </div>
-            {registrationStats.loading ? (
-              <span className="text-primary text-xl font-bold animate-pulse">Loading...</span>
-            ) : (
-              <span className={`text-xl font-bold ${
-                registrationStats.current >= registrationStats.capacity 
-                  ? 'text-red-400' 
-                  : registrationStats.current >= registrationStats.capacity * 0.8 
-                    ? 'text-yellow-400' 
-                    : 'text-green-400'
-              }`}>
-                {registrationStats.current} / {registrationStats.capacity}
-              </span>
-            )}
-            {!registrationStats.loading && registrationStats.current >= registrationStats.capacity && (
-              <span className="text-red-400 text-sm">(Full)</span>
-            )}
-            {!registrationStats.loading && registrationStats.current >= registrationStats.capacity * 0.8 && registrationStats.current < registrationStats.capacity && (
-              <span className="text-yellow-400 text-sm">(Filling Fast!)</span>
-            )}
-          </div>
-        </div>
+
 
         {/* Register Now Button */}
         <motion.button

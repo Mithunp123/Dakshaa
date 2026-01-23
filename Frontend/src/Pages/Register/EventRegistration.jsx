@@ -39,7 +39,7 @@ const EventRegistration = () => {
           className="mt-24 text-center p-8 bg-gray-800/50 backdrop-blur-xl rounded-3xl shadow-sm border border-white/10"
         >
           <p className="text-gray-400">
-            Need help? Contact our support team at <span className="text-secondary">support@dakshaa.org</span>
+            Need help? Contact our support team at <span className="text-secondary">dakshaa@ksrct.ac.in</span>
           </p>
         </motion.div>
       </div>
