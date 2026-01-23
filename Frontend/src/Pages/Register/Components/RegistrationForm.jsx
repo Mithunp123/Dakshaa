@@ -948,8 +948,9 @@ const RegistrationForm = () => {
         amount: totalAmount,
       });
 
-      // Call backend to get payment data (use localhost to avoid ngrok CORS issues)
-      const backendResponse = await fetch('http://localhost:3000/payment/initiate', {
+      // Call backend to get payment data
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const backendResponse = await fetch(`${apiUrl}/payment/initiate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1291,8 +1292,8 @@ const RegistrationForm = () => {
       const bookingId = `TEAM_${teamData.teamId}_${Date.now()}`;
 
       // Initiate payment via backend (backend will compute amount for unpaid members)
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const backendResponse = await fetch(`${apiUrl}/payment/initiate`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const backendResponse = await fetch(`${API_URL}/payment/initiate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
