@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const path = require('path');
 
 // Create transporter
 const createTransporter = () => {
@@ -189,6 +190,307 @@ const getWelcomeEmailTemplate = (userName, userEmail) => {
   `;
 };
 
+// Payment Success Template matching "Dhaskaa T26" Dark Theme
+const getPaymentSuccessTemplate = (userName, details) => {
+    const { amount, transactionId, orderId, items, date, userId, phone, college, department, year, teamName } = details;
+    
+    // Generate items list text
+    // Use line breaks for multiple items so they list nicely
+    const eventDisplay = items.length > 0 
+        ? items.map(i => i.name).join('<br>') 
+        : 'Event Registration';
+  
+    // QR Code URL (using public API for simplicity)
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${userId}`;
+  
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+          body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: #0B1120; /* Deep dark blue background matching image */
+            margin: 0; 
+            padding: 0; 
+            -webkit-font-smoothing: antialiased; 
+          }
+          .container { 
+            max-width: 600px; 
+            margin: 40px auto; 
+            background: #151e32; /* Slightly lighter card background */
+            border-radius: 16px; 
+            overflow: hidden; 
+            color: #e2e8f0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            border: 1px solid #1e293b;
+          }
+          .header { 
+            background: #0f172a; 
+            padding: 20px; 
+            text-align: center; 
+            border-bottom: 1px solid #1e293b;
+          }
+          .dhaskaa-logo {
+            max-height: 60px;
+            object-fit: contain;
+          }
+          .content { padding: 30px; }
+          
+          /* Success Badge */
+          .badge-container {
+             text-align: center;
+             margin-bottom: 25px;
+          }
+          .success-badge {
+            background: rgba(6, 182, 212, 0.1); /* Transparent cyan */
+            color: #06b6d4; /* Cyan text */
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+          }
+          
+          .footer-imgs {
+             padding: 20px;
+             text-align: center;
+             background: #0f172a;
+             border-top: 1px solid #1e293b;
+          }
+          .ksrct-logo {
+             max-height: 50px;
+             opacity: 0.8;
+          }
+
+          .greeting {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 5px;
+          }
+          .user-name {
+            color: #06b6d4;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+          }
+          
+          .description {
+            color: #334155; /* Darker text for description if on light, but here we are on dark */
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 30px;
+          }
+
+          /* Details Section */
+          .section-title {
+            color: #06b6d4;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 10px;
+          }
+          .details-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+          }
+          .details-label {
+            color: #06b6d4;
+            font-weight: 600;
+            width: 35%;
+          }
+          .details-value {
+            color: #e2e8f0;
+            width: 65%;
+            text-align: right;
+            line-height: 1.4;
+          }
+          .details-value-link {
+            color: #3b82f6;
+            text-decoration: none;
+          }
+
+          /* Entry Pass Section */
+          .pass-container {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 30px;
+          }
+          .pass-title {
+            color: #06b6d4;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+          }
+          .qr-box {
+            background: white;
+            padding: 10px;
+            display: inline-block;
+            border-radius: 8px;
+          }
+          .qr-img {
+            width: 150px;
+            height: 150px;
+            display: block;
+          }
+          .qr-text {
+            color: #64748b;
+            font-size: 11px;
+            margin-top: 15px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <img src="cid:dhaskaalogo" alt="DaKshaa T26" class="dhaskaa-logo" />
+            <div style="display:none; color: #06b6d4; font-weight: bold; font-size: 24px;">DHASKAA T26</div>
+          </div>
+          
+          <div class="content">
+            <div class="badge-container">
+              <span class="success-badge">✓ Registration Successful</span>
+            </div>
+
+            <div class="greeting">Hello</div>
+            <div class="user-name">${userName}</div>
+            
+            <div class="description">
+              Thank you for registering for <strong style="color: #06b6d4;">DaKshaa T26</strong>. 
+              Your registration has been confirmed.
+            </div>
+
+            <div class="section-title">
+             📋 Registration Details
+            </div>
+            
+            <div class="details-row">
+              <span class="details-label">Registration ID</span>
+              <span class="details-value">${orderId.substring(6, 16)}...</span>
+            </div>
+            <div class="details-row">
+              <span class="details-label">Date</span>
+              <span class="details-value">${date}</span>
+            </div>
+            <div class="details-row">
+              <span class="details-label">Booking Type</span>
+              <span class="details-value" style="font-weight: 500;">${eventDisplay}</span>
+            </div>
+            <div class="details-row">
+              <span class="details-label">Name</span>
+              <span class="details-value">${userName}</span>
+            </div>
+            <div class="details-row">
+              <span class="details-label">Phone</span>
+              <span class="details-value">${phone || 'N/A'}</span>
+            </div>
+            <div class="details-row">
+              <span class="details-label">College</span>
+              <span class="details-value">${college || 'N/A'}</span>
+            </div>
+            <div class="details-row">
+              <span class="details-label">Department</span>
+              <span class="details-value">${department}</span>
+            </div>
+            <div class="details-row">
+              <span class="details-label">Year</span>
+              <span class="details-value">${year}</span>
+            </div>
+            ${teamName && teamName !== 'N/A' ? `
+            <div class="details-row">
+              <span class="details-label">Team Name</span>
+              <span class="details-value">${teamName}</span>
+            </div>` : ''}
+            <div class="details-row">
+              <span class="details-label">Fee Paid</span>
+              <span class="details-value">₹${amount}</span>
+            </div>
+
+            <div class="pass-container">
+               <div class="pass-title">
+                 🎫 Your Entry Pass
+               </div>
+               <div class="qr-box">
+                 <img src="${qrCodeUrl}" alt="Entry QR Code" class="qr-img" />
+               </div>
+               <div class="qr-text">
+                 Show this QR code at the event for quick check-in
+               </div>
+            </div>
+            
+            <center style="margin-top: 30px; margin-bottom: 10px;">
+              <a href="https://dakshaa.ksrct.ac.in/dashboard/registrations" style="background: linear-gradient(90deg, #06b6d4, #3b82f6); color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 14px; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);">View Full Details</a>
+            </center>
+          </div>
+          
+          <div class="footer-imgs">
+             <img src="cid:ksrctlogo" alt="KSRCT" class="ksrct-logo" />
+             <div style="font-size: 11px; color: #64748b; margin-top: 10px;">
+               K.S. Rangasamy College of Technology<br/>
+               Autonomous, Tiruchengode
+             </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+  };
+
+// Send Payment Success Email
+const sendPaymentSuccessEmail = async (userEmail, userName, paymentDetails) => {
+    try {
+      const transporter = createTransporter();
+      
+      // Get Event Name for Subject
+      // Clean up "Event: " prefix if present for cleaner subject
+      let subjectEventName = 'Event Registration';
+      if (paymentDetails.items && paymentDetails.items.length > 0) {
+          subjectEventName = paymentDetails.items.map(i => i.name.replace(/^Event: /, '').replace(/^Team: /, '')).join(', ');
+      }
+
+      const mailOptions = {
+        from: `"DaKshaa T26" <${process.env.EMAIL_USER}>`,
+        to: userEmail,
+        subject: `🎉 Registration Confirmed - ${subjectEventName} | Dhaskaa T26`,
+        html: getPaymentSuccessTemplate(userName, paymentDetails),
+        attachments: [
+          {
+            filename: 'logo.png',
+            path: path.join(__dirname, 'logo.png'),
+            cid: 'dhaskaalogo' // same cid value as in the html img src
+          },
+          {
+            filename: 'ksrct.png',
+            path: path.join(__dirname, 'ksrct.png'),
+            cid: 'ksrctlogo' // same cid value as in the html img src
+          }
+        ]
+      };
+  
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Payment success email sent:', info.messageId);
+      return { success: true, messageId: info.messageId };
+    } catch (error) {
+      console.error('Error sending payment email:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
 // Send welcome email
 const sendWelcomeEmail = async (userEmail, userName) => {
   try {
@@ -210,4 +512,4 @@ const sendWelcomeEmail = async (userEmail, userName) => {
   }
 };
 
-module.exports = { sendWelcomeEmail };
+module.exports = { sendWelcomeEmail, sendPaymentSuccessEmail };

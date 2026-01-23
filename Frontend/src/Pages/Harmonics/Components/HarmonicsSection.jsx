@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import dance from "../../../assets/HORMONICS/SOLO DANCE.png";
-import group from "../../../assets/HORMONICS/GROUP.png";
-import instruments from "../../../assets/HORMONICS/INSTRUMENT.png";
-import musical from "../../../assets/HORMONICS/MUSICAL.png";
-import shortFilm from "../../../assets/HORMONICS/short flim.png"
+import hr1 from "../../../assets/HORMONICS/hr1.png";
+import hr2 from "../../../assets/HORMONICS/hr2.png";
+import hr3 from "../../../assets/HORMONICS/hr3.png";
+import hr4 from "../../../assets/HORMONICS/hr4.png";
+import hr5 from "../../../assets/HORMONICS/hr5.png"
 import { motion } from "framer-motion";
 import { Navigate, useNavigate } from "react-router-dom";
 
@@ -16,11 +16,11 @@ const Card = () => {
   }, []);
 
   const cards = [
-    { id: 1, image: instruments, title: "Mastro Mania", text: "Musicians performing with musical instruments.", fee: "Registration Fee: 150", link: "/event/culturals-event-2" },
-    { id: 2, image: musical, title: "Musical Mavericks", text: "Solo singing is an individual vocal performance with expression.", fee: "Registration Fee: 150", link: "/event/culturals-event-1" },
-    { id: 3, image: group, title: "Beat Battle", text: "Synchronized dance performance by group.",fee: "Registration Fee: 600", link: "/event/culturals-event-3" },
-    { id: 4, image: dance, title: "Spotlight Stepper", text: "Solo dance is expressive, graceful, and captivating.", fee: "Registration Fee: 150", link: "/event/culturals-event-4" },
-    { id: 5, image: shortFilm, title: "Short Film", text: "A single moment can change a lifetime, shaping destiny in unexpected ways.", fee: "Registration Fee: 150", link: "/event/culturals-event-5" },
+    { id: 1, image: hr1, title: "Infinite Step", text: "A solo dance competition showcasing rhythm, expression, and graceful movements.", fee: "Registration Fee: 150", link: "/event/culturals-event-1" },
+    { id: 2, image: hr2, title: "cine fest", text: "A short film competition that brings creative storytelling and cinematic vision to life.", fee: "Registration Fee: 150", link: "/event/culturals-event-2" },
+    { id: 3, image: hr3, title: "spotlight", text: "An open stage event that goes beyond talent, celebrating confidence and originality.",fee: "Registration Fee: 600", link: "/event/culturals-event-3" },
+    { id: 4, image: hr4, title: "Musical maverics", text: "A solo singing competition highlighting vocal strength, emotion, and musical finesse.", fee: "Registration Fee: 150", link: "/event/culturals-event-4" },
+    { id: 5, image: hr5, title: "Beat mode", text:"A group dance competition featuring synchronization, energy, and powerful choreography.", fee: "Registration Fee: 150", link: "/event/culturals-event-5" },
   ];
 
   const title = "Harmonicks";

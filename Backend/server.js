@@ -2,7 +2,7 @@ const express = require("express");
 const { v4: uuidv4 } = require("uuid"); // Import UUID generator
 const supabase = require("./db"); // Import Supabase connection
 const cors = require('cors');
-const { sendWelcomeEmail } = require('./emailService');
+const { sendWelcomeEmail, sendPaymentSuccessEmail } = require('./emailService');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -916,8 +916,6 @@ app.post("/payment/initiate", async (req, res) => {
         alreadyPaidMemberIdsCount = count || 0;
         unpaidMembersCount = teamSize - alreadyPaidMemberIdsCount;
       }
-
-      // Compute total amount
       const pricePerMember = Number(eventRowData.price) || 0;
       computedAmount = Number((pricePerMember * unpaidMembersCount).toFixed(2));
 
@@ -930,12 +928,9 @@ app.post("/payment/initiate", async (req, res) => {
         pricePerMember, 
         computedAmount 
       });
-
-      // Update actualBookingId
       actualBookingId = currentTeamId;
     }
 
-    // Generate unique order ID
     const order_id = `ORDER_${new Date().toISOString().split('T')[0].replace(/-/g, '')}_${Date.now()}_${actualBookingId.toString().substring(0, 8)}`;
 
     // Format payment payload for gateway
@@ -943,17 +938,15 @@ app.post("/payment/initiate", async (req, res) => {
     const callback_url = `http://localhost:3000/payment/callback?order_id=${order_id}`;
 
     const paymentPayload = {
-      amount: (booking_type === 'team' || booking_type === 'mixed_registration') ? computedAmount : amount,
-      order_id: order_id,
-      customer_name: profile.full_name,
-      customer_email: customer_email,
-      customer_phone: customer_phone,
-      customer_college: profile.college_name || "N/A",
-      customer_department: profile.department || "N/A",
-      callback_url: callback_url,
-      description: `Dhaskaa T26 - ${booking_type.toUpperCase()} Registration`
+      dueamount: (booking_type === 'team' || booking_type === 'mixed_registration') ? computedAmount : amount,
+      regno :  `DakshaaT26-${customer_phone}`,
+      apporderid: order_id,
+      fullname: profile.full_name,
+      emailid: customer_email,
+      mobileno: customer_phone,
+      clg: profile.college_name || "N/A",
+      eventname: "DakshaaT26"
     };
-
     const paymentInsertData = {
       user_id: user_id,
       order_id: order_id,
@@ -963,16 +956,13 @@ app.post("/payment/initiate", async (req, res) => {
       status: 'INITIATED',
       gateway_payload: paymentPayload
     };
-
-    // For team payments, store additional team data
     if (booking_type === 'team') {
       const { team_name, event_id, member_count } = req.body;
       const pricePerMember = Number(teamEventRow?.price) || 0;
-      
       paymentInsertData.gateway_payload = {
         ...paymentPayload,
         team_data: {
-          team_id: actualBookingId, // Use resolved ID (created or existing)
+          team_id: actualBookingId, 
           team_name: team_name,
           event_id: event_id,
           member_count: member_count || 0,
@@ -996,13 +986,11 @@ app.post("/payment/initiate", async (req, res) => {
             }
         };
     }
-
     const { data: paymentRecord, error: paymentError } = await supabase
       .from('payment_transactions')
       .insert(paymentInsertData)
       .select()
       .single();
-
     if (paymentError) {
       console.error("❌ DETAILED ERROR storing payment record:", paymentError);
       return res.status(500).json({
@@ -1014,42 +1002,30 @@ app.post("/payment/initiate", async (req, res) => {
 
     console.log("✅ Payment transaction created:", { order_id, booking_id, user_id, amount });
 
-    // Call payment gateway from backend (server-to-server, no CORS)
-    const paymentGatewayUrl = process.env.PAYMENT_GATEWAY_URL || 'https://ccabc81dd642.ngrok-free.app';
+    // Generate Direct Payment URL (Client Redirect)
+    // We do NOT fetch from backend. We construct the URL and let the frontend redirect the user.
+    const baseUrl = 'https://fees.ksrctdigipro.in/HandlePaymentFromApp';
+    
+    // Ensure payload values are strings for URLSearchParams
+    const queryParams = new URLSearchParams();
+    Object.entries(paymentPayload).forEach(([key, value]) => {
+        queryParams.append(key, String(value));
+    });
+    
+    const paymentUrl = `${baseUrl}?${queryParams.toString()}`;
 
-    try {
-      const gatewayResponse = await fetch(`${paymentGatewayUrl}/initiate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(paymentPayload),
-      });
+    console.log("🔗 Generated Payment URL:", paymentUrl);
 
-      const gatewayResult = await gatewayResponse.json();
+    res.status(200).json({
+      success: true,
+      message: "Payment initiated successfully",
+      payment_data: paymentPayload,
+      payment_url: paymentUrl,
+      transaction_id: paymentRecord?.id,
+      calculated_amount: paymentPayload.dueamount
+    });
 
-      if (!gatewayResult.success) {
-        throw new Error('Payment gateway initialization failed');
-      }
 
-      let paymentUrl = gatewayResult.payment_url;
-      if (paymentUrl.includes('localhost:5002')) {
-        paymentUrl = paymentUrl.replace('http://localhost:5002', paymentGatewayUrl);
-      }
-
-      res.status(200).json({
-        success: true,
-        message: "Payment initiated successfully",
-        payment_data: paymentPayload,
-        payment_url: paymentUrl,
-        transaction_id: paymentRecord?.id,
-        calculated_amount: paymentPayload.amount
-      });
-    } catch (gatewayError) {
-      console.error("Payment gateway error:", gatewayError);
-      res.status(500).json({
-        success: false,
-        error: "Payment gateway communication failed"
-      });
-    }
   } catch (error) {
     console.error("❌ Error initiating payment:", error);
     res.status(500).json({ success: false, error: "Internal Server Error" });
@@ -1076,14 +1052,24 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
 */
     
     // Use 'let' for variables we might need to update via polling
-    let { 
-      order_id,
-      txn_id,
-      payment_id,
-      error: errorMsg
-    } = payload;
+    // 1. Normalize Keys (Support 'apporderid' vs 'order_id')
+    let order_id = payload.order_id || payload.apporderid;
 
-    let status = payload.status; // Mutable status variable
+    // 2. Extract and Sanitize Fields
+    let txn_id = payload.txn_id;
+    let payment_id = payload.payment_id;
+    let errorMsg = payload.error;
+    let status = payload.status;
+    let callbackAmount = payload.amount; // Extract amount from callback
+
+    // Handle "Null" string values from Gateway
+    if (String(txn_id) === 'Null') txn_id = null;
+    if (String(payment_id) === 'Null') payment_id = null;
+
+    // 3. Infer status from presence of 'success' flag (common in redirects)
+    if (!status && (payload.success !== undefined)) {
+       status = 'SUCCESS';
+    }
 
     // 🔄 POLLING STRATEGY FOR GET REDIRECTS
     // If this is a user redirect (GET) and status is missing, the Webhook (POST) might be processing in parallel.
@@ -1126,7 +1112,7 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
         <html>
           <head>
             <title>Payment Status</title>
-            <meta http-equiv="refresh" content="3;url=http://localhost:5173/dashboard?payment_check=true" />
+            <meta http-equiv="refresh" content="3;url=https://dakshaa.ksrct.ac.in/dashboard" />
             <style>
               body { font-family: sans-serif; text-align: center; padding: 40px; }
               .loader { border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 20px auto; }
@@ -1137,7 +1123,7 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
             <h1>Checking Payment Status...</h1>
             <div class="loader"></div>
             <p>Please wait while we verify your transaction.</p>
-            <p>If you are not redirected automatically, <a href="http://localhost:5173/dashboard?payment_check=true">click here</a>.</p>
+            <p>If you are not redirected automatically, <a href="https://dakshaa.ksrct.ac.in/dashboard">click here</a>.</p>
           </body>
         </html>
       `);
@@ -1152,7 +1138,7 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
 
     // Map status to uppercase
     // Ensure we handle undefined status gracefully (though previous checks should prevent it)
-    const paymentStatus = (status || '').toUpperCase();
+    let paymentStatus = (status || '').toUpperCase();
 
     // Fetch payment transaction record
     const { data: paymentRecord, error: fetchError } = await supabase
@@ -1169,6 +1155,7 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
 
     if (fetchError || !paymentRecord) {
       console.error("❌ Payment transaction not found:", { order_id, error: fetchError });
+      // ... error handling ...
       const htmlError = `
         <html>
           <body>
@@ -1179,19 +1166,56 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
         </html>
       `;
       if (req.method === 'GET') return res.status(404).send(htmlError);
-      return res.status(404).send(htmlError); // Webhook usually expects 200/400 but sending 404 is fine.
+      return res.status(404).send(htmlError);
+    }
+
+    // 🛡️ Security Check: Verify Amount Matching (1.0 vs 1)
+    let remainingAmount = 0;
+    
+    if (paymentStatus === 'SUCCESS' && callbackAmount) {
+        const receivedAmount = parseFloat(callbackAmount);
+        const expectedAmount = parseFloat(paymentRecord.amount);
+        
+        if (!isNaN(receivedAmount) && !isNaN(expectedAmount)) {
+             // Allow tiny floating point differences (e.g. 1.000001 vs 1)
+             if (Math.abs(receivedAmount - expectedAmount) > 0.1) {
+                 if (receivedAmount < expectedAmount) {
+                     console.log(`⚠️ Partial Payment Detected: Received ${receivedAmount}, Expected ${expectedAmount}`);
+                     // Map to 'PENDING' because DB likely doesn't support 'PARTIAL' in status check constraint
+                     paymentStatus = 'PENDING'; 
+                     remainingAmount = expectedAmount - receivedAmount;
+                     errorMsg = `Partial Payment: remaining ${remainingAmount}`;
+                 } else {
+                     console.error(`❌ Payment Security Alert: Amount mismatch! Expected: ${expectedAmount}, Received: ${receivedAmount}`);
+                     paymentStatus = 'FAILED'; 
+                     errorMsg = `Amount validation failed: Expected ${expectedAmount}, got ${receivedAmount}`;
+                 }
+             } else {
+                 console.log(`✅ Amount Verified matches: ${receivedAmount} == ${expectedAmount}`);
+             }
+        }
+    }
+    
+    // Normalize status to match DB constraint (usually INITIATED, SUCCESS, FAILED, PENDING)
+    // If DB has a constraint check, we must adhere to allowed values.
+    // User requested to map failed status to 'PENDING'
+    if (paymentStatus === 'FAILURE' || paymentStatus === 'FAIL') {
+        paymentStatus = 'PENDING';
     }
 
     // Check if we already processed this order to prevent double-processing
     // (e.g. Webhook finished it, now Redirect is here)
     if (paymentRecord && paymentRecord.status === 'SUCCESS' && req.method === 'GET') {
        console.log("✅ Payment already processed (verified via DB). Skipping duplicate logic.");
+       
+       const redirectUrl = `https://dakshaa.ksrct.ac.in/dashboard`;
+       
        // Just return the success page immediately
        return res.send(`
         <html>
           <head>
             <title>Payment Status</title>
-            <meta http-equiv="refresh" content="3;url=http://localhost:5173/dashboard?payment_check=true" />
+            <meta http-equiv="refresh" content="0;url=${redirectUrl}" />
             <style>
               body { font-family: sans-serif; text-align: center; padding: 40px; }
               .loader { border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 20px auto; }
@@ -1202,7 +1226,7 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
             <h1>Payment Processed</h1>
             <div class="loader"></div>
             <p>Your payment has been recorded. Redirecting you...</p>
-            <p>If you are not redirected automatically, <a href="http://localhost:5173/dashboard?payment_check=true">click here</a>.</p>
+            <p>If you are not redirected automatically, <a href="${redirectUrl}">click here</a>.</p>
           </body>
         </html>
       `);
@@ -1234,11 +1258,71 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
       return res.status(500).send(htmlErr);
     }
 
+    let updateResult;
+
+    // Handle PARTIAL Payment Redirect Logic (GET only) before marking booking as FAILED/SUCCESS
+    // We use errorMsg detection since paymentStatus is now normalized to 'PENDING'
+    if (remainingAmount > 0 && req.method === 'GET') {
+         // Create New Pending Transaction for Remaining Amount
+         const newOrderId = `ORDER_${Date.now()}_REMAINING_${paymentRecord.booking_id.toString().substring(0, 5)}`;
+         
+         const newPayload = {
+             ...paymentRecord.gateway_payload,
+             dueamount: remainingAmount,
+             apporderid: newOrderId
+         };
+
+         // Insert new transaction
+         await supabase.from('payment_transactions').insert({
+             user_id: paymentRecord.user_id,
+             order_id: newOrderId,
+             booking_id: paymentRecord.booking_id,
+             booking_type: paymentRecord.booking_type,
+             amount: remainingAmount,
+             status: 'INITIATED',
+             gateway_payload: newPayload
+         });
+
+         // Construct Payment URL
+         const baseUrl = 'https://fees.ksrctdigipro.in/HandlePaymentFromApp';
+         const queryParams = new URLSearchParams();
+         // Ensure correct mapping
+         Object.entries(newPayload).forEach(([key, value]) => {
+             // Fix key names if payload has old mapping
+             if (key === 'apporderid' || key === 'order_id') queryParams.append('apporderid', newOrderId);
+             else if (key === 'dueamount') queryParams.append('dueamount', remainingAmount);
+             else queryParams.append(key, String(value));
+         });
+         
+         const paymentUrl = `${baseUrl}?${queryParams.toString()}`;
+
+         return res.send(`
+             <html>
+                <head>
+                 <title>Payment Warning</title>
+                 <style>
+                  body { font-family: sans-serif; text-align: center; padding: 40px; color: #333; }
+                  .warning { background: #fff3cd; color: #856404; padding: 20px; border: 1px solid #ffeeba; border-radius: 5px; margin: 20px auto; max-width: 600px; }
+                  .btn { display: inline-block; padding: 12px 24px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 20px; }
+                 </style>
+                </head>
+                <body>
+                  <h1>⚠️ Partial Payment Detected</h1>
+                  <div class="warning">
+                    <h2>Do NOT change the amount!</h2>
+                    <p>You paid less than the required amount. You still owe <strong>₹${remainingAmount}</strong>.</p>
+                    <p>If you change the amount again, your registration may be cancelled.</p>
+                  </div>
+                  <p>Click below to pay the remaining balance.</p>
+                  <a href="${paymentUrl}" class="btn">Pay Remaining ₹${remainingAmount}</a>
+                </body>
+             </html>
+         `);
+    }
+
     // Update booking status based on payment result
     if (paymentStatus === 'SUCCESS') {
       const { booking_id, booking_type, user_id } = paymentRecord;
-
-      let updateResult;
       
       if (booking_type === 'accommodation') {
         updateResult = await supabase
@@ -1635,16 +1719,162 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
       }
       
       console.log("✅ Payment successful, database updated");
+
+      // Send Payment Success Email
+      try {
+        const email = paymentRecord.gateway_payload?.emailid;
+        const name = paymentRecord.gateway_payload?.fullname || "User";
+        
+        if (email) {
+            // Reconstruct items list for email
+            let items = [];
+            
+            // Try to get more specific item details from payload if available
+            if (booking_type === 'mixed_registration' && paymentRecord.gateway_payload?.mixed_data?.registrations) {
+                paymentRecord.gateway_payload.mixed_data.registrations.forEach(reg => {
+                     items.push({ 
+                         name: reg.event_name ? `Event: ${reg.event_name}` : 'Event Registration',
+                         price: reg.amount
+                     });
+                });
+            } else if (booking_type === 'team' && paymentRecord.gateway_payload?.team_data) {
+                const td = paymentRecord.gateway_payload.team_data;
+                items.push({
+                    name: `Team: ${td.team_name || 'Team Event'}`,
+                    price: td.total_amount || paymentRecord.amount
+                });
+            } else if (booking_type === 'event') {
+                // If single event, we might not have event name in payload top level easily, generic fallback:
+                items.push({ name: 'Event Registration', price: paymentRecord.amount });
+            } else if (booking_type === 'lunch') {
+                 items.push({ name: 'Lunch Booking', price: paymentRecord.amount });
+            } else if (booking_type === 'accommodation') {
+                 items.push({ name: 'Accommodation', price: paymentRecord.amount });
+            } else {
+                 // Fallback
+                 items.push({ name: `${booking_type.charAt(0).toUpperCase() + booking_type.slice(1)} Booking`, price: paymentRecord.amount });
+            }
+
+            // Fetch additional profile details for email
+            const { data: userProfile } = await supabase
+                .from('profiles')
+                .select('department, year, college_name, mobile_number')
+                .eq('id', paymentRecord.user_id)
+                .single();
+
+            await sendPaymentSuccessEmail(email, name, {
+                amount: paymentRecord.amount,
+                transactionId: payment_id || txn_id,
+                orderId: order_id,
+                date: new Date().toLocaleDateString('en-IN'),
+                items: items,
+                userId: paymentRecord.user_id,
+                phone: paymentRecord.gateway_payload?.mobileno || userProfile?.mobile_number,
+                college: paymentRecord.gateway_payload?.clg || userProfile?.college_name,
+                department: userProfile?.department || 'N/A',
+                year: userProfile?.year || 'N/A',
+                teamName: paymentRecord.gateway_payload?.team_data?.team_name || 'N/A'
+            });
+            console.log("✅ Payment success email sent to:", email);
+        } else {
+             console.log("⚠️ No email found in payload, skipping email.");
+        }
+      } catch (err) {
+        console.error("❌ Failed to send payment email:", err);
+      }
+
+      // Localhost notification removed as per request
+      console.log("✅ Payment successful handling complete.");
+    } else {
+      // Payment FAILED (or any status other than SUCCESS)
+      console.log(`⚠️ Payment not successful (Status: ${paymentStatus}). Updating booking status to FAILED.`);
+
+      const { booking_id, booking_type, user_id } = paymentRecord;
+      let failUpdateResult;
+
+      // Update booking status to FAILED
+      if (booking_type === 'accommodation') {
+        failUpdateResult = await supabase
+          .from('accommodation_requests')
+          .update({ 
+            payment_status: 'FAILED',
+            payment_id: payment_id || txn_id
+          })
+          .eq('id', booking_id)
+          .eq('user_id', user_id);
+      } else if (booking_type === 'lunch') {
+        failUpdateResult = await supabase
+          .from('lunch_bookings')
+          .update({ 
+            payment_status: 'FAILED',
+            payment_id: payment_id || txn_id
+          })
+          .eq('id', booking_id)
+          .eq('user_id', user_id);
+      } else if (booking_type === 'event') {
+        // Find batch ID if exists
+        const { data: firstReg } = await supabase
+          .from('event_registrations_config')
+          .select('transaction_id')
+          .eq('id', booking_id)
+          .maybeSingle();
+
+        const batchId = firstReg?.transaction_id;
+        let updateQuery = supabase
+          .from('event_registrations_config')
+          .update({ 
+            payment_status: 'FAILED',
+            transaction_id: payment_id || txn_id
+          })
+          .eq('user_id', user_id);
+
+        if (batchId && batchId.startsWith('BATCH_')) {
+          updateQuery = updateQuery.eq('transaction_id', batchId);
+        } else {
+          updateQuery = updateQuery.eq('id', booking_id);
+        }
+
+        failUpdateResult = await updateQuery;
+      } else if (booking_type === 'combo') {
+        failUpdateResult = await supabase
+          .from('combo_purchases')
+          .update({ 
+            payment_status: 'FAILED',
+            transaction_id: payment_id || txn_id
+          })
+          .eq('id', booking_id)
+          .eq('user_id', user_id);
+      } else if (booking_type === 'team') {
+          // No complex logic for team failure, just logging mainly as they are created on fly usually
+          // For now, no specific table update for generic 'team' type unless we tracked a specific request ID
+          // But based on paymentRecord, we might not have a specific single row to update to failed 
+          // if registrations weren't created yet.
+          console.log("Team payment failed. No specific pre-booking row to update to FAILED.");
+      } else if (booking_type === 'mixed_registration') {
+          console.log("Mixed payment failed. No specific pre-booking row to update to FAILED.");
+      }
+
+      if (failUpdateResult?.error) {
+           console.error("❌ Error updating DB to FAILED:", failUpdateResult.error);
+      } else {
+           console.log("✅ DB updated to FAILED status.");
+      }
+      
+      // Localhost notification removed as per request
+      console.log("⚠️ Payment failure handling complete.");
     }
 
     // Finally return response
     if (req.method === 'GET') {
+       const dbUpdated = paymentStatus === 'SUCCESS' && !updateResult?.error;
+       const redirectUrl = `https://dakshaa.ksrct.ac.in/dashboard/registrations`;
+
        // Return Redirect HTML
        return res.send(`
         <html>
           <head>
             <title>Payment Status</title>
-            <meta http-equiv="refresh" content="3;url=http://localhost:5173/dashboard?payment_check=true" />
+            <meta http-equiv="refresh" content="0;url=${redirectUrl}" />
             <style>
               body { font-family: sans-serif; text-align: center; padding: 40px; }
               .loader { border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 20px auto; }
@@ -1655,7 +1885,7 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
             <h1>Payment Processed</h1>
             <div class="loader"></div>
             <p>Your payment has been recorded. Redirecting you...</p>
-            <p>If you are not redirected automatically, <a href="http://localhost:5173/dashboard?payment_check=true">click here</a>.</p>
+            <p>If you are not redirected automatically, <a href="${redirectUrl}">click here</a>.</p>
           </body>
         </html>
       `);

@@ -519,7 +519,12 @@ const EventDetails = () => {
             name: "Mr.Adith D",
             email: "",
             phone: "7094278374",
-          }
+          },
+          {
+            name: "Mr.Madhukumar M",
+            email: "",
+            phone: "9791441235",
+          },
         ],
       },
 
