@@ -20,6 +20,7 @@ import Tech19 from "../assets/EventsImages/EventDetails/TechnicalImages/txt_tech
 import Tech20 from "../assets/EventsImages/EventDetails/TechnicalImages/txt_tech1.png";
 import Tech21 from "../assets/EventsImages/EventDetails/TechnicalImages/vlsi_tech.png";
 import Tech22 from "../assets/EventsImages/EventDetails/TechnicalImages/ft_tech1.png";
+import Tech23 from "../assets/EventsImages/EventDetails/TechnicalImages/ece_tech1.png";
 
 
 
@@ -112,4 +113,9 @@ export const technicalEvents = [
     image: Tech22,
     eventId: "tech-ft-1",
   },
+  {
+    image: Tech23,
+    eventId: "tech-ece1",
+  },
+  
 ];

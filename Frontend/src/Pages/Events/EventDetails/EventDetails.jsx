@@ -20,6 +20,7 @@ import { useInView } from "react-intersection-observer";
   //'tech-cse-1': 'BotXhibit – CSE',
 
   //'tech-ece': 'zero Component – ECE',
+  //'tech-ece1': 'Paper Presentation – ECE',
   //'tech-eee': 'trailblazer – EEE',
 
   //'tech-eee-1': 'Paper Presentation – EEE',
@@ -60,6 +61,7 @@ import Tech19 from "../../../assets/EventsImages/EventDetails/TechnicalImages/tx
 import Tech20 from "../../../assets/EventsImages/EventDetails/TechnicalImages/txt_tech1.png";
 import Tech21 from "../../../assets/EventsImages/EventDetails/TechnicalImages/vlsi_tech.png";
 import Tech22 from "../../../assets/EventsImages/EventDetails/TechnicalImages/ft_tech1.png";
+import Tech23 from "../../../assets/EventsImages/EventDetails/TechnicalImages/ece_tech1.png";
 
 
 import NonTech1 from "../../../assets/EventsImages/EventDetails/Nontech/aids_nontech.png";
@@ -209,6 +211,7 @@ const EventDetails = () => {
     'tech-txt-1': 'technical-event-20',
     'tech-vlsi': 'technical-event-21',
     'tech-ft-1': 'technical-event-22',
+    'tech-ece1': 'technical-event-23',
 
     // Non-Technical Events
     
@@ -1571,6 +1574,66 @@ const EventDetails = () => {
         description:
           "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
         image: Tech22,
+        rounds: [
+          
+          {
+            title: "TOPICS:",
+            description: [
+              "Internet of Things",
+            ],
+          },
+        ],
+        rules: [
+          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
+          "Use PowerPoint (PPT) or any specified tool for the slides.",
+          "The number of slides should be 10-15, keeping it clear and concise.",
+          "The presentation should have:",
+          "Title Slide (Paper title, authors, affiliation)",
+          "Introduction (Problem statement, objective)",
+          "Methodology (Approach, technologies used)",
+          "Results & Discussion (Findings, graphs, tables)",
+          "Conclusion & Future Work",
+          "References (if required)",
+        ],
+        schedule: [
+          {
+            round: "Venue",
+            date: "March 28, 2026",
+            time: "9:30AM -10:30AM",
+            location: "announcing soon",
+          },
+        ],
+        contact: {
+          facultyCoordinator: [
+            {
+              name: "RAJASEKARAN N. AP / EEE",
+              email:"rajasekaran.n@ksrct.ac.in",
+              phone: "8056975723",
+            },
+          ],
+          studentCoordinator: [
+            {
+              name: "TIVITH C",
+              email:"tivithpoongodi@gmail.com",
+              phone: "9345426277",
+            },
+            {
+              name: "MOTUPALLI SHEKAR ",
+              email:"shekarmotupalli@gmail.com ",
+              phone: "8838510411",
+            },
+
+          ],
+        },
+  
+        registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
+      },
+
+      "technical-event-23": {
+        title: "VoltEdge (PAPER PRESENTATION)",
+        description:
+          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+        image: Tech23,
         rounds: [
           
           {
