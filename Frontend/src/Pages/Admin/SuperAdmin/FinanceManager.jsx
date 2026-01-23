@@ -87,7 +87,8 @@ const FinanceManager = () => {
       setLoading(true);
       
       // Use Backend API to bypass RLS issues
-      const response = await fetch('http://localhost:3000/api/admin/finance');
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${apiUrl}/api/admin/finance`);
       const result = await response.json();
 
       if (!result.success) throw new Error(result.error);
