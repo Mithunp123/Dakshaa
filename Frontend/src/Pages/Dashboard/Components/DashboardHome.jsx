@@ -33,9 +33,21 @@ const DashboardHome = () => {
   const [registrations, setRegistrations] = useState([]);
   const [teamsCount, setTeamsCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  
+  // Ref to prevent double-fetch in React StrictMode
+  const isFetchingRef = React.useRef(false);
 
   useEffect(() => {
-    fetchDashboardData();
+    // Prevent double-fetch in StrictMode
+    if (isFetchingRef.current) {
+      console.log('⏭️ Skipping duplicate dashboard fetch');
+      return;
+    }
+    isFetchingRef.current = true;
+    
+    fetchDashboardData().finally(() => {
+      isFetchingRef.current = false;
+    });
 
     // Set up real-time subscription for registration updates
     const storedUser = getStoredUser();
@@ -63,36 +75,46 @@ const DashboardHome = () => {
   }, []);
 
   const fetchDashboardData = async () => {
-    setLoading(true);
+    // Don't show loading spinner if we have fresh cache
+    const cachedData = sessionStorage.getItem('dashboard_data');
+    let hasValidCache = false;
+    
+    if (cachedData) {
+      try {
+        const parsed = JSON.parse(cachedData);
+        const cacheAge = Date.now() - parsed.timestamp;
+        // Use cache if less than 30 seconds old (increased from 10s)
+        if (cacheAge < 30000) {
+          setProfile(parsed.profile);
+          setRegistrations(parsed.registrations);
+          setTeamsCount(parsed.teamsCount);
+          setLoading(false);
+          hasValidCache = true;
+          console.log(`✅ Dashboard loaded from cache (${Math.round(cacheAge / 1000)}s old)`);
+          
+          // Background refresh if older than 10 seconds
+          if (cacheAge > 10000) {
+            console.log('🔄 Background refresh triggered...');
+            // Continue to fetch in background without showing loading
+          } else {
+            return; // Cache is very fresh, don't fetch
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to parse cached dashboard data');
+      }
+    }
+    
+    // Only show loading if we don't have valid cache
+    if (!hasValidCache) {
+      setLoading(true);
+    }
     
     try {
       const storedUser = getStoredUser();
       if (!storedUser) {
         setLoading(false);
         return;
-      }
-
-      // Check cache first for instant load (but only if valid and recent)
-      const cachedData = sessionStorage.getItem('dashboard_data');
-      let usedCache = false;
-      
-      if (cachedData) {
-        try {
-          const parsed = JSON.parse(cachedData);
-          const cacheAge = Date.now() - parsed.timestamp;
-          // Use cache if less than 10 seconds old (for quick navigation)
-          if (cacheAge < 10000) {
-            setProfile(parsed.profile);
-            setRegistrations(parsed.registrations);
-            setTeamsCount(parsed.teamsCount);
-            setLoading(false);
-            usedCache = true;
-            console.log('✅ Dashboard loaded from cache');
-            return; // Don't fetch again if cache is very fresh
-          }
-        } catch (e) {
-          console.warn('Failed to parse cached dashboard data');
-        }
       }
 
       // Fetch profile, registrations, teams with proper error handling

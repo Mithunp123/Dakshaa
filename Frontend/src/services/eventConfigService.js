@@ -32,27 +32,71 @@ export const clearEventsCache = () => {
  */
 export const getCachedEvents = () => {
   try {
-    const cached = localStorage.getItem(EVENTS_STATIC_KEY);
+    // First try the main events cache (used by getEventsWithStats)
+    const cached = localStorage.getItem(EVENTS_CACHE_KEY);
     if (cached) {
-      const { data } = JSON.parse(cached);
+      const { data, timestamp } = JSON.parse(cached);
+      // Return cache if it's less than 15 minutes old
+      if (data?.length > 0 && (Date.now() - timestamp) < 15 * 60 * 1000) {
+        console.log('⚡ getCachedEvents: Found valid cache');
+        return data;
+      }
+    }
+    // Fallback to static cache
+    const staticCached = localStorage.getItem(EVENTS_STATIC_KEY);
+    if (staticCached) {
+      const { data } = JSON.parse(staticCached);
       return data || null;
     }
   } catch (e) {
-    // Ignore cache errors
+    console.warn('getCachedEvents error:', e);
   }
   return null;
 };
 
 /**
- * Get all events with registration statistics (with caching for static data)
- * Static event data is cached, but registration counts are ALWAYS fetched fresh
+ * Get all events with registration statistics (OPTIMIZED with smart caching)
+ * Uses cache-first strategy with background refresh for best performance
+ * @param {boolean} forceRefresh - Force bypass cache
  * @returns {Promise<Array>} List of events with current_registrations count
  */
-export const getEventsWithStats = async () => {
+export const getEventsWithStats = async (forceRefresh = false) => {
   try {
     console.log('🔄 Fetching events with stats...');
     
-    // ALWAYS fetch fresh events from database (no cache for now to ensure accuracy)
+    // Step 1: Check cache first (instant load on refresh)
+    if (!forceRefresh) {
+      try {
+        const cached = localStorage.getItem(EVENTS_CACHE_KEY);
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          const age = Date.now() - timestamp;
+          
+          // If cache is less than 10 minutes old, use it
+          if (age < CACHE_DURATION && data?.length > 0) {
+            console.log(`✅ Using cached events (${Math.round(age / 1000)}s old)`);
+            
+            // Background refresh if cache is older than 2 minutes
+            if (age > 2 * 60 * 1000) {
+              console.log('🔄 Background refresh triggered...');
+              setTimeout(() => getEventsWithStats(true), 100);
+            }
+            
+            return {
+              success: true,
+              data: data,
+              error: null,
+              fromCache: true,
+              cacheAge: age
+            };
+          }
+        }
+      } catch (e) {
+        console.warn('Cache read error:', e);
+      }
+    }
+    
+    // Step 2: Fetch fresh data from database
     const { data: fetchedEvents, error: eventsError } = await supabase
       .from('events')
       .select('*')
@@ -61,6 +105,17 @@ export const getEventsWithStats = async () => {
 
     if (eventsError || !fetchedEvents) {
       console.error('❌ Failed to fetch events:', eventsError);
+      
+      // Fallback to stale cache if available
+      try {
+        const staleCache = localStorage.getItem(EVENTS_CACHE_KEY);
+        if (staleCache) {
+          const { data } = JSON.parse(staleCache);
+          console.warn('⚠️ Using stale cache due to fetch error');
+          return { success: true, data, error: null, fromCache: true, stale: true };
+        }
+      } catch (e) {}
+      
       return {
         success: false,
         data: [],
@@ -79,7 +134,7 @@ export const getEventsWithStats = async () => {
       };
     }
     
-    // Normalize event data - convert TEXT fields to proper types
+    // Step 3: Normalize event data - convert TEXT fields to proper types
     const eventsData = fetchedEvents.map(event => ({
       ...event,
       price: parseFloat(event.price) || 0,
@@ -92,30 +147,54 @@ export const getEventsWithStats = async () => {
       is_active: event.is_active === true || event.is_active === 'true' || event.is_active === undefined
     }));
     
-    // Fetch PAID registration counts via secure RPC to bypass RLS
-    console.log('🔄 Fetching registration counts via RPC...');
-
-    const statsResponses = await Promise.all(
-      eventsData.map(async (event) => {
-        try {
-          const { data, error } = await supabase.rpc('get_event_stats', { p_event_id: event.id });
-          if (error) {
-            console.warn(`⚠️ RPC get_event_stats failed for ${event.name}:`, error.message);
+    // Step 4: Fetch PAID registration counts via BATCHED RPC (1 call vs N calls)
+    console.log('🔄 Fetching registration counts via BATCH RPC...');
+    
+    const eventIds = eventsData.map(e => e.id);
+    let countMap = {};
+    
+    try {
+      // Try batch RPC first (much faster)
+      const { data: batchStats, error: batchError } = await supabase.rpc('get_batch_event_stats', { 
+        p_event_ids: eventIds 
+      });
+      
+      if (batchError) {
+        console.warn('⚠️ Batch RPC failed, falling back to individual calls:', batchError.message);
+        throw batchError; // Fall back to individual calls
+      }
+      
+      if (batchStats && Array.isArray(batchStats)) {
+        countMap = Object.fromEntries(
+          batchStats.map(stat => [stat.event_id, stat.registered || 0])
+        );
+        console.log('✅ Batch stats fetched successfully');
+      }
+    } catch (batchErr) {
+      // Fallback: Individual RPC calls (legacy support)
+      console.log('🔄 Using fallback individual RPC calls...');
+      const statsResponses = await Promise.all(
+        eventsData.map(async (event) => {
+          try {
+            const { data, error } = await supabase.rpc('get_event_stats', { p_event_id: event.id });
+            if (error) {
+              console.warn(`⚠️ RPC get_event_stats failed for ${event.name}:`, error.message);
+              return { id: event.id, registered: 0 };
+            }
+            const registered = (data && typeof data.registered === 'number') ? data.registered : 0;
+            return { id: event.id, registered };
+          } catch (e) {
+            console.warn(`⚠️ RPC get_event_stats exception for ${event.name}:`, e.message);
             return { id: event.id, registered: 0 };
           }
-          const registered = (data && typeof data.registered === 'number') ? data.registered : 0;
-          return { id: event.id, registered };
-        } catch (e) {
-          console.warn(`⚠️ RPC get_event_stats exception for ${event.name}:`, e.message);
-          return { id: event.id, registered: 0 };
-        }
-      })
-    );
+        })
+      );
+      countMap = Object.fromEntries(statsResponses.map(r => [r.id, r.registered]));
+    }
 
-    const countMap = Object.fromEntries(statsResponses.map(r => [r.id, r.registered]));
-    console.log('📊 Registration counts (RPC):', countMap);
+    console.log('📊 Registration counts:', countMap);
 
-    // Merge counts with event data
+    // Step 5: Merge counts with event data
     const eventsWithStats = eventsData.map(event => {
       const count = countMap[event.id] || 0;
       return {
@@ -124,6 +203,17 @@ export const getEventsWithStats = async () => {
         registered_count: count
       };
     });
+    
+    // Step 6: Cache the result
+    try {
+      localStorage.setItem(EVENTS_CACHE_KEY, JSON.stringify({
+        data: eventsWithStats,
+        timestamp: Date.now()
+      }));
+      console.log('💾 Events cached successfully');
+    } catch (e) {
+      console.warn('Failed to cache events:', e);
+    }
     
     console.log(`✅ Loaded ${eventsWithStats.length} events with fresh registration counts`);
     
@@ -573,15 +663,37 @@ export const updateRegistrationPayment = async (
   }
 };
 
+// Cache for user registered event IDs
+const REGISTERED_IDS_CACHE_KEY = 'dakshaa_registered_ids';
+const REGISTERED_IDS_CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
+
 /**
- * Get all event IDs that the user has already registered for
+ * Get all event IDs that the user has already registered for (CACHED)
  * @param {string} userId - User ID
+ * @param {boolean} forceRefresh - Force bypass cache
  * @returns {Promise<Set<string>>} Set of event IDs user is registered for
  */
-export const getUserRegisteredEventIds = async (userId) => {
+export const getUserRegisteredEventIds = async (userId, forceRefresh = false) => {
   try {
     if (!userId) {
       return new Set();
+    }
+
+    // Check cache first
+    if (!forceRefresh) {
+      try {
+        const cached = sessionStorage.getItem(`${REGISTERED_IDS_CACHE_KEY}_${userId}`);
+        if (cached) {
+          const { ids, timestamp } = JSON.parse(cached);
+          const age = Date.now() - timestamp;
+          if (age < REGISTERED_IDS_CACHE_DURATION && ids?.length >= 0) {
+            console.log(`📋 Using cached registered IDs (${Math.round(age / 1000)}s old)`);
+            return new Set(ids);
+          }
+        }
+      } catch (e) {
+        console.warn('Cache read error for registered IDs:', e);
+      }
     }
 
     // Only get PAID registrations (not PENDING or FAILED)
@@ -594,8 +706,20 @@ export const getUserRegisteredEventIds = async (userId) => {
     if (error) throw error;
 
     // Return a Set of event IDs for fast lookup
-    const eventIds = new Set((data || []).map(reg => reg.event_id));
-    console.log(`📋 User has ${eventIds.size} registered events`);
+    const eventIdsArray = (data || []).map(reg => reg.event_id);
+    const eventIds = new Set(eventIdsArray);
+    console.log(`📋 User has ${eventIds.size} registered events (fresh)`);
+    
+    // Cache the result
+    try {
+      sessionStorage.setItem(`${REGISTERED_IDS_CACHE_KEY}_${userId}`, JSON.stringify({
+        ids: eventIdsArray,
+        timestamp: Date.now()
+      }));
+    } catch (e) {
+      console.warn('Failed to cache registered IDs:', e);
+    }
+    
     return eventIds;
   } catch (error) {
     console.error("Error fetching user registered events:", error);

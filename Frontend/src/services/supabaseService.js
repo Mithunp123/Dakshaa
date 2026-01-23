@@ -149,8 +149,23 @@ export const supabaseService = {
     }
   },
 
-  // Get user registrations
-  async getUserRegistrations(userId) {
+  // Get user registrations (with caching for performance)
+  async getUserRegistrations(userId, forceRefresh = false) {
+    // Check sessionStorage cache first (60 second cache)
+    const cacheKey = `user_registrations_${userId}`;
+    if (!forceRefresh) {
+      try {
+        const cached = sessionStorage.getItem(cacheKey);
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < 60000) { // 60 seconds
+            console.log('📋 Using cached registrations');
+            return data;
+          }
+        }
+      } catch (e) {}
+    }
+
     // First fetch registrations
     const { data: registrations, error } = await supabase
       .from("event_registrations_config")
@@ -180,10 +195,17 @@ export const supabaseService = {
     });
     
     // Attach event data to registrations
-    return registrations.map(reg => ({
+    const result = registrations.map(reg => ({
       ...reg,
       events: eventsById[reg.event_id] || eventsByTextId[reg.event_id] || null
     }));
+    
+    // Cache the result
+    try {
+      sessionStorage.setItem(cacheKey, JSON.stringify({ data: result, timestamp: Date.now() }));
+    } catch (e) {}
+    
+    return result;
   },
 
   // Team methods

@@ -111,7 +111,7 @@ export const pendingPaymentService = {
   },
 
   /**
-   * Check and update payment status from database
+   * Check and update payment status from database (with debounce)
    * @param {Object} supabase - Supabase client
    * @param {string} userId - User ID
    */
@@ -121,6 +121,20 @@ export const pendingPaymentService = {
       const userPending = pendingPayments.filter(p => p.userId === userId);
       
       if (userPending.length === 0) return;
+
+      // Check if we synced recently (within 30 seconds) to avoid spamming
+      const lastSyncKey = `pending_payment_sync_${userId}`;
+      const lastSync = sessionStorage.getItem(lastSyncKey);
+      if (lastSync) {
+        const timeSinceSync = Date.now() - parseInt(lastSync);
+        if (timeSinceSync < 30000) { // 30 seconds debounce
+          console.log('⏭️ Skipping pending payment sync (synced recently)');
+          return;
+        }
+      }
+      
+      // Mark sync time
+      sessionStorage.setItem(lastSyncKey, Date.now().toString());
 
       // Check payment status for each pending payment
       for (const payment of userPending) {

@@ -79,7 +79,11 @@ const RegistrationForm = () => {
   const [preSelectApplied, setPreSelectApplied] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState(() => {
+    // Initialize with cached events for instant display
+    const cached = eventConfigService.getCachedEvents();
+    return cached || [];
+  });
   const [combos, setCombos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -91,6 +95,7 @@ const RegistrationForm = () => {
   const [validationStatus, setValidationStatus] = useState(null);
   const [validationMessage, setValidationMessage] = useState("");
   const [loadingTimeout, setLoadingTimeout] = useState(false);
+  const [showingCachedData, setShowingCachedData] = useState(false);
   
   // State for Mixed Registration (Team Details per Event)
   const [teamDetailsMap, setTeamDetailsMap] = useState({});
@@ -187,21 +192,51 @@ const RegistrationForm = () => {
     }
   }, [user]);
 
+  // Ref to prevent duplicate data loading in StrictMode
+  const dataLoadedRef = useRef(false);
+  const loadingRef = useRef(false);
+  const effectIdRef = useRef(0);
+
   // Load data and set up auth listener
   useEffect(() => {
-    console.log('🚀 Starting data loading...');
+    // Increment effect ID to track this specific effect run
+    const currentEffectId = ++effectIdRef.current;
+    
+    // Prevent double execution in React StrictMode if data already loaded
+    if (dataLoadedRef.current) {
+      console.log('⏭️ Skipping duplicate load call (data already loaded)');
+      setLoading(false);
+      return;
+    }
+    
+    console.log(`🚀 Starting data loading... (effect #${currentEffectId})`);
     console.log('👤 Initial user:', user ? `✅ ${user.id}` : '❌ None');
-    let isMounted = true;
+    loadingRef.current = true;
+    
+    // Helper to check if this effect is still valid
+    const isEffectValid = () => effectIdRef.current === currentEffectId;
     
     const loadData = async () => {
       try {
         console.log('=== LOADING DATA ===');
-        setLoading(true); // Show loading spinner
         
-        // Load events (always) - runs in background to refresh cache
+        // Check if we have cached events for instant display
+        const cachedEvents = eventConfigService.getCachedEvents();
+        const hasCachedData = cachedEvents && cachedEvents.length > 0;
+        
+        if (hasCachedData && isEffectValid()) {
+          console.log('⚡ Showing cached events instantly:', cachedEvents.length);
+          setEvents(cachedEvents);
+          setShowingCachedData(true);
+          setLoading(false); // Hide loading spinner immediately
+        } else {
+          setLoading(true); // Show loading spinner only if no cache
+        }
+        
+        // Load events (always fetch fresh in background)
         const eventsPromise = eventConfigService.getEventsWithStats().catch(err => {
           console.error('Failed to load events:', err);
-          return { success: false, data: [] };
+          return { success: false, data: cachedEvents || [] }; // Fallback to cache
         });
         
         // Load combos if user exists
@@ -215,19 +250,9 @@ const RegistrationForm = () => {
             return { success: false, data: [] };
           });
           
-          // Fetch user's PAID combo purchases
-          comboService.getUserPaidCombos(user.id).then(result => {
-            if (isMounted && result.success) {
-              console.log('💳 User paid combos:', result.data.length);
-              setUserPurchasedCombos(result.data);
-            }
-          }).catch(err => {
-            console.warn('Failed to load paid combos:', err);
-          });
-          
-          // Fetch user's PAID combo purchases
-          comboService.getUserPaidCombos(user.id).then(result => {
-            if (isMounted && result.success) {
+          // Fetch user's PAID combo purchases (SINGLE CALL - removed duplicate)
+          const paidCombosPromise = comboService.getUserPaidCombos(user.id).then(result => {
+            if (isEffectValid() && result.success) {
               console.log('💳 User paid combos:', result.data.length);
               setUserPurchasedCombos(result.data);
             }
@@ -249,7 +274,7 @@ const RegistrationForm = () => {
                 .filter(p => p.userId === user.id)
                 .map(p => p.eventId)
             );
-            if (isMounted) {
+            if (isEffectValid()) {
               console.log('💳 Pending payment events:', pendingEventIds.size, 'events');
               setPendingPaymentEvents(pendingEventIds);
             }
@@ -263,7 +288,7 @@ const RegistrationForm = () => {
             .eq("id", user.id)
             .single()
             .then(({ data: profile }) => {
-              if (isMounted) setUserProfile(profile);
+              if (isEffectValid()) setUserProfile(profile);
             })
             .catch(err => {
               console.warn('Failed to load profile:', err);
@@ -280,22 +305,31 @@ const RegistrationForm = () => {
           registeredIdsPromise
         ]);
         
-        if (isMounted) {
+        // Check if this effect is still valid before updating state
+        if (isEffectValid()) {
           const eventsData = eventsResult?.data || [];
           const combosData = combosResult?.success ? (combosResult.data || []) : [];
           
-          console.log(`✅ Loaded ${eventsData.length} events`);
-          console.log(`✅ Loaded ${combosData.length} combos`);
-          console.log(`✅ Loaded ${registeredIds.size} registered event IDs`);
+          console.log(`✅ [RegistrationForm] Effect #${currentEffectId} - Loaded ${eventsData.length} events`);
+          console.log(`✅ [RegistrationForm] Loaded ${combosData.length} combos`);
+          console.log(`✅ [RegistrationForm] Loaded ${registeredIds.size} registered event IDs`);
           
+          // ALWAYS update events state with fresh data
           setEvents(eventsData);
+          setShowingCachedData(false);
           setCombos(combosData);
           setRegisteredEventIds(registeredIds);
           setLoading(false);
+          
+          console.log('✅ [RegistrationForm] State updated successfully');
+          
+          dataLoadedRef.current = true;
+        } else {
+          console.warn(`⚠️ [RegistrationForm] Effect #${currentEffectId} cancelled (newer effect exists)`);
         }
       } catch (error) {
         console.error("Error loading data:", error);
-        if (isMounted) {
+        if (isEffectValid()) {
           setLoading(false);
           // Show error toast
           toast.error('Failed to load events. Please refresh the page.', {
@@ -303,6 +337,8 @@ const RegistrationForm = () => {
             position: 'top-center',
           });
         }
+      } finally {
+        loadingRef.current = false;
       }
     };
     
@@ -311,14 +347,14 @@ const RegistrationForm = () => {
     // Auth state listener for future changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('🔐 Auth changed:', event);
-      if (!isMounted) return;
+      if (!isEffectValid()) return;
       
       if (session?.user) {
         setUser(session.user);
         if (event === 'SIGNED_IN') {
           // Reload combos on sign in
           comboService.getActiveCombosForStudents(session.user.id).then(result => {
-            if (isMounted && result.success) setCombos(result.data || []);
+            if (isEffectValid() && result.success) setCombos(result.data || []);
           });
         }
       } else if (event === 'SIGNED_OUT') {
@@ -330,7 +366,7 @@ const RegistrationForm = () => {
     });
     
     return () => {
-      isMounted = false;
+      // Cleanup - no need to set anything, effectIdRef will naturally invalidate
       subscription.unsubscribe();
     };
   }, []); // Run once on mount - user is already initialized from localStorage
