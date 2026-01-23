@@ -169,11 +169,17 @@ function AppContent() {
             <Route path="/events/workshop" element={<Workshop />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/events/hormonics" element={<Harmonics />} />
+            <Route path="/event/hackathon-1" element={<Hackathon />} />
+            <Route path="/event/hackathon-2" element={<Hackathon />} />
+            <Route path="/event/hackathon-3" element={<Hackathon />} />
+            <Route path="/event/hackathon-4" element={<Hackathon />} />
+            <Route path="/event/hackathon-5" element={<Hackathon />} />
+            <Route path="/event/hackathon-6" element={<Hackathon />} />
+            <Route path="/event/hackathon" element={<Hackathon />} />
             <Route path="/event/:eventId" element={<EventDetails />} />
             <Route path="/teams" element={<Teams />} />
             <Route path="/startups" element={<Startup />} />
             <Route path="/accomodation" element={<Accomodation />} />
-            <Route path="/event/hackathon" element={<Hackathon />} />
             <Route path="/event/codeathon" element={<Codathon />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/feedback" element={<Feedback />} />

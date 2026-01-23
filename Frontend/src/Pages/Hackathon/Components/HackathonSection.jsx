@@ -1,89 +1,459 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, ArrowLeft } from "lucide-react"; 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { hackathonEvents } from "../../../data/hackathonEvents";
 
-import Tech2 from "../../../assets/EventsImages/EventDetails/TechnicalImages/aiml_tech.png";
-import guvi from "../../Sponsors/assets/aidswk.png";
 
 const HackathonSection = () => {
   const navigate = useNavigate();
-  // Example data as an array of objects
-  const eventDetails = {
-    id: "hackathon-event-1",
-    title: "Neura-Hack 2026 By",
-    descriptions: [
-     
-    ],
-    registrationLink: "https://forms.gle/DH6Su1b3y2YPfuvDA",
-    rounds: [
-      {
-        title: "Topics",
-        description: [
-          "Artificial Intelligence and Machine Learning",
-        
-        ],
-      },
-      {
-        title: "Round: Ideation",
-        description: [
-          "Problem Statement: On-the-spot selection from 20 topics.",
-          "Submit your project idea.",
-          "Present a brief pitch.",
-          "Develop a working prototype.",
-          "Submit a demo video.",
-          "The top 10 finalists will give a presentation on 29th March, and the top 3 will be selected as the final winners.",
-          "Winners will be announced.",
-        ],
-      },
-      
-     
-    ],
-    rules: 
-    [
-      "Teams must consist of 3 members.",
-      "All code must be written during the hackathon.",
-      "Plagiarism will result in disqualification.",
-    ],
-    schedule: [
-      {
-        round: "Venue",
-        date: "March 28, 2026",
-        time: "10:00 AM",
-        location: "IT-Lab 1, IT Park",
-      },
-      
-    ],
-    contact: {
-      facultyCoordinator: [
+  const { eventId: rawEventId } = useParams();
+  
+  // Map hackathon event IDs to event index
+  const eventIndexMap = {
+    "hackathon-1": 0,
+    "hackathon-2": 1,
+    "hackathon-3": 2,
+    "hackathon-4": 3,
+    "hackathon-5": 4,
+    "hackathon-6": 5,
+  };
+  
+  const eventIndex = eventIndexMap[rawEventId] || 0;
+  const currentHackathonEvent = hackathonEvents[eventIndex];
+  
+  // Hackathon Events Content - Separate content for each event
+  const hackathonEventDetails = {
+    "hackathon-1": {
+      id: "hackathon-1",
+      title: "Neura-Hack 2026",
+      registrationLink: "https://forms.gle/DH6Su1b3y2YPfuvDA",
+      description: "Neura Hack - 36-Hour Hackathon is powered by GUVI where teams develop solutions to problem statements provided by the organizers. Participants must register in advance and complete their projects within the 36-hour timeframe, using only original work. Open-source tools are allowed, but plagiarism and pre-existing solutions are prohibited. Submissions must include code, documentation, and a working demo. Projects are judged on innovation, technical implementation, impact, and presentation.",
+      rewards: [
         {
-          name: "Mr. K.Senthil Kumar",
-          phone: "+91 95666 66124",
-          email: "senthilkumark@ksrct.ac.in",
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹30,000",
         },
         {
-          name: "Mrs. K.Mahalakshmi",
-          phone: "+91 99442 86457",
-          email: "mahalakshmik@ksrct.ac.in",
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹20,000",
+        },
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹10,000",
         },
       ],
-      studentCoordinator: [
+      rounds: [
         {
-          name: "Poorna Sri K ",
-          phone: "+91 6374702698",
-          email: "poornasri664@gmail.com",
+          title: "Topics",
+          description: [
+            "Artificial Intelligence and Machine Learning",
+          ],
         },
         {
-          name: "Sivaraj A",
-          phone: "+91 90872 78175",
-          email: "sivarajboss22@gmail.com",
+          title: "Round: Ideation",
+          description: [
+            "Problem Statement: On-the-spot selection from 20 topics.",
+            "Submit your project idea.",
+            "Present a brief pitch.",
+            "Develop a working prototype.",
+            "Submit a demo video.",
+            "The top 10 finalists will give a presentation on 29th March, and the top 3 will be selected as the final winners.",
+            "Winners will be announced.",
+          ],
         },
       ],
+      rules: [
+        "Teams must consist of 3 members.",
+        "All code must be written during the hackathon.",
+        "Plagiarism will result in disqualification.",
+      ],
+      schedule: [
+        {
+          round: "Venue",
+          date: "March 28, 2026",
+          time: "10:00 AM",
+          location: "IT-Lab 1, IT Park",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Mr. K.Senthil Kumar",
+            phone: "+91 95666 66124",
+            email: "senthilkumark@ksrct.ac.in",
+          },
+          {
+            name: "Mrs. K.Mahalakshmi",
+            phone: "+91 99442 86457",
+            email: "mahalakshmik@ksrct.ac.in",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "Poorna Sri K",
+            phone: "+91 6374702698",
+            email: "poornasri664@gmail.com",
+          },
+          {
+            name: "Sivaraj A",
+            phone: "+91 90872 78175",
+            email: "sivarajboss22@gmail.com",
+          },
+        ],
+      },
+    },
+    "hackathon-2": {
+      id: "hackathon-2",
+      title: "BioNexathon 2026",
+      registrationLink: "https://forms.gle/example2",
+      description: "BioNexathon is a biotechnology-focused hackathon where participants develop innovative solutions for biological and medical challenges. Teams collaborate to create prototypes that can solve real-world healthcare problems.",
+      rewards: [
+        {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹25,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹15,000",
+        },
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹8,000",
+        },
+      ],
+      rounds: [
+        {
+          title: "Topics",
+          description: [
+            "Biotechnology and Life Sciences",
+          ],
+        },
+        {
+          title: "Round: Development",
+          description: [
+            "Problem Statement: Biological challenge selection",
+            "Design your solution",
+            "Create a prototype",
+            "Present your findings",
+          ],
+        },
+      ],
+      rules: [
+        "Teams must consist of 3-4 members.",
+        "Original research required.",
+        "No use of pre-existing solutions.",
+      ],
+      schedule: [
+        {
+          round: "Venue",
+          date: "April 15, 2026",
+          time: "09:00 AM",
+          location: "BioTech Lab, Campus",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Dr. Bio Coordinator",
+            phone: "+91 98765 43210",
+            email: "biocoordinator@ksrct.ac.in",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "Bio Team Lead",
+            phone: "+91 93456 78901",
+            email: "bioteamlead@gmail.com",
+          },
+        ],
+      },
+    },
+    "hackathon-3": {
+      id: "hackathon-3",
+      title: "NeuroCode 2.0",
+      registrationLink: "https://forms.gle/example3",
+      description: "NeuroCode 2.0 focuses on neural network development and deep learning applications. Participants build AI solutions using advanced machine learning techniques.",
+      rewards: [
+        {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹28,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹18,000",
+        },
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹9,000",
+        },
+      ],
+      rounds: [
+        {
+          title: "Topics",
+          description: [
+            "Deep Learning and Neural Networks",
+          ],
+        },
+        {
+          title: "Round: Implementation",
+          description: [
+            "Dataset analysis",
+            "Model development",
+            "Training and optimization",
+            "Final presentation",
+          ],
+        },
+      ],
+      rules: [
+        "Teams must consist of 2-3 members.",
+        "Use of pre-trained models allowed.",
+        "Code must be original implementations.",
+      ],
+      schedule: [
+        {
+          round: "Venue",
+          date: "May 10, 2026",
+          time: "08:30 AM",
+          location: "AI Lab, Building A",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Dr. AI Expert",
+            phone: "+91 97654 32109",
+            email: "aiexpert@ksrct.ac.in",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "Neural Team Lead",
+            phone: "+91 94567 89012",
+            email: "neuralteam@gmail.com",
+          },
+        ],
+      },
+    },
+    "hackathon-4": {
+      id: "hackathon-4",
+      title: "VibeCode-26",
+      registrationLink: "https://forms.gle/example4",
+      description: "VibeCode-26 is a creative coding hackathon focused on building vibrant, interactive applications. Teams develop web and mobile solutions with emphasis on user experience.",
+      rewards: [
+        {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹22,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹14,000",
+        },
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹7,000",
+        },
+      ],
+      rounds: [
+        {
+          title: "Topics",
+          description: [
+            "Web and Mobile Development",
+          ],
+        },
+        {
+          title: "Round: Creation",
+          description: [
+            "Ideation and wireframing",
+            "Development phase",
+            "UI/UX implementation",
+            "Demo and feedback",
+          ],
+        },
+      ],
+      rules: [
+        "Teams must consist of 3-4 members.",
+        "Creative and original designs required.",
+        "Responsive design mandatory.",
+      ],
+      schedule: [
+        {
+          round: "Venue",
+          date: "May 25, 2026",
+          time: "10:00 AM",
+          location: "Development Lab, Building B",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Dr. Web Dev",
+            phone: "+91 96543 21098",
+            email: "webdev@ksrct.ac.in",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "Code Vibe Lead",
+            phone: "+91 95678 90123",
+            email: "codevibelead@gmail.com",
+          },
+        ],
+      },
+    },
+    "hackathon-5": {
+      id: "hackathon-5",
+      title: "Startup Pitch 2026",
+      registrationLink: "https://forms.gle/example5",
+      description: "Startup Pitch is an entrepreneurial hackathon where teams develop business ideas and prototypes. Focus is on feasibility, market potential, and innovation.",
+      rewards: [
+        {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹35,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹22,000",
+        },
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹12,000",
+        },
+      ],
+      rounds: [
+        {
+          title: "Topics",
+          description: [
+            "Business Innovation and Entrepreneurship",
+          ],
+        },
+        {
+          title: "Round: Pitching",
+          description: [
+            "Startup idea submission",
+            "Business plan development",
+            "Prototype creation",
+            "Final pitch presentation",
+          ],
+        },
+      ],
+      rules: [
+        "Teams must consist of 2-4 members.",
+        "Viable business model required.",
+        "Market analysis mandatory.",
+      ],
+      schedule: [
+        {
+          round: "Venue",
+          date: "June 5, 2026",
+          time: "02:00 PM",
+          location: "Innovation Hub, Building C",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Dr. Entrepreneur",
+            phone: "+91 95432 10987",
+            email: "entrepreneur@ksrct.ac.in",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "Startup Lead",
+            phone: "+91 94567 01234",
+            email: "startupleader@gmail.com",
+          },
+        ],
+      },
+    },
+    "hackathon-6": {
+      id: "hackathon-6",
+      title: "Designathon 2026",
+      registrationLink: "https://forms.gle/example6",
+      description: "Designathon is a design-focused hackathon for mechanical and product design. Teams create innovative solutions using CAD and design thinking principles.",
+      rewards: [
+        {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹20,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹12,000",
+        },
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹6,000",
+        },
+      ],
+      rounds: [
+        {
+          title: "Topics",
+          description: [
+            "Mechanical Design and Innovation",
+          ],
+        },
+        {
+          title: "Round: Design",
+          description: [
+            "Problem identification",
+            "CAD modeling",
+            "Prototype development",
+            "Design presentation",
+          ],
+        },
+      ],
+      rules: [
+        "Teams must consist of 3-4 members.",
+        "CAD designs required.",
+        "Feasibility analysis mandatory.",
+      ],
+      schedule: [
+        {
+          round: "Venue",
+          date: "June 20, 2026",
+          time: "11:00 AM",
+          location: "Design Studio, Building D",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Dr. Design Expert",
+            phone: "+91 94321 09876",
+            email: "designexpert@ksrct.ac.in",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "Design Lead",
+            phone: "+91 93456 12345",
+            email: "designlead@gmail.com",
+          },
+        ],
+      },
     },
   };
-
-  // Use the first event in the array for demonstration
-  const event = eventDetails;
+  
+  const event = hackathonEventDetails[rawEventId] || hackathonEventDetails["hackathon-1"];
 
   const [openRound, setOpenRound] = useState(null);
 
@@ -131,15 +501,15 @@ const HackathonSection = () => {
             {event.title}
           </h1>
           <img
-            src={guvi}
-            alt=""
-            className="md:w-40 md:h-24 w-24 h-16"
+            src={currentHackathonEvent.image}
+            alt={event.title}
+            className="md:w-40 md:h-24 w-24 h-16 object-contain"
           />
         </div>
         <div className="border border-sky-800 p-2">
           <div className="text-center clip-bottom-right flex flex-col gap-4 p-4 md:p-10 items-center bg-sky-900/20">
             <img
-              src={Tech2}
+              src={currentHackathonEvent.image}
               alt={event.title}
               className="w-40 h-40 md:w-96 md:h-96 object-cover mb-4 shadow-md"
             />
@@ -230,35 +600,19 @@ const HackathonSection = () => {
 
             {/* Prize List */}
             <div className="flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-12">
-              {/* 1st Prize */}
-              <div className="flex flex-col items-center bg-primary-dark/30 border border-primary-dark p-6 rounded-lg w-full max-w-xs shadow-md sm:mt-16 order-2 sm:order-1">
-                <span className="text-2xl font-bold text-yellow-400">
-                  🥈 2nd Prize
-                </span>
-                <span className="text-3xl font-semibold text-white mt-2">
-                  ₹20,000
-                </span>
-              </div>
-
-              {/* 2nd Prize (Center) */}
-              <div className="flex flex-col items-center bg-primary-dark/30 border border-primary-dark p-6 rounded-lg w-full max-w-xs shadow-md sm:mb-16 order-1 sm:order-2">
-                <span className="text-2xl font-bold text-gray-300">
-                  🥇 1st Prize
-                </span>
-                <span className="text-3xl font-semibold text-white mt-2">
-                  ₹30,000
-                </span>
-              </div>
-
-              {/* 3rd Prize */}
-              <div className="flex flex-col items-center bg-primary-dark/30 border border-primary-dark p-6 rounded-lg w-full max-w-xs shadow-md sm:mt-16 order-3">
-                <span className="text-2xl font-bold text-orange-400">
-                  🥉 3rd Prize
-                </span>
-                <span className="text-3xl font-semibold text-white mt-2">
-                  ₹10,000
-                </span>
-              </div>
+              {event.rewards && event.rewards.map((reward, index) => {
+                const orderClass = index === 1 ? "order-1 sm:order-2 sm:mb-16" : index === 0 ? "order-2 sm:order-1 sm:mt-16" : "order-3 sm:mt-16";
+                return (
+                  <div key={index} className={`flex flex-col items-center bg-primary-dark/30 border border-primary-dark p-6 rounded-lg w-full max-w-xs shadow-md ${orderClass}`}>
+                    <span className="text-2xl font-bold">
+                      {reward.emoji} {reward.position}
+                    </span>
+                    <span className="text-3xl font-semibold text-white mt-2">
+                      {reward.amount}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -85,7 +85,24 @@ import NonTech18 from "../../../assets/EventsImages/EventDetails/Nontech/mech_no
 import NonTech19 from "../../../assets/EventsImages/EventDetails/Nontech/txt_nontech.png";
 import NonTech20 from "../../../assets/EventsImages/EventDetails/Nontech/vlsi_nontech.png";
 
-
+/* Workshop Events List
+workshop-aids: Agentic AI
+workshop -aiml: AI Arcade (AI tools for game development)
+workshop-bt : Next Generation Sequencing Technologies
+workshop- civil : BIM (Building Information Modeling)
+workshop - csbs Blockchain Beyond Crypto: Real-World Applications
+workshop-cse: CyberStrike
+workshop-ece: The Future of IoT: LoRaWAN with Artificial Intelligence
+workshop-eee: EV- Retrofitting
+workshop-ft: Sustainable Innovations in Food Processing Techniques
+workshop-ipr: IPR
+workshop-it: Github Essentials : Code Commit Collaborate
+workshop-mct: Flight mode: ON
+workshop-mech: Development of Next Gen vehicle
+workshop-txt: AI Integrated Smart Medi Tech
+workshop-vlsi: Chip2Test
+workshop-mca: Code, Click, Done: Mobile App Development in a day.
+*/
 
 import workshop1 from "../../../assets/EventsImages/EventDetails/Workshop/aids_wk.png";
 import workshop2 from "../../../assets/EventsImages/EventDetails/Workshop/aiml_wk.png";
@@ -256,7 +273,14 @@ const EventDetails = () => {
 
 
     // Hackathon Events - Maps to Neura Hack
-    'hackathon': 'technical-event-2',
+    'hackathon1': 'hackathon-1',
+    'hackathon2': 'hackathon-2',
+    'hackathon3': 'hackathon-3',
+    'hackathon4': 'hackathon-4',
+    'hackathon5': 'hackathon-5',
+    'hackathon6': 'hackathon-6',
+    
+
 
 
     // Workshop Events
@@ -1537,57 +1561,71 @@ const EventDetails = () => {
         registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
       },
       "technical-event-21": {
-        title: "VoltEdge (PAPER PRESENTATION)",
+        title: "CoreX (Project Presentation)",
         description:
-          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+          "A technical project presentation competition where teams (1-3 members) showcase innovative projects in engineering, technology, or innovation.Each team gets 10 minutes to present and 5 minutes for Q&A, with originality being crucial.A Q&A session helps evaluate technical depth and communication skills.The winning team will be awarded with cash prize, and attendance is mandatory for certification.",
         image: Tech21,
         rounds: [
           
           {
             title: "TOPICS:",
             description: [
-              "Internet of Things",
+              "IoT (Internet of Things)",
+              "Al (Artificial Intelligence)",
+              "Embedded Systems",
+              "E-Vehicle and Autonomous Vehicles",
+              "VLSI (Very Large Scale Integration)",
+              "3D Printing",
             ],
           },
         ],
         rules: [
-          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
-          "Use PowerPoint (PPT) or any specified tool for the slides.",
-          "The number of slides should be 10-15, keeping it clear and concise.",
-          "The presentation should have:",
-          "Title Slide (Paper title, authors, affiliation)",
-          "Introduction (Problem statement, objective)",
-          "Methodology (Approach, technologies used)",
-          "Results & Discussion (Findings, graphs, tables)",
-          "Conclusion & Future Work",
-          "References (if required)",
+          "Each team consist of 1 to 3 members",
+          "The team should be available there",
+          "Each team will have 10 minutes to present their project",
+          "An additional 5 minutes will be allocated for Q&A",
+          "All projects be based on engineering, technology, or innovation",
+          "Any form of plagiarism or copied work will result in immediate disqualification",
+          "The team should have proper project plan with unique solution",
+          "The attendance is mandatory for all session to getting certificate",
+          "Winner team will be awarded with prize amount",
         ],
         schedule: [
           {
-            round: "Venue",
-            date: "March 28, 2026",
-            time: "9:30AM -10:30AM",
-            location: "announcing soon",
+            round: "Round",
+            date: "February 13, 2026",
+            time: " 9.00 AM to 4.00 PM",
+            location: "Electronic Devices Laboratory, J Block 4th Floor",
           },
         ],
         contact: {
           facultyCoordinator: [
             {
-              name: "RAJASEKARAN N. AP / EEE",
-              email:"rajasekaran.n@ksrct.ac.in",
-              phone: "8056975723",
+              name: "Mr. D. Poorna Kumar",
+              email:"",
+              phone: "",
             },
+            {
+              name: "Mrs. C. Saranya ",
+              email:"",
+              phone: "",
+            }
           ],
           studentCoordinator: [
             {
-              name: "TIVITH C",
-              email:"tivithpoongodi@gmail.com",
-              phone: "9345426277",
+              name: ". M. Suriya Prasanth",
+              email:"",
+              phone: " 9487822144",
             },
             {
-              name: "MOTUPALLI SHEKAR ",
-              email:"shekarmotupalli@gmail.com ",
-              phone: "8838510411",
+              name: "Ms. G.S. Harsha Prabha ",
+              email:" ",
+              phone: "94422 18288",
+            },
+            {
+              name: "Mr. R. Shanmugavel ",
+              email:" ",
+              phone: " ",
             },
 
           ],
@@ -1596,57 +1634,60 @@ const EventDetails = () => {
         registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
       },
       "technical-event-22": {
-        title: "VoltEdge (PAPER PRESENTATION)",
+        title: "PAPER PRESENTATION",
         description:
-          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+          "Green Innovation in Food Processing Techniques is a platform that celebrates ideas and innovations shaping the future of food. The conference brings together students, researchers, academicians, and industry professionals to explore eco-friendly solutions, safe food practices, and sustainable technologies in food processing. This event encourages creative thinking, knowledge sharing, and meaningful discussions on building a greener, healthier, and more sustainable food system.",
         image: Tech22,
         rounds: [
           
           {
             title: "TOPICS:",
             description: [
-              "Internet of Things",
+              "Innovative Food Processing Techniques",
+              "Sustainable & Green Food Technologies",
+              "Future Foods and Alternative Protein Sources",
+              "Food Safety and Fermentation Technologies ",
+              "Eco-friendly & Smart Food Packaging",
+            
             ],
           },
         ],
         rules: [
-          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
-          "Use PowerPoint (PPT) or any specified tool for the slides.",
-          "The number of slides should be 10-15, keeping it clear and concise.",
-          "The presentation should have:",
-          "Title Slide (Paper title, authors, affiliation)",
-          "Introduction (Problem statement, objective)",
-          "Methodology (Approach, technologies used)",
-          "Results & Discussion (Findings, graphs, tables)",
-          "Conclusion & Future Work",
-          "References (if required)",
+           "Individual or team (up to 3 members) participation allowed.",
+           "Paper must be original and plagiarism-free.",
+            "Abstract (max 250 words) and full paper must be submitted before the deadline.",
+            "Abstract Submission Date:7 February",
+            "Full Paper Submission Date:10 February",
+            "8–10 minutes presentation + Q&A.",
+            "udges’ decision is final.",
+
         ],
         schedule: [
           {
-            round: "Venue",
-            date: "March 28, 2026",
-            time: "9:30AM -10:30AM",
-            location: "announcing soon",
+            round: "Round",
+            date: "February 13, 2026",
+            time: "9.00 AM to 2.00 PM ",
+            location: "Smart classroom",
           },
         ],
         contact: {
           facultyCoordinator: [
             {
-              name: "RAJASEKARAN N. AP / EEE",
-              email:"rajasekaran.n@ksrct.ac.in",
-              phone: "8056975723",
+              name: "Dr. K.Balasubramani",
+              email:"",
+              phone: "97892 52952",
             },
           ],
           studentCoordinator: [
             {
-              name: "TIVITH C",
-              email:"tivithpoongodi@gmail.com",
-              phone: "9345426277",
+              name: "Mr.Rajulapati Yatheeswar",
+              email:"",
+              phone: "9441236991",
             },
             {
-              name: "MOTUPALLI SHEKAR ",
-              email:"shekarmotupalli@gmail.com ",
-              phone: "8838510411",
+              name: "Mr S.Yogeshwaran ",
+              email:" ",
+              phone: "7305213626",
             },
 
           ],
@@ -1656,37 +1697,33 @@ const EventDetails = () => {
       },
 
       "technical-event-23": {
-        title: "VoltEdge (PAPER PRESENTATION)",
+        title: "PAPER PRESENTATION",
         description:
-          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+          "The field of Electronics and Communication Engineering is rapidly evolving with revolutionary trends such as 5G and upcoming 6G communication, Internet of Things (IoT), Artificial Intelligence in communication systems, and advanced embedded technologies. These innovations are transforming the way in high-speed connectivity, smart automation, and intelligent decision-making. Applications like smart cities,autonomous vehicles, healthcare monitoring, industrial automation, and next-generation wireless networks.",
         image: Tech23,
         rounds: [
           
           {
             title: "TOPICS:",
             description: [
-              "Internet of Things",
+              "Revolutionary Trends in Electronics and Communication Engineering",
             ],
           },
         ],
         rules: [
-          "The presentation should be within 5-7minutes, followed by a Q&A session of 2-3minutes.",
-          "Use PowerPoint (PPT) or any specified tool for the slides.",
-          "The number of slides should be 10-15, keeping it clear and concise.",
-          "The presentation should have:",
-          "Title Slide (Paper title, authors, affiliation)",
-          "Introduction (Problem statement, objective)",
-          "Methodology (Approach, technologies used)",
-          "Results & Discussion (Findings, graphs, tables)",
-          "Conclusion & Future Work",
-          "References (if required)",
+          "Individual or team participation (maximum 2 members).",
+          "Strict adherence to the allotted time.",
+          "Topics must align with the conference theme.",
+          "Original work only.",
+          "Professional conduct is expected throughout the event.",
+          "Judge’s decisions will be final.",
         ],
         schedule: [
           {
-            round: "Venue",
-            date: "March 28, 2026",
-            time: "9:30AM -10:30AM",
-            location: "announcing soon",
+            round: "Round",
+            date: "February 13, 2026",
+            time: "9.00 AM to 2.00 PM",
+            location: "Smart Class Room (Main Block)",
           },
         ],
         contact: {
@@ -3122,347 +3159,411 @@ const EventDetails = () => {
     // Workshop
     "workshop-1": {
       title:
-        "Design for Testability (DFT) Demystified:The Basics you need to Know",
+        "Agentic AI",
       description:
-        "Join our workshop to gain a basic understanding of DFT and its importance in the semiconductor industry. Open to UG & PG students from all branches, with mandatory attendance for certification. Participation certificates will be provided to all attendees!",
+        "A one-day workshop on “Agentic AI” will introduce participants to intelligent AI agents capable of autonomous decision-making, planning, and real-world problem solving. The session will be led by Mr. Dineshkumar Shanmugam, Founder & CEO of Wildrise, Korclub Consumer Private Limited, who brings strong industry expertise in AI-driven product development.Through expert talks and real-world use cases, participants will explore the architecture, applications, and future scope of Agentic AI across industries such as automation, robotics, and smart systems.The workshop is ideal for students and faculty interested in AI, Data Science, and Machine Learning. It will be held at AB Lab 2, with a registration fee of ₹300 per head.",
       image: workshop1,
       schedule: [
         {
           round: "Round  ",
-          date: "March 28, 2026",
-          time: "9:00 AM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
+          date: "February 12, 2026",
+          time: "1 day",
+          location: "AB Lab 2",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Dr.S.Gomathi",
-            email: "gomathi@ksrct.ac.in",
-            phone: "9894279244",
+            name: "Mr. S. Raja",
+            email: "",
+            phone: "7502821440",
           },
           {
-            name: "Mr.S.Pradeep ",
-            email: "pradeeps@ksrct.ac.in",
-            phone: "812213986",
+            name: "Mrs. A. Eswari ",
+            email: "",
+            phone: "9443181818",
           },
         ],
 
         studentCoordinator: [
           {
-            name: "Hari Kesavaraj J , Second Year EE (VLSI D&T)",
-            email: "harikesavaraj1806@gmail.com",
-            phone: "8270278279",
+            name: "S. Balamurugan, IV Year",
+            phone: "9487707552",
+            email: "",
           },
           {
-            name: "Aishvarieya V , Second Year EE (VLSI D&T)",
-            email: "aishvarieyav5@gmail.com",
-            phone: "6374684519",
+            name: "D. Vedhaanthan, III Year",
+            phone: "8825722898",
+            email: "",
           },
+          {
+            name: "A. Kayalvizhi, III Year",
+            phone: "8098214368",
+            email: "",
+          },
+          {
+            name: "Nivethitha, II Year",
+            phone: "6380446457",
+            email: "",
+          },
+
         ],
       },
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
     "workshop-2": {
-      title: "A Walkthrough of Modern Techniques",
-      description:
-        "This workshop will introduce students to prompt engineering, a critical skill for optimizing AI interactions. Participants will learn how to craft precise, efficient, and structured prompts to get the best responses from AI models like ChatGPT, Gemini, and DeepSeek. The session will cover types of prompts, best practices, real-world applications, and hands-on exercises to help students develop a deeper understanding of AI communication.",
+      title: "AI Arcade (AI Tools for Game Development)",
+
+      description: 
+       "Step into the AI Arcade and discover how AI tools can supercharge game development — build smarter, faster, and more creative games using cutting-edge AI tools.",
       image: workshop2,
       schedule: [
         {
-          round: "Venue ",
-          date: "March 28, 2026",
-          time: "9:00 PM to 3:00 PM",
-          location: "IT lab 1,IT Park ",
+          round: "Workshop",
+          duration: "1 Day",
+          venue: "AB Lab 1",
+          registrationFee: "₹300",
         },
       ],
       contact: {
         facultyCoordinator: [
-          {
-            name: "Mr.P.Dinesh Kumar ",
-            phone: "9688837873",
-            email: "p.dineshkumar@ksrct.ac.in",
-          },
+         {
+          name: "Ms. M. Indumathi",
+          designation: "Assistant Professor",
+          phone: "9715247992",
+          email: "",
+      },
+      {
+        name: "Mr. S. Vinothkumar",
+        designation: "Assistant Professor",
+        phone: "7548898727",
+        email: "",
+      },
         ],
         studentCoordinator: [
-          {
-            name: "Anisa F",
-            phone: "9942651212",
-            email: "anisafairoz@gmail.com",
-          },
-          {
-            name: "Balasastha E",
-            phone: "8056520787",
-            email: "balasastha85266@gmail.com",
-          },
+         {
+          name: "Jevithesh",
+          year: "III Year",
+          department: "CSE (AIML)",
+          phone: "8072827232",
+          email: "",
+      },
+      {
+        name: "Hanish J",
+        year: "II Year",
+        department: "CSE (AIML)",
+        phone: "8072813642",
+        email: "",
+      },
+      {
+        name: "Bharanidharan P",
+        year: "I Year",
+        department: "CSE (AIML)",
+        phone: "9789282253",
+        email: "",
+      },
+      {
+        name: "Lesanth N",
+        year: "III Year",
+        department: "CSE (AIML)",
+        phone: "6385643934",
+        email: "",
+      },
         ],
       },
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
     "workshop-3": {
-      title: "Ui Path Supported Workshop” Robotic Process Automation”",
-      description:
-        "Join our UiPath-Supported Workshop on Robotic Process Automation (RPA) led by Mr. M. Senthil, Lead Technical Trainer at ICT Academy, Chennai. Gain hands-on experience in automation tools and techniques to enhance workflow efficiency. Don’t miss this opportunity to elevate your automation skills! 🚀",
+      title: "Next Generation Sequencing Technologies",
+
+      description: 
+          "This workshop introduces Next-Generation Sequencing (NGS) technologies used in modern and future genomic and biomedical research.Participants gain industry-oriented knowledge on advanced sequencing platforms, workflows, and data analysis trends.The session connects molecular biology and genomics theory with real-time clinical, agricultural, and research applications.",
+          
       image: workshop3,
-      schedule: [
-        {
-          round: "Workshop timing",
-          date: "March 28, 2026",
-          time: "10:00 AM to 3:00 PM",
-          location: "AI Lab, Mechatronics Block",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr N.Giridharan ",
-            email: "giridharan@ksrct.ac.in",
-            phone: "8925325252",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Gowrinath V",
-            email: "gowrigowri75392@gmail.com",
-            phone: "8056570574",
-          },
-          {
-            name: "Durga S",
-            email: "durgasaran2004@gmail.com",
-            phone: "9080191925",
-          },
-        ],
+      
+
+     schedule: [
+    {
+      round: "Workshop",
+      date:"February 12, 2026",
+      time: "1 Day",
+      location: "Dr. M S Swaminathan Biotech Seminar Hall",
+      
+    },
+  ],
+
+  contact: {
+    facultyCoordinator: [
+      {
+          name: "Dr. Rahul Chauhan",
+          designation: "Assistant Professor",
+          phone: "",
+          email: "",
       },
+    ],
+
+    studentCoordinator: [
+      {
+          name: "S. Raamprasaanth",
+          year: "III Year",
+          department: "Biotechnology",
+          phone: "8838616292",
+          email: "",
+      },
+      {
+          name: "E.K.A. Lakshitha",
+          year: "III Year",
+          department: "Biotechnology",
+          phone: "9095622122",
+          email: "",
+      },
+      {
+          name: "R. Hari",
+          year: "III Year",
+          department: "Biotechnology",
+          phone: "9751239792",
+          email: "",
+      },
+    ],
+  },
+
+
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
     "workshop-4": {
-      title: "AI in Game Developing",
-      description:
-        "The AI on Game Developing Workshop, organized by IITM Pravartak Technologies Foundation, is a two-day event designed to introduce participants to the integration of Artificial Intelligence (AI) in game development. This hands-on workshop covers key AI techniques such as pathfinding, decision-making algorithms, and neural networks, enabling participants to create intelligent game characters, optimize game mechanics, and enhance player experience. Open to students, professionals, and AI/game development enthusiasts, no prior experience is required—just a basic understanding of programming is recommended. Inter-specialization teams are welcome, and registration is free! 🚀🎮",
-      image: workshop4,
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mrs. R.S. Sivarajani (AP/CSE(AIML))",
-            email: "sivaranjani.rs@ksrct.ac.in",
-            phone: "9677055783",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Surendra Krishana R (III-Year/CSE(AIML))",
-            email: "surendirakrishna.info@gmail.com",
-            phone: "8438878063",
-          },
-          {
-            name: "Sriharan S (III-Year/CSE(AIML))",
-            email: "sriharan2544@gmail.com",
-            phone: "9629729009",
-          },
-        ],
+  title: "BIM (Building Information Modeling)",
+
+  description: "Master the future of construction in this BIM workshop, where 3D design meets intelligent data integration to streamline project lifecycles, improve collaboration, minimize structural errors, and build expertise using industry-standard tools for the digital transformation of the Architecture, Engineering, and Construction (ACE) industry.",
+
+  image: workshop4,
+  schedule: [
+    {
+      location: "Civil CADD Laboratory",
+      time: "1 Day",
+      date: "February 12, 2026",
+    },
+  ],
+
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Dr. S. Gunasekar",
+        phone: "9976876238",
+        email: "",
       },
+    ],
+
+    studentCoordinator: [
+      {
+        name: "S. Sandhiya",
+        phone: "9659953151",
+        email: "",
+      },
+      {
+        name: "M. Keerthi Varshini",
+        phone: "8870016266",
+        email: "",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
     "workshop-5": {
-      title: "Blockchain 101",
-      description:
-        "Blockchain 101  is an introductory workshop designed to help developers understand blockchain technology and its practical applications. It covers key concepts such as decentralization, cryptographic security, consensus mechanisms, and smart contracts. Participants will gain hands-on experience in writing and deploying smart contracts using Solidity and working with blockchain development tools like Remix, Truffle, and MetaMask. By the end of the session, attendees will have a solid foundation in blockchain and the skills to start building decentralized applications (DApps).",
-      image: workshop5,
-      schedule: [
-        {
-          round: "Event Timing",
-          date: "March 28, 2026",
-          time: "9:00 AM to 4:00 PM",
-          location: "AB 209, Academic Block",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr. P. Venkatesh",
-            email: "venkateshp@ksrct.ac.in",
-            phone: "8903366916",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Mohanakumaran K",
-            email: "mohanakumaran2004@gmail.com",
-            phone: "8838401078",
-          },
-          {
-            name: "Narendar P",
-            email: "naren20062005@gmail.com",
-            phone: "8508774247",
-          },
-        ],
+  title: "Blockchain Beyond Crypto: Real-World Applications",
+
+  description: "This workshop introduces blockchain technology beyond cryptocurrencies, focusing on real-world applications across industries such as supply chain management, healthcare, finance, governance, digital identity, and data security, while exploring how decentralization, transparency, and trust solve challenges in traditional systems through practical examples and discussions.",
+
+ 
+image: workshop5,
+  schedule: [
+    {
+      location: "AB LAB-4",
+      duration: "1 Day",
+      date: "February 12, 2026",
+    },
+  ],
+
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mrs. T. Udhaya",
+        designation: "Assistant Professor",
+        phone: "8675587180",
+        email: "",
       },
+    ],
+
+    studentCoordinator: [
+      {
+        name: "G. Abinithi",
+        year: "III Year",
+        department: "CSBS",
+        phone: "9787202300",
+        email: "",
+      },
+      {
+        name: "B. Mahitha",
+        year: "III Year",
+        department: "CSBS",
+        phone: "9360503971",
+        email: "",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
     "workshop-6": {
-      title:
-        "Mobile Application Development By RemitBee India Private Limited - Chennai",
-      description:
-        "In today’s digital world, mobile applications are a key driver of how individuals and businesses engage with technology. This Mobile Application Development Workshop aims to equip participants with a solid grasp of mobile app development across both Android and iOS platforms. The workshop will feature hands-on training, live coding, and a mini-project to implement learned concepts in practice",
-      image: workshop6,
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr K.Dinesh Kumar",
-            email: "dineshkumark@ksrct.ac.in",
-            phone: "9360287212",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Kaviya S",
-            email: "kaviyasenthil12005@gmail.com",
-            phone: "6382491543",
-          },
-          {
-            name: "Obu Sharva Dharshini O ",
-            email: "obusharvadharshinio@gmail.com",
-            phone: "6381014001",
-          },
-        ],
+  title: "CyberStrike",
+
+  description: "CyberStrike is a high-impact hands-on cybersecurity workshop designed to introduce participants to the fundamentals of cybersecurity and real-world web application security. The event covers career insights, essential security concepts, and practical exposure to OWASP Top 10 vulnerabilities through live demonstrations and guided activities. Participants will learn how attacks happen, how to defend systems, and how to build secure applications with industry-relevant knowledge and techniques.",
+  image: workshop6,
+  schedule: [
+    {
+      location: "CSE LAB 1",
+      duration: "1 Day",
+      date: "February 12, 2026",
+    },
+  ],
+
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "M. Saradha",
+        department: "CSE",
+        phone: "8056575711",
+        email: "",
       },
+    ],
+
+    studentCoordinator: [
+      {
+        name: "K.L. Peranandha",
+        
+        phone: "8148537603",
+        email: "",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
     "workshop-7": {
-      title: "Do Engineering using NI Lab VIEW By Mew Technology, Bangalore",
-      description:
-        "Participants will learn to create virtual instruments, control hardware, and analyze data. The workshop focuses on practical applications in engineering and control systems.",
-      image: workshop7,
-      schedule: [
-        {
-          round: "Venue",
-          date: "March 28 & 22, 2026",
-          time: "9:00 AM to 4:00 PM",
-          location: "Computer Lab,EEE Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr. Thangadurai A",
-            email: "thangaduraia@ksrct.ac.in ",
-            phone: "9095322233",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Bhuwanesh R",
-            email: "bhuwanesh2004@gmail.com",
-            phone: "9342566322",
-          },
-          {
-            name: "Karmuhilan V",
-            email: "karmuhilan90252@gmail.com ",
-            phone: "9025244374",
-          },
-        ],
+  title: "The Future of IoT: LoRaWAN with Artificial Intelligence",
+
+  description: "The Future of IoT: LoRaWAN with Artificial Intelligence workshop by Enthu Technology Solutions India Pvt. Ltd. introduces participants to long-range, low-power IoT communication using LoRaWAN and its integration with AI. The session highlights real-world applications like smart cities, agriculture, and industrial automation through practical demonstrations and insights into intelligent IoT systems.",
+
+  image: workshop7,
+
+  schedule: [
+    {
+      location: "Embedded System Laboratory",
+      duration: "9:00 AM to 4:00 PM",
+      date: "February 12, 2026",
+    },
+  ],
+
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. Mohanraj AP",
+        phone: "8056575711",
+        email: "",
       },
+    ],
+
+    studentCoordinator: [
+      {
+        name: "Srinivasan P",
+        phone: "6383319663",
+        email: "",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
     "workshop-8": {
-      title:
-        "Next Generation Sequencing technologies in Health Care By Genotypic Technology, Bengaluru",
-      description:
-        "An interactive workshop providing hands-on experience and insights into cutting-edge sequencing technologies.",
-      image: workshop8,
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 28, 2026",
-          time: "10:00 AM to 4:00 PM",
-          location: "Bio tech smart class,BIOTECH Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Dr. Puniethaa Prabhu",
-            email: "punithaa@ksrct.ac.in",
-            phone: "9080195801",
-          },
-          {
-            name: "Dr. Sidhra S",
-            email: "sidhra@ksrct.ac.in",
-            phone: "8870681797",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Sanjay Kumar K",
-            email: "sanjaysanjay212004@gmail.com",
-            phone: "8807076569",
-          },
-          {
-            name: "Mohammed Arkam K",
-            email: "mohammedarkamsheriff@gmail.com",
-            phone: "7904655755",
-          },
-          {
-            name: "Raamprasaanth S",
-            email: "raamprasaanths7607@gmail.com",
-            phone: "8838616292",
-          },
-        ],
+  title: "EV- Retrofitting",
+
+  description: "The Workshop on EV Retrofitting is designed to provide participants with comprehensive knowledge of converting conventional internal combustion engine (ICE) vehicles into electric vehicles. This workshop focuses on fundamental principles, design considerations, and practical aspects involved in EV retrofitting, including motor selection, battery systems, power electronics, motor controllers, charging infrastructure, and safety standards.",
+
+  image: workshop8,
+
+  schedule: [
+    {
+      location: "EEE Project Lab",
+      duration: "2 Days",
+      date: "February 12, 2026",
+    },
+  ],
+
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. E. Chandrakumar",
+        
+        phone: "",
+        email: "",
       },
+    ],
+
+    studentCoordinator: [
+      {
+        name: "Mr. Sujaysarvesh D",
+        
+        phone: "7708758486",
+        email: "",
+      },
+      {
+        name: "Mr. Muhildharshan L",
+       
+        phone: "9597033919",
+        email: "",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
     "workshop-9": {
-      title:
-        "Soaring High: Hands-on Drone Building and Flight workshop By Garuda Aerospace",
-      description:
-        "Join our Hands-on Drone Building and Flight Workshop and experience the thrill of creating and flying your own drone! This interactive session covers drone assembly, aerodynamics, and real-world applications, giving you practical insights into UAV technology. With expert guidance, you'll build your drone from scratch and take it for a test flight, mastering essential piloting skills. Whether you're a beginner or a tech enthusiast, this workshop will elevate your knowledge and take you to new heights!",
-      image: workshop9,
-      schedule: [
-        {
-          round: "Round ",
-          date: "March 28 & 29, 2026",
-          time: "9:00 AM to 4:00 PM",
-          location:
-            "Centre of Excellence in Drone Technology,Mechatronics Block ",
-        },
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Mr. S. Hari Prasadh",
-            email: "hariprasadh@ksrct.ac.in",
-            phone: "7092821630",
-          },
-          {
-            name: "Mr. R. Vivek",
-            email: "vivekr@ksrct.ac.in",
-            phone: "7200458826",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Soundarrajan A",
-            email: "soundarrajan2004@gmail.com",
-            phone: "9442727410",
-          },
-        ],
+  title: "Sustainable Innovation in Food Processing Techniques",
+
+  description: "Students will actively engage in hands-on sessions to explore innovative and sustainable food processing techniques, focusing on waste reduction, energy efficiency, and value addition. Through live demonstrations and guided activities, participants will design, analyze, and improve food processing methods using eco-friendly practices, while collaborating to develop practical solutions for real-world food sustainability challenges.",
+
+  image: workshop9,
+  schedule: [
+    {
+      location: "Baking and Confectionery Laboratory",
+      duration: "1 Day",
+      date: "February 12, 2026",
+    },
+  ],
+
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. T.G.N. Nagarjun",
+        phone: "8754394242",
+        email: "",
       },
+    ],
+
+    studentCoordinator: [
+      {
+        name: "Ms. R. Pavithra",
+        phone: "9345894830",
+        email: "",
+      },
+      {
+        name: "Mr. V. Lithin Prasath",
+        phone: "9791320244",
+        email: "",
+      },
+    ],
+  },
+
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
     },
     "workshop-10": {
