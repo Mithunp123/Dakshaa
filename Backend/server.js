@@ -740,24 +740,11 @@ app.post("/payment/initiate", async (req, res) => {
         if (!event) continue;
 
         const price = Number(event.price) || 0;
-        const isConference = (event.category || '').toLowerCase() === 'conference';
 
         if (item.type === 'team') {
            // Team Logic
            const count = Number(item.member_count);
-           let itemTotal = 0;
-           
-           // Apply 50% discount for additional conference attendees
-           if (isConference && count > 1) {
-             // First person pays full price, additional people pay 50%
-             const firstPersonPrice = price;
-             const additionalPeoplePrice = price * 0.5 * (count - 1);
-             itemTotal = firstPersonPrice + additionalPeoplePrice;
-             console.log(`📋 Conference discount applied: ${count} people, First: ₹${firstPersonPrice}, Additional: ₹${additionalPeoplePrice}, Total: ₹${itemTotal}`);
-           } else {
-             itemTotal = price * count;
-           }
-           
+           const itemTotal = price * count;
            totalCalculatedAmount += itemTotal;
 
            // Create Inactive Team NOW
@@ -946,18 +933,42 @@ app.post("/payment/initiate", async (req, res) => {
 
     const order_id = `ORDER_${new Date().toISOString().split('T')[0].replace(/-/g, '')}_${Date.now()}_${actualBookingId.toString().substring(0, 8)}`;
 
+    // [New] Check for insufficient amount credit
+    let finalAmount = (booking_type === 'team' || booking_type === 'mixed_registration') ? computedAmount : amount;
+    let usedCredit = 0;
+    
+    try {
+      const { data: creditData } = await supabase
+        .from('insufficient_amount')
+        .select('amount')
+        .eq('userid', user_id)
+        .single();
+      
+      if (creditData && creditData.amount > 0) {
+        const credit = parseFloat(creditData.amount);
+        console.log(`ℹ️ User ${user_id} has credit of ₹${credit}`);
+        
+        usedCredit = credit;
+        finalAmount = Math.max(1, finalAmount - credit); // Ensure at least ₹1 is paid if using gateway
+        
+        console.log(`💰 Applied credit. Original: ₹${(booking_type === 'team' || booking_type === 'mixed_registration') ? computedAmount : amount}, New Due: ₹${finalAmount}`);
+      }
+    } catch (creditErr) {
+      console.error("Error checking credit:", creditErr);
+    }
+
     // Format payment payload for gateway
     // Append order_id to callback_url so it persists through the gateway's redirect
     const callback_url = `http://localhost:3000/payment/callback?order_id=${order_id}`;
 
     const paymentPayload = {
-      dueamount: (booking_type === 'team' || booking_type === 'mixed_registration') ? computedAmount : amount,
+      dueamount: finalAmount, // Use calculated final amount
       regno :  `DakshaaT26-${customer_phone}`,
       apporderid: order_id,
       fullname: profile.full_name,
       emailid: customer_email,
       mobileno: customer_phone,
-      clg: profile.college_name || "N/A",
+      clg: "KSRCT",
       eventname: "DakshaaT26"
     };
     const paymentInsertData = {
@@ -965,10 +976,18 @@ app.post("/payment/initiate", async (req, res) => {
       order_id: order_id,
       booking_id: actualBookingId,
       booking_type: booking_type,
-      amount: (booking_type === 'team' || booking_type === 'mixed_registration') ? computedAmount : amount,
+      amount: finalAmount, // Use calculated final amount
       status: 'INITIATED',
-      gateway_payload: paymentPayload
+      gateway_payload: {
+          ...paymentPayload,
+          metadata: { // Moving metadata inside gateway_payload to avoid schema changes
+            original_amount: (booking_type === 'team' || booking_type === 'mixed_registration') ? computedAmount : amount,
+            credit_used: usedCredit
+          }
+      }
     };
+
+
     if (booking_type === 'team') {
       const { team_name, event_id, member_count } = req.body;
       const pricePerMember = Number(teamEventRow?.price) || 0;
@@ -1198,6 +1217,29 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
                      paymentStatus = 'PENDING'; 
                      remainingAmount = expectedAmount - receivedAmount;
                      errorMsg = `Partial Payment: remaining ${remainingAmount}`;
+
+                     // [NEW] Update Insufficient Amount Table - Store accumulated partial payments
+                     try {
+                        const { data: currIn } = await supabase
+                             .from('insufficient_amount')
+                             .select('amount')
+                             .eq('userid', paymentRecord.user_id)
+                             .single();
+                        
+                        const currentStored = (currIn && currIn.amount) ? parseFloat(currIn.amount) : 0;
+                        const newStored = currentStored + receivedAmount;
+
+                        await supabase.from('insufficient_amount').upsert({
+                            userid: paymentRecord.user_id,
+                            amount: newStored,
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'userid' });
+                        
+                        console.log(`💾 Stored partial amount for user ${paymentRecord.user_id}: +${receivedAmount} (Total stored: ${newStored})`);
+                     } catch(err) {
+                        console.error("Failed to update insufficient_amount table:", err);
+                     }
+
                  } else {
                      console.error(`❌ Payment Security Alert: Amount mismatch! Expected: ${expectedAmount}, Received: ${receivedAmount}`);
                      paymentStatus = 'FAILED'; 
@@ -1205,6 +1247,12 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
                  }
              } else {
                  console.log(`✅ Amount Verified matches: ${receivedAmount} == ${expectedAmount}`);
+                 
+                 // [NEW] Payment Complete -> Remove from insufficient table
+                 try {
+                    await supabase.from('insufficient_amount').delete().eq('userid', paymentRecord.user_id);
+                    console.log(`🗑️ Cleared insufficient_amount record for user ${paymentRecord.user_id}`);
+                 } catch(err) { console.error("Failed to clear insufficient_amount:", err); }
              }
         }
     }
@@ -1796,71 +1844,6 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
         console.error("❌ Failed to send payment email:", err);
       }
 
-      // 🎁 REFERRAL TRACKING - Increment referral usage count on successful payment
-      try {
-        // Get user's referred_by from profile
-        const { data: userProfileForReferral } = await supabase
-          .from('profiles')
-          .select('referred_by')
-          .eq('id', paymentRecord.user_id)
-          .single();
-
-        const referredBy = userProfileForReferral?.referred_by?.trim();
-
-        if (referredBy) {
-          console.log('🎁 Processing referral for:', referredBy);
-
-          // Check if it's a 10-digit mobile number (KSRCT student) or alphanumeric ID (outside student)
-          const isMobileNumber = /^\d{10}$/.test(referredBy);
-          const usageLimit = isMobileNumber ? 50 : 25;
-
-          // Fetch current referral code record
-          const { data: referralRecord, error: referralFetchError } = await supabase
-            .from('referral_code')
-            .select('*')
-            .eq('referral_id', referredBy)
-            .maybeSingle();
-
-          if (referralFetchError) {
-            console.error('❌ Error fetching referral code:', referralFetchError);
-          } else if (referralRecord) {
-            // Check if within usage limit
-            if (referralRecord.usage_count < usageLimit) {
-              // Increment the usage count
-              const { error: updateError } = await supabase
-                .from('referral_code')
-                .update({ usage_count: referralRecord.usage_count + 1 })
-                .eq('referral_id', referredBy);
-
-              if (updateError) {
-                console.error('❌ Error incrementing referral count:', updateError);
-              } else {
-                console.log(`✅ Referral count incremented for ${referredBy}: ${referralRecord.usage_count + 1}/${usageLimit}`);
-              }
-            } else {
-              console.log(`⚠️ Referral limit reached for ${referredBy}: ${referralRecord.usage_count}/${usageLimit} - bypassing increment`);
-            }
-          } else {
-            // Referral code not found in table - create it with count 1
-            const { error: insertError } = await supabase
-              .from('referral_code')
-              .insert({
-                referral_id: referredBy,
-                usage_count: 1
-              });
-
-            if (insertError) {
-              console.error('❌ Error creating referral code record:', insertError);
-            } else {
-              console.log(`✅ New referral code created and counted for ${referredBy}: 1/${usageLimit}`);
-            }
-          }
-        }
-      } catch (referralErr) {
-        console.error('❌ Error processing referral:', referralErr);
-        // Don't fail the payment process if referral tracking fails
-      }
-
       // Localhost notification removed as per request
       console.log("✅ Payment successful handling complete.");
     } else {
@@ -2114,4 +2097,4 @@ app.get("/api/admin/finance", async (req, res) => {
 // Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+});//on 24-01-2026
