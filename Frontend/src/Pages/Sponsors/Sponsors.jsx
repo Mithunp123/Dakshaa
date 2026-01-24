@@ -76,7 +76,7 @@ function Sponsors() {
 
       {/* Title Sponsors Section */}
       <div className="text-center w-full">
-        <h2 className="text-3xl font-bold mb-10">Title Sponsers</h2>
+        <h2 className="text-3xl font-bold mb-10">Title Sponser</h2>
         <div className="flex justify-center flex-wrap gap-6">
           {titlesponser.map((image, index) => (
             <motion.div
@@ -94,7 +94,7 @@ function Sponsors() {
 
       {/* Co-Sponsor Section */}
       <div className="text-center w-full">
-        <h2 className="text-3xl font-bold mb-10">Co-Sponsor</h2>
+        <h2 className="text-3xl font-bold mb-10">Co-Sponsors</h2>
         <div className="flex justify-center">
           {cosponser.map((image, index) => (
             <motion.div

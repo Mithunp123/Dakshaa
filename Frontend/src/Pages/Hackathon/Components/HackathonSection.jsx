@@ -76,41 +76,24 @@ const HackathonSection = () => {
       ],
       schedule: [
         {
-<<<<<<< HEAD
           round: "Event",
           date: "12th Feb - 13th Feb, 2026",
           time: "9:00 AM to 9:00 PM",
-=======
-          round: "Venue",
-          date: "12th February  9 AM TO 13th February 9 PM",
-          time: "10:00 AM",
->>>>>>> bff9636338fa43553ebbcc817878e360dffa43c3
           location: "IT PARK",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-<<<<<<< HEAD
-            name: "S.VADIVEL / CSE",
+            name: "Mr.S.VADIVEL",
             phone: "+91 97906 32171",
-=======
-            name: "Mr.S.VADIVEL  ",
-            phone: "9790632171",
->>>>>>> bff9636338fa43553ebbcc817878e360dffa43c3
             email: "senthilkumark@ksrct.ac.in",
           },
         ],
         studentCoordinator: [
           {
-<<<<<<< HEAD
-            name: "SHANMUGESHWARA A / III-Year CSE",
-            phone: "+91 94871 19381",
-            email: "poornasri664@gmail.com",
-=======
             name: "Mr.A.SHANMUGESHWARA",
-            phone: "9487119381",
->>>>>>> bff9636338fa43553ebbcc817878e360dffa43c3
+            phone: "+91 94871 19381",
           },
         ],
       },
