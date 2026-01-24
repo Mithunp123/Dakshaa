@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Calendar, 
@@ -10,38 +10,49 @@ import {
   ChevronRight,
   Star
 } from 'lucide-react';
+import { supabase } from '../../../supabase';
 
 const EventSchedule = () => {
   const [activeDay, setActiveDay] = useState(1);
   const [filter, setFilter] = useState('My Events'); // 'My Events' or 'All Events'
+  const [schedule, setSchedule] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  const schedule = {
-    1: [
-      { time: '09:00 AM', name: 'Workshops (5 parallel)', venue: 'Various Labs', category: 'Workshop', coordinator: 'Workshop Team', phone: '+91 98765 43210', isMyEvent: true },
-      { time: '09:00 AM', name: 'Technical Events – Round 1', venue: 'Seminar Halls', category: 'Technical', coordinator: 'Tech Team', phone: '+91 98765 43211', isMyEvent: true },
-      { time: '09:00 AM', name: 'Registration & QR Attendance', venue: 'Help Desk', category: 'General', coordinator: 'Admin Team', phone: '+91 98765 43212', isMyEvent: false },
-      { time: '01:30 PM', name: 'Workshops (4 parallel)', venue: 'Various Labs', category: 'Workshop', coordinator: 'Workshop Team', phone: '+91 98765 43210', isMyEvent: true },
-      { time: '01:30 PM', name: 'Non-Technical Events (FREE)', venue: 'Open Grounds', category: 'Non-Technical', coordinator: 'Non-Tech Team', phone: '+91 98765 43213', isMyEvent: true },
-      { time: '04:30 PM', name: 'Hackathon Inauguration', venue: 'Main Auditorium', category: 'Hackathon', coordinator: 'Hackathon Team', phone: '+91 98765 43214', isMyEvent: true },
-    ],
-    2: [
-      { time: '09:00 AM', name: 'Workshops (5 parallel)', venue: 'Various Labs', category: 'Workshop', coordinator: 'Workshop Team', phone: '+91 98765 43210', isMyEvent: true },
-      { time: '09:00 AM', name: 'Technical Events – Finals', venue: 'Seminar Halls', category: 'Technical', coordinator: 'Tech Team', phone: '+91 98765 43211', isMyEvent: true },
-      { time: '09:00 AM', name: 'Non-Technical Events (FREE)', venue: 'Open Grounds', category: 'Non-Technical', coordinator: 'Non-Tech Team', phone: '+91 98765 43213', isMyEvent: false },
-      { time: '01:30 PM', name: 'Codeathon & Designathon', venue: 'IT Labs', category: 'Technical', coordinator: 'Coding Team', phone: '+91 98765 43215', isMyEvent: true },
-      { time: '01:30 PM', name: 'Startup TN Idea Pitch', venue: 'Conference Hall', category: 'Startup', coordinator: 'Startup Team', phone: '+91 98765 43216', isMyEvent: true },
-      { time: '05:30 PM', name: 'Grand Cultural Night', venue: 'Main Stage', category: 'Cultural', coordinator: 'Cultural Team', phone: '+91 98765 43217', isMyEvent: true },
-    ],
-    3: [
-      { time: '09:00 AM', name: 'Workshops (Remaining 4)', venue: 'Various Labs', category: 'Workshop', coordinator: 'Workshop Team', phone: '+91 98765 43210', isMyEvent: true },
-      { time: '09:00 AM', name: 'Non-Technical Events (FREE)', venue: 'Open Grounds', category: 'Non-Technical', coordinator: 'Non-Tech Team', phone: '+91 98765 43213', isMyEvent: true },
-      { time: '01:00 PM', name: 'Hackathon Final Demo', venue: 'Main Auditorium', category: 'Hackathon', coordinator: 'Hackathon Team', phone: '+91 98765 43214', isMyEvent: true },
-      { time: '01:00 PM', name: 'Tech Event Grand Finals', venue: 'Seminar Halls', category: 'Technical', coordinator: 'Tech Team', phone: '+91 98765 43211', isMyEvent: true },
-      { time: '04:30 PM', name: 'Valedictory & Prize Distribution', venue: 'Main Auditorium', category: 'General', coordinator: 'Admin Team', phone: '+91 98765 43212', isMyEvent: true },
-    ]
+  useEffect(() => {
+    fetchSchedule();
+  }, []);
+
+  const fetchSchedule = async () => {
+    try {
+      setLoading(true);
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+
+      // Ensure backend runs on 3000 or configure via env
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+      const response = await fetch(`${API_URL}/api/schedule${userId ? `?userId=${userId}` : ''}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setSchedule(data.schedule);
+      } else {
+        console.error('Failed to load schedule:', data.error);
+        // Fallback to empty if fetch fails
+        setSchedule({});
+      }
+    } catch (error) {
+      console.error('Error fetching schedule:', error);
+      setSchedule({});
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filteredSchedule = schedule[activeDay].filter(event => 
+  const activeDaySchedule = schedule[activeDay] || [];
+
+  const filteredSchedule = activeDaySchedule.filter(event => 
     filter === 'All Events' || (filter === 'My Events' && event.isMyEvent)
   );
 
@@ -91,6 +102,11 @@ const EventSchedule = () => {
 
       {/* Schedule List */}
       <div className="space-y-4">
+        {loading ? (
+             <div className="flex justify-center items-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary"></div>
+             </div>
+        ) : (
         <AnimatePresence mode="wait">
           <motion.div
             key={`${activeDay}-${filter}`}
@@ -136,22 +152,30 @@ const EventSchedule = () => {
                     </div>
                   </div>
 
-                  {/* Coordinator Info */}
-                  <div className="md:w-48 shrink-0 flex flex-col gap-2">
-                    <div className="flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/5">
-                      <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center text-secondary">
-                        <Phone size={14} />
+                  {/* Coordinator Info & Mobile Actions */}
+                  <div className="md:w-56 shrink-0 flex flex-col gap-2 w-full mt-2 md:mt-0">
+                    <a 
+                      href={event.phone ? `tel:${event.phone}` : undefined}
+                      className={`flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/5 transition-all w-full relative group/btn ${
+                        event.phone ? 'hover:bg-secondary/10 hover:border-secondary/30 active:scale-95 cursor-pointer' : ''
+                      }`}
+                    >
+                      <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center text-secondary shrink-0 group-hover/btn:bg-secondary group-hover/btn:text-white transition-colors">
+                        <Phone size={18} />
                       </div>
-                      <div className="overflow-hidden">
+                      <div className="overflow-hidden flex-1 text-left">
                         <p className="text-[10px] text-gray-500 uppercase font-bold">Coordinator</p>
-                        <p className="text-xs font-bold truncate">{event.coordinator}</p>
+                        <p className="text-sm font-bold truncate text-white">{event.coordinator}</p>
                       </div>
-                    </div>
+                      
+                      {/* Mobile Call Indicator */}
+                      {event.phone && (
+                        <div className="md:hidden flex items-center justify-center w-8 h-8 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
+                           <Phone size={14} className="fill-current" />
+                        </div>
+                      )}
+                    </a>
                   </div>
-
-                  <button className="p-3 bg-white/5 hover:bg-secondary hover:text-white rounded-2xl transition-all">
-                    <ChevronRight size={20} />
-                  </button>
                 </div>
               ))
             ) : (
@@ -172,6 +196,7 @@ const EventSchedule = () => {
             )}
           </motion.div>
         </AnimatePresence>
+        )}
       </div>
     </div>
   );

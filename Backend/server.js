@@ -2095,6 +2095,115 @@ app.get("/api/admin/finance", async (req, res) => {
 });
 
 // Start Server
+/* 🟢 Route to Fetch Schedule Data */
+app.get("/api/schedule", async (req, res) => {
+  try {
+    const { userId } = req.query;
+    console.log(`📅 Fetching schedule for userId: ${userId || 'Guest'}`);
+
+    // 1. Fetch all active events with schedule info
+    const { data: events, error: eventsError } = await supabase
+      .from('events')
+      .select('id, event_id, name, venue, category, event_date, start_time, coordinator_name, coordinator_contact')
+      .eq('is_active', true)
+      .order('start_time', { ascending: true });
+
+    if (eventsError) {
+      console.error('Error fetching events:', eventsError);
+      throw eventsError;
+    }
+
+    // 2. If userId is provided, fetch user registrations to mark "My Events"
+    let myRegisteredEventIds = new Set();
+    if (userId) {
+      const { data: registrations, error: regError } = await supabase
+        .from('registrations')
+        .select('event_id')
+        .eq('user_id', userId);
+        
+       if (!regError && registrations) {
+           registrations.forEach(r => {
+             if (r.event_id) myRegisteredEventIds.add(r.event_id);
+           });
+       }
+       console.log(`📅 Found ${myRegisteredEventIds.size} registrations for user`);
+    }
+
+    // 3. Helper Functions
+    const formatTime = (timeStr) => {
+        if (!timeStr) return 'TBA';
+        try {
+          // Handle ISO string or simple time string
+          let timeOnly = timeStr;
+          if (timeStr.includes('T')) {
+             timeOnly = timeStr.split('T')[1];
+          }
+          
+          const [hours, minutes] = timeOnly.split(':');
+          const h = parseInt(hours);
+          const ampm = h >= 12 ? 'PM' : 'AM';
+          const h12 = h % 12 || 12; 
+          return `${h12}:${minutes} ${ampm}`;
+        } catch (e) {
+          return timeStr;
+        }
+    };
+
+    const formatCategory = (cat) => {
+        if (!cat) return 'General';
+        // Capitalize first letter
+        return cat.charAt(0).toUpperCase() + cat.slice(1);
+    };
+
+    // Explicit Date Mapping Logic
+    const getDayFromDate = (dateStr) => {
+        if (!dateStr) return null;
+        // Normalize date string (take YYYY-MM-DD part), trim whitespace
+        const datePart = typeof dateStr === 'string' ? dateStr.trim().split('T')[0] : '';
+        
+        if (datePart === '2026-02-12') return 1;
+        if (datePart === '2026-02-13') return 2;
+        if (datePart === '2026-02-14') return 3;
+        
+        return null; 
+    };
+
+    // 4. Transform data structure
+    const schedule = {};
+    schedule[1] = [];
+    schedule[2] = [];
+    schedule[3] = [];
+
+    events.forEach(event => {
+        const day = getDayFromDate(event.event_date);
+        
+        if (day) {
+            // Check matches against UUID (id) OR Text ID (event_id)
+            const isMyEvent = userId ? (
+              myRegisteredEventIds.has(event.event_id) || 
+              myRegisteredEventIds.has(event.id)
+            ) : false;
+
+            schedule[day].push({
+                time: formatTime(event.start_time),
+                name: event.name,
+                venue: event.venue || 'TBA',
+                category: formatCategory(event.category),
+                coordinator: event.coordinator_name || 'Coordinator',
+                phone: event.coordinator_contact || '',
+                isMyEvent: isMyEvent
+            });
+        }
+    });
+
+    res.json({ success: true, schedule });
+
+  } catch (error) {
+    console.error('Error in /api/schedule:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });//on 24-01-2026
