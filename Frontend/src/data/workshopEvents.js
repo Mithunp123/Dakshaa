@@ -42,62 +42,77 @@ export const workshopEvents = [
   {
     image: workshop1,
     eventId: "workshop-aids",
+    price: 300,
   },
   {
     image: workshop2,
     eventId: "workshop-aiml",
+    price: 300,
   },
   {
     image: workshop3,
     eventId: "workshop-bt",
+    price: 300,
   },
   {
     image: workshop4,
     eventId: "workshop-civil",
+    price: 300,
   },
   {
     image: workshop5,
     eventId: "workshop-csbs",
+    price: 350,
   },
   {
     image: workshop6,
     eventId: "workshop-cse",
+    price: 350,
   },
   {
     image: workshop7,
     eventId: "workshop-ece",
+    price: 350,
   },
   {
     image: workshop8,
     eventId: "workshop-eee",
+    price: 350,
   },
   {
     image: workshop9,
     eventId: "workshop-ft",
+    price: 350,
   },
   {
     image: workshop10,
     eventId: "workshop-ipr",
+    price: 350,
   },
   {
     image: workshop11,
     eventId: "workshop-it",
+    price: 350,
   },
   {
     image: workshop12,
     eventId: "workshop-mct",
+    price: 350,
   },
   {
     image: workshop13,
     eventId: "workshop-mech",
+    price: 350,
   },
   {
     image: workshop14,
     eventId: "workshop-txt",
+    price: 350,
   },
   {
     image: workshop15,
     eventId: "workshop-vlsi",
+    price: 350,
   },
   /*{
     image: workshop16,

@@ -17,21 +17,26 @@ export const culturalEvents = [
   {
     image: hr1,
     eventId: "cultural-1",
+    price: 100,
   },
   {
     image: hr2,
     eventId: "cultural-2",
+    price: 100,
   },
   {
     image: hr3,
     eventId: "cultural-3",
+    price: 100,
   },
   {
     image: hr4,
     eventId: "cultural-4",
+    price: 100,
   },
   {
     image: hr5,
     eventId: "cultural-5",
+    price: 100,
   },
 ];
