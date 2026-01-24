@@ -35,36 +35,50 @@ const DashboardLayout = ({ children }) => {
     return null;
   };
 
-  const [userProfile, setUserProfile] = useState(() => {
-    // Try to get cached profile first
+  // Try to get initial profile from cache or build from stored user
+  const getInitialProfile = () => {
+    // First try sessionStorage cache
     const cachedProfile = sessionStorage.getItem('userProfile');
-    return cachedProfile ? JSON.parse(cachedProfile) : null;
-  });
-  const [loading, setLoading] = useState(!userProfile);
+    if (cachedProfile) {
+      try {
+        return JSON.parse(cachedProfile);
+      } catch (e) {}
+    }
+    // Fallback: build basic profile from stored user for instant display
+    const storedUser = getStoredUser();
+    if (storedUser) {
+      return {
+        full_name: storedUser.user_metadata?.full_name || storedUser.email?.split('@')[0] || 'User',
+        email: storedUser.email,
+        role: 'student'
+      };
+    }
+    return null;
+  };
+
+  const [userProfile, setUserProfile] = useState(getInitialProfile);
+  const [loading, setLoading] = useState(false); // Start with false since we have initial profile
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      // If we already have cached profile, skip loading immediately
-      if (userProfile) {
-        setLoading(false);
-        return;
-      }
-
-      // Check sessionStorage first
+      // If we already have a complete cached profile (with role from DB), skip fetch
       const cached = sessionStorage.getItem('userProfile');
       if (cached) {
         try {
           const parsedProfile = JSON.parse(cached);
-          setUserProfile(parsedProfile);
-          setLoading(false);
-          return; // Don't fetch from server if we have cache
+          // Check if it's a complete profile (has role from DB, not default)
+          if (parsedProfile.role && parsedProfile.role !== 'student') {
+            setUserProfile(parsedProfile);
+            return; // Complete cache, no need to fetch
+          }
         } catch (e) {
           console.warn('Failed to parse cached profile');
         }
       }
 
+      // Background fetch to get complete profile from DB
       try {
         const storedUser = getStoredUser();
         
@@ -82,8 +96,6 @@ const DashboardLayout = ({ children }) => {
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
-      } finally {
-        setLoading(false);
       }
     };
 

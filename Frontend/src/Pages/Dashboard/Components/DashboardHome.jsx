@@ -32,11 +32,45 @@ const DashboardHome = () => {
     return null;
   };
 
-  const [profile, setProfile] = useState(null);
-  const [registrations, setRegistrations] = useState([]);
-  const [teamsCount, setTeamsCount] = useState(0);
-  const [referralCount, setReferralCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  // Try to load from cache immediately for instant display
+  const getInitialState = () => {
+    try {
+      const cachedData = sessionStorage.getItem('dashboard_data');
+      if (cachedData) {
+        const parsed = JSON.parse(cachedData);
+        const cacheAge = Date.now() - parsed.timestamp;
+        // Use cache if less than 5 minutes old for initial render
+        if (cacheAge < 300000) {
+          return {
+            profile: parsed.profile,
+            registrations: parsed.registrations || [],
+            teamsCount: parsed.teamsCount || 0,
+            referralCount: parsed.referralCount || 0,
+            loading: false,
+            hasCache: true
+          };
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to parse cached dashboard data');
+    }
+    return {
+      profile: null,
+      registrations: [],
+      teamsCount: 0,
+      referralCount: 0,
+      loading: true,
+      hasCache: false
+    };
+  };
+
+  const initialState = getInitialState();
+  
+  const [profile, setProfile] = useState(initialState.profile);
+  const [registrations, setRegistrations] = useState(initialState.registrations);
+  const [teamsCount, setTeamsCount] = useState(initialState.teamsCount);
+  const [referralCount, setReferralCount] = useState(initialState.referralCount);
+  const [loading, setLoading] = useState(initialState.loading);
   
   // Ref to prevent double-fetch in React StrictMode
   const isFetchingRef = React.useRef(false);
@@ -49,9 +83,18 @@ const DashboardHome = () => {
     }
     isFetchingRef.current = true;
     
-    fetchDashboardData().finally(() => {
-      isFetchingRef.current = false;
-    });
+    // If we loaded from cache, do a background refresh
+    if (initialState.hasCache) {
+      console.log('⚡ Dashboard loaded instantly from cache, background refresh...');
+      // Background refresh without showing loading
+      fetchDashboardData(true).finally(() => {
+        isFetchingRef.current = false;
+      });
+    } else {
+      fetchDashboardData().finally(() => {
+        isFetchingRef.current = false;
+      });
+    }
 
     // Set up real-time subscription for registration updates
     const storedUser = getStoredUser();
@@ -78,12 +121,12 @@ const DashboardHome = () => {
     }
   }, []);
 
-  const fetchDashboardData = async () => {
-    // Don't show loading spinner if we have fresh cache
+  const fetchDashboardData = async (skipLoading = false) => {
+    // Don't show loading spinner if we have fresh cache or skipLoading is true
     const cachedData = sessionStorage.getItem('dashboard_data');
-    let hasValidCache = false;
+    let hasValidCache = skipLoading;
     
-    if (cachedData) {
+    if (!skipLoading && cachedData) {
       try {
         const parsed = JSON.parse(cachedData);
         const cacheAge = Date.now() - parsed.timestamp;
@@ -337,7 +380,7 @@ const DashboardHome = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Alerts & Announcements */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-3 space-y-4">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-xl font-bold flex items-center gap-2">
               <AlertCircle className="text-secondary" size={20} />
@@ -368,41 +411,6 @@ const DashboardHome = () => {
               </div>
             </motion.div>
           ))}
-        </div>
-
-        {/* Upcoming Event Card */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Calendar className="text-secondary" size={20} />
-            Next Up
-          </h2>
-          <motion.div 
-            variants={itemVariants}
-            className="bg-gradient-to-b from-secondary/20 to-transparent border border-secondary/30 rounded-2xl p-6 relative overflow-hidden group"
-          >
-            <div className="relative z-10">
-              <div className="flex justify-between items-start mb-4">
-                <span className="px-3 py-1 rounded-full bg-secondary text-[10px] font-bold uppercase tracking-widest">Technical</span>
-                <span className="text-xs text-gray-400">Today, 10:30 AM</span>
-              </div>
-              <h3 className="text-xl font-bold mb-4 group-hover:text-secondary transition-colors">Web-O-Thon 2026</h3>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 text-sm text-gray-400">
-                  <MapPin size={16} className="text-secondary" />
-                  <span>IT Lab 3, Block B</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-gray-400">
-                  <Users size={16} className="text-secondary" />
-                  <span>Team: Web Wizards</span>
-                </div>
-              </div>
-              <button className="w-full mt-6 py-3 bg-white text-black font-bold rounded-xl hover:bg-secondary hover:text-white transition-all duration-300">
-                View Details
-              </button>
-            </div>
-            {/* Background Glow */}
-            <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-secondary/20 blur-3xl rounded-full group-hover:bg-secondary/40 transition-all duration-500"></div>
-          </motion.div>
         </div>
       </div>
     </motion.div>

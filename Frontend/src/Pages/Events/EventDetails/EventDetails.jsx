@@ -1109,20 +1109,30 @@ const EventDetails = () => {
           title: "TOPICS:",
         },
         {
-          title: "themes need",
+          title: "Renewable energy ",
           
         },
         {
-          title: "themes need",
+          title: "AI-Driven Electrical Engineering ",
           
         },
         {
-          title: "themes need",
+          title: "Smart Grid ",
           
         },
         {
-          title: "themes need",
+          title: "Power Electronics ",
           
+        },
+        {
+          title: "Internet of things (IoT) ",
+          
+        },
+        {
+          title: "Sensor Technology ",
+        },
+        {
+          title: "Power systems .",
         },
       ],
       rules: [
@@ -1143,23 +1153,23 @@ const EventDetails = () => {
         facultyCoordinator: [
           {
             name: "Dr. M. K. Elango ",
-            phone: "",
+            phone: " +91 99524 93666",
           },
         ],
         studentCoordinator: [
           {
-            name: "Ms. Dharseni Santhiya Sampath Kumar ",
-            phone: "9344415565",
+            name: "Ms.N.Dharshika ",
+            phone: "+91 90036 44185",
           },
           {
-            name: "Ms. Hema Vardhini S P",
+            name: "Ms. S .P. Hema Vardhini ",
             phone: "7200904682",
           },
         
         ],
       },
 
-      registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
+      registrationLink: "", // Registration link
     },
     "technical-event-14": {
       title: "POSTER PRESENTATION",
