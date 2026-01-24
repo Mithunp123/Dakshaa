@@ -46,82 +46,102 @@ export const nonTechnicalEvents = [
   {
     image: nontech1,
     eventId: "nontech-aids",
+    price: 100,
   },
   {
     image: nontech2,
     eventId: "nontech-aids1",
+    price: 100,
   },
   {
     image: nontech3,
     eventId: "nontech-bt",
+    price: 100,
   },
   {
     image: nontech4,    
     eventId: "nontech-civil",
+    price: 100,
   },
   {
     image: nontech5,
     eventId: "nontech-csbs",
+    price: 100,
   },
   {
     image: nontech6,
     eventId: "nontech-cse",
+    price: 100,
   },
   {
     image: nontech7,
     eventId: "nontech-cse1",
+    price: 100,
   },
   {
     image: nontech8,
     eventId: "nontech-ece",
+    price: 100,
   },
   {
     image: nontech9,
     eventId: "nontech-ece1",
+    price: 100,
   },
   {
     image: nontech10,
     eventId: "nontech-eee",
+    price: 100,
   },
   {
     image: nontech11,
     eventId: "nontech-eee1",
+    price: 100,
   },
   {
     image: nontech12,
     eventId: "nontech-eee2",
+    price: 100,
   },
   {
     image: nontech13,
     eventId: "nontech-ft",
+    price: 100,
   },
   {
     image: nontech14,
     eventId: "nontech-it",
+    price: 100,
   },
   {
     image: nontech15,
     eventId: "nontech-mca",
+    price: 100,
   },
   {
     image: nontech16,
     eventId: "nontech-mct",
+    price: 100,
   },
   {
     image: nontech17,
     eventId: "nontech-mct1",
+    price: 100,
   },
   {
     image: nontech18,
     eventId: "nontech-mech",
+    price: 100,
   },
   {
     image: nontech19,
     eventId: "nontect-txt",
+    price: 100,
   },
   {
     image: nontech20,
     eventId: "nontech-vlsi",
+    price: 100,
   },
 
 ];

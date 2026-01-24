@@ -100,6 +100,7 @@ const Schedule = () => {
           time: "09:00 AM – 12:00 PM",
           title: "Morning Finals",
           items: [
+            { name: "Harmonicks", icon: <Code className="w-4 h-4" />, type: "Non-Technical" },
             { name: "Non-Technical Events ", icon: <Zap className="w-4 h-4" />, type: "Non-Technical" }
           ]
         },
@@ -114,6 +115,7 @@ const Schedule = () => {
           time: "01:00 PM – 04:00 PM",
           title: "Grand Finals",
           items: [
+            { name: "Harmonicks", icon: <Trophy className="w-4 h-4" />, type: "Non-Technical" },
             { name: "Hackathon final demo & jury evaluation", icon: <Trophy className="w-4 h-4" />, type: "Hackathon" },
           ]
         },

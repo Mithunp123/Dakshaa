@@ -392,7 +392,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 13, 2026",
+          date: "February 12, 2026",
           time: "1 day",
           location: "AI Lab 2",
         },
@@ -481,7 +481,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 13, 2026",
+          date: "February 12, 2026",
           time: " 2-3 hrs",
           location: " AB Lab 4",
         },
@@ -537,8 +537,8 @@ const EventDetails = () => {
       ],
       schedule: [
         {
-          round: "Round",
-          date: "February 13, 2026",
+          round: "Event Timing",
+          date: "February 12, 2026",
           time: "1Day",
           location: "AB lab 3",
         },
@@ -629,7 +629,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 13, 2026",
+          date: "February 12, 2026",
           time: "9.00 AM to 2.00 PM ",
           location: "Bioprocess Laboratory ",
         },
@@ -693,8 +693,8 @@ const EventDetails = () => {
 
       schedule: [
         {
-          round: "Round",
-          date: "February 13, 2026",
+          round: "Event Timing",
+          date: "February 12, 2026",
           time: "3hours ",
           location: "Location need",
         },
@@ -755,7 +755,7 @@ const EventDetails = () => {
   schedule: [
     {
       round: "Event Timing",
-      date: "February 13, 2026",
+      date: "February 12, 2026",
       time: "3 Hours",
       location: "Protein and Enzyme Engineering Laboratory",
     },
@@ -819,7 +819,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 13, 2026",
+          date: "February 12, 2026",
           time: "9:00 AM to 12:00 PM",
           location: "Civil CADD Laboratory",
         },
@@ -880,7 +880,7 @@ const EventDetails = () => {
        schedule: [
          {
            round: "Event Timing",
-           date: "February 13, 2026",
+           date: "February 12, 2026",
            time: "9:00 AM to 12:00 AM",
            location: " Civil Building, C110 classroom",
          },
@@ -939,9 +939,9 @@ const EventDetails = () => {
       ],
       schedule: [
         {
-          round: "Round",
-          date: "February 13, 2026",
-          time: "",
+          round: "Event Timing",
+          date: "February 12, 2026",
+          time: "9:00 AM to 4:00 PM ",
           location: " IT PARK",
         },
       ],
@@ -964,7 +964,7 @@ const EventDetails = () => {
         ],
       },
 
-      registrationLink: "https://forms.gle/gziLh4EoGaCQLSpg8", // Registration link
+      registrationLink: " ", // Registration link
     },
     "technical-event-10": {
       title: "BOTXHIBIT",
@@ -991,8 +991,8 @@ const EventDetails = () => {
       ],
       schedule: [
         {
-          round: "Round",
-          date: "February 13, 2026",
+          round: "Event Timing",
+          date: "February 12, 2026",
           time: "",
           location: "IT PARK ",
         },
@@ -1033,8 +1033,8 @@ const EventDetails = () => {
       ],
       schedule: [
         {
-          round: "Round",
-          date: "February 13, 2026",
+          round: "Event Timing",
+          date: "February 12, 2026",
           time: "9:00 AM to 1:00 PM",
           location: "Electronic Devices Laboratory",
         },
@@ -1074,8 +1074,8 @@ const EventDetails = () => {
       ],
       schedule: [
         {
-          round: "Round",
-          date: "February 13, 2026",
+          round: "Event Timing",
+          date: "February 12, 2026",
           time: "4 Hours",
           location: "Location need",
         },
@@ -1139,7 +1139,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Round",
-          date: "February 13, 2026",
+          date: "February 12, 2026",
           time: "4 Hours",
           location: "Location need",
         },
@@ -1190,7 +1190,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Round",
-          date: "February 13, 2026",
+          date: "February 12, 2026",
           time: "",
           location: " Baking and Confectionery Laboratory",
         },
@@ -1220,9 +1220,9 @@ const EventDetails = () => {
       registrationLink: "https://forms.gle/2wBfChfRVPiKVw599", // Registration link
     },
     "technical-event-15": {
-        title: "NeuroHack 2.O(36-hour)",
+        title: "Neurocode 2.O",
         description:
-          "NeuroHack 2.O(36-hour) is a team-based web design challenge where a reference website design is provided.Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
+          "Neurocode 2.O is a team-based web design challenge where a reference website design is provided.Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
         image: Tech15,
         rounds: [
           {
@@ -1268,9 +1268,9 @@ const EventDetails = () => {
         ],
         schedule: [
           {
-            round: "Venue",
-            date: "February 13, 2026",
-            time: "3hours",
+            round: "Event Timing",
+            date: "February 12, 2026",
+            time: "9:30 AM to 12:30 PM",
             location: " Computer Lab (high spec)",
           },
         ],
@@ -1322,8 +1322,8 @@ const EventDetails = () => {
         ],
         schedule: [
           {
-            round: "Round",
-            date: "February 13, 2026",
+            round: "Event Timing",
+            date: "February 12, 2026",
             time: "time need",
             location: "Homi J Baba Hall (Conference Hall) (MCT Block)",
           },
@@ -1378,7 +1378,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Round",
-            date: "February 13, 2026",
+            date: "February 12, 2026",
             time: "9:30AM -2:00PM",
             location: "Smart Class Room [ Mechanical ]",
           },
@@ -1440,7 +1440,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Round",
-            date: "February 13, 2026",
+            date: "February 12, 2026",
             time: "3hours",
             location: "Idea lab [ Main Building ]",
           },
@@ -1505,7 +1505,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Round",
-            date: "February 13, 2026",
+            date: "February 12, 2026",
             time: "3 hours ",
             location: "Garment Lab -Textile Block",
           },
@@ -1563,7 +1563,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Event Timing",
-            date: "February 13, 2026",
+            date: "February 12, 2026",
             time: "9.00 AM to 2.00 PM",
             location: "MBA Seminar Hall",
           },
@@ -1631,7 +1631,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Event Timing",
-            date: "February 13, 2026",
+            date: "February 12, 2026",
             time: " 9.00 AM to 4.00 PM",
             location: "Electronic Devices Laboratory, J Block 4th Floor",
           },
@@ -1703,7 +1703,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Round",
-            date: "February 13, 2026",
+            date: "February 12, 2026",
             time: "9.00 AM to 2.00 PM ",
             location: "Smart classroom",
           },
@@ -1758,8 +1758,8 @@ const EventDetails = () => {
         ],
         schedule: [
           {
-            round: "Round",
-            date: "February 13, 2026",
+            round: "Event Timing",
+            date: "February 12, 2026",
             time: "9.00 AM to 2.00 PM",
             location: "Smart Class Room (Main Block)",
           },
@@ -1767,22 +1767,18 @@ const EventDetails = () => {
         contact: {
           facultyCoordinator: [
             {
-              name: "RAJASEKARAN N. AP / EEE",
-              email:"rajasekaran.n@ksrct.ac.in",
-              phone: "8056975723",
+              name: "Mr. Jayamani S",
+              email:"jayamani@ksrct.ac.in",
+              phone: "+91 96292 97054",
             },
           ],
           studentCoordinator: [
             {
-              name: "TIVITH C",
-              email:"tivithpoongodi@gmail.com",
-              phone: "9345426277",
+              name: "Naveen J",
+              email:"",
+              phone: "+91 90801 21928",
             },
-            {
-              name: "MOTUPALLI SHEKAR ",
-              email:"shekarmotupalli@gmail.com ",
-              phone: "8838510411",
-            },
+           
 
           ],
         },
@@ -2219,11 +2215,11 @@ const EventDetails = () => {
 
       registrationLink: "https://forms.gle/cgwAsboW12c9pWXFA", // Registration link
     },
-    "non-technical-event-6": {
+    "non-technical-event-7": {
   title: "Arangam Athira",
   description:
     "Arangam Athira is a fun-filled musical entertainment event designed to test participants’ love for music, memory, and spontaneity. Set in a lively DJ atmosphere, the event creates an energetic and engaging environment where rhythm meets challenge. Participants enjoy interactive music sessions focused purely on enjoyment, crowd interaction, and spontaneous performance rather than competition.",
-  image: NonTech6,
+  image: NonTech7,
   rounds: [
     {
       title: "DJ Stop & Sing",
@@ -2276,11 +2272,11 @@ const EventDetails = () => {
 
      
     },
-    "non-technical-event-7": {
+    "non-technical-event-6": {
   title: "Battle Arena",
   description:
     "Battle Arena is a high-intensity eSports competition designed to bring together skilled gamers in a professional and competitive environment. Participants compete in popular gaming titles such as EA Sports FC and Free Fire, showcasing precision, strategy, reflexes, and real-time decision-making. The event follows a structured knockout tournament format to identify and crown the ultimate champions of the arena.",
-  image: NonTech7,
+  image: NonTech6,
   rounds: [
     {
       title: "Tournament Battles",
@@ -2703,24 +2699,18 @@ const EventDetails = () => {
     facultyCoordinator: [
       {
         name: "Mr. M. Thilakraj",
-        designation: "Assistant Professor",
-        department: "",
-        phone: "",
+        phone: "+91 98428 15665",
         email: " ",
       },
     ],
     studentCoordinator: [
       {
         name: "Mr. M. Pravin Kumar",
-        department: "Information Technology",
-        year: "III Year",
         phone: "8667474397",
         email: " ",
       },
       {
         name: "Ms. Linesha",
-        department: "Information Technology",
-        year: "II Year",
         phone: "9944623923",
         email: " ",
       },
@@ -2892,7 +2882,7 @@ const EventDetails = () => {
   ],
   schedule: [
     {
-      round: "Event ",
+      round: "Event Timing",
       date: "February 14, 2026",
       time: "To be announced",
       location: "Robotics Laboratory",
@@ -2985,7 +2975,7 @@ const EventDetails = () => {
         name: "Ms. D. Vijayalakshimi",
         department: "Mechanical Engineering",
         year: "III Year",
-        phone: "9994747296",
+        phone: "+91 99947 47296",
         email: " ",
       },
       {
@@ -3901,7 +3891,7 @@ image: workshop5,
       {
         name: "Mr. R.T. Dineshkumar",
         designation: "Assistant Professor",
-        phone: "",
+        phone: "+91 99527 62214",
         email: "",
       },
     ],
@@ -3909,15 +3899,13 @@ image: workshop5,
     studentCoordinator: [
       {
         name: "Mr. S. Deepan",
-        year: "III Year",
-        department: "Information Technology",
+       
         phone: "8015441715",
         email: "",
       },
       {
         name: "Ms. P.D. Malathi",
-        year: "III Year",
-        department: "Information Technology",
+        
         phone: "8072844465",
         email: "",
       },
