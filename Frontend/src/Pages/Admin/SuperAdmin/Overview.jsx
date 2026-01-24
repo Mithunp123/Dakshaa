@@ -39,6 +39,8 @@ const Overview = () => {
   const [countdown, setCountdown] = useState(10);
   const [openingEvents, setOpeningEvents] = useState(false);
   const [openSuccess, setOpenSuccess] = useState(false);
+  const [allEventsOpen, setAllEventsOpen] = useState(false);
+  const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
 
   // Function to open all events
   const openAllEvents = async () => {
@@ -55,11 +57,12 @@ const Overview = () => {
         alert('Failed to open events: ' + error.message);
       } else {
         console.log('✅ All events opened successfully!');
-        setOpenSuccess(true);
+        setAllEventsOpen(true);
+        setShowSuccessCelebration(true);
         // Refresh stats to show updated active events count
         fetchStats();
-        // Hide success message after 3 seconds
-        setTimeout(() => setOpenSuccess(false), 3000);
+        // Hide celebration after 5 seconds
+        setTimeout(() => setShowSuccessCelebration(false), 5000);
       }
     } catch (err) {
       console.error('❌ Error:', err);
@@ -68,6 +71,31 @@ const Overview = () => {
       setOpeningEvents(false);
     }
   };
+
+  // Check if all events are already open
+  const checkAllEventsOpen = async () => {
+    try {
+      const { count: closedCount } = await supabase
+        .from('events_config')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_open', false);
+      
+      const { count: nullCount } = await supabase
+        .from('events_config')
+        .select('*', { count: 'exact', head: true })
+        .is('is_open', null);
+      
+      const totalClosed = (closedCount || 0) + (nullCount || 0);
+      setAllEventsOpen(totalClosed === 0);
+    } catch (err) {
+      console.error('Error checking events status:', err);
+    }
+  };
+
+  // Check on mount if all events are open
+  useEffect(() => {
+    checkAllEventsOpen();
+  }, []);
 
   // Countdown timer effect
   useEffect(() => {
@@ -583,88 +611,95 @@ const Overview = () => {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {/* Success Message */}
+          {/* Open All Events Button - Epic Design - Only show if not all events are open */}
           <AnimatePresence>
-            {openSuccess && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/50 rounded-lg"
+            {!allEventsOpen && (
+              <motion.button
+                onClick={startCountdown}
+                disabled={openingEvents}
+                className="group relative overflow-hidden px-6 py-3 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.3 } }}
               >
-                <CheckCircle className="w-4 h-4 text-green-400" />
-                <span className="text-sm text-green-400 font-medium">All Events Opened!</span>
-              </motion.div>
+                {/* Animated Background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 animate-gradient-x" />
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                {/* Shine Effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                </div>
+                
+                {/* Border Glow */}
+                <div className="absolute inset-0 rounded-xl border-2 border-white/20 group-hover:border-white/40 transition-colors" />
+                
+                {/* Content */}
+                <div className="relative flex items-center gap-3 text-white">
+                  {openingEvents ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <motion.span
+                      className="text-xl"
+                      animate={{ rotate: [0, 15, -15, 0] }}
+                      transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+                    >
+                      🚀
+                    </motion.span>
+                  )}
+                  <span className="text-sm font-bold tracking-wide uppercase">
+                    {openingEvents ? 'Opening...' : 'Launch Events'}
+                  </span>
+                  <motion.div
+                    className="flex gap-0.5"
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                  >
+                    <span className="text-white/60">›</span>
+                    <span className="text-white/80">›</span>
+                    <span className="text-white">›</span>
+                  </motion.div>
+                </div>
+                
+                {/* Particle Effects */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl">
+                  {[...Array(6)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100"
+                      style={{ left: `${20 + i * 15}%`, bottom: '0' }}
+                      animate={{
+                        y: [0, -40, -60],
+                        opacity: [0, 1, 0],
+                      }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        delay: i * 0.15,
+                      }}
+                    />
+                  ))}
+                </div>
+              </motion.button>
             )}
           </AnimatePresence>
           
-          {/* Open All Events Button - Epic Design */}
-          <motion.button
-            onClick={startCountdown}
-            disabled={openingEvents}
-            className="group relative overflow-hidden px-6 py-3 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {/* Animated Background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 animate-gradient-x" />
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            
-            {/* Shine Effect */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-            </div>
-            
-            {/* Border Glow */}
-            <div className="absolute inset-0 rounded-xl border-2 border-white/20 group-hover:border-white/40 transition-colors" />
-            
-            {/* Content */}
-            <div className="relative flex items-center gap-3 text-white">
-              {openingEvents ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <motion.span
-                  className="text-xl"
-                  animate={{ rotate: [0, 15, -15, 0] }}
-                  transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
-                >
-                  🚀
-                </motion.span>
-              )}
-              <span className="text-sm font-bold tracking-wide uppercase">
-                {openingEvents ? 'Opening...' : 'Launch Events'}
-              </span>
+          {/* Events Already Open Badge */}
+          <AnimatePresence>
+            {allEventsOpen && (
               <motion.div
-                className="flex gap-0.5"
-                animate={{ x: [0, 5, 0] }}
-                transition={{ duration: 1, repeat: Infinity }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/50 rounded-lg"
               >
-                <span className="text-white/60">›</span>
-                <span className="text-white/80">›</span>
-                <span className="text-white">›</span>
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span className="text-sm text-green-400 font-bold">All Events Live!</span>
               </motion.div>
-            </div>
-            
-            {/* Particle Effects */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl">
-              {[...Array(6)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100"
-                  style={{ left: `${20 + i * 15}%`, bottom: '0' }}
-                  animate={{
-                    y: [0, -40, -60],
-                    opacity: [0, 1, 0],
-                  }}
-                  transition={{
-                    duration: 1,
-                    repeat: Infinity,
-                    delay: i * 0.15,
-                  }}
-                />
-              ))}
-            </div>
-          </motion.button>
+            )}
+          </AnimatePresence>
           
           <button
             onClick={() => fetchStats()}
@@ -1229,6 +1264,245 @@ const Overview = () => {
               whileTap={{ scale: 0.9 }}
             >
               ×
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Success Celebration Overlay */}
+      <AnimatePresence>
+        {showSuccessCelebration && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
+            style={{ background: 'radial-gradient(ellipse at center, rgba(0,50,0,0.95) 0%, rgba(0,0,0,0.98) 100%)' }}
+          >
+            {/* Firework Particles */}
+            {[...Array(100)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute rounded-full"
+                style={{
+                  width: Math.random() * 8 + 4,
+                  height: Math.random() * 8 + 4,
+                  background: ['#22d3ee', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'][Math.floor(Math.random() * 6)],
+                  left: '50%',
+                  top: '50%',
+                  boxShadow: `0 0 ${Math.random() * 20 + 10}px currentColor`,
+                }}
+                initial={{ x: 0, y: 0, opacity: 1, scale: 0 }}
+                animate={{
+                  x: (Math.random() - 0.5) * window.innerWidth,
+                  y: (Math.random() - 0.5) * window.innerHeight,
+                  opacity: [1, 1, 0],
+                  scale: [0, 1.5, 0],
+                }}
+                transition={{
+                  duration: 2 + Math.random() * 2,
+                  delay: Math.random() * 0.5,
+                  ease: "easeOut",
+                }}
+              />
+            ))}
+
+            {/* Confetti Rain */}
+            {[...Array(50)].map((_, i) => (
+              <motion.div
+                key={`confetti-${i}`}
+                className="absolute"
+                style={{
+                  width: Math.random() * 15 + 8,
+                  height: Math.random() * 15 + 8,
+                  background: ['#22d3ee', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'][Math.floor(Math.random() * 5)],
+                  left: `${Math.random() * 100}%`,
+                  top: '-5%',
+                  borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+                }}
+                animate={{
+                  y: window.innerHeight + 100,
+                  x: (Math.random() - 0.5) * 200,
+                  rotate: Math.random() * 720,
+                  opacity: [1, 1, 0],
+                }}
+                transition={{
+                  duration: 3 + Math.random() * 2,
+                  delay: Math.random() * 2,
+                  ease: "easeIn",
+                }}
+              />
+            ))}
+
+            {/* Expanding Rings */}
+            {[0, 1, 2, 3, 4].map((i) => (
+              <motion.div
+                key={`ring-${i}`}
+                className="absolute rounded-full border-4 border-green-500"
+                initial={{ width: 0, height: 0, opacity: 1 }}
+                animate={{
+                  width: [0, 1000],
+                  height: [0, 1000],
+                  opacity: [1, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  delay: i * 0.3,
+                  ease: "easeOut",
+                  repeat: 1,
+                }}
+                style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+              />
+            ))}
+
+            {/* Main Success Content */}
+            <motion.div
+              className="relative z-10 text-center"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.3 }}
+            >
+              {/* Big Checkmark */}
+              <motion.div
+                className="w-40 h-40 md:w-56 md:h-56 mx-auto mb-8 relative"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.5 }}
+              >
+                <motion.div
+                  className="absolute inset-0 rounded-full bg-green-500/20"
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.2, 0.5] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+                <motion.div
+                  className="absolute inset-4 rounded-full bg-green-500/30"
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.6, 0.3, 0.6] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
+                />
+                <div className="absolute inset-8 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-[0_0_60px_rgba(34,197,94,0.6)]">
+                  <motion.svg
+                    className="w-20 h-20 md:w-28 md:h-28 text-white"
+                    viewBox="0 0 24 24"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 0.8, delay: 0.8 }}
+                  >
+                    <motion.path
+                      d="M5 13l4 4L19 7"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.5, delay: 0.8 }}
+                    />
+                  </motion.svg>
+                </div>
+              </motion.div>
+
+              {/* Success Text */}
+              <motion.h1
+                className="text-5xl md:text-7xl font-black mb-4"
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 1 }}
+                style={{
+                  background: 'linear-gradient(135deg, #22d3ee 0%, #10b981 50%, #34d399 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  textShadow: '0 0 60px rgba(16,185,129,0.5)',
+                }}
+              >
+                🎉 EVENTS LIVE! 🎉
+              </motion.h1>
+
+              <motion.p
+                className="text-xl md:text-2xl text-green-300 font-bold mb-2"
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 1.2 }}
+              >
+                All registrations are now open!
+              </motion.p>
+
+              <motion.p
+                className="text-gray-400 text-lg"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 1.4 }}
+              >
+                Students can now register for events
+              </motion.p>
+
+              {/* Animated Stats */}
+              <motion.div
+                className="flex justify-center gap-8 mt-8"
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 1.6 }}
+              >
+                <div className="text-center">
+                  <motion.div
+                    className="text-4xl font-bold text-green-400"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", delay: 1.8 }}
+                  >
+                    {stats.totalEvents}
+                  </motion.div>
+                  <div className="text-sm text-gray-500">Events Opened</div>
+                </div>
+                <div className="text-center">
+                  <motion.div
+                    className="text-4xl font-bold text-cyan-400"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", delay: 2 }}
+                  >
+                    ✓
+                  </motion.div>
+                  <div className="text-sm text-gray-500">Status: Live</div>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Sparkle Effects */}
+            {[...Array(20)].map((_, i) => (
+              <motion.div
+                key={`sparkle-${i}`}
+                className="absolute text-2xl"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                }}
+                animate={{
+                  scale: [0, 1, 0],
+                  rotate: [0, 180, 360],
+                  opacity: [0, 1, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  delay: Math.random() * 3,
+                }}
+              >
+                ✨
+              </motion.div>
+            ))}
+
+            {/* Close Button */}
+            <motion.button
+              onClick={() => setShowSuccessCelebration(false)}
+              className="absolute top-8 right-8 px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/30 rounded-xl text-white font-bold transition-all z-50"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 2 }}
+            >
+              Continue →
             </motion.button>
           </motion.div>
         )}
