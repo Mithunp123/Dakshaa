@@ -624,12 +624,23 @@ const RegistrationForm = () => {
     // For "Own Combo" (Individual + Mixed Team) or just plain selection
     selectedEventDetails.forEach(e => {
        const isTeam = (e.min_team_size > 1 || e.max_team_size > 1);
+       const isConference = (e.category || '').toLowerCase() === 'conference';
+       
        if (isTeam) {
           const eventId = e.id || e.event_id;
           const details = teamDetailsMap[eventId];
           const count = details?.memberCount ? parseInt(details.memberCount) : (e.min_team_size || 1);
           const price = parseFloat(e.price || 0);
-          sum += (price * count);
+          
+          // Apply 50% discount for additional conference attendees
+          if (isConference && count > 1) {
+            // First person pays full price, additional people pay 50%
+            const firstPersonPrice = price;
+            const additionalPeoplePrice = price * 0.5 * (count - 1);
+            sum += (firstPersonPrice + additionalPeoplePrice);
+          } else {
+            sum += (price * count);
+          }
        } else {
           sum += parseFloat(e.price || 0);
        }
@@ -2371,6 +2382,24 @@ const RegistrationForm = () => {
                         const eventId = event.id || event.event_id;
                         const isTeam = (event.min_team_size > 1 || event.max_team_size > 1);
                         const showTeamDetails = isTeam && (registrationMode === "individual" || registrationMode === "combo");
+                        const isConference = (event.category || '').toLowerCase() === 'conference';
+                        const memberCount = teamDetailsMap[eventId]?.memberCount || event.min_team_size || 1;
+                        
+                        // Calculate price with conference discount
+                        const calculateEventPrice = () => {
+                          if (registrationMode === "combo") return "Included";
+                          const price = event.price || 0;
+                          if (isTeam && showTeamDetails) {
+                            if (isConference && memberCount > 1) {
+                              // First person full price + additional people 50% off
+                              const firstPersonPrice = price;
+                              const additionalPeoplePrice = price * 0.5 * (memberCount - 1);
+                              return `₹${firstPersonPrice + additionalPeoplePrice}`;
+                            }
+                            return `₹${price * memberCount}`;
+                          }
+                          return `₹${price}`;
+                        };
                         
                         return (
                           <div
@@ -2385,15 +2414,15 @@ const RegistrationForm = () => {
                                 <p className="text-sm text-gray-400">
                                   {event.category} {isTeam && <span className="text-green-400 font-bold ml-2">(Team Event)</span>}
                                 </p>
+                                {/* Show conference discount info */}
+                                {isConference && isTeam && showTeamDetails && memberCount > 1 && (
+                                  <p className="text-xs text-yellow-400 mt-1">
+                                    💰 Conference Discount: 1st person ₹{event.price}, additional @ 50% off (₹{Math.round(event.price * 0.5)} each)
+                                  </p>
+                                )}
                               </div>
                               <p className="text-xl font-bold text-green-400">
-                                {registrationMode === "combo" ? (
-                                  "Included"
-                                ) : (
-                                  isTeam && showTeamDetails ? 
-                                    `₹${(event.price || 0) * (teamDetailsMap[eventId]?.memberCount || event.min_team_size || 1)}` 
-                                    : `₹${event.price || 0}`
-                                )}
+                                {calculateEventPrice()}
                               </p>
                             </div>
                             
