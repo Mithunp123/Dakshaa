@@ -899,7 +899,7 @@ const EventDetails = () => {
     "technical-event-9": {
       title: " NEUROHACK 2.O",
       description:
-        " NeuroHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, 	Defend, and Secure technology to shape the future of digital innovation.",
+        " NeuroHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, 	Defend, and Secure technology to shape the future of digital innovation".
       image: Tech9,
       rounds: [
         {
@@ -945,7 +945,7 @@ const EventDetails = () => {
         ],
         studentCoordinator: [
           {
-            name: "SHANMUGESHWARA A",
+            name: "SHANMUGESHWARA",
             email: "",
             phone: "9487119381",
           },
@@ -1926,7 +1926,7 @@ const EventDetails = () => {
           },
         ],
       },
-      registrationLink: "https://forms.gle/F7ToBuAQk8jMRJe5A", // Registration link
+     
     },
     "non-technical-event-2": {
       title: "IPL AUCTION",
@@ -2259,7 +2259,7 @@ const EventDetails = () => {
     ],
   },
 
-      registrationLink: "https://forms.gle/F7ToBuAQk8jMRJe5A", // Registration link
+     
     },
     "non-technical-event-6": {
   title: "Battle Arena",
