@@ -294,7 +294,7 @@ const RegistrationForm = () => {
               if (isEffectValid()) setUserProfile(profile);
             })
             .catch(err => {
-              console.warn('Failed to load profile:', err);
+              console.warn('Failed to load profile Please log in again.', err);
             });
         } else {
           console.log('⚠️ No user - skipping combos');
@@ -2527,7 +2527,11 @@ const RegistrationForm = () => {
                           >
                             Payment Terms & Conditions
                           </a>
-                          , including the <strong className="text-red-400">no refund policy</strong> and payment amount verification requirements.
+                          , including the <strong className="text-red-400">no refund policy</strong>.
+                          <br />
+                          <strong className="text-orange-400 block mt-2">
+                             ⚠️ Warning: Do not change the payment amount. Any modification will be detected.
+                          </strong>
                         </p>
                         {!termsAccepted && (
                           <p className="text-yellow-400 text-xs mt-2 flex items-center gap-1">
@@ -2685,7 +2689,11 @@ const RegistrationForm = () => {
                           >
                             Payment Terms & Conditions
                           </a>
-                          , including the <strong className="text-red-400">no refund policy</strong> and payment amount verification requirements.
+                          , including the <strong className="text-red-400">no refund policy</strong>.
+                          <br />
+                          <strong className="text-orange-400 block mt-2">
+                             ⚠️ Warning: Do not change the amount in the payment gateway. If detected, your registration will be canceled.
+                          </strong>
                         </p>
                         {!termsAccepted && (
                           <p className="text-yellow-400 text-xs mt-2 flex items-center gap-1">
