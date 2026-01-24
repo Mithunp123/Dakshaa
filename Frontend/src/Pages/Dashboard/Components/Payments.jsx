@@ -159,13 +159,15 @@ const Payments = () => {
 
       {/* Transaction History */}
       <div className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden">
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
+        <div className="p-4 md:p-6 border-b border-white/10 flex items-center justify-between">
           <h3 className="text-xl font-bold flex items-center gap-2">
             <History className="text-secondary" size={20} />
             Transaction History
           </h3>
         </div>
-        <div className="overflow-x-auto">
+        
+        {/* Desktop View - Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-white/5 text-gray-400 text-xs uppercase tracking-widest">
@@ -218,6 +220,50 @@ const Payments = () => {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile View - Cards */}
+        <div className="md:hidden divide-y divide-white/10">
+          {transactions.map((txn) => (
+            <div key={txn.id} className="p-4 flex flex-col gap-4">
+              <div className="flex justify-between items-start">
+                <div>
+                   <p className="text-[10px] font-mono text-gray-500 mb-1">{txn.transaction_id || txn.order_id || 'N/A'}</p>
+                   <h4 className="font-bold text-white text-lg">{getBookingTypeLabel(txn.booking_type)}</h4>
+                   <p className="text-xs text-gray-400 capitalize">{txn.payment_method || 'Online'}</p>
+                </div>
+                <div className="text-right">
+                   <p className="text-xl font-bold text-white">₹{parseFloat(txn.amount).toFixed(2)}</p>
+                   <p className="text-xs text-gray-500">
+                     {new Date(txn.created_at).toLocaleDateString('en-IN', { 
+                        day: '2-digit', 
+                        month: 'short'
+                      })}
+                   </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between mt-2">
+                 <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${getStatusStyles(txn.status)}`}>
+                      {txn.status}
+                 </span>
+                 
+                 <button 
+                    disabled={txn.status?.toUpperCase() !== 'SUCCESS'}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-xs font-medium text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <Download size={14} />
+                    Receipt
+                  </button>
+              </div>
+            </div>
+          ))}
+          
+          {transactions.length === 0 && (
+            <div className="p-8 text-center text-gray-500">
+              No transactions found.
+            </div>
+          )}
         </div>
       </div>
     </div>
