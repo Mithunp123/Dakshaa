@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import logo from "../../assets/logo1.png";
 import TechnicalImage from "../../assets/EventsImages/technical.png";
 import NonTechnicalImage from "../../assets/EventsImages/non-technical.png";
@@ -21,7 +21,9 @@ const Events = () => {
   const [selectedEvent, setSelectedEvent] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const eventsRef = useRef(null);
 
   const events = [
     {
@@ -63,8 +65,31 @@ const Events = () => {
   ];
 
   useEffect(() => {
-    setSelectedEvent(events[0].id);
-  }, []);
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      // Map category names to event IDs
+      const categoryMap = {
+        'technical': 1,
+        'non-technical': 2, 
+        'harmonicks': 3,
+        'hackathon': 4,
+        'workshop': 5,
+        'conference': 6
+      };
+      const eventId = categoryMap[categoryParam] || 1;
+      setSelectedEvent(eventId);
+      
+      // Set rotation for the selected category
+      const index = events.findIndex(event => event.id === eventId);
+      if (index !== -1) {
+        const anglePerEvent = 360 / events.length;
+        const targetRotation = -(index * anglePerEvent);
+        setRotation(targetRotation);
+      }
+    } else {
+      setSelectedEvent(events[0].id);
+    }
+  }, [searchParams]);
 
   const handleEventClick = (id, index) => {
     if (isSpinning) return;
@@ -82,7 +107,29 @@ const Events = () => {
     });
 
     setSelectedEvent(id);
-    setTimeout(() => setIsSpinning(false), 1000);
+    
+    // Update URL with selected category
+    const categoryNames = ['technical', 'non-technical', 'harmonicks', 'hackathon', 'workshop', 'conference'];
+    const categoryName = categoryNames[index];
+    setSearchParams({ category: categoryName });
+    
+    // Auto-scroll to events section after a shorter delay to ensure smooth UX
+    setTimeout(() => {
+      setIsSpinning(false);
+      // Add a small additional delay to ensure the animation state has updated
+      setTimeout(() => {
+        if (eventsRef.current) {
+          const yOffset = -100; // Offset to account for header/navbar
+          const element = eventsRef.current;
+          const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          
+          window.scrollTo({
+            top: y,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+    }, 800); // Reduced from 1000ms to 800ms for faster response
   };
 
   const selectedEventData =
@@ -458,12 +505,13 @@ const Events = () => {
         {/* Event Details Section */}
         <AnimatePresence mode="wait">
           <motion.div
+            ref={eventsRef}
             key={selectedEvent}
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -40 }}
             transition={{ duration: 0.5 }}
-            className="w-full max-w-7xl mx-auto relative"
+            className="w-full max-w-7xl mx-auto relative mt-20"
           >
             {/* Decorative Background for Section */}
             <div className="absolute -inset-10 bg-primary/5 rounded-[4rem] blur-3xl -z-10" />

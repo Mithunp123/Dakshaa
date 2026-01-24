@@ -14,8 +14,7 @@ import workshop12 from "../assets/EventsImages/EventDetails/Workshop/mct_wk.png"
 import workshop13 from "../assets/EventsImages/EventDetails/Workshop/mech_wk.png";
 import workshop14 from "../assets/EventsImages/EventDetails/Workshop/txt_wk.png";
 import workshop15 from "../assets/EventsImages/EventDetails/Workshop/vlsi_wk.png";
-
-//import Workshop16 from "../assets/EventsImages/EventDetails/Workshop/mca_wk1.png";
+import workshop16 from "../assets/EventsImages/EventDetails/Workshop/mca_wk.png";
 
 
 /* Workshop Events List
@@ -50,8 +49,8 @@ export const workshopEvents = [
     price: 300,
   },
   {
-    image: workshop3,
-    eventId: "workshop-bt",
+    image: workshop10,
+    eventId: "workshop-ipr",
     price: 300,
   },
   {
@@ -85,8 +84,8 @@ export const workshopEvents = [
     price: 350,
   },
   {
-    image: workshop10,
-    eventId: "workshop-ipr",
+    image: workshop3,
+    eventId: "workshop-bt",
     price: 350,
   },
   {
@@ -114,9 +113,9 @@ export const workshopEvents = [
     eventId: "workshop-vlsi",
     price: 350,
   },
-  /*{
+  {
     image: workshop16,
     eventId: "workshop-mca",
   },
-  */
+  
 ];

@@ -102,6 +102,7 @@ workshop-mech: Development of Next Gen vehicle
 workshop-txt: AI Integrated Smart Medi Tech
 workshop-vlsi: Chip2Test
 workshop-mca: Code, Click, Done: Mobile App Development in a day.
+
 */
 
 import workshop1 from "../../../assets/EventsImages/EventDetails/Workshop/aids_wk.png";
@@ -119,7 +120,7 @@ import workshop12 from "../../../assets/EventsImages/EventDetails/Workshop/mct_w
 import workshop13 from "../../../assets/EventsImages/EventDetails/Workshop/mech_wk.png";
 import workshop14 from "../../../assets/EventsImages/EventDetails/Workshop/txt_wk.png";
 import workshop15 from "../../../assets/EventsImages/EventDetails/Workshop/vlsi_wk.png";
-//import workshop16 from "../../../assets/EventsImages/EventDetails/Workshop/mca_wk1.png";
+import workshop16 from "../../../assets/EventsImages/EventDetails/Workshop/mca_wk.png";
 
 
 
@@ -327,7 +328,7 @@ const EventDetails = () => {
     'workshop-mech': 'workshop-13',
     'workshop-txt': 'workshop-14',
     'workshop-vlsi': 'workshop-15',
-    //'workshop-mca': 'workshop-16',
+    'workshop-mca': 'workshop-16',
 
     // Conference Events - Maps to conference page (handled separately)
     'conference': 'conference-event-1',
@@ -385,7 +386,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 12, 2026",
+          date: "February 13, 2026",
           time: "9:00 AM - 4:00 PM",
           location: "AI Lab 2",
         },
@@ -475,7 +476,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 12, 2026",
+          date: "February 13, 2026",
           time: " 2-3 hrs",
           location: " AB Lab 4",
         },
@@ -520,7 +521,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 12, 2026",
+          date: "February 13, 2026",
           time: "9:00 AM - 4:00 PM",
           location: "AB lab 3",
         },
@@ -612,7 +613,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 12, 2026",
+          date: "February 13, 2026",
           time: "9.00 AM to 2.00 PM ",
           location: "Bioprocess Laboratory ",
         },
@@ -675,7 +676,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 12, 2026",
+          date: "February 13, 2026",
           time: "10 AM to 4 PM ",
           location: " Bioinformatics Laboratory",
         },
@@ -742,7 +743,7 @@ const EventDetails = () => {
   schedule: [
     {
       round: "Event Timing",
-      date: "February 12, 2026",
+      date: "February 13, 2026",
       time: "3 Hours",
       location: "Protein and Enzyme Engineering Laboratory",
     },
@@ -807,7 +808,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 12, 2026",
+          date: "February 13, 2026",
           time: "9:00 AM to 12:00 PM",
           location: "Civil CADD Laboratory",
         },
@@ -869,7 +870,7 @@ const EventDetails = () => {
        schedule: [
          {
            round: "Event Timing",
-           date: "February 12, 2026",
+           date: "February 13, 2026",
            time: "9:00 AM to 12:00 AM",
            location: " Civil Building, C110 classroom",
          },
@@ -930,7 +931,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 12, 2026",
+          date: "February 13, 2026",
           time: "9:00 AM to 4:00 PM ",
           location: " IT PARK",
         },
@@ -983,7 +984,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 12, 2026",
+          date: "February 13, 2026",
           time: "",
           location: "IT PARK ",
         },
@@ -1026,7 +1027,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 12, 2026",
+          date: "February 13, 2026",
           time: "9:00 AM to 1:00 PM",
           location: "Electronic Devices Laboratory",
         },
@@ -1068,7 +1069,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 12, 2026",
+          date: "February 13, 2026",
           time: "4 Hours",
           location: "Location need",
         },
@@ -1133,7 +1134,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Round",
-          date: "February 12, 2026",
+          date: "February 13, 2026",
           time: "4 Hours",
           location: "Location need",
         },
@@ -1185,7 +1186,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Event Timing",
-          date: "February 12, 2026",
+          date: "February 13, 2026",
           time: "",
           location: " Baking and Confectionery Laboratory",
         },
@@ -1265,7 +1266,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Event Timing",
-            date: "February 12, 2026",
+            date: "February 13, 2026",
             time: "9:30 AM to 12:30 PM",
             location: " Computer Lab (high spec)",
           },
@@ -1320,7 +1321,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Event Timing",
-            date: "February 12, 2026",
+            date: "February 13, 2026",
             time: "time need",
             location: "Homi J Baba Hall (Conference Hall) (MCT Block)",
           },
@@ -1376,7 +1377,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Event Timing",
-            date: "February 12, 2026",
+            date: "February 13, 2026",
             time: "9:30AM -2:00PM",
             location: "Smart Class Room [ Mechanical ]",
           },
@@ -1439,7 +1440,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Event Timing",
-            date: "February 12, 2026",
+            date: "February 13, 2026",
             time: "3hours",
             location: "Idea lab [ Main Building ]",
           },
@@ -1505,7 +1506,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Event Timing",
-            date: "February 12, 2026",
+            date: "February 13, 2026",
             time: "3 hours ",
             location: "Garment Lab -Textile Block",
           },
@@ -1564,7 +1565,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Event Timing",
-            date: "February 12, 2026",
+            date: "February 13, 2026",
             time: "9.00 AM to 2.00 PM",
             location: "MBA Seminar Hall",
           },
@@ -1633,7 +1634,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Event Timing",
-            date: "February 12, 2026",
+            date: "February 13, 2026",
             time: " 9.00 AM to 4.00 PM",
             location: "Electronic Devices Laboratory, J Block 4th Floor",
           },
@@ -1705,7 +1706,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Event Timing",
-            date: "February 12, 2026",
+            date: "February 13, 2026",
             time: "9.00 AM to 2.00 PM ",
             location: "Smart classroom",
           },
@@ -1761,7 +1762,7 @@ const EventDetails = () => {
         schedule: [
           {
             round: "Event Timing",
-            date: "February 12, 2026",
+            date: "February 13, 2026",
             time: "9.00 AM to 2.00 PM",
             location: "Smart Class Room (Main Block)",
           },
@@ -1788,11 +1789,11 @@ const EventDetails = () => {
         registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
       },
       /*"technical-event-16": {
-        title: "VoltEdge (PAPER PRESENTATION)",
+        title: "Code, Click, Done: Mobile AppDevelopment in a day.",
         description:
-          "The Internet of Things (IoT) – Connecting the Future Discover how IoT is transforming industries with smart connectivity, automation, and real-time data, shaping a smarter and more efficient world.",
+          "Code, Click, Done is a hands-on mobile app development workshop designed tointroduce participants to the fundamentals of building functional mobile applications in  just one day. This tech event focuses on transforming ideas into real mobile apps through guided coding, interactive demonstrations, and practical exercises.",
         image: Tech16,
-        rounds: [
+        /*rounds: [
           
           {
             title: "TOPICS:",
@@ -1898,7 +1899,7 @@ const EventDetails = () => {
       ],
       schedule: [
         {
-          round: "Round 1",
+          round: "Event Timing",
           date: "February 14, 2026",
           time: "10:00 AM to 12:00 PM",
           location: "AB 408",
@@ -1965,7 +1966,7 @@ const EventDetails = () => {
       ],
       schedule: [
         {
-          round: "Round 1",
+          round: "Event Timing",
           date: "February 14, 2026",
           time: "1:30 PM to 3:00 PM",
           location: " AB 410",
@@ -2040,7 +2041,7 @@ const EventDetails = () => {
       ],
       schedule: [
         {
-          round: "Round 1",
+          round: "Event Timing",
           date: "February 14, 2026",
           time: "1 hour",
           location: " Dr. M S. Swaminathan Biotech Seminar Hall",
@@ -2187,7 +2188,7 @@ const EventDetails = () => {
   ],
   schedule: [
     {
-      round: "All Rounds",
+      round: "Event Timing",
       date: "February 14, 2026",
       time: "2–3 Hours",
       location: "AB 110",
@@ -2741,13 +2742,13 @@ const EventDetails = () => {
   description:
     "Face Painting is a fun, creative, and engaging non-technical event that brings out the artistic talents of participants. This event offers a platform for students to express their imagination through colors, designs, and meaningful themes painted on faces. Participants can showcase styles such as cartoons, abstract art, nature-inspired patterns, cultural motifs, and message-driven creativity.",
   image: NonTech15,
-  rounds: [
+  /*rounds: [
     {
       title: "Creative Expression Round",
       description:
         "Participants create face painting designs based on given themes such as nature, creativity and fantasy, or social awareness. Designs should creatively convey a message through art.",
     },
-  ],
+  ],*/
   rules: [
     "Participants must bring their own materials including paints, brushes, sponges, mirrors, and tissues.",
     "Only skin-safe and non-toxic paints must be used.",
@@ -3497,7 +3498,7 @@ const EventDetails = () => {
 
         ],
       },
-      registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
+      registrationLink: "", // Registration link
     },
     "workshop-2": {
       title: "AI Arcade (AI Tools for Game Development)",
@@ -3509,7 +3510,7 @@ const EventDetails = () => {
       schedule: [
         {
           round: "Timing",
-          duration: "1 Day",
+          time: "1 Day",
           venue: "AB Lab 1",
           registrationFee: "₹300",
         },
@@ -3673,7 +3674,7 @@ image: workshop5,
     {
       round:"Timing",
       location: "AB LAB-4",
-      duration: "1 Day",
+      time: "1 Day",
       date: "February 12, 2026",
     },
   ],
@@ -3718,7 +3719,7 @@ image: workshop5,
     {
       round:"Timing",
       location: "CSE LAB 1",
-      duration: "1 Day",
+      time: "1 Day",
       date: "February 12, 2026",
     },
   ],
@@ -3794,7 +3795,7 @@ image: workshop5,
     {
       round:"Timing",
       location: "EEE Project Lab",
-      duration: "2 Days",
+      time: "2 Days",
       date: "February 12, 2026",
     },
   ],
@@ -3838,7 +3839,7 @@ image: workshop5,
     {
       round:"Timing",
       location: "Baking and Confectionery Laboratory",
-      duration: "1 Day",
+      time: "1 Day",
       date: "February 12, 2026",
     },
   ],
@@ -3866,42 +3867,38 @@ image: workshop5,
     ],
   },
 
-      registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
+      registrationLink: " ", // Registration link
     },
     "workshop-10": {
       title:
-        "Industry IoT using LoRaWAN Technology By Enthu Technology Solutions India Pvt Ltd",
+        " Monetizing Your Idea through Intellectual Property Rights (IPR)",
       price: "₹300",
       description:
-        "Workshop delves into LoRaWAN technology and its role in Industrial IoT (IIoT), enabling long-range, low-power wireless communication for various applications. Participants will gain insights into LoRaWAN architecture, device communication, network deployment, and security protocols. The workshop will cover smart manufacturing, asset tracking, environmental monitoring, and predictive maintenance, with hands-on sessions and real-world case studies to equip attendees with practical skills for implementing IoT solutions in industrial automation and efficiency.",
+        " This one-day workshop on “Monetizing Your Idea through Intellectual Property Rights (IPR)” focuses on helping students, innovators, and early-stage entrepreneurs understand how ideas can be converted into protected intellectual assets and commercially leveraged. The session covers the practical use of patents, copyrights, trademarks, and designs, explaining what can be protected, when to file, and how IPR directly supports revenue generation through licensing, technology transfer, product commercialization, and startup valuation. Participants will also gain clarity on the role of IPR in funding, grants, and investor interest, along with common mistakes to avoid while protecting and monetizing innovations.",
       image: workshop10,
       schedule: [
         {
           round: "Timing", 
-          date: "March 29, 2026",
-          time: "2:00 PM to 3:00 PM",
-          location: "Textile chemical processing laboratory,Textile Block ",
+          date: "12 February 2026",
+          time: "9:00 AM to 4:00 PM",
+          location: "To be announced ",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Mrs. Jayamani S (AP/ECE)",
-            email: "jayamani@ksrct.ac.in",
-            phone: "9629297054",
+            name: "Dr. B. Mythili Gnanamangai",
+            email: "mythilignanamangai@ksrct.ac.in",
+            phone: "+91 94870 88678",
           },
         ],
         studentCoordinator: [
           {
-            name: "Rohith R (III-Year/ECE)",
-            email: "rohith66r@gmail.com",
-            phone: "9345580330",
-          },
-          {
-            name: "Rithan V (II-Year/ECE)",
-            email: "rithanv78@gmail.com",
-            phone: "9025033891",
-          },
+        name: "Mr. A.Harish ",
+        phone: "+91 63642 32959",
+        email: "",
+      },
+          
         ],
       },
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
@@ -3936,7 +3933,6 @@ image: workshop5,
     studentCoordinator: [
       {
         name: "Mr. S. Deepan",
-       
         phone: "8015441715",
         email: "",
       },
@@ -4149,7 +4145,7 @@ image: workshop5,
 
       registrationLink: "", // Registration link
     },
-    /*
+    
     "workshop-16": {
   title: "Code, Click, Done: Mobile App Development in a Day",
 
@@ -4159,9 +4155,9 @@ image: workshop5,
 
   schedule: [
     {
-      round:"Timing",
+      round:"Event Timing",
       location: "MCA Laboratory",
-      duration: "1 Day",
+      time: "9:30 AM to 4:00 PM",
       date: "February 12, 2026",
     },
   ],
@@ -4209,7 +4205,7 @@ image: workshop5,
   },
 
       registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
-    },*/
+    },
   };  
 
 

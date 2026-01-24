@@ -1,26 +1,30 @@
 import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, ArrowLeft } from "lucide-react"; 
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { hackathonEvents } from "../../../data/hackathonEvents";
 
 
 const HackathonSection = () => {
   const navigate = useNavigate();
-  const { eventId: rawEventId } = useParams();
+  const location = useLocation();
   
-  // Map hackathon event IDs to event index
-  const eventIndexMap = {
-    "hackathon-1": 0,
-    "hackathon-2": 1,
-    "hackathon-3": 2,
-    "hackathon-4": 3,
-    "hackathon-5": 4,
-    "hackathon-6": 5,
-  };
+  // Extract event ID from the current pathname
+  const rawEventId = useMemo(() => {
+    const path = location.pathname;
+    if (path.includes('/event/hackathon-1')) return 'hackathon-1';
+    if (path.includes('/event/hackathon-2')) return 'hackathon-2';
+    if (path.includes('/event/hackathon-3')) return 'hackathon-3';
+    if (path.includes('/event/hackathon-4')) return 'hackathon-4';
+    if (path.includes('/event/hackathon-5')) return 'hackathon-5';
+    if (path.includes('/event/hackathon-6')) return 'hackathon-6';
+    return 'hackathon-1'; // default fallback
+  }, [location.pathname]);
   
-  const eventIndex = eventIndexMap[rawEventId] || 0;
-  const currentHackathonEvent = hackathonEvents[eventIndex];
+  // Find the correct hackathon event by eventId
+  const currentHackathonEvent = useMemo(() => {
+    return hackathonEvents.find(event => event.eventId === rawEventId) || hackathonEvents[0];
+  }, [rawEventId]);
   
   // Hackathon Events Content - Separate content for each event
   const hackathonEventDetails = {
@@ -28,7 +32,7 @@ const HackathonSection = () => {
       id: "hackathon-1",
       title: "Neura-Hack 2.0 (36 Hours Hackathon)",
       registrationLink: "",
-      description: "NeuroHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, 	Defend, and Secure technology to shape the future of digital innovation.",
+      description: "NeuroHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, Defend, and Secure technology to shape the future of digital innovation.\n\nSubtitle: Build, Break, Secure\nTheme: Cyber Security\nTech Stack: Open Source",
       rewards: [
         {
           position: "2nd Prize",
@@ -73,35 +77,25 @@ const HackathonSection = () => {
       ],
       schedule: [
         {
-          round: "Venue",
-          date: "March 28, 2026",
-          time: "10:00 AM",
+          round: "Event",
+          date: "12th Feb - 13th Feb, 2026",
+          time: "9:00 AM to 9:00 PM",
           location: "IT PARK",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "S.VADIVEL  ",
+            name: "S.VADIVEL / CSE",
             phone: "+91 97906 32171",
             email: "senthilkumark@ksrct.ac.in",
-          },
-          {
-            name: "Mrs. K.Mahalakshmi",
-            phone: "+91 99442 86457",
-            email: "mahalakshmik@ksrct.ac.in",
           },
         ],
         studentCoordinator: [
           {
-            name: "Poorna Sri K",
-            phone: "+91 6374702698",
+            name: "SHANMUGESHWARA A / III-Year CSE",
+            phone: "+91 94871 19381",
             email: "poornasri664@gmail.com",
-          },
-          {
-            name: "Sivaraj A",
-            phone: "+91 90872 78175",
-            email: "sivarajboss22@gmail.com",
           },
         ],
       },

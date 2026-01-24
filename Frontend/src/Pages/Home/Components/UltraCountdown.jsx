@@ -209,7 +209,7 @@ const UltraCountdown = () => {
           }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          ⚡ Registration Starts In ⚡
+          ⚡ Registration Ends In ⚡
         </motion.p>
 
         {/* Timer Grid */}
