@@ -109,6 +109,7 @@ const Navbar = () => {
   const navLinks = [
     { name: "Home", path: "/", preload: "home" },
     { name: "Events", path: "/events", preload: "events" },
+    { name: "Event Schedule", path: "/schedule", preload: "schedule" },
     { name: "Referral", path: "/referral", preload: "referral" },
     { name: "Sponsors", path: "/sponsors", preload: "sponsors" },
     { name: "Teams", path: "/teams", preload: "teams" },
