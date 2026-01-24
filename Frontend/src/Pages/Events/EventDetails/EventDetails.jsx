@@ -515,20 +515,7 @@ const EventDetails = () => {
       description:
         " “Launch Something Lovable” in 24 Hours is a high-energy, in-person vibe coding hackathon where teams build and ship real MVPs using Lovable, focusing on product thinking, usability, and real-world impact.",
       image: Tech3,
-      rounds: [
-        {
-          title: "",
-          description: [
-            ""
-          ],
-        },
-        {
-          title: "",
-          description:
-            "",
-        },
-
-      ],
+     
       rules: [
         "Only registered participants are permitted to attend the workshop.",
         "Participants must bring their own laptop with internet access.",
@@ -639,7 +626,7 @@ const EventDetails = () => {
           {
             name: "Dr. S. Sidhra",
             email: "",
-            phone: "",
+            phone: "8925606990",
           },
         ],
         studentCoordinator: [
@@ -671,53 +658,55 @@ const EventDetails = () => {
     "technical-event-5": {
       title: "Bionexathon",
       description:
-        "Bioblitz-Map is an exciting treasure hunt event that challenges participants to use logic, observation, and problem-solving skills. Teams navigate through mapped clues and tasks, decoding hints to reach the final destination.The event promotes teamwork, strategic thinking, and quick decision-making in a fun and competitive environment.",
+        "A platform for students, researchers, and professionals to present and discuss recent advancements in biotechnology.Includes keynote lectures, panel discussions, and interactive sessions.Focus on innovation, research impact, and interdisciplinary collaboration. Encourages networking and knowledge exchange among participants.",
       image: Tech5,
       rounds: [
         {
-          title: " ",
-          description: "",
+          title: "Title :  Converging Life Sciences with Smart Technologies",
+          
         },
       ],
       rules: [
-      "All team members must be present during the event.",
-      "The core idea, logic, and scientific justification must be human-driven.",
-      "Use of pre-built or plagiarized solutions is strictly prohibited.",
-      "Any form of misconduct, cheating, or rule violation will lead to disqualification.",
-      "Each team will be allocated a specific time slot, and time limits must be strictly followed.",
-      "Teams must follow all instructions given by the event coordinators.",
-      "Fully AI-generated solutions or presentations are not allowed.",
-      "If AI tools are used, teams must clearly explain how they were applied.",
-      "The decisions of the organizers and judges regarding presentations, sessions, and awards are final and binding.",
+  "Participants must register before the deadline to confirm their attendance.",
+  "Presentations must be relevant to biotechnology and allied fields.",
+  "Each speaker will be allocated a specific time slot, and time limits must be strictly followed.",
+  "Original research and ideas are encouraged; plagiarism is strictly prohibited.",
+  "The decisions of the organizers and judges regarding presentations, sessions, and awards are final and binding.",
 ],
+
 
       schedule: [
         {
           round: "Event Timing",
           date: "February 12, 2026",
-          time: "3hours ",
-          location: "Location need",
+          time: "10 AM to 4 PM ",
+          location: " Bioinformatics Laboratory",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Mrs. V. Indumathi",
-            email: "indumathi@ksrct.ac.in",
-            phone: "9965137001",
+            name: "Dr. G. Ayyappadasan ",
+            email: "",
+            phone: "+91 99445 28382",
           },
         ],
         studentCoordinator: [
           {
-            name: "Gokkarneashvarnath V",
-            email: "gokkarmct@gmail.com ",
-            phone: "9444177711",
+            name: "Mr. P. Nishaanth",
+            email: " ",
+            phone: "9843493094",
           },
           {
-            name: "Gokul V",
-            email: "gokulv992004@gmail.com",
-            phone: "6382116360",
+            name: "Mr. N. Vasanth ",
+            email: "",
+            phone: "7397192415",
           },
+          {
+            name: "Mr. M. Karunamurthy",
+            email: "",
+            phone: " 8925243072",
+          }
         ],
       },
 
@@ -765,7 +754,7 @@ const EventDetails = () => {
       {
         name: "Dr. S. Sidhra",
         email: "",
-        phone: "",
+        phone: "8925606990",
       },
     ],
     studentCoordinator: [
@@ -853,7 +842,7 @@ const EventDetails = () => {
        description:
          "This presentation provides a clear and structured explanation of the selected concept, covering its basic principles, system design, and real-world relevance. It highlights how the idea can be applied practically, discusses current developments, and points out key challenges and future scope, helping the audience understand both theory and application",
        image: Tech8,
-       rounds: [
+       topics: [
          {
            description: "Topics",
          },
@@ -900,7 +889,7 @@ const EventDetails = () => {
              phone: "9944108747",
            },
            {
-             name: ". Ms. C. V. Swetha",
+             name: "Ms. C. V. Swetha",
              email: "",
              phone: "7538831885",
            },
@@ -2827,7 +2816,7 @@ const EventDetails = () => {
     {
       round: "Event Timing",
       date: "February 14, 2026",
-      time: "To be announced",
+      time: "10:00 AM to 12.30PM",
       location: "Hall No: MC 306",
     },
   ],
@@ -2837,7 +2826,7 @@ const EventDetails = () => {
         name: "Mrs. V. Indumathi",
         department: "",
         phone: "9965137001",
-        email: " ",
+        email: "indhumathi@ksrct.ac.in",
       },
     ],
     studentCoordinator: [
@@ -2846,14 +2835,14 @@ const EventDetails = () => {
         department: "",
         year: "",
         phone: "9677996590",
-        email: " ",
+        email: "sridharpalanisamy222@gmail.com ",
       },
       {
         name: "Mr. Bharath",
         department: "",
         year: "",
         phone: "8012355633",
-        email: " ",
+        email: "kumarbharath236@gmail.com ",
       },
     ],
   },
@@ -2884,7 +2873,7 @@ const EventDetails = () => {
     {
       round: "Event Timing",
       date: "February 14, 2026",
-      time: "To be announced",
+      time: "10:00 AM to 12.30PM",
       location: "Robotics Laboratory",
     },
   ],
@@ -2894,7 +2883,7 @@ const EventDetails = () => {
         name: "Dr. M. Sasikumar",
         department: "",
         phone: "9965167895",
-        email: " ",
+        email: "sasikumarm@ksrct.ac.in ",
       },
     ],
     studentCoordinator: [
@@ -4241,13 +4230,17 @@ image: workshop5,
   const hasRounds = event?.rounds && event.rounds.length > 0 && 
     event.rounds.some(round => round.title || round.description);
 
+  // Check if event has topics (supports both `topics` and `Topics` keys)
+  const topicsList = event?.topics ?? event?.Topics;
+  const hasTopics = Array.isArray(topicsList) && topicsList.length > 0;
+
   // Get price from database data instead of hardcoded values
   const eventPrice = getEventPrice();
   const registrationFee = eventPrice !== null ? `₹${eventPrice}` : (
-    eventId.startsWith("workshop") ? "₹350" :
-    eventId.startsWith("technical-event") ? "₹100" :
-    eventId.startsWith("non-technical-event") ? "₹50" :
-    eventId.startsWith("culturals") ? "₹100" : ""
+    eventId.startsWith("workshop") ? "₹300" :
+    eventId.startsWith("technical-event") ? "₹250" :
+    eventId.startsWith("non-technical-event") ? "₹100" :
+    eventId.startsWith("culturals") ? "₹" : ""
   );
 
   return (
@@ -4322,7 +4315,14 @@ image: workshop5,
           <>
             <ScrollAnimation>
               <div className="flex flex-col md:flex-row justify-between my-10 gap-4">
-                {["Description", "Rounds", "Rules", "Schedule", "Contact"]
+                {[
+                  "Description",
+                  ...(hasTopics ? ["Topics"] : []),
+                  "Rounds",
+                  "Rules",
+                  "Schedule",
+                  "Contact",
+                ]
                   .filter(item => item !== "Rounds" || hasRounds)
                   .map((item, index) => (
                     <motion.div
@@ -4340,10 +4340,51 @@ image: workshop5,
                         {item}
                       </h1>
                     </motion.div>
-                  )
-                )}
+                  ))}
               </div>
             </ScrollAnimation>
+
+            {/* Topics Section */}
+            {hasTopics && (
+              <ScrollAnimation>
+                <div className="border border-primary-dark p-2" id="Topics">
+                  <div className="border border-primary-dark shadow-lg p-4 md:p-10">
+                    <h2 className="text-center font-semibold text-2xl md:text-3xl mb-5 text-primary border border-primary-dark bg-primary-dark/30 px-3 py-3">
+                      Topics
+                    </h2>
+
+                    <div className="flex flex-col gap-7">
+                      {topicsList.map((topic, index) => (
+                        <motion.div
+                          key={index}
+                          className="flex flex-col gap-3"
+                          variants={itemVariants}
+                        >
+                          {topic.title && (
+                            <h1 className="font-semibold text-xl md:text-2xl text-primary">
+                              {topic.title}
+                            </h1>
+                          )}
+
+                          {/* If topic content is an array, render as list */}
+                          {Array.isArray(topic.description) ? (
+                            <ul className="list-disc pl-6 text-lg md:text-xl text-primary">
+                              {topic.description.map((point, i) => (
+                                <li key={i}>{point}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-lg md:text-xl text-justify text-primary">
+                              {topic.description}
+                            </p>
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </ScrollAnimation>
+            )}
 
             {/* Rounds Section */}
             {hasRounds && (
