@@ -344,14 +344,6 @@ const EventDetails = () => {
   const databaseEventId = reverseEventIdMap[eventId] || rawEventId;
 
   // Get event price from EVENTS_DATA
-  const getEventPrice = () => {
-    const dbId = databaseEventId;
-    for (const category of Object.values(EVENTS_DATA)) {
-      const event = category.find(e => e.id === dbId);
-      if (event) return event.price;
-    }
-    return null;
-  };
 
   // Handle registration click
   const handleRegisterClick = () => {
@@ -368,6 +360,7 @@ const EventDetails = () => {
     // Technical Events
     "technical-event-1": {
       title: "AI Mystery Box Challenge",
+      price: "₹250",
       description:
         "The AI Mystery Box Challenge is a one-day technical event designed to test participants’ analytical thinking, creativity, and practical skills in Artificial Intelligence and Machine Learning. This event offers a unique, problem-solving experience where teams are challenged with an unknown AI task revealed only at the start of the competition. Participants will receive a mystery box containing a real-world dataset and a problem statement. Once the box is opened upon official announcement, teams must quickly analyze the problem, design an appropriate machine learning solution, and develop a working model within the given time. To enhance practical applicability, teams are also required to integrate their model with a functional web interface, simulating industry-level AI deployment.The event encourages collaborative teamwork, effective time management, and hands- on implementation of AI concepts such as data preprocessing, model selection, training, evaluation, and deployment. With internet access permitted, participants can explore libraries, frameworks, and documentation to refine their solutions.The AI Mystery Box Challenge will be conducted at AI Lab 2 with a registration fee of ₹250 per head. This event is ideal for students who are passionate about AI, Data Science, and real-time problem solving, and who wish to showcase their technical expertise in a competitive environment.",
       image: Tech1,
@@ -393,7 +386,7 @@ const EventDetails = () => {
         {
           round: "Event Timing",
           date: "February 12, 2026",
-          time: "1 day",
+          time: "9:00 AM - 4:00 PM",
           location: "AI Lab 2",
         },
       ],
@@ -437,6 +430,7 @@ const EventDetails = () => {
     },
     "technical-event-2": {
       title: "System Sense – Usability & Analysis Challenge",
+      price: "₹250",
       description:
         "System Sense is a technical challenge designed to evaluate heuristic principles, identify design and interaction issues, and propose effective improvements within a limited time. Where participants assess systems based on established usability guidelines such as clarity, consistency, feedback, and user control. By applying these principles, participants develop practical solutions that enhance both user experience and business efficiency.",
       image: Tech2,
@@ -512,6 +506,7 @@ const EventDetails = () => {
 
     "technical-event-3": {
       title: " VibeCode’26 (Vibe coding partnered with Lovable.AI) ",
+      price: "₹250",
       description:
         " “Launch Something Lovable” in 24 Hours is a high-energy, in-person vibe coding hackathon where teams build and ship real MVPs using Lovable, focusing on product thinking, usability, and real-world impact.",
       image: Tech3,
@@ -526,7 +521,7 @@ const EventDetails = () => {
         {
           round: "Event Timing",
           date: "February 12, 2026",
-          time: "1Day",
+          time: "9:00 AM - 4:00 PM",
           location: "AB lab 3",
         },
       ],
@@ -572,6 +567,7 @@ const EventDetails = () => {
 
     "technical-event-4": {
       title: "Reel-O-Science",
+      price: "₹250",
       description:
         "Reel-O-Science is a creative science communication challenge where participants create an engaging Instagram reel that explains scientific concepts in a simple, impactful, and visually appealing way. The event encourages students to blend scientific accuracy with creativity to raise awareness on topics related to Biotechnology, Life Sciences, Health, Environment, and Science for Society.",
       image: Tech4,
@@ -657,10 +653,11 @@ const EventDetails = () => {
 
     "technical-event-5": {
       title: "Bionexathon",
+      price: "₹250",
       description:
         "A platform for students, researchers, and professionals to present and discuss recent advancements in biotechnology.Includes keynote lectures, panel discussions, and interactive sessions.Focus on innovation, research impact, and interdisciplinary collaboration. Encourages networking and knowledge exchange among participants.",
       image: Tech5,
-      rounds: [
+      topics: [
         {
           title: "Title :  Converging Life Sciences with Smart Technologies",
           
@@ -714,6 +711,7 @@ const EventDetails = () => {
     },
    "technical-event-6": {
   title: "BioBlitz-Map (Bio Treasure Hunt)",
+      price: "₹250",
   description:
     "BioBlitz-Map is a biology-based campus treasure hunt that challenges participants to apply biotechnology concepts, scientific logic, and observation skills to solve clues. Teams navigate through multiple locations using mapped hints, biological riddles, and logical reasoning to reach the final destination. The event emphasizes teamwork, accuracy, and strategic thinking in a competitive and engaging environment.",
   image: Tech6,
@@ -781,6 +779,7 @@ const EventDetails = () => {
     },
     "technical-event-7": {
       title: "3D Arena (Google SketchUp)",
+      price: "₹250",
       description:
         "Transform 2D concepts into immersive 3D environments while demonstrating your mastery of spatialefficiency and creative problem-solving. This challenge tests your ability to visualize volume andtexture in a high-energy setting. Bring your ideas to life, from sleek modern interiors to complexstructural exteriors.",
       image: Tech7,
@@ -839,6 +838,7 @@ const EventDetails = () => {
     },
     "technical-event-8": {
        title: "Paper Presentation",
+      price: "₹250",
        description:
          "This presentation provides a clear and structured explanation of the selected concept, covering its basic principles, system design, and real-world relevance. It highlights how the idea can be applied practically, discusses current developments, and points out key challenges and future scope, helping the audience understand both theory and application",
        image: Tech8,
@@ -898,6 +898,7 @@ const EventDetails = () => {
     },
     "technical-event-9": {
       title: " NEUROHACK 2.O",
+      price: "₹250",
       description:
         " NeuroHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, 	Defend, and Secure technology to shape the future of digital innovation",
       image: Tech9,
@@ -957,6 +958,7 @@ const EventDetails = () => {
     },
     "technical-event-10": {
       title: "BOTXHIBIT",
+      price: "₹250",
       description:
         "A showcase-based technical event where participants present pre-developed software or hardware bots demonstrating innovation, functionality, and real-world application. Teams must explain the concept, design, working principle, and technology stack of their bot and perform a live demonstration within the allotted time. Evaluation will be based on originality, technical complexity, problem-solving approach, performance, and presentation quality. The team that best demonstrates a functional, innovative, and impactful bot will be declared the winner.",
       image: Tech10,
@@ -1009,6 +1011,7 @@ const EventDetails = () => {
     },
     "technical-event-11": {
       title: "Zero component",
+      price: "₹250",
       description:
         "An engaging electronics-based technical event where participants are given only component symbols without component names. Participants must identify the correct components and build the complete circuit within a limited time. The participant who successfully builds a correct and working circuit in the shortest time is declared the winner.",
       image: Tech11,
@@ -1050,6 +1053,7 @@ const EventDetails = () => {
     },
     "technical-event-12": {
       title: "Trailblazer",
+      price: "₹250",
       description:
         "The Trailblazer event challenges participants to design and operate a robot that follows a predefined path accurately and efficiently. The robot must track a line from start to finish with minimal deviation.",
       image: Tech12,
@@ -1095,6 +1099,7 @@ const EventDetails = () => {
     },
     "technical-event-13": {
       title: "Paper presentation",
+      price: "₹250",
       description:
         "Paper Presentation is a technical event that provides a platform for students and researchers to present their innovative ideas, research findings, and technical knowledge in front of an expert panel. Participants are required to prepare and present a research or review paper related to engineering, science, technology, or management domains.",
       image: Tech13,
@@ -1157,12 +1162,13 @@ const EventDetails = () => {
     },
     "technical-event-14": {
       title: "POSTER PRESENTATION",
+      price: "₹250",
       description:
         "This poster presentation provides students a platform to showcase innovative ideas and research on emerging food processing technologies. Participants will visually present advanced techniques, applications, and benefits that enhance food quality, safety, and sustainability. The session encourages knowledge sharing, creativity, and scientific discussion among students and experts.",
       image: Tech14,
       topics: [
         {
-          title: " ",
+          title: " Emerging Food Processing Technologies ",
           description:
             "",
         },
@@ -1178,7 +1184,7 @@ const EventDetails = () => {
       ],
       schedule: [
         {
-          round: "Round",
+          round: "Event Timing",
           date: "February 12, 2026",
           time: "",
           location: " Baking and Confectionery Laboratory",
@@ -1210,6 +1216,7 @@ const EventDetails = () => {
     },
     "technical-event-15": {
         title: "Neurocode 2.O",
+      price: "₹250",
         description:
           "Neurocode 2.O is a team-based web design challenge where a reference website design is provided.Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
         image: Tech15,
@@ -1288,6 +1295,7 @@ const EventDetails = () => {
       },
       "technical-event-16": {
         title: "Paper Presentation",
+      price: "₹250",
         description:
           "This presentation provides a clear and structured explanation of the selected concept, covering its basic principles, system design, and real-world relevance. It highlights how the idea can be applied practically, discusses current developments, and points out key challenges and future scope, helping the audience understand both theory and application.",
         image: Tech16,
@@ -1345,6 +1353,7 @@ const EventDetails = () => {
 
       "technical-event-17": {
         title: "PAPER PRESENTATION",
+      price: "₹250",
         description:
           "This event allows students to present technical ideas and research in engineering fields. Participants showcase innovation, analysis, and problem-solving through structured presentations.A Q&A session helps evaluate technical depth and communication skills.",
         image: Tech17,
@@ -1366,7 +1375,7 @@ const EventDetails = () => {
         ],
         schedule: [
           {
-            round: "Round",
+            round: "Event Timing",
             date: "February 12, 2026",
             time: "9:30AM -2:00PM",
             location: "Smart Class Room [ Mechanical ]",
@@ -1409,6 +1418,7 @@ const EventDetails = () => {
       },
       "technical-event-18": {
         title: "DESIGNATHON",
+      price: "₹250",
         description:
           "Designathon challenges individuals to solve an engineering problem within a limited time.Participants develop creative design solutions using logical and technical thinking. Originality, feasibility, and time management are key evaluation criteria.",
         image: Tech18,
@@ -1428,7 +1438,7 @@ const EventDetails = () => {
         ],
         schedule: [
           {
-            round: "Round",
+            round: "Event Timing",
             date: "February 12, 2026",
             time: "3hours",
             location: "Idea lab [ Main Building ]",
@@ -1471,6 +1481,7 @@ const EventDetails = () => {
       },
       "technical-event-19": {
         title: "Drape X: Fabric Draping in Action",
+      price: "₹250",
         description:
           "DrapeX: Fabric Draping in Action offers hands-on practice in both basic and advanced fabric draping techniques using dress forms. Participants will understand fabric behavior such as fall, flow, and structure through the use of different fabrics, while applying creativity and technical skills to create original draped designs. The event also focuses on translating draped forms into garment silhouettes and design concepts, analyzing fabric properties that influence drape and appearance, and enhancing practical skills, creativity, and confidence in fabric manipulation.",
         image: Tech19,
@@ -1493,7 +1504,7 @@ const EventDetails = () => {
         ],
         schedule: [
           {
-            round: "Round",
+            round: "Event Timing",
             date: "February 12, 2026",
             time: "3 hours ",
             location: "Garment Lab -Textile Block",
@@ -1526,6 +1537,7 @@ const EventDetails = () => {
       },
       "technical-event-20": {
         title: "PAPER PRESENTATION ",
+      price: "₹250",
         description:
           "The paper presentation focuses on providing an overview of sustainability and its growing importance in the textile industry, along with recent trends and innovations in textile technology and manufacturing. It addresses key issues related to textile waste and discusses methods such as recycling, reuse, and upcycling to promote sustainable practices. Participants will also be introduced to smart textiles and their basic applications in daily life, eco-friendly practices including water, energy, and chemical conservation, and the future scope, emerging areas, and career opportunities in textile engineering.",
         image: Tech20,
@@ -1589,13 +1601,14 @@ const EventDetails = () => {
       },
       "technical-event-21": {
         title: "CoreX (Project Presentation)",
+      price: "₹250",
         description:
           "A technical project presentation competition where teams (1-3 members) showcase innovative projects in engineering, technology, or innovation.Each team gets 10 minutes to present and 5 minutes for Q&A, with originality being crucial.A Q&A session helps evaluate technical depth and communication skills.The winning team will be awarded with cash prize, and attendance is mandatory for certification.",
         image: Tech21,
         rounds: [
           
           {
-            title: "TOPICS:",
+            topics: "TOPICS:",
             description: [
               "IoT (Internet of Things)",
               "Al (Artificial Intelligence)",
@@ -1691,7 +1704,7 @@ const EventDetails = () => {
         ],
         schedule: [
           {
-            round: "Round",
+            round: "Event Timing",
             date: "February 12, 2026",
             time: "9.00 AM to 2.00 PM ",
             location: "Smart classroom",
@@ -1860,6 +1873,7 @@ const EventDetails = () => {
 
     "non-technical-event-1": {
       title: "AI Meme Contest",
+      price: "₹100",
       description:
         "The AI Meme Contest is a fun-filled one-day non-technical event that combines creativity, humor, and artificial intelligence concepts through visually engaging memes. Participants will create original memes based on given AI-related themes using either AI-based tools or manual editing, with a strong focus on originality and ethical content creation. The event encourages innovative thinking and expressive digital creativity in a light-hearted competitive environment. It will be conducted at AB 408, with a registration fee of ₹150, and is open to both individuals and teams.",
       image: NonTech1,
@@ -1930,6 +1944,7 @@ const EventDetails = () => {
     },
     "non-technical-event-2": {
       title: "IPL AUCTION",
+      price: "₹100",
       description:
         "Blind Maze Challenge encourages creative thinking and teamwork to tackle complex challenges in a fun and engaging way.",
       image: NonTech2,
@@ -1991,6 +2006,7 @@ const EventDetails = () => {
     },
     "non-technical-event-3": {
       title: "Just-a-Minute (JAM)",
+      price: "₹100",
       description:
         "Just-A-Minute (JAM) is a fast-paced speaking event where participants must speak on a given topic for one full minute without hesitation, repetition, or deviation. It tests quick thinking, clarity of thought, confidence, and effective communication skills in a fun and engaging way.",
       image: NonTech3,
@@ -2073,6 +2089,7 @@ const EventDetails = () => {
     },
     "non-technical-event-4": {
   title: "Civil Circuit (Connection)",
+      price: "₹100",
   description:
     "Civil Circuit (Connection) is an engaging non-technical event designed to test participants’ speed, logical thinking, and basic technical understanding of civil engineering concepts. Through multiple interactive rounds, participants will identify connections between civil engineering terms, categorize materials and processes, and recognize logos of construction brands and government agencies. The event encourages teamwork, quick thinking, and industry awareness in a competitive yet fun environment.",
   image: NonTech4,
@@ -2138,6 +2155,7 @@ const EventDetails = () => {
     },
     "non-technical-event-5": {
   title: "Emoji Pictionary",
+      price: "₹100",
   description:
     "Emoji Pictionary is a fast-paced and entertaining non-technical event where participants decode famous movie titles, book plots, or well-known phrases represented entirely through emoji sequences. This event adds a digital twist to the classic game of Pictionary by replacing drawings with emojis, challenging participants’ creativity, interpretation skills, and quick thinking. Teams race against time to correctly guess the answers based on visual emoji clues, making the event both fun and intellectually stimulating.",
   image: NonTech5,
@@ -2206,6 +2224,7 @@ const EventDetails = () => {
     },
     "non-technical-event-7": {
   title: "Arangam Athira",
+      price: "₹100",
   description:
     "Arangam Athira is a fun-filled musical entertainment event designed to test participants’ love for music, memory, and spontaneity. Set in a lively DJ atmosphere, the event creates an energetic and engaging environment where rhythm meets challenge. Participants enjoy interactive music sessions focused purely on enjoyment, crowd interaction, and spontaneous performance rather than competition.",
   image: NonTech7,
@@ -2263,6 +2282,7 @@ const EventDetails = () => {
     },
     "non-technical-event-6": {
   title: "Battle Arena",
+      price: "₹100",
   description:
     "Battle Arena is a high-intensity eSports competition designed to bring together skilled gamers in a professional and competitive environment. Participants compete in popular gaming titles such as EA Sports FC and Free Fire, showcasing precision, strategy, reflexes, and real-time decision-making. The event follows a structured knockout tournament format to identify and crown the ultimate champions of the arena.",
   image: NonTech6,
@@ -2317,6 +2337,7 @@ const EventDetails = () => {
     },
     "non-technical-event-8": {
   title: "LineX",
+      price: "₹100",
   description:
     "LineX is a robotics-based non-technical event where participants compete head-to-head by controlling robots using a remote control. The robots must navigate through a predefined track filled with multiple obstacles. The participant who completes the track in the shortest time is declared the winner. This event focuses on testing speed, precision, control skills, and the ability to handle robots effectively under competitive conditions.",
   image: NonTech8,
@@ -2369,6 +2390,7 @@ const EventDetails = () => {
     },
     "non-technical-event-9": {
   title: "Kahoot! Quiz",
+      price: "₹100",
   description:
     "The Kahoot! Quiz Challenge is an exciting and interactive quiz event designed to test participants’ knowledge, speed, and teamwork. Using the Kahoot platform, participants answer multiple-choice questions in real time through their smartphones. The quiz includes a mix of technical topics, general knowledge, and fun questions, making it both competitive and engaging. Accuracy and quick thinking are the key factors for success.",
   image: NonTech9,
@@ -2421,6 +2443,7 @@ const EventDetails = () => {
 
     "non-technical-event-10": {
   title: "Twisted Tiles",
+      price: "₹100",
   description:
     "Twisted Tiles is a puzzle-based non-technical event designed to challenge participants’ logical thinking and problem-solving abilities. Participants must analyze patterns, think critically, and solve puzzles within a limited time, making it an engaging test of focus, reasoning, and mental agility.",
   image: NonTech10,
@@ -2478,6 +2501,7 @@ const EventDetails = () => {
     },
     "non-technical-event-11": {
   title: "Logo Quiz",
+      price: "₹100",
   description:
     "Logo Quiz is a non-technical event that tests participants’ ability to identify logos related to brands, technology companies, and general knowledge. The event challenges visual recognition, memory, and quick recall skills in a fun and engaging quiz-based format.",
   image: NonTech11,
@@ -2535,6 +2559,7 @@ const EventDetails = () => {
     },
     "non-technical-event-12": {
   title: "Unit Wars",
+      price: "₹100",
   description:
     "Unit Wars is an educational quiz-based non-technical event focusing on fundamental and derived SI units used in science and engineering. The event challenges participants’ conceptual understanding, memory, and speed, making it both informative and competitive.",
   image: NonTech12,
@@ -2592,6 +2617,7 @@ const EventDetails = () => {
     },
     "non-technical-event-13": {
   title: "Unmasking Brands & Flavours",
+      price: "₹100",
   description:
     "Unmasking Brands & Flavours is an interactive non-technical event that challenges participants’ knowledge of corporate branding and food recognition. Through a fun, three-level game format, the event tests awareness, teamwork, and quick thinking by combining logo identification, performance-based guessing, and culinary knowledge in an engaging and competitive environment.",
   image: NonTech13,
@@ -2654,6 +2680,7 @@ const EventDetails = () => {
     },
     "non-technical-event-14": {
   title: "Treasure Hunt",
+      price: "₹100",
   description:
     "Treasure Hunt is an exciting team-based non-technical event that challenges participants to think creatively, solve clues, and work together under time pressure. Teams navigate through multiple checkpoints by cracking riddles, puzzles, physical tasks, and observation-based challenges spread across the campus. The first team to successfully complete all challenges and uncover the final treasure is declared the winner.",
   image: NonTech14,
@@ -2710,6 +2737,7 @@ const EventDetails = () => {
     },
    "non-technical-event-15": {
   title: "Face Painting",
+      price: "₹100",
   description:
     "Face Painting is a fun, creative, and engaging non-technical event that brings out the artistic talents of participants. This event offers a platform for students to express their imagination through colors, designs, and meaningful themes painted on faces. Participants can showcase styles such as cartoons, abstract art, nature-inspired patterns, cultural motifs, and message-driven creativity.",
   image: NonTech15,
@@ -2781,6 +2809,7 @@ const EventDetails = () => {
     },
     "non-technical-event-16": {
   title: "Mind Spark",
+      price: "₹100",
   description:
     "Mind Spark Arena is a three-round knowledge-based non-technical event designed to test participants’ intelligence, observation skills, and brand awareness. Teams compete through a general quiz, a visual picture connection round, and a logo & brand tagline identification challenge. Participants must think fast, connect ideas smartly, and demonstrate their mental agility to win.",
   image: NonTech16,
@@ -2851,6 +2880,7 @@ const EventDetails = () => {
     },
     "non-technical-event-17": {
   title: "Tech Without Tech",
+      price: "₹100",
   description:
     "Tech Without Tech is a non-technical team event where participants are given a common technology or everyday system and must explain how it works without using any technical terms. Using simple language, real-life examples, gestures, or storytelling, participants make complex concepts understandable to a non-technical audience. The event tests creativity, communication skills, and the ability to simplify ideas effectively.",
   image: NonTech17,
@@ -2908,6 +2938,7 @@ const EventDetails = () => {
     },
     "non-technical-event-18": {
   title: "Freezeframe",
+      price: "₹100",
   description:
     "Freezeframe is a creative photography contest focused on visual storytelling and awareness. Participants capture meaningful moments within the college campus without any editing or filters. The event promotes observational skills, creativity, and the ability to convey a message through a single photograph.",
   image: NonTech18,
@@ -2981,6 +3012,7 @@ const EventDetails = () => {
     },
     "non-technical-event-19": {
   title: "T2T – Trash 2 Textile",
+      price: "₹100",
   description:
     "T2T – Trash 2 Textile is a creative non-technical event that focuses on transforming textile waste into innovative and useful products. Participants explore techniques for recycling, upcycling, and repurposing discarded fabrics, old garments, and textile scraps. The event encourages sustainability, hands-on creativity, and understanding how to turn waste into value in an eco-friendly manner.",
   image: NonTech19,
@@ -3121,6 +3153,7 @@ const EventDetails = () => {
       title: "INFINITE STEP",
       description:
         "Solo dance is a personal expression of rhythm, emotion, and creativity through graceful movements. It captivates audiences with unique styles and storytelling.",
+      price: "₹250",
       image: Culturals1,
         rules: [
         "Song Duration should be between 3 to 4 min",
@@ -3175,6 +3208,7 @@ const EventDetails = () => {
       title: "BEAT MODE",
       description:
         "A thrilling showcase of teamwork, rhythm, and creativity as groups compete with electrifying dance performances!",
+      price: "₹150 (per member)",
       image: Culturals2,
 
       schedule: [
@@ -3231,6 +3265,7 @@ const EventDetails = () => {
       title: "CINE FEST",
       description:
         " Cine Fest is a short film competition that celebrates the art of storytelling through visual media. Participants are invited to create and submit original short films that captivate audiences with compelling narratives, creative cinematography, and impactful messages. This event provides a platform for aspiring filmmakers to showcase their talent, creativity, and passion for cinema.",
+      price: "₹300 (per team)",
       image: Culturals3,
 
       schedule: [
@@ -3287,6 +3322,7 @@ const EventDetails = () => {
       title: "MUSICAL MAVERICKS",
       description:
         "A talented vocalist who mesmerizes the audience with a soulful performance, adding emotion and energy to the event.",
+      price: "₹ 200",
       image: Culturals4,
       rules: [
         "Time limit: 3–5 minutes per performance ",
@@ -3348,6 +3384,7 @@ const EventDetails = () => {
       title: "SPOTLIGHT",
       description:
         "SPOTLIGHT is a special cultural event that celebrates unique and extraordinary talents of participants. This platform is open for performances such as magic shows, musical instrument performances, Silambam, martial arts, beatboxing, mimicry, and other creative skills. Participants will be judged based on originality, stage presence, skill level, and overall impact. SPOTLIGHT aims to recognize and encourage diverse talents by giving them a stage to shine.",
+      price: "₹ 200",
       image: Culturals5,
       schedule: [
         {
@@ -3410,6 +3447,7 @@ const EventDetails = () => {
     "workshop-1": {
       title:
         "Agentic AI",
+      price: "₹300",
       description:
         "A one-day workshop on “Agentic AI” will introduce participants to intelligent AI agents capable of autonomous decision-making, planning, and real-world problem solving. The session will be led by Mr. Dineshkumar Shanmugam, Founder & CEO of Wildrise, Korclub Consumer Private Limited, who brings strong industry expertise in AI-driven product development.Through expert talks and real-world use cases, participants will explore the architecture, applications, and future scope of Agentic AI across industries such as automation, robotics, and smart systems.The workshop is ideal for students and faculty interested in AI, Data Science, and Machine Learning. It will be held at AB Lab 2, with a registration fee of ₹300 per head.",
       image: workshop1,
@@ -3463,6 +3501,7 @@ const EventDetails = () => {
     },
     "workshop-2": {
       title: "AI Arcade (AI Tools for Game Development)",
+      price: "₹300",
 
       description: 
        "Step into the AI Arcade and discover how AI tools can supercharge game development — build smarter, faster, and more creative games using cutting-edge AI tools.",
@@ -3525,6 +3564,7 @@ const EventDetails = () => {
     },
     "workshop-3": {
       title: "Next Generation Sequencing Technologies",
+      price: "₹300",
 
       description: 
           "This workshop introduces Next-Generation Sequencing (NGS) technologies used in modern and future genomic and biomedical research.Participants gain industry-oriented knowledge on advanced sequencing platforms, workflows, and data analysis trends.The session connects molecular biology and genomics theory with real-time clinical, agricultural, and research applications.",
@@ -3582,6 +3622,7 @@ const EventDetails = () => {
     },
     "workshop-4": {
   title: "BIM (Building Information Modeling)",
+      price: "₹300",
 
   description: "Master the future of construction in this BIM workshop, where 3D design meets intelligent data integration to streamline project lifecycles, improve collaboration, minimize structural errors, and build expertise using industry-standard tools for the digital transformation of the Architecture, Engineering, and Construction (ACE) industry.",
 
@@ -3622,6 +3663,7 @@ const EventDetails = () => {
     },
     "workshop-5": {
   title: "Blockchain Beyond Crypto: Real-World Applications",
+      price: "₹300",
 
   description: "This workshop introduces blockchain technology beyond cryptocurrencies, focusing on real-world applications across industries such as supply chain management, healthcare, finance, governance, digital identity, and data security, while exploring how decentralization, transparency, and trust solve challenges in traditional systems through practical examples and discussions.",
 
@@ -3668,6 +3710,7 @@ image: workshop5,
     },
     "workshop-6": {
   title: "CyberStrike",
+      price: "₹300",
 
   description: "CyberStrike is a high-impact hands-on cybersecurity workshop designed to introduce participants to the fundamentals of cybersecurity and real-world web application security. The event covers career insights, essential security concepts, and practical exposure to OWASP Top 10 vulnerabilities through live demonstrations and guided activities. Participants will learn how attacks happen, how to defend systems, and how to build secure applications with industry-relevant knowledge and techniques.",
   image: workshop6,
@@ -3704,6 +3747,7 @@ image: workshop5,
     },
     "workshop-7": {
   title: "The Future of IoT: LoRaWAN with Artificial Intelligence",
+      price: "₹300",
 
   description: "The Future of IoT: LoRaWAN with Artificial Intelligence workshop by Enthu Technology Solutions India Pvt. Ltd. introduces participants to long-range, low-power IoT communication using LoRaWAN and its integration with AI. The session highlights real-world applications like smart cities, agriculture, and industrial automation through practical demonstrations and insights into intelligent IoT systems.",
 
@@ -3740,6 +3784,7 @@ image: workshop5,
     },
     "workshop-8": {
   title: "EV- Retrofitting",
+      price: "₹300",
 
   description: "The Workshop on EV Retrofitting is designed to provide participants with comprehensive knowledge of converting conventional internal combustion engine (ICE) vehicles into electric vehicles. This workshop focuses on fundamental principles, design considerations, and practical aspects involved in EV retrofitting, including motor selection, battery systems, power electronics, motor controllers, charging infrastructure, and safety standards.",
 
@@ -3784,6 +3829,7 @@ image: workshop5,
     },
     "workshop-9": {
   title: "Sustainable Innovation in Food Processing Techniques",
+      price: "₹300",
 
   description: "Students will actively engage in hands-on sessions to explore innovative and sustainable food processing techniques, focusing on waste reduction, energy efficiency, and value addition. Through live demonstrations and guided activities, participants will design, analyze, and improve food processing methods using eco-friendly practices, while collaborating to develop practical solutions for real-world food sustainability challenges.",
 
@@ -3825,6 +3871,7 @@ image: workshop5,
     "workshop-10": {
       title:
         "Industry IoT using LoRaWAN Technology By Enthu Technology Solutions India Pvt Ltd",
+      price: "₹300",
       description:
         "Workshop delves into LoRaWAN technology and its role in Industrial IoT (IIoT), enabling long-range, low-power wireless communication for various applications. Participants will gain insights into LoRaWAN architecture, device communication, network deployment, and security protocols. The workshop will cover smart manufacturing, asset tracking, environmental monitoring, and predictive maintenance, with hands-on sessions and real-world case studies to equip attendees with practical skills for implementing IoT solutions in industrial automation and efficiency.",
       image: workshop10,
@@ -3861,6 +3908,7 @@ image: workshop5,
     },
     "workshop-11": {
   title: "Github Essentials: Code Commit Collaborate",
+      price: "₹300",
 
   description: "This hands-on workshop introduces college students to Git and GitHub for efficient version control and team-based development, covering repositories, commits, branching, merging, and conflict resolution through live demos and practice, while engaging participants in real-world workflows like collaboration and code reviews, ultimately preparing them to confidently use Git and GitHub for academic, internship, hackathon, and industry-level projects.",
 
@@ -3905,6 +3953,7 @@ image: workshop5,
     },
     "workshop-12": {
   title: "Flight mode: ON",
+      price: "₹300",
 
   description: "Flight modes help control how a drone flies, making it safer and easier to operate. This workshop also includes simple drone assembly, covering basic parts, motor fixing, wiring, and controller setup.",
   image: workshop12,
@@ -3944,6 +3993,7 @@ image: workshop5,
     },
     "workshop-13": {
   title: "Development of Next Gen Vehicle",
+      price: "₹300",
 
   description: "This workshop introduces emerging technologies used in modern and future vehicles. Participants gain industry-oriented knowledge on advanced vehicle systems and design trends. The session connects engineering theory with real-time automotive applications.",
 
@@ -3992,6 +4042,7 @@ image: workshop5,
     },
     "workshop-14": {
   title: "AI Integrated Smart Medi Tech",
+      price: "₹300",
 
   description: "The workshop provides an introduction to AI concepts and their role in smart medical and healthcare technologies, along with an overview of medical textiles, smart fabrics, and sensor-integrated textile systems. Participants will gain exposure to AI-enabled health monitoring, diagnostics, and wearable medical applications through demonstrations and real-world case studies. The program also offers insights into emerging trends, innovations, and career opportunities in AI-driven medical textiles and healthcare technology.",
 
@@ -4042,6 +4093,7 @@ image: workshop5,
 
     "workshop-15": {
   title: "Chip2Test",
+      price: "₹300",
 
   description: "This hands-on workshop will guide students through the journey of VLSI design, from logic design to the implementation of test patterns using DFT techniques. Participants will gain practical experience in identifying faults, creating test strategies, and understanding how DFT ensures reliability and efficiency in modern chip design. By the end of the session, students will have a clear understanding of the role of DFT in bridging design and verification in real-world VLSI circuits.",
 
@@ -4234,14 +4286,8 @@ image: workshop5,
   const topicsList = event?.topics ?? event?.Topics;
   const hasTopics = Array.isArray(topicsList) && topicsList.length > 0;
 
-  // Get price from database data instead of hardcoded values
-  const eventPrice = getEventPrice();
-  const registrationFee = eventPrice !== null ? `₹${eventPrice}` : (
-    eventId.startsWith("workshop") ? "₹300" :
-    eventId.startsWith("technical-event") ? "₹250" :
-    eventId.startsWith("non-technical-event") ? "₹100" :
-    eventId.startsWith("culturals") ? "₹" : ""
-  );
+  // Use price from event object directly
+  const registrationFee = event?.price || null;
 
   return (
     <div className="p-4 md:p-10 mt-24 text-white min-h-screen">
@@ -4263,7 +4309,6 @@ image: workshop5,
         {registrationFee && (
           <div className="text-center text-primary text-xl md:text-2xl font-semibold mb-4">
             Registration Fee: {registrationFee}
-            {eventPrice === 0 && <span className="ml-2 text-green-400">(FREE)</span>}
           </div>
         )}
 

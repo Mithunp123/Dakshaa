@@ -31,14 +31,14 @@ const HackathonSection = () => {
       description: "NeuroHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, 	Defend, and Secure technology to shape the future of digital innovation.",
       rewards: [
         {
-          position: "1st Prize",
-          emoji: "🥇",
+          position: "2nd Prize",
+          emoji: "🥈",
           amount: "₹30,000",
         },
         {
-          position: "2nd Prize",
-          emoji: "🥈",
-          amount: "₹20,000",
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹30,000",
         },
         {
           position: "3rd Prize",
