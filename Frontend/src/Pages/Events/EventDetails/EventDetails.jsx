@@ -73,9 +73,9 @@ import NonTech6 from "../../../assets/EventsImages/EventDetails/Nontech/cse_nont
 import NonTech7 from "../../../assets/EventsImages/EventDetails/Nontech/cse_nontech1.png";
 import NonTech8 from "../../../assets/EventsImages/EventDetails/Nontech/ece_nontech.png";
 import NonTech9 from "../../../assets/EventsImages/EventDetails/Nontech/ece_nontech1.png";
-import NonTech10 from "../../../assets/EventsImages/EventDetails/Nontech/eee_nontech.png";
+import NonTech10 from "../../../assets/EventsImages/EventDetails/Nontech/eee_nontech2.png";
 import NonTech11 from "../../../assets/EventsImages/EventDetails/Nontech/eee_nontech1.png";
-import NonTech12 from "../../../assets/EventsImages/EventDetails/Nontech/eee_nontech2.png";
+import NonTech12 from "../../../assets/EventsImages/EventDetails/Nontech/eee_nontech.png";
 import NonTech13 from "../../../assets/EventsImages/EventDetails/Nontech/ft_nontech.png";
 import NonTech14 from "../../../assets/EventsImages/EventDetails/Nontech/it_nontech.png";
 import NonTech15 from "../../../assets/EventsImages/EventDetails/Nontech/mca_nontech.png";
