@@ -391,7 +391,7 @@ const EventDetails = () => {
       ],
       schedule: [
         {
-          round: "Round",
+          round: "Event Timing",
           date: "February 13, 2026",
           time: "1 day",
           location: "AI Lab 2",
@@ -423,7 +423,7 @@ const EventDetails = () => {
           },
           {
             name: "Ms. S.Obulakshmi",
-            Phone: "8124225197",
+            phone: "8124225197",
             email: "",
           },
           {
@@ -442,7 +442,7 @@ const EventDetails = () => {
       image: Tech2,
       rounds: [
         {
-          title: "Round 1 – System Analysis Round",
+          title: "Round-1 – System Analysis Round",
           description: [
             "Participants must analyze the given system, identify key usability or design issues, and propose a logical improvement using heuristic principles.",
             "Evaluation will be based on accuracy of problem identification, relevance of the proposed solution, and clarity of analysis.",
@@ -456,13 +456,13 @@ const EventDetails = () => {
           ],
         },
         {
-          title: "Additional Features",
+          title: "Round-3 - Additional Features",
           description: [
             "Participants are encouraged to apply heuristic principles and system-thinking approaches to arrive at effective solutions.",
           ],
         },
         {
-          title: "Plagiarism and Fair Conduct",
+          title: "Round-4 - Plagiarism and Fair Conduct",
           description: [
             "All analyses and solutions must be original and developed during the event.",
             "Copying, sharing answers, or using unfair means in any form is strictly prohibited.",
@@ -480,7 +480,7 @@ const EventDetails = () => {
       ],
       schedule: [
         {
-          round: "Round",
+          round: "Event Timing",
           date: "February 13, 2026",
           time: " 2-3 hrs",
           location: " AB Lab 4",
@@ -586,24 +586,49 @@ const EventDetails = () => {
     "technical-event-4": {
       title: "Reel-O-Science",
       description:
-        "Short technical video presentation event Students showcase innovative engineering ideas Focus on clarity, creativity, and technical understanding  Judged through content quality and explanation skills   ",
+        "Reel-O-Science is a creative science communication challenge where participants create an engaging Instagram reel that explains scientific concepts in a simple, impactful, and visually appealing way. The event encourages students to blend scientific accuracy with creativity to raise awareness on topics related to Biotechnology, Life Sciences, Health, Environment, and Science for Society.",
       image: Tech4,
       rounds: [
         {
-          title: " ",
-          description: "",
+          title: "Reel Creation & Submission ",
+          description: "Participants must create a 45–60 second vertical Instagram reel based on the given science-related themes. The reel should clearly explain the scientific concept using original ideas, visuals, and narration. The reel must be posted on Instagram by tagging the official Dakshaa page and using the specified hashtags.",
         },
+        {
+          title: "Evaluation & Shortlisting",
+          description:"Submitted reels will be evaluated based on scientific understanding, originality, presentation quality, and audience impact. Shortlisted entries will be considered for final ranking and prizes.",
+        }
       ],
       rules: [
-        "Video must be short and within the specified time limit.",
-        "Content should be original and based on an engineering or technical concept.",
-        "Explanation must be clear, relevant, and technically accurate.",
-        "Plagiarism or inappropriate content will lead to disqualification.",
-        "Judges’ decision will be final and binding.",  
+        "Participation is open to UG and PG students.",
+
+        "Participants can compete individually or in teams of up to 2 members.",
+
+        "Reel duration must be 45–60 seconds and in vertical (9:16) format.",
+
+        "Video resolution should be minimum 720p (up to 4K allowed).",
+
+        "Language can be English or Tamil (subtitles are encouraged).",
+
+        "AI tools may be used only as support; the scientific explanation and narration must be human-driven.",
+        "Fully AI-generated reels are strictly prohibited.",
+
+        "Any misuse of AI or misrepresentation of originality will lead to disqualification.",
+
+        "Content must be scientifically accurate and free from offensive, political, religious, or misleading material.",
+
+        "Plagiarism is strictly prohibited.",
+
+        "Only copyright-free music is allowed.",
+
+        "The reel must be posted on Instagram, tagging the official Dakshaa page.",
+
+        "Mandatory hashtags: #Dakshaa #ksrct1994 #Biotechnology",
+
+        "The Instagram reel link must be submitted during the event.",  
       ],
       schedule: [
         {
-          round: "Round",
+          round: "Event Timing",
           date: "February 13, 2026",
           time: "9.00 AM to 2.00 PM ",
           location: "Bioprocess Laboratory ",
@@ -644,7 +669,7 @@ const EventDetails = () => {
 
 
     "technical-event-5": {
-      title: "aa",
+      title: "Bionexathon",
       description:
         "Bioblitz-Map is an exciting treasure hunt event that challenges participants to use logic, observation, and problem-solving skills. Teams navigate through mapped clues and tasks, decoding hints to reach the final destination.The event promotes teamwork, strategic thinking, and quick decision-making in a fun and competitive environment.",
       image: Tech5,
@@ -655,8 +680,17 @@ const EventDetails = () => {
         },
       ],
       rules: [
-        "Participants must follow the given map and clues strictly.",
-      ],
+      "All team members must be present during the event.",
+      "The core idea, logic, and scientific justification must be human-driven.",
+      "Use of pre-built or plagiarized solutions is strictly prohibited.",
+      "Any form of misconduct, cheating, or rule violation will lead to disqualification.",
+      "Each team will be allocated a specific time slot, and time limits must be strictly followed.",
+      "Teams must follow all instructions given by the event coordinators.",
+      "Fully AI-generated solutions or presentations are not allowed.",
+      "If AI tools are used, teams must clearly explain how they were applied.",
+      "The decisions of the organizers and judges regarding presentations, sessions, and awards are final and binding.",
+],
+
       schedule: [
         {
           round: "Round",
@@ -689,65 +723,71 @@ const EventDetails = () => {
 
       registrationLink: "https://forms.gle/gziLh4EoGaCQLSpg8", // Registration link
     },
-    "technical-event-6": {
-      title: "Bioblitz- Map (Bio Treasure Hunt)",
+   "technical-event-6": {
+  title: "BioBlitz-Map (Bio Treasure Hunt)",
+  description:
+    "BioBlitz-Map is a biology-based campus treasure hunt that challenges participants to apply biotechnology concepts, scientific logic, and observation skills to solve clues. Teams navigate through multiple locations using mapped hints, biological riddles, and logical reasoning to reach the final destination. The event emphasizes teamwork, accuracy, and strategic thinking in a competitive and engaging environment.",
+  image: Tech6,
+  rounds: [
+    {
+      title: "Round 1: Clue Decoding & Navigation",
       description:
-        "Bioblitz-Map is an exciting treasure hunt event that challenges participants to use logic, observation, and problem-solving skills. Teams navigate through mapped clues and tasks, decoding hints to reach the final destination.The event promotes teamwork, strategic thinking, and quick decision-making in a fun and competitive environment.",
-      image: Tech6,
-      rounds: [
-        {
-          title: "",
-          description:
-            "",
-        },
-        {
-          title: "",
-          description:
-            "",
-        },
-      ],
-      rules: [
-        "Participants must follow the given map and clues strictly.",
-        "Teams should not damage property or disturb others during the hunt.",
-        "Use of unfair means or external help is strictly prohibited.",
-        "All tasks must be completed within the allotted time.",
-        "The organizers’ and judges’ decisions will be final and binding.",
-      ],
-      schedule: [
-        {
-          round : "Round ",
-          date: "February 13, 2026",
-          time: " 3hours ",
-          location: "Protein and Enzyme Engineering Laboratory",
-        },
-
-      ],
-      contact: {
-        facultyCoordinator: [
-          {
-            name: "Dr. S. Sidhra",
-            email: "",
-            phone: "",
-          },
-        ],
-        studentCoordinator: [
-          {
-            name: "Ms. D. Moumitha",
-            email: "",
-            phone: "9952533198",
-          },
-          {
-            name: "Mr. M. Ajairaj ",
-            email: "",
-            phone: " 9342070737",
-          },
-          {
-            name: "Ms. Nancy",
-            email: "",
-            phone: "7695890609",
-          },
-        ],
+        "Teams begin the hunt by decoding biological riddles, concept-based questions, and image or spot identification clues. Each correct answer leads to the next mapped location within the campus.",
+    },
+    {
+      title: "Round 2: Final Discovery & Completion",
+      description:
+        "In the final phase, teams solve advanced life-science–based logical challenges to reach the treasure point. Performance is evaluated based on speed, accuracy, and progress within the given time limit.",
+    },
+  ],
+  rules: [
+    "The event is open to UG and PG students only.",
+    "Each team must consist of 1 to 2 members.",
+    "Team members must stay together throughout the event.",
+    "No external help from other participants or spectators is allowed.",
+    "All clues must be solved using biotechnology and life science knowledge.",
+    "Any damage to college property will result in immediate disqualification.",
+    "Misconduct, unfair practices, or rule violations will not be tolerated.",
+    "All tasks must be completed within the allotted time limit of 60–90 minutes.",
+    "Participants must strictly follow the instructions given by the event coordinators.",
+    "The decisions of the coordinators and judges are final and binding.",
+  ],
+  schedule: [
+    {
+      round: "Event Timing",
+      date: "February 13, 2026",
+      time: "3 Hours",
+      location: "Protein and Enzyme Engineering Laboratory",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Dr. S. Sidhra",
+        email: "",
+        phone: "",
       },
+    ],
+    studentCoordinator: [
+      {
+        name: "Ms. D. Moumitha",
+        email: "",
+        phone: "9952533198",
+      },
+      {
+        name: "Mr. M. Ajairaj",
+        email: "",
+        phone: "9342070737",
+      },
+      {
+        name: "Ms. Nancy",
+        email: "",
+        phone: "7695890609",
+      },
+    ],
+  },
+
+
       registrationLink: "https://forms.gle/2wBfChfRVPiKVw599", // Registration link
     },
     "technical-event-7": {
@@ -755,7 +795,7 @@ const EventDetails = () => {
       description:
         "Transform 2D concepts into immersive 3D environments while demonstrating your mastery of spatialefficiency and creative problem-solving. This challenge tests your ability to visualize volume andtexture in a high-energy setting. Bring your ideas to life, from sleek modern interiors to complexstructural exteriors.",
       image: Tech7,
-      rounds: [
+      /*rounds: [
         {
           title: "",
           description: [
@@ -768,7 +808,7 @@ const EventDetails = () => {
             "",
           ],
         },
-      ],
+      ],*/
       rules: [
         "Time Limit: Complete the model within the allotted time.",
         "No Outside Help: Mobile phones, internet, and external files are strictly prohibited.",
@@ -778,9 +818,9 @@ const EventDetails = () => {
       ],
       schedule: [
         {
-          round: "Round",
+          round: "Event Timing",
           date: "February 13, 2026",
-          time: "",
+          time: "9:00 AM to 12:00 PM",
           location: "Civil CADD Laboratory",
         },
       ],
@@ -806,7 +846,7 @@ const EventDetails = () => {
         ],
       },
 
-      registrationLink: "https://forms.gle/gziLh4EoGaCQLSpg8", // Registration link
+      registrationLink: "   ", // Registration link
     },
     "technical-event-8": {
        title: "Paper Presentation",
@@ -839,10 +879,10 @@ const EventDetails = () => {
        ],
        schedule: [
          {
-           round: "Round",
-           date: "May 22, 2026",
-           time: "9:00 AM to 11:00 AM",
-           location: "Tech Hub, Innovation Center",
+           round: "Event Timing",
+           date: "February 13, 2026",
+           time: "9:00 AM to 12:00 AM",
+           location: " Civil Building, C110 classroom",
          },
        ],
        contact: {
@@ -1180,107 +1220,77 @@ const EventDetails = () => {
       registrationLink: "https://forms.gle/2wBfChfRVPiKVw599", // Registration link
     },
     "technical-event-15": {
-        title: "CODE RELAY",
+        title: "NeuroHack 2.O(36-hour)",
         description:
-          "Code Relay is a team-based web design challenge where a reference website design is provided.Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
+          "NeuroHack 2.O(36-hour) is a team-based web design challenge where a reference website design is provided.Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
         image: Tech15,
         rounds: [
           {
-            title: "TOPICS:",
+            title: "",
           },
           {
-            title: "Life Science and Technology Sector:",
+            title: "Round-1: Code Debug Sprint (30 Minutes) – Elimination Round Concept",
             description: [
-              "The Future of Genetic Engineering.",
-              "Urban Nourish: Street Food Remix.",
-              "Eco-Friendly Dyes: Reducing Environmental Impact in Textile Processing.",
+              "Teams are given a faulty front-end codebase containing intentional logical, syntactical, and UI errors",
+              "The goal is to debug and make the website functionally correct and visually accurate within the time limit.",
+              
             ],
           },
           {
-            title: "Computer & IT Sector:",
+            title: "Round-2: Reverse Layout Engineering (1 hour) ",
+           
             description: [
-              "Quantum Computing: Revolutionizing Data Processing.",
-              "Blockchain Technology in Cybersecurity.",
-              "Edge Computing: A Game-Changer for IoT Applications.",
+              "A live website is shown for 120 seconds",
+              "No screenshots / no notes",
+              "Mandatory CSS Grid",
+              "Semantic tags required (header, main, section, footer)",
+              "No frameworks (Bootstrap, Tailwind )",
+              
             ],
           },
           {
-            title: "Electrical & Electronics Sector:",
+            title: "Round-3: Final Showdown – Code Relay Edition (45 Minutes) ",
             description: [
-              "The Future of Wireless Communication.",
-              "Wireless Power Transmission: The Next Energy Revolution.",
+              "This round introduces the true “Code Relay” challenge, testing teamwork without communication.",
+              "Each team must consist of exactly 3 members",
+              "All members must be present during all rounds",
+
             ],
           },
-          {
-            title: "Building and Mechanical Sector:",
-            description: [
-              "3D Printing in Manufacturing: A Sustainable Approach.",
-              "Green Buildings: Designing a Sustainable Future.",
-            ],
-          },
-          {
-            title: "Artificial Intelligence & IoT Sector:",
-            description: [
-              "AI in Climate Change Prediction: A Sustainable Approach.",
-              "Smart Cities: IoT Solutions for Urban Sustainability.",
-            ],
-          },
-          {
-            title: "Chemical & Pharmaceutical Sector:",
-            description: [
-              "Carbon Capture Technology: Fighting Global Warming.",
-              "Green Hydrogen: The Future of Renewable Energy.",
-              "Personalized Medicine: The Role of AI in Drug Development.",
-            ],
-          }
+          
         ],
         rules: [
-          "Open to all UG, PG Students and Research Scholars. Teams can have a maximum of 3 members.",
-          "1) Poster Guidelines:",
-          "  i) Size: A1 (594 × 841 mm).",
-          "  ii) Must include title, name of the concept , and uniqueness.",
-          "  iii) Clear visuals, infographics, and creativity are encouraged.",
-          "2) Presentation:",
-          "1) Poster Guidelines:",
-          "  i) Time Limit:10 minutes per team.",
-          "  ii) Includes presentation for 6 minutes and  Q and A sections  for 4 minutes.",
-          "  iii) Must cover product innovation,  and SDG alignment",
-          "  iv) Judges may ask questions after the presentation.",
-          "3) Judging Criteria:",
-          "i) Content Relevance & Accuracy – 25%",
-          "ii) Creativity & Innovation – 20%",
-          "iii) Clarity & Organization – 20%",
-          "iv) Visual Appeal – 15%",
-          "v) Presentation & Communication Skills – 20%",
+          "Participants must bring their own laptop",
+          "Required software must be pre-installed (VS Code / browser)",
+          "Internet access is restricted unless explicitly allowed by judges",
+          "Plagiarism or copying from other teams will result in immediate disqualification",
+
         ],
         schedule: [
           {
             round: "Venue",
-            date: "March 28, 2026",
-            time: "9:30AM -10:30AM",
-            location: "announcing soon",
+            date: "February 13, 2026",
+            time: "3hours",
+            location: " Computer Lab (high spec)",
           },
         ],
         contact: {
           facultyCoordinator: [
             {
-              name: "Mr G Bharath, AP/FT",
+              name: "Mr.P.Dineshkumar",
               phone: "9047976171",
             },
           ],
           studentCoordinator: [
             {
-              name: "Surya S",
-              phone: "9360492992",
+              name: "Mr.S.Sujith",
+              phone: "9361796047",
             },
             {
-              name: "Yatheeswar R",
-              phone: "9441236991",
+              name: "Ms.G.Kari Vikashini",
+              phone: "9384525869",
             },
-            {
-                name: "Vijaya Yugeshwar R ",
-                phone: "9585768184",
-            },
+          
 
           ],
         },
@@ -1526,7 +1536,7 @@ const EventDetails = () => {
         registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
       },
       "technical-event-20": {
-        title: "PAPER PRESENTATION",
+        title: "PAPER PRESENTATION ",
         description:
           "The paper presentation focuses on providing an overview of sustainability and its growing importance in the textile industry, along with recent trends and innovations in textile technology and manufacturing. It addresses key issues related to textile waste and discusses methods such as recycling, reuse, and upcycling to promote sustainable practices. Participants will also be introduced to smart textiles and their basic applications in daily life, eco-friendly practices including water, energy, and chemical conservation, and the future scope, emerging areas, and career opportunities in textile engineering.",
         image: Tech20,
@@ -1552,23 +1562,23 @@ const EventDetails = () => {
         ],
         schedule: [
           {
-            round: "Round",
+            round: "Event Timing",
             date: "February 13, 2026",
             time: "9.00 AM to 2.00 PM",
-            location: "Smart Class Room MBA Block",
+            location: "MBA Seminar Hall",
           },
         ],
         contact: {
           facultyCoordinator: [
             {
-              name: "Dr. K.R.NandagopalE",
+              name: "Dr. K.R.Nandagopal",
               email:"",
-              phone: "90034 36705",
+              phone: "+91 90034 36705",
             },
             {
               name: "Dr. C.Premalatha",
               email:"",
-              phone: " 97502 06161",
+              phone: "+91 97502 06161",
             }
           ],
           studentCoordinator: [
@@ -1620,7 +1630,7 @@ const EventDetails = () => {
         ],
         schedule: [
           {
-            round: "Round",
+            round: "Event Timing",
             date: "February 13, 2026",
             time: " 9.00 AM to 4.00 PM",
             location: "Electronic Devices Laboratory, J Block 4th Floor",
@@ -1630,30 +1640,30 @@ const EventDetails = () => {
           facultyCoordinator: [
             {
               name: "Mr. D. Poorna Kumar",
-              email:"",
-              phone: "",
+              email:"poornakumard@ksrct.ac.in",
+              phone: "+91 90036 45614",
             },
             {
               name: "Mrs. C. Saranya ",
-              email:"",
-              phone: "",
+              email:"saranyac@ksrct.ac.in",
+              phone: "+91 99945 88990",
             }
           ],
           studentCoordinator: [
             {
-              name: ". M. Suriya Prasanth",
+              name: " Mr. M. Suriya Prasanth",
               email:"",
-              phone: " 9487822144",
+              phone: " +91 94878 22144",
             },
             {
               name: "Ms. G.S. Harsha Prabha ",
               email:" ",
-              phone: "94422 18288",
+              phone: "+91 94422 18288",
             },
             {
               name: "Mr. R. Shanmugavel ",
               email:" ",
-              phone: " ",
+              phone: " +91 63695 31193",
             },
 
           ],
@@ -2113,7 +2123,7 @@ const EventDetails = () => {
     {
       round: "All Rounds",
       date: "February 14, 2026",
-      time: "To be announced",
+      time: "9.00 AM to 11.00 PM",
       location: "Civil CADD Laboratory",
     },
   ],
@@ -2139,7 +2149,7 @@ const EventDetails = () => {
     ],
   },
 
-      registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
+      registrationLink: "", // Registration link
     },
     "non-technical-event-5": {
   title: "Emoji Pictionary",
@@ -2825,7 +2835,7 @@ const EventDetails = () => {
   ],
   schedule: [
     {
-      round: "All Rounds",
+      round: "Event Timing",
       date: "February 14, 2026",
       time: "To be announced",
       location: "Hall No: MC 306",
@@ -2882,7 +2892,7 @@ const EventDetails = () => {
   ],
   schedule: [
     {
-      round: "Event Session",
+      round: "Event ",
       date: "February 14, 2026",
       time: "To be announced",
       location: "Robotics Laboratory",
@@ -3076,7 +3086,7 @@ const EventDetails = () => {
     {
       round: "Event Session",
       date: "February 14, 2026",
-      time: "3 Hours",
+      time: "9.00 AM to 01.00 PM",
       location: "Electronic Devices Laboratory, J Block 4th Floor",
     },
   ],
@@ -3086,15 +3096,15 @@ const EventDetails = () => {
         name: "Dr. S. Pradeep",
         designation: "Assistant Professor",
         department: "",
-        phone: "",
-        email: " ",
+        phone: " +91 81221 39862",
+        email: "pradeeps@ksrct.ac.in",
       },
       {
         name: "Dr. N. Lalithamani",
         designation: "Professor",
         department: "",
-        phone: "",
-        email: " ",
+        phone: " +91 89255 68867",
+        email: "lathithamani@ksrct.ac.in ",
       },
     ],
     studentCoordinator: [
@@ -3102,27 +3112,27 @@ const EventDetails = () => {
         name: "Mr. S. Hardeep",
         department: "Electronics Engineering (VLSIDT)",
         year: "II Year",
-        phone: "9976048999",
+        phone: "+91 99760 48999",
         email: " ",
       },
       {
         name: "Ms. P. Dhivyadharshini",
         department: "Electronics Engineering (VLSIDT)",
         year: "II Year",
-        phone: "8489253710",
+        phone: "+91 84892 53710",
         email: " ",
       },
       {
         name: "Ms. G. Jeevaranjani",
         department: "Electronics Engineering (VLSIDT)",
         year: "I Year",
-        phone: "",
+        phone: "+91 82702 02728",
         email: " ",
       },
     ],
   },
 
-      registrationLink: "https://forms.gle/5yq2dPubztMWun548", // Registration link
+      registrationLink: "", // Registration link
     },
 
 
@@ -3241,7 +3251,7 @@ const EventDetails = () => {
     "culturals-event-3": {
       title: "CINE FEST",
       description:
-        "A thrilling showcase of teamwork, rhythm, and creativity as groups compete with electrifying dance performances! ",
+        " Cine Fest is a short film competition that celebrates the art of storytelling through visual media. Participants are invited to create and submit original short films that captivate audiences with compelling narratives, creative cinematography, and impactful messages. This event provides a platform for aspiring filmmakers to showcase their talent, creativity, and passion for cinema.",
       image: Culturals3,
 
       schedule: [
@@ -3253,14 +3263,13 @@ const EventDetails = () => {
         },
       ],
       rules: [
-        "Song Duration should be between 4 to 5 min",
-        "Team size should be between 3 to 8 members",
-        "Song should be in mp3 format and must be brought by the participants",
-        "Register before the final date",
-        "Props: AlloweDuration up to 10 minutes.",
-        "WiAll films must be submitted in video file format (MP4, MOV, or AVI).",
-        "Winners will be judged based on creativity, storytelling, and overall impact.",
-        "No 18 +, bad words and adult content.",
+        "The event is open to all individual participants and teams. Teams may consist of 1 to 3 members.",
+        "The Short films can be based on any theme & genres without any vulgar content.",
+        "The short film should be original.",
+        "Duration up to 10 minutes.",
+        "All films must be submitted in video file format (MP4, MOV, or AVI).",
+        "Winners will be judged based on creativity, storytelling, and overall impact",
+        "No 18 +, bad words and adult content",
       ],
       contact: {
         facultyCoordinator:
@@ -3363,7 +3372,7 @@ const EventDetails = () => {
       image: Culturals5,
       schedule: [
         {
-          round: "Round 1",
+          round: "Event Timing",
           date: "February, 2026",
           time: "10:00 AM to 03:00 PM",
           location: "KSRCT",
@@ -3372,12 +3381,11 @@ const EventDetails = () => {
       rules: [
         "The event is open to all registered participants of the cultural fest.",
         "Each participant must showcase one special talent only (e.g., magic, musical instrument, Silambam, martial arts, mimicry, etc.).",
-        "Performance duration must be strictly followed",
+        "Performance duration (max 4 minutes) must be strictly followed ",
         "Participants must report to the venue at least 30 minutes before the event starts.",
         "Vulgarity, offensive content, or any form of inappropriate performance is strictly prohibited.",
         "Use of dangerous props, fire, sharp weapons, or hazardous materials is not allowed.",
         "Participants are responsible for bringing their own instruments, props, or materials required for the performance.",
-        "Background music (if any) must be submitted to the coordinators before the event in the specified format.",
         "Background music (if any) must be submitted to the coordinators before the event in the specified format.",
       ],
       contact: {
@@ -4064,9 +4072,9 @@ image: workshop5,
 
   schedule: [
     {
-      round:"Timing",
+      round:" Event Timing",
       location: "VLSI Lab, J Block 1st Floor",
-      duration: "1 Day",
+      time: "9.00 AM to 4.00 PM",
       date: "February 12, 2026",
     },
   ],
@@ -4076,13 +4084,13 @@ image: workshop5,
       {
         name: "Mr. A. Suresh Kumar",
         designation: "Assistant Professor",
-        phone: "",
-        email: "",
+        phone: "+91 95003 71772",
+        email: "sureshkumara@ksrct.ac.in",
       },
       {
         name: "Dr. P. Suthanthira Kumar",
         designation: "Assistant Professor",
-        phone: "",
+        phone: "+91 95008 25738",
         email: "",
       },
     ],
@@ -4090,8 +4098,6 @@ image: workshop5,
     studentCoordinator: [
       {
         name: "Ms. S. Srikiruthika",
-        year: "III Year",
-        department: "Electronics Engineering (VLSIDT)",
         phone: "9042231825",
         email: "",
       },
@@ -4112,7 +4118,7 @@ image: workshop5,
     ],
   },
 
-      registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9", // Registration link
+      registrationLink: "", // Registration link
     },
     /*
     "workshop-16": {
