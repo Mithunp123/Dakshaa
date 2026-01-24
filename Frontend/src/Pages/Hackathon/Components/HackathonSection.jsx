@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { supabase } from "../../../supabase";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, ArrowLeft } from "lucide-react"; 
 import { useNavigate, useLocation } from "react-router-dom";
@@ -8,6 +9,23 @@ import { hackathonEvents } from "../../../data/hackathonEvents";
 const HackathonSection = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    fetchUser();
+    
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
   
   // Extract event ID from the current pathname
   const rawEventId = useMemo(() => {
@@ -567,6 +585,16 @@ const HackathonSection = () => {
     return event.rounds && Array.isArray(event.rounds) && event.rounds.length > 0 && event.rounds.some(round => round.title && round.title.trim() !== '');
   };
 
+  const handleRegisterClick = () => {
+    if (!user) {
+      // Not logged in - redirect to login with return URL
+      navigate('/login', { state: { returnTo: `/event/${rawEventId}` } });
+      return;
+    }
+    // Logged in - redirect to registration page with event pre-selected
+    navigate('/register-events', { state: { selectedEventId: rawEventId } });
+  };
+
   // Infinite Pulsing Animation for Button
   const pulseAnimation = {
     animate: {
@@ -624,7 +652,7 @@ const HackathonSection = () => {
               whileTap={{ scale: 0.9 }}
               variants={pulseAnimation} // Infinite pulsing animation
               animate="animate" // Ensure the animation is always running
-              onClick={() => window.open(event.registrationLink, "_blank")} // Open registration link in a new tab
+              onClick={() => handleRegisterClick()} // Open registration link in a new tab
             >
               REGISTER NOW!
             </motion.button>
@@ -682,7 +710,6 @@ const HackathonSection = () => {
           </div>
         </div> */}
         {/*  */}
-
         {/* Eligibility Section */}
         {event.eligibility && (
           <div className="border border-primary-dark p-2 mb-5" id="Eligibility">
