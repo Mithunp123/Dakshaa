@@ -1,26 +1,30 @@
 import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, ArrowLeft } from "lucide-react"; 
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { hackathonEvents } from "../../../data/hackathonEvents";
 
 
 const HackathonSection = () => {
   const navigate = useNavigate();
-  const { eventId: rawEventId } = useParams();
+  const location = useLocation();
   
-  // Map hackathon event IDs to event index
-  const eventIndexMap = {
-    "hackathon-1": 0,
-    "hackathon-2": 1,
-    "hackathon-3": 2,
-    "hackathon-4": 3,
-    "hackathon-5": 4,
-    "hackathon-6": 5,
-  };
+  // Extract event ID from the current pathname
+  const rawEventId = useMemo(() => {
+    const path = location.pathname;
+    if (path.includes('/event/hackathon-1')) return 'hackathon-1';
+    if (path.includes('/event/hackathon-2')) return 'hackathon-2';
+    if (path.includes('/event/hackathon-3')) return 'hackathon-3';
+    if (path.includes('/event/hackathon-4')) return 'hackathon-4';
+    if (path.includes('/event/hackathon-5')) return 'hackathon-5';
+    if (path.includes('/event/hackathon-6')) return 'hackathon-6';
+    return 'hackathon-1'; // default fallback
+  }, [location.pathname]);
   
-  const eventIndex = eventIndexMap[rawEventId] || 0;
-  const currentHackathonEvent = hackathonEvents[eventIndex];
+  // Find the correct hackathon event by eventId
+  const currentHackathonEvent = useMemo(() => {
+    return hackathonEvents.find(event => event.eventId === rawEventId) || hackathonEvents[0];
+  }, [rawEventId]);
   
   // Hackathon Events Content - Separate content for each event
   const hackathonEventDetails = {
