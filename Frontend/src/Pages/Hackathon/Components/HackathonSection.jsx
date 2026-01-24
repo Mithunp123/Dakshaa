@@ -32,7 +32,7 @@ const HackathonSection = () => {
       id: "hackathon-1",
       title: "Neura-Hack 2.0 (36 Hours Hackathon)",
       registrationLink: "",
-      description: "NeuroHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, Defend, and Secure technology to shape the future of digital innovation.\n\nSubtitle: Build, Break, Secure\nTheme: Cyber Security\nTech Stack: Open Source",
+      description: "NeuroHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, Defend, and Secure technology to shape the future of digital innovation.",
       rewards: [
         {
           position: "2nd Prize",
@@ -51,7 +51,7 @@ const HackathonSection = () => {
         },
       ],
       
-      rounds: [
+      /*rounds: [
         {
           title: "",
           description: [
@@ -64,7 +64,7 @@ const HackathonSection = () => {
             
           ],
         },
-      ], 
+      ], */
       rules: [
         "Each team shall consist of three (3) to four (4) members.",
         "NeuroHack 2.O is a continuous 36-hour hackathon with no breaks in development time.",
@@ -102,6 +102,24 @@ const HackathonSection = () => {
       id: "hackathon-2",
       title: "BioNexathon 2026",
       description: "A platform for students, researchers, and professionals to present and discuss recent advancements in biotechnology. Includes keynote lectures, panel discussions, and interactive sessions. Focus on innovation, research impact, and interdisciplinary collaboration. Encourages networking and knowledge exchange among participants.",
+      eligibility: {
+        categories: [
+          "Open to UG, PG, Ph.D., & Research Scholars",
+          "Students from Biotechnology, Life Sciences, Bioinformatics, Biomedical, Chemical, Environmental and allied disciplines",
+        ],
+        teamSize: {
+          minimum: 1,
+          maximum: 3,
+          note: "Interdisciplinary teams are encouraged"
+        }
+      },
+      theme: {
+        primary: "Forge the Future of Science & Technology",
+        details: [
+          "Open to all Life Science students",
+          "Interdisciplinary participation is allowed and encouraged"
+        ]
+      },
       rewards: [
         {
           position: "1st Prize",
@@ -124,25 +142,81 @@ const HackathonSection = () => {
           title: "Topics",
           description: [
             "Biotechnology and Life Sciences",
+            "Forge the Future of Science & Technology.",
+            "Open to all Life Science students.",
+            "Interdisciplinary participation is allowed and encouraged.",
+
           ],
         },
         {
-          title: "Round: Development",
+          title: "",
         },
       ],
       rules: [
-        "Participants must register before the deadline to confirm attendance.",
-        "Presentations should be relevant to biotechnology and allied fields.",
-        "Each speaker will be allocated a specific time slot; time limits must be strictly followed.",
-        "Original research and ideas are preferred; plagiarism is strictly prohibited.",
-        "Organizers and judges’ decisions regarding presentations, sessions, and awards will be final.",
-      ],
-      schedule: [
+        "All team members must be present during the event.",
+        "Core idea, logic and scientific justification must be human-driven.",
+        "Use of pre-built or plagiarized solutions is strictly prohibited.",
+        "Any form of misconduct, cheating or rule violation will lead to disqualification.",
+        "Each Team will be allocated a specific time slot; time limits must be strictly followed.",
+        "Teams must follow all instructions given by event coordinators.",
+        "Fully AI-generated solutions or presentations are not allowed.",
+        "Teams must clearly explain how AI tools were used, if applicable.",
+        "Organizers and judges decisions regarding presentations, sessions, and awards will be final.",
+      ],      prototypeGuidelines: {
+        title: "Prototype & Solution Guidelines",
+        format: [
+          "Conceptual model",
+          "Experimental workflow",
+          "Computational model",
+          "Design prototype or proof-of-concept"
+        ],
+        requirements: [
+          "Scientifically valid",
+          "Feasible and scalable",
+          "Ethically sound and safe"
+        ]
+      },
+      presentationRules: {
+        title: "Presentation Rules",
+        rules: [
+          "Each team will be given 5–7 minutes for presentation.",
+          "2–3 minutes will be allotted for Q&A.",
+          "Presentation can be done in English or Tamil or Bilingual.",
+          "The presentation must strictly follow the format provided by the organizers.",
+          "No modification, addition, or rearrangement of slides beyond the given format is allowed.",
+          "Failure to adhere to the prescribed presentation format may lead to point deduction or disqualification."
+        ]
+      },
+      judgingCriteria: {
+        title: "Judging Criteria",
+        criteria: [
+          {
+            aspect: "Scientific Understanding & Accuracy",
+            percentage: "30%"
+          },
+          {
+            aspect: "Innovation & Originality",
+            percentage: "25%"
+          },
+          {
+            aspect: "Feasibility & Practical Application",
+            percentage: "20%"
+          },
+          {
+            aspect: "Presentation & Communication",
+            percentage: "15%"
+          },
+          {
+            aspect: "Teamwork & Approach",
+            percentage: "10%"
+          }
+        ]
+      },      schedule: [
         {
           round: "Venue",
-          date: "February 13, 2026",
-          time: "10 AM to 4 PM",
-          location: "Bioinformatics Laboratory",
+          date: "February 13 2026 to February 14, 2026",
+          time: "24 hours",
+          location: "Seminar Hall",
         },
       ],
       contact: {
@@ -488,6 +562,11 @@ const HackathonSection = () => {
     setOpenRound(openRound === round ? null : round);
   };
 
+  // Check if rounds has valid data
+  const hasRounds = () => {
+    return event.rounds && Array.isArray(event.rounds) && event.rounds.length > 0 && event.rounds.some(round => round.title && round.title.trim() !== '');
+  };
+
   // Infinite Pulsing Animation for Button
   const pulseAnimation = {
     animate: {
@@ -559,7 +638,7 @@ const HackathonSection = () => {
 
         {/* Rest of the content */}
         <div className="flex flex-col md:flex-row justify-center my-10 gap-4">
-          {["Rewards", "Rounds", "Rules", "Schedule", "Contact"].map(
+          {[ "Rewards", "Rounds", "Rules", "Schedule", "Contact"].map(
             (item, index) => (
               <motion.div
                 key={index}
@@ -609,6 +688,43 @@ const HackathonSection = () => {
         </div> */}
         {/*  */}
 
+        {/* Eligibility Section */}
+        {event.eligibility && (
+          <div className="border border-primary-dark p-2 mb-5" id="Eligibility">
+            <div className="border border-primary-dark shadow-lg p-4 md:p-10">
+              <h2 className="text-center font-semibold text-2xl md:text-3xl mb-5 text-primary border border-primary-dark bg-primary-dark/30 px-3 py-3">
+                Eligibility
+              </h2>
+              <div className="flex flex-col gap-6">
+                <div>
+                  <h3 className="text-xl md:text-2xl font-semibold text-primary mb-3">
+                    Categories
+                  </h3>
+                  <ul className="list-disc pl-6 text-lg md:text-xl text-primary">
+                    {event.eligibility.categories.map((category, index) => (
+                      <li key={index}>{category}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-xl md:text-2xl font-semibold text-primary mb-3">
+                    Team Size
+                  </h3>
+                  <p className="text-lg md:text-xl text-primary mb-2">
+                    Minimum Members: <span className="font-semibold">{event.eligibility.teamSize.minimum}</span>
+                  </p>
+                  <p className="text-lg md:text-xl text-primary mb-2">
+                    Maximum Members: <span className="font-semibold">{event.eligibility.teamSize.maximum}</span>
+                  </p>
+                  <p className="text-lg md:text-xl text-primary">
+                    {event.eligibility.teamSize.note}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Rewards and Recognition Section */}
         <div className="border border-primary-dark p-2 mb-5 " id="Rewards">
           <div className="border border-primary-dark shadow-lg p-4 md:p-10">
@@ -636,34 +752,36 @@ const HackathonSection = () => {
         </div>
 
         {/* Rounds Section */}
-        <div className="border border-primary-dark p-2" id="Rounds">
-          <div className="border border-primary-dark shadow-lg p-4 md:p-10">
-            <h2 className="text-center font-semibold text-2xl md:text-3xl mb-5 text-primary border border-primary-dark bg-primary-dark/30 px-3 py-3">
-              Rounds
-            </h2>
-            <div className="flex flex-col gap-7">
-              {event.rounds.map((round, index) => (
-                <motion.div key={index} className="flex flex-col gap-3">
-                  <h1 className="font-semibold text-xl md:text-2xl text-primary">
-                    {round.title}
-                  </h1>
-                  {/* Check if description is an array and render as a list */}
-                  {Array.isArray(round.description) ? (
-                    <ul className="list-disc pl-6 text-lg md:text-xl text-primary">
-                      {round.description.map((point, i) => (
-                        <li key={i}>{point}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-lg md:text-xl text-primary">
-                      {round.description}
-                    </p>
-                  )}
-                </motion.div>
-              ))}
+        {hasRounds() && (
+          <div className="border border-primary-dark p-2" id="Rounds">
+            <div className="border border-primary-dark shadow-lg p-4 md:p-10">
+              <h2 className="text-center font-semibold text-2xl md:text-3xl mb-5 text-primary border border-primary-dark bg-primary-dark/30 px-3 py-3">
+                Rounds
+              </h2>
+              <div className="flex flex-col gap-7">
+                {event.rounds.map((round, index) => (
+                  <motion.div key={index} className="flex flex-col gap-3">
+                    <h1 className="font-semibold text-xl md:text-2xl text-primary">
+                      {round.title}
+                    </h1>
+                    {/* Check if description is an array and render as a list */}
+                    {Array.isArray(round.description) ? (
+                      <ul className="list-disc pl-6 text-lg md:text-xl text-primary">
+                        {round.description.map((point, i) => (
+                          <li key={i}>{point}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-lg md:text-xl text-primary">
+                        {round.description}
+                      </p>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Rules Section */}
         <div className="border border-primary-dark p-2 mt-6" id="Rules">
@@ -678,6 +796,78 @@ const HackathonSection = () => {
             </ul>
           </div>
         </div>
+
+        {/* Prototype Guidelines Section */}
+        {event.prototypeGuidelines && (
+          <div className="border border-primary-dark p-2 mt-6" id="Prototype">
+            <div className="border border-primary-dark shadow-lg p-4 md:p-10">
+              <h2 className="text-center font-semibold text-2xl md:text-3xl mb-5 text-primary border border-primary-dark bg-primary-dark/30 px-3 py-3">
+                Prototype & Solution Guidelines
+              </h2>
+              <div className="flex flex-col gap-6">
+                <div>
+                  <h3 className="text-xl md:text-2xl font-semibold text-primary mb-3">
+                    Format
+                  </h3>
+                  <ul className="list-disc pl-6 text-lg md:text-xl text-primary">
+                    {event.prototypeGuidelines.format.map((format, index) => (
+                      <li key={index}>{format}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-xl md:text-2xl font-semibold text-primary mb-3">
+                    Requirements
+                  </h3>
+                  <ul className="list-disc pl-6 text-lg md:text-xl text-primary">
+                    {event.prototypeGuidelines.requirements.map((req, index) => (
+                      <li key={index}>{req}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Presentation Rules Section */}
+        {event.presentationRules && (
+          <div className="border border-primary-dark p-2 mt-6" id="Presentation">
+            <div className="border border-primary-dark shadow-lg p-4 md:p-10">
+              <h2 className="text-center font-semibold text-2xl md:text-3xl mb-5 text-primary border border-primary-dark bg-primary-dark/30 px-3 py-3">
+                Presentation Rules
+              </h2>
+              <ul className="list-disc pl-6 text-lg md:text-xl text-primary">
+                {event.presentationRules.rules.map((rule, index) => (
+                  <li key={index}>{rule}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* Judging Criteria Section */}
+        {event.judgingCriteria && (
+          <div className="border border-primary-dark p-2 mt-6" id="Judging">
+            <div className="border border-primary-dark shadow-lg p-4 md:p-10">
+              <h2 className="text-center font-semibold text-2xl md:text-3xl mb-5 text-primary border border-primary-dark bg-primary-dark/30 px-3 py-3">
+                Judging Criteria
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {event.judgingCriteria.criteria.map((criterion, index) => (
+                  <div key={index} className="bg-primary-dark/30 border border-primary-dark p-4 rounded-lg">
+                    <h3 className="text-lg md:text-xl font-semibold text-primary mb-2">
+                      {criterion.aspect}
+                    </h3>
+                    <p className="text-base md:text-lg text-primary">
+                      Weight: <span className="font-bold">{criterion.percentage}</span>
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Schedule Section */}
         <div className="border border-primary-dark p-2 mt-6" id="Schedule">
