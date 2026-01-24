@@ -100,7 +100,7 @@ const HackathonSection = () => {
     },
     "hackathon-2": {
       id: "hackathon-2",
-      title: "BioNexathon 2026",
+      title: "BioNexathon 2026 (24 Hours Hackathon)",
       description: "A platform for students, researchers, and professionals to present and discuss recent advancements in biotechnology. Includes keynote lectures, panel discussions, and interactive sessions. Focus on innovation, research impact, and interdisciplinary collaboration. Encourages networking and knowledge exchange among participants.",
       eligibility: {
         categories: [
@@ -122,14 +122,14 @@ const HackathonSection = () => {
       },
       rewards: [
         {
-          position: "1st Prize",
-          emoji: "🥇",
-          amount: "₹5,000",
-        },
-        {
           position: "2nd Prize",
           emoji: "🥈",
           amount: "₹3,000",
+        },
+        {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹5,000",
         },
         {
           position: "3rd Prize",
@@ -223,18 +223,18 @@ const HackathonSection = () => {
         facultyCoordinator: [
           {
             name: "Dr. G. Ayyappadasan",
-            phone: "9876543210",
-            email: "biocoordinator@ksrct.ac.in",
+            phone: "+91 99445 28382",
+            email: "",
           },
         ],
         studentCoordinator: [
           {
-            name: "Mr. P. Nishaanth",
-            phone: "9843493094",
+            name: "Mr. D Hariharasudhan",
+            phone: "+91 98428 25230",
           },
           {
-            name: "Mr. N. Vasanth",
-            phone: "7397192415",
+            name: "Mr. P. Nishaanth",
+            phone: "9843493094",
           },
           {
             name: "Mr. M. Karunamurthy",
@@ -606,11 +606,6 @@ const HackathonSection = () => {
           <h1 className="text-2xl md:text-5xl font-bold text-center text-[#9DD3FF]">
             {event.title}
           </h1>
-          <img
-            src={currentHackathonEvent.image}
-            alt={event.title}
-            className="md:w-40 md:h-24 w-24 h-16 object-contain"
-          />
         </div>
         <div className="border border-sky-800 p-2">
           <div className="text-center clip-bottom-right flex flex-col gap-4 p-4 md:p-10 items-center bg-sky-900/20">
@@ -963,4 +958,12 @@ const HackathonSection = () => {
 };
 
 export default HackathonSection;
+
+
+
+
+
+
+
+
 
