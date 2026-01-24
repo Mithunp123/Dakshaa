@@ -66,19 +66,18 @@ const HackathonSection = () => {
         },
       ], 
       rules: [
-        " Each team shall consist of three (3) to four (4) members.",
+        "Each team shall consist of three (3) to four (4) members.",
         "NeuroHack 2.O is a continuous 36-hour hackathon with no breaks in development time.",
         "A total of two (2) evaluation rounds will be conducted during the hackathon period.",
         "Participants must bring their own laptops, peripherals, and required accessories.",
         "At least one team member must be present and actively working at all times throughout the 36-hour duration.",
         "All solutions must be developed during the hackathon period only.",
         "The decision of the judging panel shall be final and binding.",
-
       ],
       schedule: [
         {
           round: "Venue",
-          date: "March 28, 2026",
+          date: "12th February  9 AM TO 13th February 9 PM",
           time: "10:00 AM",
           location: "IT PARK",
         },
@@ -86,26 +85,15 @@ const HackathonSection = () => {
       contact: {
         facultyCoordinator: [
           {
-            name: "S.VADIVEL  ",
-            phone: "+91 97906 32171",
+            name: "Mr.S.VADIVEL  ",
+            phone: "9790632171",
             email: "senthilkumark@ksrct.ac.in",
-          },
-          {
-            name: "Mrs. K.Mahalakshmi",
-            phone: "+91 99442 86457",
-            email: "mahalakshmik@ksrct.ac.in",
           },
         ],
         studentCoordinator: [
           {
-            name: "Poorna Sri K",
-            phone: "+91 6374702698",
-            email: "poornasri664@gmail.com",
-          },
-          {
-            name: "Sivaraj A",
-            phone: "+91 90872 78175",
-            email: "sivarajboss22@gmail.com",
+            name: "Mr.A.SHANMUGESHWARA",
+            phone: "9487119381",
           },
         ],
       },
@@ -113,23 +101,22 @@ const HackathonSection = () => {
     "hackathon-2": {
       id: "hackathon-2",
       title: "BioNexathon 2026",
-      registrationLink: "https://forms.gle/example2",
-      description: "BioNexathon is a biotechnology-focused hackathon where participants develop innovative solutions for biological and medical challenges. Teams collaborate to create prototypes that can solve real-world healthcare problems.",
+      description: "A platform for students, researchers, and professionals to present and discuss recent advancements in biotechnology. Includes keynote lectures, panel discussions, and interactive sessions. Focus on innovation, research impact, and interdisciplinary collaboration. Encourages networking and knowledge exchange among participants.",
       rewards: [
         {
           position: "1st Prize",
           emoji: "🥇",
-          amount: "₹25,000",
+          amount: "₹5,000",
         },
         {
           position: "2nd Prize",
           emoji: "🥈",
-          amount: "₹15,000",
+          amount: "₹3,000",
         },
         {
           position: "3rd Prize",
           emoji: "🥉",
-          amount: "₹8,000",
+          amount: "₹2,000",
         },
       ],
       rounds: [
@@ -141,40 +128,43 @@ const HackathonSection = () => {
         },
         {
           title: "Round: Development",
-          description: [
-            "Problem Statement: Biological challenge selection",
-            "Design your solution",
-            "Create a prototype",
-            "Present your findings",
-          ],
         },
       ],
       rules: [
-        "Teams must consist of 3-4 members.",
-        "Original research required.",
-        "No use of pre-existing solutions.",
+        "Participants must register before the deadline to confirm attendance.",
+        "Presentations should be relevant to biotechnology and allied fields.",
+        "Each speaker will be allocated a specific time slot; time limits must be strictly followed.",
+        "Original research and ideas are preferred; plagiarism is strictly prohibited.",
+        "Organizers and judges’ decisions regarding presentations, sessions, and awards will be final.",
       ],
       schedule: [
         {
           round: "Venue",
-          date: "April 15, 2026",
-          time: "09:00 AM",
-          location: "BioTech Lab, Campus",
+          date: "February 13, 2026",
+          time: "10 AM to 4 PM",
+          location: "Bioinformatics Laboratory",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Dr. Bio Coordinator",
-            phone: "+91 98765 43210",
+            name: "Dr. G. Ayyappadasan",
+            phone: "9876543210",
             email: "biocoordinator@ksrct.ac.in",
           },
         ],
         studentCoordinator: [
           {
-            name: "Bio Team Lead",
-            phone: "+91 93456 78901",
-            email: "bioteamlead@gmail.com",
+            name: "Mr. P. Nishaanth",
+            phone: "9843493094",
+          },
+          {
+            name: "Mr. N. Vasanth",
+            phone: "7397192415",
+          },
+          {
+            name: "Mr. M. Karunamurthy",
+            phone: "8925243072",
           },
         ],
       },
@@ -183,29 +173,32 @@ const HackathonSection = () => {
       id: "hackathon-3",
       title: "NeuroCode 2.0",
       registrationLink: "https://forms.gle/example3",
-      description: "NeuroCode 2.0 focuses on neural network development and deep learning applications. Participants build AI solutions using advanced machine learning techniques.",
+      description: "Code Relay is a team-based web design challenge where a reference website design is provided. Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
       rewards: [
         {
           position: "1st Prize",
           emoji: "🥇",
-          amount: "₹28,000",
+          amount: "₹5,000",
         },
         {
           position: "2nd Prize",
           emoji: "🥈",
-          amount: "₹18,000",
+          amount: "₹3,000",
         },
         {
           position: "3rd Prize",
           emoji: "🥉",
-          amount: "₹9,000",
+          amount: "₹2,000",
         },
       ],
       rounds: [
         {
           title: "Topics",
           description: [
-            "Deep Learning and Neural Networks",
+            "Relay the logic",
+            "Round 1: Code Debug Sprint (30 Minutes) – Elimination Round Concept",
+            "Round 2: Reverse Layout Engineering (1 hour) ",
+            "Round 3: Final Showdown – Code Relay Edition (45 Minutes)"
           ],
         },
         {
@@ -219,31 +212,40 @@ const HackathonSection = () => {
         },
       ],
       rules: [
-        "Teams must consist of 2-3 members.",
-        "Use of pre-trained models allowed.",
-        "Code must be original implementations.",
+        "Mandatory CSS Grid",
+        "Semantic tags required (header, main, section, footer)",
+        "No frameworks (Bootstrap, Tailwind )",
+        "Each team must consist of exactly 3 members",
+        "All members must be present during all rounds",
+        "Participants must bring their own laptop",
+        "Required software must be pre-installed (VS Code / browser)",
+        "Internet access is restricted unless explicitly allowed by judges",
+        "Plagiarism or copying from other teams will result in immediate disqualification"
       ],
       schedule: [
         {
           round: "Venue",
-          date: "May 10, 2026",
-          time: "08:30 AM",
-          location: "AI Lab, Building A",
+          date: "February 13, 2026",
+          time: "09:00 AM",
+          location: "Computer Lab",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Dr. AI Expert",
-            phone: "+91 97654 32109",
-            email: "aiexpert@ksrct.ac.in",
+            name: "Mr.P.Dineshkumar",
+            phone: "",
+            email: "",
           },
         ],
         studentCoordinator: [
           {
-            name: "Neural Team Lead",
-            phone: "+91 94567 89012",
-            email: "neuralteam@gmail.com",
+            name: "Mr.S.Sujith",
+            phone: "9361796047",
+          },
+          {
+            name: "Ms.G.Kari Vikashini",
+            phone: "9384525869",
           },
         ],
       },
@@ -251,68 +253,78 @@ const HackathonSection = () => {
     "hackathon-4": {
       id: "hackathon-4",
       title: "VibeCode-26",
-      registrationLink: "https://forms.gle/example4",
-      description: "VibeCode-26 is a creative coding hackathon focused on building vibrant, interactive applications. Teams develop web and mobile solutions with emphasis on user experience.",
+      description: "“Launch Something Lovable” in 24 Hours is a high-energy, in-person vibe coding hackathon where teams build and ship real MVPs using Lovable, focusing on product thinking, usability, and real-world impact.",
       rewards: [
         {
           position: "1st Prize",
           emoji: "🥇",
-          amount: "₹22,000",
+          amount: "₹10,000",
         },
         {
           position: "2nd Prize",
           emoji: "🥈",
-          amount: "₹14,000",
+          amount: "₹7,500",
         },
         {
           position: "3rd Prize",
           emoji: "🥉",
-          amount: "₹7,000",
+          amount: "₹5,000",
         },
       ],
       rounds: [
         {
           title: "Topics",
           description: [
-            "Web and Mobile Development",
+            "VibeCode’26",
           ],
         },
         {
           title: "Round: Creation",
-          description: [
-            "Ideation and wireframing",
-            "Development phase",
-            "UI/UX implementation",
-            "Demo and feedback",
-          ],
         },
       ],
       rules: [
-        "Teams must consist of 3-4 members.",
-        "Creative and original designs required.",
-        "Responsive design mandatory.",
+        "Only registered participants are permitted to attend the workshop.",
+        "Participants must bring their own laptop with internet access.",
+        "Full-day attendance and punctuality are mandatory.",
+        "All participants must follow the instructions of the Lovable.AI team and organizers."
       ],
       schedule: [
         {
           round: "Venue",
-          date: "May 25, 2026",
-          time: "10:00 AM",
-          location: "Development Lab, Building B",
+          date: "February 13, 2026",
+          time: "09:00 AM",
+          location: "AB lab 3",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Dr. Web Dev",
-            phone: "+91 96543 21098",
-            email: "webdev@ksrct.ac.in",
+            name: "Mr. S.Insol Rajasekar",
+            phone: "8220512436",
+            email: "",
+          },
+          {
+            name: "Mr.K.Praveen",
+            phone: "9500918101",
+            email: "",
           },
         ],
         studentCoordinator: [
           {
-            name: "Code Vibe Lead",
-            phone: "+91 95678 90123",
-            email: "codevibelead@gmail.com",
+            name: "Ms.Dhinesha",
+            phone: "9942687393",
+          },
+          {
+            name: "Ms.R.Monika",
+            phone: "9363607816",
+          },
+          {
+            name: "Mr.D.Adith",
+            phone: "7094278374",
+          },
+          {
+            name: "Mr.M.Madhukumar",
+            phone: "9942687393",
           },
         ],
       },
@@ -320,23 +332,22 @@ const HackathonSection = () => {
     "hackathon-5": {
       id: "hackathon-5",
       title: "Startup Pitch 2026",
-      registrationLink: "https://forms.gle/example5",
       description: "Startup Pitch is an entrepreneurial hackathon where teams develop business ideas and prototypes. Focus is on feasibility, market potential, and innovation.",
       rewards: [
         {
           position: "1st Prize",
           emoji: "🥇",
-          amount: "₹35,000",
+          amount: "₹10,000",
         },
         {
           position: "2nd Prize",
           emoji: "🥈",
-          amount: "₹22,000",
+          amount: "₹7,500",
         },
         {
           position: "3rd Prize",
           emoji: "🥉",
-          amount: "₹12,000",
+          amount: "₹5,000",
         },
       ],
       rounds: [
@@ -389,23 +400,22 @@ const HackathonSection = () => {
     "hackathon-6": {
       id: "hackathon-6",
       title: "Designathon 2026",
-      registrationLink: "https://forms.gle/example6",
-      description: "Designathon is a design-focused hackathon for mechanical and product design. Teams create innovative solutions using CAD and design thinking principles.",
+      description: "Designathon challenges individuals to solve an engineering problem within a limited time. Participants develop creative design solutions using logical and technical thinking. Originality, feasibility, and time management are key evaluation criteria.",
       rewards: [
         {
           position: "1st Prize",
           emoji: "🥇",
-          amount: "₹20,000",
+          amount: "₹1,500",
         },
         {
           position: "2nd Prize",
           emoji: "🥈",
-          amount: "₹12,000",
+          amount: "₹1,000",
         },
         {
           position: "3rd Prize",
           emoji: "🥉",
-          amount: "₹6,000",
+          amount: "₹500",
         },
       ],
       rounds: [
@@ -418,39 +428,52 @@ const HackathonSection = () => {
         {
           title: "Round: Design",
           description: [
-            "Problem identification",
-            "CAD modeling",
-            "Prototype development",
-            "Design presentation",
           ],
         },
       ],
       rules: [
-        "Teams must consist of 3-4 members.",
-        "CAD designs required.",
-        "Feasibility analysis mandatory.",
+        "This is an individual (solo) participation event. Open to all participants of any displinary.",
+        "Participants must carry a valid ID card. The total duration of the designathon is 3 hours.",
+        "Participants must start and end within the given time frame.",
+        "Late submissions will not be considered. Any form of plagiarism will lead to immediate disqualification. Internet usage are restricted",
+        "Any misconduct may result in disqualification. The decision of the judges will be final and binding."
       ],
       schedule: [
         {
           round: "Venue",
-          date: "June 20, 2026",
-          time: "11:00 AM",
-          location: "Design Studio, Building D",
+          date: "February 13, 2026",
+          time: "09:00 AM",
+          location: "Idea lab [ Main Building ]",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Dr. Design Expert",
-            phone: "+91 94321 09876",
-            email: "designexpert@ksrct.ac.in",
+            name: "Dr.K.Santhanam",
+            phone: "",
+            email: "",
+          },
+           {
+            name: "Mr.S.Venkatesan",
+            phone: "",
+            email: "",
           },
         ],
         studentCoordinator: [
           {
-            name: "Design Lead",
-            phone: "+91 93456 12345",
-            email: "designlead@gmail.com",
+            name: "Mr.G.S.Priyan",
+            phone: "8668057985",
+            email: "",
+          },
+            {
+            name: "Mr. S.Vijayaragavan",
+            phone: "8124547760",
+            email: "",
+          },
+            {
+            name: "Ms. M.Nabishka",
+            phone: "",
+            email: "",
           },
         ],
       },
@@ -518,16 +541,7 @@ const HackathonSection = () => {
               className="w-40 h-40 md:w-96 md:h-96 object-cover mb-4 shadow-md"
             />
             <p className="text-lg md:text-xl mb-4 text-sky-600 text-justify">
-              Neura Hack - 36-Hour Hackathon is powered by GUVI where teams
-              develop solutions to problem statements provided by the
-              organizers. Participants must register in advance and complete
-              their projects within the 36-hour timeframe, using only original
-              work. Open-source tools are allowed, but plagiarism and
-              pre-existing solutions are prohibited. Submissions must include
-              code, documentation, and a working demo. Projects are judged on
-              innovation, technical implementation, impact, and presentation. A
-              strict code of conduct ensures fairness, and intellectual property
-              rights and prizes are governed by GUVI's policies.
+              {event.description}
             </p>
             {/* Register Now Button */}
             <motion.button
