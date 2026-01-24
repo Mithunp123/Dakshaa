@@ -135,21 +135,16 @@ const UltraCountdown = () => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Event registration ends on February 10, 2026
-    const targetDate = new Date('February 1, 2026 23:59:59');
+    // Event registration ends on February 9, 2026
+    const targetDate = new Date('February 9, 2026 23:59:59');
     const targetTime = targetDate.getTime();
-    
-    // Start date for progress calculation (e.g., when registrations opened)
-    const startTime = new Date('December 1, 2025 00:00:00').getTime();
-    const totalDuration = targetTime - startTime;
 
     const interval = setInterval(() => {
       const now = new Date().getTime();
       const difference = targetTime - now;
-      const elapsed = now - startTime;
       
-      // Calculate progress percentage
-      setProgress(Math.min((elapsed / totalDuration) * 100, 100));
+      // Always show 100% progress
+      setProgress(100);
 
       if (difference <= 0) {
         clearInterval(interval);

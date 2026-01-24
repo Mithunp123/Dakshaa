@@ -445,8 +445,11 @@ const RegistrationForm = () => {
 
   // Memoized categories - prevents recalculation on every render
   const categories = useMemo(() => {
-    // Define the preferred categories as requested by user
-    const preferredCategories = ["Team Events", "Hackathon", "Conference", "Technical", "Non-Technical", "Workshop"];
+    // Define the preferred categories as requested by user - these will ALWAYS be shown
+    const alwaysShowCategories = ["Technical", "Non-Technical", "Team Events", "Hackathon"];
+    
+    // Additional categories that only show if events exist
+    const optionalCategories = ["Conference", "Workshop"];
     
     // Get all unique categories from events
     const uniqueCategories = new Set(
@@ -458,10 +461,11 @@ const RegistrationForm = () => {
         .map((e) => e.category.trim())
     );
     
-    // Only include categories that are in the preferred list and exist in events
-    const filteredCategories = preferredCategories.filter(cat => 
-      cat === "Team Events" || cat === "Hackathon" || uniqueCategories.has(cat)
-    );
+    // Always include the mandatory categories, plus optional ones if they exist in events
+    const filteredCategories = [
+      ...alwaysShowCategories,
+      ...optionalCategories.filter(cat => uniqueCategories.has(cat))
+    ];
     
     return ["ALL", ...filteredCategories].filter(Boolean);
   }, [events]);

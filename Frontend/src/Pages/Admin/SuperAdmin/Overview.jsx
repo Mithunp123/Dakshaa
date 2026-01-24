@@ -35,6 +35,58 @@ const Overview = () => {
   const [events, setEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [downloadingReport, setDownloadingReport] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
+  const [countdown, setCountdown] = useState(10);
+  const [openingEvents, setOpeningEvents] = useState(false);
+  const [openSuccess, setOpenSuccess] = useState(false);
+
+  // Function to open all events
+  const openAllEvents = async () => {
+    setOpeningEvents(true);
+    try {
+      console.log('🚀 Opening all events...');
+      const { data, error } = await supabase
+        .from('events_config')
+        .update({ is_open: true })
+        .neq('is_open', true);
+
+      if (error) {
+        console.error('❌ Error opening events:', error);
+        alert('Failed to open events: ' + error.message);
+      } else {
+        console.log('✅ All events opened successfully!');
+        setOpenSuccess(true);
+        // Refresh stats to show updated active events count
+        fetchStats();
+        // Hide success message after 3 seconds
+        setTimeout(() => setOpenSuccess(false), 3000);
+      }
+    } catch (err) {
+      console.error('❌ Error:', err);
+      alert('An error occurred while opening events');
+    } finally {
+      setOpeningEvents(false);
+    }
+  };
+
+  // Countdown timer effect
+  useEffect(() => {
+    let timer;
+    if (showCountdown && countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    } else if (showCountdown && countdown === 0) {
+      setShowCountdown(false);
+      setCountdown(10);
+      // Open all events when countdown reaches 0
+      openAllEvents();
+    }
+    return () => clearTimeout(timer);
+  }, [showCountdown, countdown]);
+
+  const startCountdown = () => {
+    setShowCountdown(true);
+    setCountdown(10);
+  };
 
   useEffect(() => {
     fetchStats();
@@ -531,6 +583,89 @@ const Overview = () => {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {/* Success Message */}
+          <AnimatePresence>
+            {openSuccess && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/50 rounded-lg"
+              >
+                <CheckCircle className="w-4 h-4 text-green-400" />
+                <span className="text-sm text-green-400 font-medium">All Events Opened!</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* Open All Events Button - Epic Design */}
+          <motion.button
+            onClick={startCountdown}
+            disabled={openingEvents}
+            className="group relative overflow-hidden px-6 py-3 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {/* Animated Background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 animate-gradient-x" />
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            
+            {/* Shine Effect */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+            </div>
+            
+            {/* Border Glow */}
+            <div className="absolute inset-0 rounded-xl border-2 border-white/20 group-hover:border-white/40 transition-colors" />
+            
+            {/* Content */}
+            <div className="relative flex items-center gap-3 text-white">
+              {openingEvents ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <motion.span
+                  className="text-xl"
+                  animate={{ rotate: [0, 15, -15, 0] }}
+                  transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+                >
+                  🚀
+                </motion.span>
+              )}
+              <span className="text-sm font-bold tracking-wide uppercase">
+                {openingEvents ? 'Opening...' : 'Launch Events'}
+              </span>
+              <motion.div
+                className="flex gap-0.5"
+                animate={{ x: [0, 5, 0] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                <span className="text-white/60">›</span>
+                <span className="text-white/80">›</span>
+                <span className="text-white">›</span>
+              </motion.div>
+            </div>
+            
+            {/* Particle Effects */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl">
+              {[...Array(6)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100"
+                  style={{ left: `${20 + i * 15}%`, bottom: '0' }}
+                  animate={{
+                    y: [0, -40, -60],
+                    opacity: [0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 1,
+                    repeat: Infinity,
+                    delay: i * 0.15,
+                  }}
+                />
+              ))}
+            </div>
+          </motion.button>
+          
           <button
             onClick={() => fetchStats()}
             disabled={refreshing}
@@ -745,6 +880,356 @@ const Overview = () => {
                 )}
               </div>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Countdown Overlay */}
+      <AnimatePresence>
+        {showCountdown && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black overflow-hidden"
+          >
+            {/* Animated Stars/Particles Background */}
+            <div className="absolute inset-0">
+              {[...Array(50)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-1 h-1 bg-white rounded-full"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                  }}
+                  animate={{
+                    opacity: [0, 1, 0],
+                    scale: [0, 1.5, 0],
+                  }}
+                  transition={{
+                    duration: 2 + Math.random() * 2,
+                    repeat: Infinity,
+                    delay: Math.random() * 2,
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Animated Grid Background */}
+            <motion.div 
+              className="absolute inset-0 opacity-30"
+              animate={{ 
+                backgroundPosition: ['0px 0px', '50px 50px'],
+              }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              style={{
+                backgroundImage: `
+                  linear-gradient(rgba(34,211,238,0.3) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(34,211,238,0.3) 1px, transparent 1px)
+                `,
+                backgroundSize: '50px 50px',
+              }}
+            />
+
+            {/* Cyber Hexagon Pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <svg width="100%" height="100%">
+                <defs>
+                  <pattern id="hexagons" width="50" height="43.4" patternUnits="userSpaceOnUse" patternTransform="scale(2)">
+                    <polygon points="25,0 50,14.4 50,38.4 25,52.8 0,38.4 0,14.4" fill="none" stroke="#22d3ee" strokeWidth="0.5"/>
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#hexagons)"/>
+              </svg>
+            </div>
+
+            {/* Multiple Expanding Pulse Rings */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <motion.div
+                  key={i}
+                  className="absolute rounded-full border-2 border-secondary"
+                  initial={{ width: 100, height: 100, opacity: 0.8 }}
+                  animate={{ 
+                    width: [100, 800],
+                    height: [100, 800],
+                    opacity: [0.6, 0],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    delay: i * 0.6,
+                    ease: "easeOut",
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Rotating Orbital Rings */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <motion.div
+                className="absolute w-[500px] h-[500px] md:w-[700px] md:h-[700px] rounded-full border border-secondary/40"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              >
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-secondary rounded-full shadow-[0_0_20px_#22d3ee]" />
+              </motion.div>
+              <motion.div
+                className="absolute w-[400px] h-[400px] md:w-[550px] md:h-[550px] rounded-full border border-primary/40"
+                animate={{ rotate: -360 }}
+                transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+              >
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full shadow-[0_0_15px_#0ea5e9]" />
+              </motion.div>
+              <motion.div
+                className="absolute w-[300px] h-[300px] md:w-[400px] md:h-[400px] rounded-full border-2 border-dashed border-white/20"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              />
+            </div>
+
+            {/* Center Glow Effect */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <motion.div
+                className="w-[300px] h-[300px] md:w-[500px] md:h-[500px] rounded-full"
+                style={{
+                  background: 'radial-gradient(circle, rgba(34,211,238,0.3) 0%, rgba(34,211,238,0.1) 40%, transparent 70%)',
+                }}
+                animate={{
+                  scale: [1, 1.3, 1],
+                  opacity: [0.5, 0.8, 0.5],
+                }}
+                transition={{
+                  duration: 1,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            </div>
+
+            {/* Countdown Number with Epic Animation */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={countdown}
+                className="relative z-10"
+                initial={{ 
+                  scale: 3,
+                  opacity: 0,
+                  rotateX: -90,
+                  filter: 'blur(20px)',
+                }}
+                animate={{ 
+                  scale: 1,
+                  opacity: 1,
+                  rotateX: 0,
+                  filter: 'blur(0px)',
+                }}
+                exit={{ 
+                  scale: 0.5,
+                  opacity: 0,
+                  rotateX: 90,
+                  filter: 'blur(20px)',
+                  transition: { duration: 0.3 }
+                }}
+                transition={{ 
+                  duration: 0.5,
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 20,
+                }}
+              >
+                {/* Glitch Effect Layers */}
+                <motion.span
+                  className="absolute inset-0 text-[180px] md:text-[280px] lg:text-[380px] font-black text-cyan-500/30 flex items-center justify-center"
+                  animate={{
+                    x: [0, -5, 5, -5, 0],
+                    opacity: [0, 1, 0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 0.2,
+                    repeat: Infinity,
+                    repeatDelay: 2,
+                  }}
+                >
+                  {countdown}
+                </motion.span>
+                <motion.span
+                  className="absolute inset-0 text-[180px] md:text-[280px] lg:text-[380px] font-black text-red-500/30 flex items-center justify-center"
+                  animate={{
+                    x: [0, 5, -5, 5, 0],
+                    opacity: [0, 1, 0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 0.2,
+                    repeat: Infinity,
+                    repeatDelay: 2,
+                    delay: 0.1,
+                  }}
+                >
+                  {countdown}
+                </motion.span>
+                
+                {/* Main Number */}
+                <motion.span 
+                  className="text-[180px] md:text-[280px] lg:text-[380px] font-black text-transparent bg-clip-text relative"
+                  style={{
+                    backgroundImage: 'linear-gradient(180deg, #22d3ee 0%, #ffffff 50%, #0ea5e9 100%)',
+                    textShadow: '0 0 100px rgba(34,211,238,0.8), 0 0 200px rgba(34,211,238,0.4)',
+                    WebkitTextStroke: '2px rgba(34,211,238,0.3)',
+                  }}
+                  animate={{
+                    textShadow: [
+                      '0 0 100px rgba(34,211,238,0.8), 0 0 200px rgba(34,211,238,0.4)',
+                      '0 0 150px rgba(34,211,238,1), 0 0 300px rgba(34,211,238,0.6)',
+                      '0 0 100px rgba(34,211,238,0.8), 0 0 200px rgba(34,211,238,0.4)',
+                    ],
+                  }}
+                  transition={{ duration: 0.5, repeat: Infinity }}
+                >
+                  {countdown}
+                </motion.span>
+
+                {/* Scanning Line Effect */}
+                <motion.div
+                  className="absolute inset-0 overflow-hidden pointer-events-none"
+                  style={{ mixBlendMode: 'overlay' }}
+                >
+                  <motion.div
+                    className="absolute left-0 right-0 h-[4px] bg-gradient-to-r from-transparent via-white to-transparent"
+                    animate={{
+                      top: ['-10%', '110%'],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  />
+                </motion.div>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Circular Progress Indicator */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <svg className="w-[250px] h-[250px] md:w-[350px] md:h-[350px] lg:w-[450px] lg:h-[450px] -rotate-90">
+                <circle
+                  cx="50%"
+                  cy="50%"
+                  r="45%"
+                  fill="none"
+                  stroke="rgba(34,211,238,0.2)"
+                  strokeWidth="4"
+                />
+                <motion.circle
+                  cx="50%"
+                  cy="50%"
+                  r="45%"
+                  fill="none"
+                  stroke="#22d3ee"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 45}`}
+                  initial={{ strokeDashoffset: 0 }}
+                  animate={{ 
+                    strokeDashoffset: 2 * Math.PI * 45,
+                  }}
+                  transition={{ duration: 1, ease: "linear" }}
+                  key={countdown}
+                  style={{ filter: 'drop-shadow(0 0 10px #22d3ee)' }}
+                />
+              </svg>
+            </div>
+
+            {/* Corner Decorations */}
+            <div className="absolute top-8 left-8 w-20 h-20 border-l-2 border-t-2 border-secondary/50" />
+            <div className="absolute top-8 right-8 w-20 h-20 border-r-2 border-t-2 border-secondary/50" />
+            <div className="absolute bottom-8 left-8 w-20 h-20 border-l-2 border-b-2 border-secondary/50" />
+            <div className="absolute bottom-8 right-8 w-20 h-20 border-r-2 border-b-2 border-secondary/50" />
+
+            {/* Top Status Bar */}
+            <motion.div
+              className="absolute top-8 left-1/2 -translate-x-1/2 flex items-center gap-4"
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div className="flex items-center gap-2 px-4 py-2 bg-secondary/10 border border-secondary/30 rounded-full">
+                <motion.div
+                  className="w-2 h-2 bg-green-500 rounded-full"
+                  animate={{ opacity: [1, 0.3, 1] }}
+                  transition={{ duration: 0.5, repeat: Infinity }}
+                />
+                <span className="text-xs text-secondary font-mono uppercase tracking-wider">System Active</span>
+              </div>
+            </motion.div>
+
+            {/* Bottom Text with Typewriter Effect */}
+            <motion.div
+              className="absolute bottom-16 md:bottom-20 text-center"
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <motion.div
+                className="flex items-center justify-center gap-3 mb-4"
+              >
+                {['E', 'V', 'E', 'N', 'T', 'S', ' ', 'O', 'P', 'E', 'N', 'I', 'N', 'G'].map((letter, i) => (
+                  <motion.span
+                    key={i}
+                    className="text-2xl md:text-3xl font-bold text-secondary"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 + i * 0.05 }}
+                    style={{ textShadow: '0 0 20px rgba(34,211,238,0.8)' }}
+                  >
+                    {letter === ' ' ? '\u00A0' : letter}
+                  </motion.span>
+                ))}
+              </motion.div>
+              <motion.div
+                className="h-1 bg-gradient-to-r from-transparent via-secondary to-transparent"
+                initial={{ width: 0 }}
+                animate={{ width: '300px' }}
+                transition={{ delay: 1, duration: 0.5 }}
+              />
+            </motion.div>
+
+            {/* Floating Tech Elements */}
+            {[...Array(6)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute text-secondary/30 font-mono text-xs"
+                style={{
+                  left: `${10 + (i % 3) * 40}%`,
+                  top: `${20 + Math.floor(i / 3) * 60}%`,
+                }}
+                animate={{
+                  opacity: [0.2, 0.5, 0.2],
+                  y: [0, -10, 0],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  delay: i * 0.5,
+                }}
+              >
+                {['<INIT/>', '{READY}', '[SYNC]', '//LOAD', '#EVENT', '@LIVE'][i]}
+              </motion.div>
+            ))}
+
+            {/* Close button */}
+            <motion.button
+              onClick={() => {
+                setShowCountdown(false);
+                setCountdown(10);
+              }}
+              className="absolute top-8 right-8 w-12 h-12 flex items-center justify-center text-white/50 hover:text-white text-2xl transition-all hover:bg-white/10 rounded-full border border-white/20 hover:border-white/40 z-50"
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              ×
+            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
