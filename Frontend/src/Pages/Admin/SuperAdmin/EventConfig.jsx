@@ -258,10 +258,6 @@ const EventConfig = () => {
             <option value="Non-Technical" className="bg-slate-900">Non-Technical</option>
             <option value="Workshop" className="bg-slate-900">Workshop</option>
             <option value="Conference" className="bg-slate-900">Conference</option>
-            <option value="Cultural" className="bg-slate-900">Cultural</option>
-            <option value="Sports" className="bg-slate-900">Sports</option>
-            <option value="Gaming" className="bg-slate-900">Gaming</option>
-            <option value="Other" className="bg-slate-900">Other</option>
           </select>
         </div>
       </div>
@@ -328,10 +324,6 @@ const EventConfig = () => {
                           <option value="Non-Technical">Non-Technical</option>
                           <option value="Workshop">Workshop</option>
                           <option value="Conference">Conference</option>
-                          <option value="Cultural">Cultural</option>
-                          <option value="Sports">Sports</option>
-                          <option value="Gaming">Gaming</option>
-                          <option value="Other">Other</option>
                         </select>
                       ) : (
                         <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-wider">
@@ -593,10 +585,6 @@ const AddEventModal = ({ isOpen, onClose, onSuccess }) => {
                 <option value="Non-Technical" className="bg-slate-900">Non-Technical</option>
                 <option value="Workshop" className="bg-slate-900">Workshop</option>
                 <option value="Conference" className="bg-slate-900">Conference</option>
-                <option value="Cultural" className="bg-slate-900">Cultural</option>
-                <option value="Sports" className="bg-slate-900">Sports</option>
-                <option value="Gaming" className="bg-slate-900">Gaming</option>
-                <option value="Other" className="bg-slate-900">Other</option>
               </select>
             </div>
 

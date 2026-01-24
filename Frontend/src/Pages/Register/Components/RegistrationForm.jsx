@@ -445,6 +445,10 @@ const RegistrationForm = () => {
 
   // Memoized categories - prevents recalculation on every render
   const categories = useMemo(() => {
+    // Define the preferred categories as requested by user
+    const preferredCategories = ["Team Events", "Hackathon", "Conference", "Technical", "Non-Technical", "Workshop"];
+    
+    // Get all unique categories from events
     const uniqueCategories = new Set(
       events
         .filter(
@@ -453,8 +457,13 @@ const RegistrationForm = () => {
         )
         .map((e) => e.category.trim())
     );
-    // Add "Team Events" and "Hackathon" to the list of categories explicitly
-    return ["ALL", "Team Events", "Hackathon", ...uniqueCategories].filter(Boolean);
+    
+    // Only include categories that are in the preferred list and exist in events
+    const filteredCategories = preferredCategories.filter(cat => 
+      cat === "Team Events" || cat === "Hackathon" || uniqueCategories.has(cat)
+    );
+    
+    return ["ALL", ...filteredCategories].filter(Boolean);
   }, [events]);
 
   // Memoized special events
@@ -2018,15 +2027,15 @@ const RegistrationForm = () => {
                   <div className="flex flex-col sm:flex-row gap-4">
                     <div className="flex-1 relative">
                       <Search
-                        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
-                        size={20}
+                        className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"
+                        size={24}
                       />
                       <input
                         type="text"
                         placeholder="Search events..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                        className="w-full pl-14 pr-6 py-4 text-lg bg-gray-800 border-2 border-gray-700 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-lg transition-all"
                       />
                     </div>
                     <div className="flex gap-2 overflow-x-auto pb-2">
@@ -2042,19 +2051,30 @@ const RegistrationForm = () => {
                       </button>
                       {categories
                         .filter((cat) => cat !== "ALL")
-                        .map((cat, index) => (
-                          <button
-                            key={`cat-${cat}-${index}`}
-                            onClick={() => setCategoryFilter(cat)}
-                            className={`px-4 py-3 rounded-2xl font-bold whitespace-nowrap transition-all capitalize ${
-                            categoryFilter === cat
-                              ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
-                              : "bg-gray-800 text-gray-400 hover:text-white"
-                          }`}
-                        >
-                          {cat}
-                        </button>
-                      ))}
+                        .map((cat, index) => {
+                          // Display proper names for categories
+                          const displayName = cat === "Technical" ? "TECH" :
+                                            cat === "Non-Technical" ? "NON-TECH" :
+                                            cat === "Team Events" ? "TEAM EVENTS" :
+                                            cat === "Hackathon" ? "HACKATHON" :
+                                            cat === "Conference" ? "CONFERENCE" :
+                                            cat === "Workshop" ? "WORKSHOP" :
+                                            cat.toUpperCase();
+                          
+                          return (
+                            <button
+                              key={`cat-${cat}-${index}`}
+                              onClick={() => setCategoryFilter(cat)}
+                              className={`px-5 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
+                              categoryFilter === cat
+                                ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg transform scale-105"
+                                : "bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700"
+                            }`}
+                            >
+                              {displayName}
+                            </button>
+                          );
+                        })}
                   </div>
                   </div>
                 )}
@@ -2194,42 +2214,55 @@ const RegistrationForm = () => {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1 relative">
                     <Search
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
-                      size={20}
+                      className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"
+                      size={24}
                     />
                     <input
                       type="text"
                       placeholder="Search events..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                      className="w-full pl-14 pr-6 py-4 text-lg bg-gray-800 border-2 border-gray-700 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-lg transition-all"
                     />
                   </div>
                   <div className="flex gap-2 overflow-x-auto pb-2">
                     <button
                       onClick={() => setCategoryFilter("ALL")}
-                      className={`px-4 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
+                      className={`px-5 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
                         categoryFilter === "ALL"
-                          ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
-                          : "bg-gray-800 text-gray-400 hover:text-white"
+                          ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg transform scale-105"
+                          : "bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700"
                       }`}
                     >
                       All Events
                     </button>
                     {/* Only show categories that are in the combo quotas */}
-                    {Object.keys(selectedCombo?.category_quotas || {}).map((cat, index) => (
-                        <button
-                          key={`combo-cat-${cat}-${index}`}
-                          onClick={() => setCategoryFilter(cat)}
-                          className={`px-4 py-3 rounded-2xl font-bold whitespace-nowrap transition-all capitalize ${
-                            categoryFilter === cat
-                              ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
-                              : "bg-gray-800 text-gray-400 hover:text-white"
-                          }`}
-                        >
-                          {cat}
-                        </button>
-                      ))}
+                    {Object.keys(selectedCombo?.category_quotas || {})
+                      .filter(cat => ["Technical", "Non-Technical", "Workshop", "Conference", "Team Events", "Hackathon"].includes(cat))
+                      .map((cat, index) => {
+                        // Display proper names for categories
+                        const displayName = cat === "Technical" ? "TECH" :
+                                          cat === "Non-Technical" ? "NON-TECH" :
+                                          cat === "Team Events" ? "TEAM EVENTS" :
+                                          cat === "Hackathon" ? "HACKATHON" :
+                                          cat === "Conference" ? "CONFERENCE" :
+                                          cat === "Workshop" ? "WORKSHOP" :
+                                          cat.toUpperCase();
+                        
+                        return (
+                          <button
+                            key={`combo-cat-${cat}-${index}`}
+                            onClick={() => setCategoryFilter(cat)}
+                            className={`px-5 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
+                              categoryFilter === cat
+                                ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg transform scale-105"
+                                : "bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700"
+                            }`}
+                          >
+                            {displayName}
+                          </button>
+                        );
+                      })}
                   </div>
                 </div>
 

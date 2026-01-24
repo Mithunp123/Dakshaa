@@ -53,7 +53,7 @@ const ComboCard = ({ combo, onSelect, isSelected, userPurchasedCombos = [] }) =>
                 <Package size={20} className="text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold">{combo.name || combo.combo_name}</h3>
+                <h3 className="text-xl font-bold text-white font-orbitron tracking-wide">{combo.name || combo.combo_name}</h3>
                 {discount > 0 && (
                   <div className="flex items-center gap-1.5 mt-1">
                     <TrendingDown size={14} className="text-green-400" />

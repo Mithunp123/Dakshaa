@@ -121,13 +121,13 @@ const { data } = await comboService.getCombosWithDetails();
 ## Categories Available
 
 1. **Technical** - Coding, hackathons, tech talks
-2. **Non-Technical** - Quizzes, debates, general events
+2. **Non-Technical** - Quizzes, debates, general events  
 3. **Workshop** - Hands-on skill sessions
 4. **Conference** - Seminars, guest lectures
-5. **Cultural** - Dance, music, drama
-6. **Sports** - Athletics, games, tournaments
-7. **Gaming** - Esports, video game competitions
-8. **Other** - Miscellaneous events
+5. **Team Events** - Collaborative team-based competitions
+6. **Hackathon** - Extended coding and innovation challenges
+
+**Note:** The event filter has been updated to only show the above preferred categories. Other categories like Cultural, Sports, Gaming, and Other are no longer actively used in the main event filter interface.
 
 ---
 

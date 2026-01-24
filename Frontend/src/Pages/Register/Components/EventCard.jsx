@@ -167,7 +167,7 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistere
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h3 className="text-xl font-bold mb-2 line-clamp-1">
+            <h3 className="text-xl font-bold mb-2 line-clamp-1 text-white font-orbitron tracking-wide">
               {event.name || event.title || event.event_name || "Unnamed Event"}
             </h3>
             {event.description && (
