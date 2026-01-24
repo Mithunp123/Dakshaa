@@ -159,8 +159,6 @@ const UltraFooter = () => {
             <div className="space-y-3 mt-4">
               <ContactItem icon={FaPhone} delay={0.2}>
                 <p>9489243775 - Kavinesh K</p>
-                <p>7708739300 - Gopinath T</p>
-                <p>8144596872 - Ruban B</p>
               </ContactItem>
               <ContactItem icon={FaEnvelope} delay={0.3}>
                 dakshaa@ksrct.ac.in

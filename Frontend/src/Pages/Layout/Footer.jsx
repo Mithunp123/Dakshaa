@@ -18,7 +18,7 @@ const Footer = () => {
                     <div className="flex flex-col items-center md:items-start gap-2 mt-3 md:mt-4">
                         <div className="flex items-center gap-2 md:gap-3 leading-8">
                             {/* <FaPhone className="text-white text-lg md:text-xl" /> */}
-                            <p className="text-base md:text-lg font-poppins">9489243775 - (Kavinesh K)<br /> 7708739300 - (Gopinath T)<br />8144596872 - (Ruban B)</p>
+                            <p className="text-base md:text-lg font-poppins">9489243775 - (Kavinesh K)</p>
                         </div>
                         <div className="flex items-center gap-2 md:gap-3 leading-8">
                             <FaEnvelope className="text-secondary text-lg md:text-xl" />
