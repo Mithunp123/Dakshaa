@@ -354,7 +354,31 @@ const UserManager = () => {
                     <Phone size={16} className="shrink-0" />
                     <span className="break-all">{user.mobile_number || 'N/A'}</span>
                   </div>
-                  <div className="flex items-start gap-3 text-sm text-gray-400">
+                  <div className="flex items-center gap-3 text-sm text-gray-400">
+                    <Mail size={16} className="shrink-0" />
+                    <span className="truncate text-xs">{user.email || 'N/A'}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <span className="text-xs">Dept:</span>
+                      <span className="font-medium text-gray-300 truncate">{user.department || 'N/A'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <span className="text-xs">Year:</span>
+                      <span className="font-medium text-gray-300">{user.year || 'N/A'}</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <span className="text-xs">Gender:</span>
+                      <span className="font-medium text-gray-300 capitalize">{user.gender || 'N/A'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <span className="text-xs">Roll:</span>
+                      <span className="font-medium text-gray-300 truncate">{user.roll_number || 'N/A'}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 text-sm text-gray-400 pt-2 border-t border-white/5">
                     <Users size={16} className="shrink-0 mt-0.5" />
                     <div className="flex-1 min-w-0">
                       {allUserTeams[user.id] && allUserTeams[user.id].length > 0 ? (
@@ -535,17 +559,36 @@ const UserManager = () => {
                           onSave={(val) => handleUpdateProfile(selectedUser.id, { college_name: val })}
                         />
                         <EditableField 
+                          label="Department" 
+                          value={selectedUser.department} 
+                          onSave={(val) => handleUpdateProfile(selectedUser.id, { department: val })}
+                        />
+                        <EditableField 
+                          label="Year" 
+                          value={selectedUser.year} 
+                          onSave={(val) => handleUpdateProfile(selectedUser.id, { year: val })}
+                        />
+                        <EditableField 
+                          label="Gender" 
+                          value={selectedUser.gender} 
+                          onSave={(val) => handleUpdateProfile(selectedUser.id, { gender: val })}
+                        />
+                        <EditableField 
                           label="Roll Number" 
                           value={selectedUser.roll_number} 
                           onSave={(val) => handleUpdateProfile(selectedUser.id, { roll_number: val })}
                         />
                         <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
                           <p className="text-xs text-gray-500 mb-1">Email</p>
-                          <p className="font-mono text-sm">{selectedUser.email || 'N/A'}</p>
+                          <p className="font-mono text-sm break-all">{selectedUser.email || 'N/A'}</p>
                         </div>
                         <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
                           <p className="text-xs text-gray-500 mb-1">Phone</p>
                           <p className="font-mono text-sm">{selectedUser.mobile_number || 'N/A'}</p>
+                        </div>
+                        <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
+                          <p className="text-xs text-gray-500 mb-1">Account Created</p>
+                          <p className="font-mono text-sm">{new Date(selectedUser.created_at).toLocaleString()}</p>
                         </div>
                       </div>
                     </section>
