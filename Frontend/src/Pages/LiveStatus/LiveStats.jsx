@@ -155,9 +155,9 @@ const LiveStats = () => {
       {/* Back Button */}
       <button 
         onClick={() => navigate(-1)}
-        className="absolute top-8 left-8 z-50 text-gray-500 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10"
+        className="absolute top-4 left-4 md:top-8 md:left-8 z-50 text-gray-500 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10"
       >
-        <ArrowLeft size={32} />
+        <ArrowLeft size={24} className="md:w-8 md:h-8" />
       </button>
 
       {/* Animated Background Particles */}
@@ -190,34 +190,34 @@ const LiveStats = () => {
 
       {/* Live Indicator */}
       <motion.div 
-        className="absolute top-8 right-8 flex items-center gap-3 px-6 py-3 bg-red-500/10 border border-red-500/30 rounded-full backdrop-blur-sm z-10"
+        className="absolute top-4 right-4 md:top-8 md:right-8 flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 bg-red-500/10 border border-red-500/30 rounded-full backdrop-blur-sm z-10"
         animate={{ scale: isLive ? [1, 1.1, 1] : 1 }}
         transition={{ duration: 0.3 }}
       >
-        <Radio className={`w-5 h-5 text-red-500 ${isLive ? 'animate-pulse' : ''}`} />
-        <span className="text-red-500 font-bold uppercase tracking-wider text-sm">
+        <Radio className={`w-4 h-4 md:w-5 md:h-5 text-red-500 ${isLive ? 'animate-pulse' : ''}`} />
+        <span className="text-red-500 font-bold uppercase tracking-wider text-xs md:text-sm">
           {isLive ? 'UPDATING...' : 'LIVE'}
         </span>
       </motion.div>
 
       {/* Main Content */}
-      <div className="relative z-10 container mx-auto px-4 py-12">
+      <div className="relative z-10 container mx-auto px-4 py-8 md:py-12 pt-20 md:pt-12 overflow-y-auto max-h-screen">
         {/* Header */}
         <motion.div 
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-center mb-16"
+          className="text-center mb-8 md:mb-16"
         >
-          <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-r from-secondary via-primary to-secondary bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl md:text-8xl font-black bg-gradient-to-r from-secondary via-primary to-secondary bg-clip-text text-transparent mb-2 md:mb-4">
             DAKSHAA 2026
           </h1>
-          <p className="text-2xl md:text-3xl text-gray-400 font-light tracking-wider">
+          <p className="text-lg md:text-3xl text-gray-400 font-light tracking-wider">
             Live Statistics Dashboard
           </p>
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 max-w-7xl mx-auto pb-8">
           {/* Students Onboarded Card */}
           <motion.div
             initial={{ x: -100, opacity: 0 }}
@@ -227,22 +227,22 @@ const LiveStats = () => {
           >
             <div className="absolute -inset-1 bg-gradient-to-r from-secondary to-orange-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition duration-500"></div>
             
-            <div className="relative bg-gradient-to-br from-gray-900 to-black border border-orange-500/30 rounded-3xl p-8 md:p-12">
+            <div className="relative bg-gradient-to-br from-gray-900 to-black border border-orange-500/30 rounded-3xl p-6 md:p-12">
               {/* Icon */}
-              <div className="flex justify-center mb-6">
-                <div className="w-20 h-20 bg-secondary/20 rounded-2xl flex items-center justify-center">
-                  <Users className="w-12 h-12 text-secondary" />
+              <div className="flex justify-center mb-4 md:mb-6">
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-secondary/20 rounded-2xl flex items-center justify-center">
+                  <Users className="w-8 h-8 md:w-12 md:h-12 text-secondary" />
                 </div>
               </div>
 
               {/* Label */}
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-300 text-center mb-4 uppercase tracking-wider">
+              <h2 className="text-xl md:text-3xl font-bold text-gray-300 text-center mb-2 md:mb-4 uppercase tracking-wider">
                 Students Joined
               </h2>
 
               {/* Counter */}
               <div className="text-center">
-                <div className="text-7xl md:text-9xl font-black text-secondary mb-4 tabular-nums">
+                <div className="text-6xl md:text-9xl font-black text-secondary mb-2 md:mb-4 tabular-nums">
                   <CountUp 
                     end={stats.users} 
                     duration={2}
@@ -251,8 +251,8 @@ const LiveStats = () => {
                   />
                 </div>
                 <div className="flex items-center justify-center gap-2 text-green-400">
-                  <TrendingUp className="w-5 h-5" />
-                  <span className="text-lg font-semibold">Total Onboarded</span>
+                  <TrendingUp className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="text-base md:text-lg font-semibold">Total Onboarded</span>
                 </div>
               </div>
 
@@ -275,22 +275,22 @@ const LiveStats = () => {
           >
             <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition duration-500"></div>
             
-            <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-3xl p-8 md:p-12">
+            <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-3xl p-6 md:p-12">
               {/* Icon */}
-              <div className="flex justify-center mb-6">
-                <div className="w-20 h-20 bg-primary/20 rounded-2xl flex items-center justify-center">
-                  <TicketCheck className="w-12 h-12 text-primary" />
+              <div className="flex justify-center mb-4 md:mb-6">
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-primary/20 rounded-2xl flex items-center justify-center">
+                  <TicketCheck className="w-8 h-8 md:w-12 md:h-12 text-primary" />
                 </div>
               </div>
 
               {/* Label */}
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-300 text-center mb-4 uppercase tracking-wider">
+              <h2 className="text-xl md:text-3xl font-bold text-gray-300 text-center mb-2 md:mb-4 uppercase tracking-wider">
                 Event Registrations
               </h2>
 
               {/* Counter */}
               <div className="text-center">
-                <div className="text-7xl md:text-9xl font-black text-primary mb-4 tabular-nums">
+                <div className="text-6xl md:text-9xl font-black text-primary mb-2 md:mb-4 tabular-nums">
                   <CountUp 
                     end={stats.registrations} 
                     duration={2}
@@ -299,8 +299,8 @@ const LiveStats = () => {
                   />
                 </div>
                 <div className="flex items-center justify-center gap-2 text-green-400">
-                  <TrendingUp className="w-5 h-5" />
-                  <span className="text-lg font-semibold">Total Seats Filled</span>
+                  <TrendingUp className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="text-base md:text-lg font-semibold">Total Seats Filled</span>
                 </div>
               </div>
 
