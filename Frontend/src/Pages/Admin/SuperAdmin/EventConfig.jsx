@@ -114,6 +114,35 @@ const EventConfig = () => {
     }
   };
 
+  const handleBulkStatusChange = async (status) => {
+    // Get IDs of currently filtered events
+    const eventIds = filteredEvents.map(e => e.id);
+    
+    if (eventIds.length === 0) {
+      alert('No events selected to update');
+      return;
+    }
+    
+    const action = status ? 'open' : 'close';
+    const confirmMessage = `Are you sure you want to ${action} ${eventIds.length} events?\n\nThis will affect all events currently visible in the list.`;
+    
+    if (!confirm(confirmMessage)) return;
+
+    setLoading(true);
+    const result = await eventConfigService.updateEventsStatus(eventIds, status);
+    
+    if (result.success) {
+      // Small delay to ensure DB update propagates before refetch
+      setTimeout(async () => {
+        await fetchEvents();
+        setLoading(false);
+      }, 500);
+    } else {
+      alert(`Bulk ${action} failed: ` + result.error);
+      setLoading(false);
+    }
+  };
+
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          event.event_key.toLowerCase().includes(searchTerm.toLowerCase());
@@ -260,6 +289,24 @@ const EventConfig = () => {
             <option value="Conference" className="bg-slate-900">Conference</option>
           </select>
         </div>
+
+        {/* Bulk Actions */}
+        <div className="flex items-center gap-2">
+          <button 
+             onClick={() => handleBulkStatusChange(true)}
+             className="px-4 py-2 bg-white/5 hover:bg-green-500/20 hover:text-green-400 border border-white/10 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap"
+             title="Open all filtered events"
+          >
+            <Unlock size={16} /> Open All
+          </button>
+          <button 
+             onClick={() => handleBulkStatusChange(false)}
+             className="px-4 py-2 bg-white/5 hover:bg-red-500/20 hover:text-red-400 border border-white/10 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap"
+             title="Close all filtered events"
+          >
+            <Lock size={16} /> Close All
+          </button>
+        </div>
       </div>
 
       {/* Events Table */}
@@ -400,18 +447,31 @@ const EventConfig = () => {
                       </div>
                     </td>
                     <td className="p-6">
-                      <button
-                        onClick={() => !isEditing && handleToggleStatus(event.id)}
-                        disabled={isEditing}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-                          event.is_open
-                            ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                            : 'bg-gray-500/20 text-gray-400 hover:bg-gray-500/30'
-                        } ${isEditing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                      >
-                        {event.is_open ? <Unlock size={12} /> : <Lock size={12} />}
-                        {event.is_open ? 'Open' : 'Closed'}
-                      </button>
+                      {isEditing ? (
+                        <button
+                          onClick={() => setEditForm({...editForm, is_open: !editForm.is_open})}
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                            editForm.is_open
+                              ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                              : 'bg-gray-500/20 text-gray-400 hover:bg-gray-500/30'
+                          }`}
+                        >
+                          {editForm.is_open ? <Unlock size={12} /> : <Lock size={12} />}
+                          {editForm.is_open ? 'Open' : 'Closed'}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleToggleStatus(event.id)}
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                            event.is_open
+                              ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                              : 'bg-gray-500/20 text-gray-400 hover:bg-gray-500/30'
+                          }`}
+                        >
+                          {event.is_open ? <Unlock size={12} /> : <Lock size={12} />}
+                          {event.is_open ? 'Open' : 'Closed'}
+                        </button>
+                      )}
                     </td>
                     <td className="p-6 text-right">
                       {isEditing ? (
