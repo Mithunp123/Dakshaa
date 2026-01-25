@@ -352,20 +352,27 @@ function AppContent() {
               />
             </Route>
 
-            {/* Coordinator Routes */}
+            {/* Event Coordinator Routes - Standalone (No Sidebar) */}
             <Route
               path="/coordinator"
               element={
                 <ProtectedRoute
                   allowedRoles={["event_coordinator", "super_admin"]}
                 >
-                  <AdminLayout />
+                  <EventCoordinatorDashboard />
                 </ProtectedRoute>
               }
-            >
-              <Route index element={<EventCoordinatorDashboard />} />
-              <Route path="scanner" element={<AttendanceScanner />} />
-            </Route>
+            />
+            <Route
+              path="/coordinator/scanner"
+              element={
+                <ProtectedRoute
+                  allowedRoles={["event_coordinator", "super_admin"]}
+                >
+                  <AttendanceScanner />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Volunteer Routes */}
             <Route
