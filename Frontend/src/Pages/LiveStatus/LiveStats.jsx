@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, TicketCheck, TrendingUp, Radio } from "lucide-react";
+import { Users, TicketCheck, TrendingUp, Radio, ArrowLeft } from "lucide-react";
 import { supabase } from "../../supabase";
 import CountUp from "react-countup";
+import { useNavigate } from "react-router-dom";
 
 const LiveStats = () => {
   const [stats, setStats] = useState({
@@ -12,6 +13,7 @@ const LiveStats = () => {
   });
   const [isLive, setIsLive] = useState(false);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Particle animation for background
   const particles = Array.from({ length: 50 }, (_, i) => ({
@@ -149,7 +151,15 @@ const LiveStats = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 relative overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-hidden">
+      {/* Back Button */}
+      <button 
+        onClick={() => navigate(-1)}
+        className="absolute top-8 left-8 z-50 text-gray-500 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10"
+      >
+        <ArrowLeft size={32} />
+      </button>
+
       {/* Animated Background Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {particles.map(particle => (
