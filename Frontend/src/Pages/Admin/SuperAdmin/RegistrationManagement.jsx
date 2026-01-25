@@ -32,6 +32,14 @@ const RegistrationManagement = () => {
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  
+  // New states for registration counts
+  const [registrationCounts, setRegistrationCounts] = useState({
+    individual: 0,
+    team: 0,
+    teamLeader: 0,
+    teamMember: 0
+  });
 
   // Transfer Logic States
   const [showTransferModal, setShowTransferModal] = useState(false);
@@ -47,6 +55,7 @@ const RegistrationManagement = () => {
 
   useEffect(() => {
     loadEventStats();
+    loadRegistrationCounts();
 
     // Set up real-time subscription for registration changes
     const registrationChannel = supabase
@@ -57,6 +66,7 @@ const RegistrationManagement = () => {
         () => {
           console.log('Registration updated, refreshing stats');
           loadEventStats();
+          loadRegistrationCounts();
           if (selectedEvent) {
             loadEventRegistrations(selectedEvent.id);
           }
@@ -307,6 +317,53 @@ const RegistrationManagement = () => {
     }
   };
 
+  const loadRegistrationCounts = async () => {
+    try {
+      // Count individual registrations (is_team = false or null)
+      const { count: individualCount } = await supabase
+        .from('event_registrations_config')
+        .select('*', { count: 'exact', head: true })
+        .eq('payment_status', 'PAID')
+        .or('is_team.is.null,is_team.eq.false');
+
+      // Count team registrations (unique teams)
+      const { data: teamData } = await supabase
+        .from('event_registrations_config')
+        .select('team_id', { count: 'exact' })
+        .eq('payment_status', 'PAID')
+        .eq('is_team', true)
+        .not('team_id', 'is', null);
+      
+      const uniqueTeams = new Set(teamData?.map(r => r.team_id).filter(Boolean));
+      const teamCount = uniqueTeams.size;
+
+      // Count team leaders (is_team_leader = true)
+      const { count: teamLeaderCount } = await supabase
+        .from('event_registrations_config')
+        .select('*', { count: 'exact', head: true })
+        .eq('payment_status', 'PAID')
+        .eq('is_team', true)
+        .eq('is_team_leader', true);
+
+      // Count team members (is_team = true but is_team_leader = false/null)
+      const { count: teamMemberCount } = await supabase
+        .from('event_registrations_config')
+        .select('*', { count: 'exact', head: true })
+        .eq('payment_status', 'PAID')
+        .eq('is_team', true)
+        .or('is_team_leader.is.null,is_team_leader.eq.false');
+
+      setRegistrationCounts({
+        individual: individualCount || 0,
+        team: teamCount,
+        teamLeader: teamLeaderCount || 0,
+        teamMember: teamMemberCount || 0
+      });
+    } catch (error) {
+      console.error('Error loading registration counts:', error);
+    }
+  };
+
   const loadEventRegistrations = async (eventId) => {
     setLoadingDetails(true);
     try {
@@ -430,6 +487,61 @@ const RegistrationManagement = () => {
               </div>
             </div>
             <p className="text-gray-400 text-sm">Avg per Event</p>
+          </motion.div>
+        </div>
+
+        {/* Registration Type Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-gradient-to-br from-cyan-500/10 to-cyan-600/10 border border-cyan-500/20 rounded-2xl p-4"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <UserPlus className="text-cyan-400" size={24} />
+              <div className="text-2xl font-bold text-cyan-400">{registrationCounts.individual}</div>
+            </div>
+            <p className="text-gray-400 text-xs">Individual Registrations</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-gradient-to-br from-orange-500/10 to-orange-600/10 border border-orange-500/20 rounded-2xl p-4"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <Users className="text-orange-400" size={24} />
+              <div className="text-2xl font-bold text-orange-400">{registrationCounts.team}</div>
+            </div>
+            <p className="text-gray-400 text-xs">Total Teams</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 border border-yellow-500/20 rounded-2xl p-4"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <CheckCircle2 className="text-yellow-400" size={24} />
+              <div className="text-2xl font-bold text-yellow-400">{registrationCounts.teamLeader}</div>
+            </div>
+            <p className="text-gray-400 text-xs">Team Leaders</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="bg-gradient-to-br from-pink-500/10 to-pink-600/10 border border-pink-500/20 rounded-2xl p-4"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <Users className="text-pink-400" size={24} />
+              <div className="text-2xl font-bold text-pink-400">{registrationCounts.teamMember}</div>
+            </div>
+            <p className="text-gray-400 text-xs">Team Members</p>
           </motion.div>
         </div>
 
