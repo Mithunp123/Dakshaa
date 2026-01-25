@@ -181,7 +181,7 @@ const SignUpForm = () => {
             full_name: formData.fullName,
             gender: formData.gender,
             college_name: formData.collegeName,
-            department: formData.departmentment,
+            department: formData.department,
             year_of_study: formData.yearOfStudy,
             roll_number: formData.rollNumber,
             mobile_number: formData.mobileNumber,
