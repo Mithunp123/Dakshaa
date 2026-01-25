@@ -2,7 +2,7 @@
   "name": "DaKshaa T26 - Event Coordinator",
   "short_name": "DaKshaa T26",
   "description": "Event Coordinator Dashboard for DaKshaa T26 Fest",
-  "start_url": "/coordinator",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#0ea5e9",
