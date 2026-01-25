@@ -360,32 +360,75 @@ export const createEvent = async (eventData) => {
 };
 
 /**
- * Update an existing event
+ * Helper: Convert value to boolean safely
+ */
+const toBool = (val) => {
+  if (typeof val === 'boolean') return val;
+  if (val === null || val === undefined) return false;
+  return String(val).toLowerCase() === 'true' || val === 1 || val === '1';
+};
+
+/**
+ * Helper: Convert to safe integer string
+ */
+const toIntStr = (val, defaultVal = '1') => {
+  if (val === null || val === undefined || val === '') return defaultVal;
+  return String(val);
+};
+
+/**
+ * Update an existing event - Direct table update following Python reference
  * @param {string} eventId - UUID of the event
  * @param {Object} updates - Fields to update
  * @returns {Promise<Object>} Result status
  */
 export const updateEvent = async (eventId, updates) => {
   try {
-    const { data, error } = await supabase.rpc("update_event_config", {
-      p_event_id: eventId,
-      p_name: updates.name,
-      p_description: updates.description || null,
-      p_price: updates.price,
-      p_type: updates.type,
-      p_capacity: updates.capacity,
-      p_is_open: updates.is_open
+    // Build update object with proper type conversion
+    const updateData = {
+      name: updates.name,
+      description: updates.description,
+      venue: updates.venue,
+      category: updates.category,
+      event_type: updates.event_type,
+      price: String(updates.price || '0'),
+      capacity: toIntStr(updates.capacity, '100'),
+      is_team_event: toBool(updates.is_team_event || false),
+      min_team_size: toIntStr(updates.min_team_size, '1'),
+      max_team_size: toIntStr(updates.max_team_size, '1'),
+      is_open: toBool(updates.is_open !== undefined ? updates.is_open : true),
+      is_active: toBool(updates.is_active !== undefined ? updates.is_active : true),
+      current_status: updates.current_status || 'upcoming',
+      event_date: updates.event_date,
+      start_time: updates.start_time,
+      end_time: updates.end_time,
+      coordinator_name: updates.coordinator_name,
+      coordinator_contact: updates.coordinator_contact,
+      type: updates.type,
+      updated_at: new Date().toISOString()
+    };
+
+    // Remove undefined values to avoid clearing data
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
+      }
     });
+
+    const { data, error } = await supabase
+      .from('events')
+      .update(updateData)
+      .eq('id', eventId)
+      .select();
 
     if (error) throw error;
 
-    if (!data.success) {
-      throw new Error(data.message);
-    }
+    // Clear cache after update
+    clearEventsCache();
 
     return {
       success: true,
-      data: data,
+      data: data && data.length > 0 ? data[0] : null,
       error: null
     };
   } catch (error) {
@@ -399,25 +442,26 @@ export const updateEvent = async (eventId, updates) => {
 };
 
 /**
- * Delete an event (only if no registrations exist)
+ * Delete an event - Direct table delete following Python reference
  * @param {string} eventId - UUID of the event
  * @returns {Promise<boolean>} Success status
  */
 export const deleteEvent = async (eventId) => {
   try {
-    const { data, error } = await supabase.rpc("delete_event_config", {
-      p_event_id: eventId
-    });
+    const { data, error } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', eventId)
+      .select();
 
     if (error) throw error;
 
-    if (!data.success) {
-      throw new Error(data.message);
-    }
+    // Clear cache after delete
+    clearEventsCache();
 
     return {
       success: true,
-      data: data,
+      data: data && data.length > 0 ? data[0] : null,
       error: null
     };
   } catch (error) {
@@ -431,21 +475,74 @@ export const deleteEvent = async (eventId) => {
 };
 
 /**
- * Toggle event open/closed status
+ * Toggle event open/closed status - Direct table update
  * @param {string} eventId - UUID of the event
  * @returns {Promise<Object>} New status
  */
 export const toggleEventStatus = async (eventId) => {
   try {
-    const { data, error } = await supabase.rpc("toggle_event_status", {
-      p_event_id: eventId
-    });
+    // First get current status
+    const { data: currentEvent, error: fetchError } = await supabase
+      .from('events')
+      .select('is_open')
+      .eq('id', eventId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Toggle the status
+    const newStatus = !currentEvent.is_open;
+
+    const { data, error } = await supabase
+      .from('events')
+      .update({ 
+        is_open: newStatus,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', eventId)
+      .select();
 
     if (error) throw error;
 
-    if (!data.success) {
-      throw new Error(data.message);
-    }
+    // Clear cache after update
+    clearEventsCache();
+
+    return {
+      success: true,
+      data: { is_open: newStatus },
+      error: null
+    };
+  } catch (error) {
+    console.error("Error toggling status:", error);
+    return {
+      success: false,
+      data: null,
+      error: error.message
+    };
+  }
+};
+
+/**
+ * Update status for multiple events (bulk operation)
+ * @param {Array} eventIds - List of event IDs to update
+ * @param {boolean} isOpen - New status
+ * @returns {Promise<Object>} Success status
+ */
+export const updateEventsStatus = async (eventIds, isOpen) => {
+  try {
+    const { data, error } = await supabase
+      .from('events')
+      .update({ 
+        is_open: isOpen,
+        updated_at: new Date().toISOString()
+      })
+      .in('id', eventIds)
+      .select();
+
+    if (error) throw error;
+
+    // Clear cache to ensure UI updates
+    clearEventsCache();
 
     return {
       success: true,
@@ -453,7 +550,81 @@ export const toggleEventStatus = async (eventId) => {
       error: null
     };
   } catch (error) {
-    console.error("Error toggling status:", error);
+    console.error("Error bulk updating status:", error);
+    return {
+      success: false,
+      data: null,
+      error: error.message
+    };
+  }
+};
+
+/**
+ * Get event statistics - Following Python reference
+ * @returns {Promise<Object>} Event statistics
+ */
+export const getEventStats = async () => {
+  try {
+    const { data: allEvents, error } = await supabase
+      .from('events')
+      .select('category, current_status, is_open, is_active');
+
+    if (error) throw error;
+
+    const stats = {
+      total_events: 0,
+      technical: 0,
+      non_technical: 0,
+      workshops: 0,
+      cultural: 0,
+      sports: 0,
+      upcoming: 0,
+      ongoing: 0,
+      completed: 0,
+      open_events: 0,
+      active_events: 0
+    };
+
+    allEvents.forEach(event => {
+      stats.total_events += 1;
+
+      const category = String(event.category || '').toLowerCase().trim();
+      const status = event.current_status || '';
+
+      // Category counts
+      if (category === 'technical') {
+        stats.technical += 1;
+      } else if (category === 'non-technical' || category === 'non tech') {
+        stats.non_technical += 1;
+      } else if (category === 'workshop') {
+        stats.workshops += 1;
+      } else if (category === 'cultural') {
+        stats.cultural += 1;
+      } else if (category === 'sports') {
+        stats.sports += 1;
+      }
+
+      // Status counts
+      if (status === 'upcoming') {
+        stats.upcoming += 1;
+      } else if (status === 'ongoing') {
+        stats.ongoing += 1;
+      } else if (status === 'completed') {
+        stats.completed += 1;
+      }
+
+      // Additional counts
+      if (event.is_open) stats.open_events += 1;
+      if (event.is_active) stats.active_events += 1;
+    });
+
+    return {
+      success: true,
+      data: stats,
+      error: null
+    };
+  } catch (error) {
+    console.error("Error fetching event stats:", error);
     return {
       success: false,
       data: null,
