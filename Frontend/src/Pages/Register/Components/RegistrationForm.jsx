@@ -446,10 +446,10 @@ const RegistrationForm = () => {
   // Memoized categories - prevents recalculation on every render
   const categories = useMemo(() => {
     // Define the preferred categories as requested by user - these will ALWAYS be shown
-    const alwaysShowCategories = ["Technical", "Non-Technical", "Team Events", "Hackathon", "Sports"];
+    const alwaysShowCategories = ["Technical", "Non-Technical", "Team Events", "Hackathon", "Workshop", "Sports"];
     
     // Additional categories that only show if events exist
-    const optionalCategories = ["Conference", "Workshop"];
+    const optionalCategories = ["Conference"];
     
     // Get all unique categories from events
     const uniqueCategories = new Set(
