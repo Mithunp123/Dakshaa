@@ -232,17 +232,20 @@ const DashboardHome = () => {
     }
   };
 
+  // Filter for paid registrations only
+  const paidRegistrations = registrations.filter(r => r.payment_status?.toUpperCase() === 'PAID');
+
   const stats = [
     { 
       label: 'Events Registered', 
-      value: registrations.length.toString(), 
+      value: paidRegistrations.length.toString(), 
       icon: Trophy, 
       color: 'text-secondary', 
       bg: 'bg-secondary/10' 
     },
     { 
       label: 'Workshops', 
-      value: registrations.filter(r => r.events?.category === 'workshop').length.toString(), 
+      value: paidRegistrations.filter(r => r.events?.category === 'workshop').length.toString(), 
       icon: Cpu, 
       color: 'text-primary-light', 
       bg: 'bg-primary/10' 
@@ -256,7 +259,7 @@ const DashboardHome = () => {
     },
     { 
       label: 'Attendance', 
-      value: `0/${registrations.length}`, 
+      value: `0/${paidRegistrations.length}`, 
       icon: CheckCircle2, 
       color: 'text-green-400', 
       bg: 'bg-green-500/10' 
