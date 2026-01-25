@@ -4,6 +4,18 @@ import { supabase } from "../supabase";
 const COMBOS_CACHE_KEY = 'dakshaa_combos_cache';
 const COMBOS_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
+// Helper to clear cache
+export const clearCombosCache = () => {
+  try {
+    localStorage.removeItem(COMBOS_CACHE_KEY);
+    console.log('Combos cache cleared');
+    return true;
+  } catch (error) {
+    console.warn('Failed to clear combos cache:', error);
+    return false;
+  }
+};
+
 // Helper to get cached combos
 const getCachedCombos = () => {
   try {
@@ -72,34 +84,27 @@ const resolveEventIds = async (eventIds) => {
 
 const comboService = {
   /**
-   * Get all combos with full details (Admin view)
+   * Get all combos - Direct table query following Python reference
+   * @param {boolean} includeInactive - Include inactive combos
    */
-  getCombosWithDetails: async () => {
+  getAllCombos: async (includeInactive = false) => {
     try {
-      // Use combos_with_stats view to get purchase counts
-      const { data, error } = await supabase
-        .from("combos_with_stats")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let query = supabase
+        .from('combos')
+        .select('*');
 
-      if (error) {
-        // Fallback to regular combos table if view doesn't exist
-        console.warn("combos_with_stats view not found, using combos table");
-        const fallback = await supabase
-          .from("combos")
-          .select("*")
-          .order("created_at", { ascending: false });
-        
-        if (fallback.error) throw fallback.error;
-        
-        return {
-          success: true,
-          data: (fallback.data || []).map(c => ({
-            ...c,
-            total_purchases: c.current_purchases || 0
-          })),
-        };
+      if (!includeInactive) {
+        query = query.eq('is_active', true);
       }
+
+      const { data, error } = await query
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Cache the results
+      if (data) cacheCombos(data);
 
       return {
         success: true,
@@ -107,6 +112,527 @@ const comboService = {
       };
     } catch (error) {
       console.error("Error fetching combos:", error);
+      return {
+        success: false,
+        data: [],
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Get combo by ID - Direct table query
+   * @param {string} comboId - UUID of the combo
+   */
+  getComboById: async (comboId) => {
+    try {
+      const { data, error } = await supabase
+        .from('combos')
+        .select('*')
+        .eq('id', comboId)
+        .single();
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data,
+      };
+    } catch (error) {
+      console.error("Error fetching combo:", error);
+      return {
+        success: false,
+        data: null,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Create new combo - Direct table insert following Python reference
+   */
+  createCombo: async ({
+    name,
+    description,
+    price,
+    originalPrice,
+    discountPercentage = 0,
+    categoryQuotas = {},
+    totalEventsRequired = 2,
+    isActive = true,
+    displayOrder = 0,
+    maxPurchases = 100,
+    badgeText,
+    badgeColor
+  }) => {
+    try {
+      const insertData = {
+        name,
+        description,
+        price,
+        original_price: originalPrice,
+        discount_percentage: discountPercentage,
+        category_quotas: categoryQuotas,
+        total_events_required: totalEventsRequired,
+        is_active: isActive,
+        display_order: displayOrder,
+        max_purchases: maxPurchases,
+        badge_text: badgeText,
+        badge_color: badgeColor
+      };
+
+      // Remove undefined values
+      Object.keys(insertData).forEach(key => {
+        if (insertData[key] === undefined) {
+          delete insertData[key];
+        }
+      });
+
+      const { data, error } = await supabase
+        .from('combos')
+        .insert(insertData)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Clear cache
+      clearCombosCache();
+
+      return {
+        success: true,
+        data,
+      };
+    } catch (error) {
+      console.error("Error creating combo:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Update combo - Direct table update following Python reference
+   */
+  updateCombo: async (comboId, {
+    name,
+    description,
+    price,
+    originalPrice,
+    discountPercentage = 0,
+    categoryQuotas = {},
+    totalEventsRequired = 2,
+    isActive = true,
+    displayOrder = 0,
+    maxPurchases = 100,
+    badgeText,
+    badgeColor
+  }) => {
+    try {
+      const updateData = {
+        name,
+        description,
+        price,
+        original_price: originalPrice,
+        discount_percentage: discountPercentage,
+        category_quotas: categoryQuotas,
+        total_events_required: totalEventsRequired,
+        is_active: isActive,
+        display_order: displayOrder,
+        max_purchases: maxPurchases,
+        badge_text: badgeText,
+        badge_color: badgeColor
+      };
+
+      // Remove undefined values
+      Object.keys(updateData).forEach(key => {
+        if (updateData[key] === undefined) {
+          delete updateData[key];
+        }
+      });
+
+      const { data, error } = await supabase
+        .from('combos')
+        .update(updateData)
+        .eq('id', comboId)
+        .select();
+
+      if (error) throw error;
+
+      // Clear cache
+      clearCombosCache();
+
+      return {
+        success: true,
+        data: data && data.length > 0 ? data[0] : null,
+        message: 'Combo updated successfully'
+      };
+    } catch (error) {
+      console.error("Error updating combo:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Delete combo - Direct table delete following Python reference
+   */
+  deleteCombo: async (comboId) => {
+    try {
+      const { data, error } = await supabase
+        .from('combos')
+        .delete()
+        .eq('id', comboId)
+        .select();
+
+      if (error) throw error;
+
+      // Clear cache
+      clearCombosCache();
+
+      return {
+        success: true,
+        data: data && data.length > 0 ? data[0] : null,
+        message: 'Combo deleted successfully'
+      };
+    } catch (error) {
+      console.error("Error deleting combo:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Toggle combo active status - Direct table update
+   */
+  toggleComboStatus: async (comboId) => {
+    try {
+      // First get current status
+      const { data: currentCombo, error: fetchError } = await supabase
+        .from('combos')
+        .select('is_active')
+        .eq('id', comboId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Toggle the status
+      const newStatus = !currentCombo.is_active;
+
+      const { data, error } = await supabase
+        .from('combos')
+        .update({ is_active: newStatus })
+        .eq('id', comboId)
+        .select();
+
+      if (error) throw error;
+
+      // Clear cache
+      clearCombosCache();
+
+      return {
+        success: true,
+        isActive: newStatus,
+        message: `Combo ${newStatus ? 'activated' : 'deactivated'} successfully`
+      };
+    } catch (error) {
+      console.error("Error toggling combo status:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Get all combo purchases - Following Python reference
+   */
+  getComboPurchases: async (limit = 100, offset = 0, paymentStatus = null) => {
+    try {
+      let query = supabase
+        .from('combo_purchases')
+        .select('*');
+
+      if (paymentStatus) {
+        query = query.eq('payment_status', paymentStatus);
+      }
+
+      const { data, error } = await query
+        .order('purchased_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (error) throw error;
+
+      // Fetch related data separately (similar to Python approach)
+      const flattened = await Promise.all((data || []).map(async (purchase) => {
+        const flat = { ...purchase };
+
+        // Try to get profile info
+        try {
+          if (purchase.user_id) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('full_name, email, mobile_number')
+              .eq('id', purchase.user_id)
+              .single();
+
+            if (profile) {
+              flat.full_name = profile.full_name;
+              flat.email = profile.email;
+              flat.mobile_number = profile.mobile_number;
+            }
+          }
+        } catch (e) {
+          console.warn('Could not fetch profile for purchase', e);
+        }
+
+        // Try to get combo info
+        try {
+          if (purchase.combo_id) {
+            const { data: combo } = await supabase
+              .from('combos')
+              .select('name')
+              .eq('id', purchase.combo_id)
+              .single();
+
+            if (combo) {
+              flat.combo_name = combo.name;
+            }
+          }
+        } catch (e) {
+          console.warn('Could not fetch combo for purchase', e);
+        }
+
+        return flat;
+      }));
+
+      return {
+        success: true,
+        data: flattened,
+      };
+    } catch (error) {
+      console.error("Error fetching combo purchases:", error);
+      return {
+        success: false,
+        data: [],
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Get purchase by ID - Following Python reference
+   */
+  getPurchaseById: async (purchaseId) => {
+    try {
+      const { data, error } = await supabase
+        .from('combo_purchases')
+        .select('*')
+        .eq('id', purchaseId)
+        .single();
+
+      if (error) throw error;
+
+      const flat = { ...data };
+
+      // Fetch related data separately
+      try {
+        if (data.user_id) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, email, mobile_number')
+            .eq('id', data.user_id)
+            .single();
+
+          if (profile) {
+            flat.full_name = profile.full_name;
+            flat.email = profile.email;
+            flat.mobile_number = profile.mobile_number;
+          }
+        }
+      } catch (e) {}
+
+      try {
+        if (data.combo_id) {
+          const { data: combo } = await supabase
+            .from('combos')
+            .select('name')
+            .eq('id', data.combo_id)
+            .single();
+
+          if (combo) {
+            flat.combo_name = combo.name;
+          }
+        }
+      } catch (e) {}
+
+      return {
+        success: true,
+        data: flat,
+      };
+    } catch (error) {
+      console.error("Error fetching purchase:", error);
+      return {
+        success: false,
+        data: null,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Delete combo purchase - Direct table delete
+   */
+  deletePurchase: async (purchaseId) => {
+    try {
+      const { data, error } = await supabase
+        .from('combo_purchases')
+        .delete()
+        .eq('id', purchaseId)
+        .select();
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data: data && data.length > 0 ? data[0] : null,
+      };
+    } catch (error) {
+      console.error("Error deleting purchase:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Update payment status - Following Python reference
+   */
+  updatePaymentStatus: async (purchaseId, status, transactionId = null) => {
+    try {
+      const updateData = { payment_status: status };
+      if (transactionId) {
+        updateData.transaction_id = transactionId;
+      }
+
+      const { data, error } = await supabase
+        .from('combo_purchases')
+        .update(updateData)
+        .eq('id', purchaseId)
+        .select();
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data: data && data.length > 0 ? data[0] : null,
+      };
+    } catch (error) {
+      console.error("Error updating payment status:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Get combo purchase statistics - Following Python reference
+   */
+  getPurchaseStats: async () => {
+    try {
+      const { data, error } = await supabase
+        .from('combo_purchases')
+        .select('payment_status, payment_amount');
+
+      if (error) throw error;
+
+      const stats = {
+        total_purchases: 0,
+        paid: 0,
+        pending: 0,
+        total_revenue: 0
+      };
+
+      (data || []).forEach(purchase => {
+        stats.total_purchases += 1;
+        const status = purchase.payment_status || '';
+
+        if (status === 'PAID' || status === 'paid') {
+          stats.paid += 1;
+          try {
+            stats.total_revenue += parseFloat(purchase.payment_amount || 0);
+          } catch (e) {}
+        } else if (status === 'PENDING' || status === 'pending') {
+          stats.pending += 1;
+        }
+      });
+
+      return {
+        success: true,
+        data: stats,
+      };
+    } catch (error) {
+      console.error("Error fetching purchase stats:", error);
+      return {
+        success: false,
+        data: null,
+        error: error.message,
+      };
+    }
+  },
+
+  /**
+   * Get all combos with full details (Admin view) - Enhanced version
+   */
+  getCombosWithDetails: async () => {
+    try {
+      // Get all combos
+      const { data: combos, error } = await supabase
+        .from('combos')
+        .select('*')
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Get purchase counts for each combo
+      const combosWithStats = await Promise.all((combos || []).map(async (combo) => {
+        try {
+          const { data: purchases } = await supabase
+            .from('combo_purchases')
+            .select('id', { count: 'exact', head: false })
+            .eq('combo_id', combo.id);
+
+          return {
+            ...combo,
+            total_purchases: purchases?.length || 0,
+            current_purchases: purchases?.length || 0
+          };
+        } catch (e) {
+          return {
+            ...combo,
+            total_purchases: 0,
+            current_purchases: 0
+          };
+        }
+      }));
+
+      // Cache the results
+      cacheCombos(combosWithStats);
+
+      return {
+        success: true,
+        data: combosWithStats,
+      };
+    } catch (error) {
+      console.error("Error fetching combos with details:", error);
       return {
         success: false,
         data: [],
@@ -211,10 +737,11 @@ const comboService = {
     }
   },
 
+  // Legacy methods below - keeping for backward compatibility
   /**
-   * Get combo by ID
+   * @deprecated Use getComboById instead
    */
-  getComboById: async (comboId) => {
+  getComboByIdLegacy: async (comboId) => {
     try {
       const { data, error } = await supabase
         .from("combos")
@@ -246,9 +773,9 @@ const comboService = {
   },
 
   /**
-   * Create new combo (category quotas only)
+   * @deprecated Use createCombo instead
    */
-  createCombo: async ({
+  createComboRPC: async ({
     name,
     description,
     price,
@@ -287,9 +814,9 @@ const comboService = {
   },
 
   /**
-   * Update existing combo (category quotas only)
+   * @deprecated Use updateCombo instead
    */
-  updateCombo: async (
+  updateComboRPC: async (
     comboId,
     { name, description, price, isActive, categoryQuotas = {} }
   ) => {
@@ -326,9 +853,9 @@ const comboService = {
   },
 
   /**
-   * Delete combo
+   * @deprecated Use deleteCombo instead
    */
-  deleteCombo: async (comboId) => {
+  deleteComboRPC: async (comboId) => {
     try {
       const { data, error } = await supabase.rpc("delete_combo", {
         p_combo_id: comboId,
@@ -357,9 +884,9 @@ const comboService = {
   },
 
   /**
-   * Toggle combo active status
+   * @deprecated Use toggleComboStatus instead
    */
-  toggleComboStatus: async (comboId) => {
+  toggleComboStatusRPC: async (comboId) => {
     try {
       const { data, error } = await supabase.rpc("toggle_combo_status", {
         p_combo_id: comboId,
