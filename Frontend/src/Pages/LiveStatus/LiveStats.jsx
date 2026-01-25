@@ -35,36 +35,51 @@ const LiveStats = () => {
     try {
       setLoading(true);
       
+      console.log("Fetching live stats...");
       // Call the secure RPC function
       const { data, error } = await supabase.rpc('get_live_stats');
       
       if (error) {
-        console.error('Error fetching stats:', error);
+        console.error('Error fetching stats via RPC:', error);
         // Fallback to direct count if RPC not available
         await fetchStatsFallback();
       } else {
+        console.log("Stats fetched via RPC:", data);
         setStats(data);
       }
     } catch (err) {
-      console.error('Error:', err);
-      await fetchStatsFallback();
+      console.error('Error in fetchInitialStats:', err);
+      // Try fallback if main try fails
+      try {
+          await fetchStatsFallback();
+      } catch (fallbackErr) {
+          console.error('Fallback also failed:', fallbackErr);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const fetchStatsFallback = async () => {
-    // Fallback method using head count
-    const [usersResult, regsResult] = await Promise.all([
-      supabase.from('profiles').select('*', { count: 'exact', head: true }),
-      supabase.from('registrations').select('*', { count: 'exact', head: true })
-    ]);
+    console.log("Using fallback stats fetch...");
+    try {
+        // Fallback method using head count
+        // Using event_registrations_config as it seems to be the main table now
+        const [usersResult, regsResult] = await Promise.all([
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
+        supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).eq('payment_status', 'PAID')
+        ]);
 
-    setStats({
-      users: usersResult.count || 0,
-      registrations: regsResult.count || 0,
-      last_updated: new Date().toISOString()
-    });
+        setStats({
+        users: usersResult.count || 0,
+        registrations: regsResult.count || 0,
+        last_updated: new Date().toISOString()
+        });
+    } catch (error) {
+         console.error("Error in fallback:", error);
+         // Set zero if everything fails to avoid loading loop
+         setStats({ users: 0, registrations: 0, last_updated: new Date().toISOString() });
+    }
   };
 
   const setupRealtimeSubscriptions = () => {
@@ -91,23 +106,27 @@ const LiveStats = () => {
       }
     );
 
-    // Listen for new registrations
+    // Listen for new registrations (Confirmed/PAID)
     channel.on(
       'postgres_changes',
       { 
-        event: 'INSERT', 
+        event: '*', 
         schema: 'public', 
-        table: 'registrations' 
+        table: 'event_registrations_config' 
       },
       (payload) => {
-        console.log('New registration!', payload);
-        setStats(prev => ({
-          ...prev,
-          registrations: prev.registrations + 1,
-          last_updated: new Date().toISOString()
-        }));
-        setIsLive(true);
-        setTimeout(() => setIsLive(false), 2000);
+        // Only count if status is PAID
+        if (payload.new && payload.new.payment_status === 'PAID') {
+           // If it's an update, check if it was already PAID (to avoid double counting) - this is hard without old state in some cases
+           // But for simplicity, we just trigger a refresh or simplistic increment if it seems new
+           
+           // If INSERT, it's new paid.
+           // If UPDATE and previous wasn't paid... simplistic: just fetch fresh stats to be accurate
+           fetchInitialStats();
+           
+           setIsLive(true);
+           setTimeout(() => setIsLive(false), 2000);
+        }
       }
     );
 
