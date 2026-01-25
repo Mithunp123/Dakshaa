@@ -33,6 +33,39 @@ const SignUpForm = () => {
     setLoading(true);
     setError(null);
 
+    // Validate all required fields are filled
+    const requiredFields = [
+      { field: 'fullName', label: 'Full Name' },
+      { field: 'gender', label: 'Gender' },
+      { field: 'collegeName', label: 'College Name' },
+      { field: 'department', label: 'Department' },
+      { field: 'yearOfStudy', label: 'Year of Study' },
+      { field: 'rollNumber', label: 'Roll Number' },
+      { field: 'mobileNumber', label: 'Mobile Number' },
+      { field: 'email', label: 'Email Address' },
+      { field: 'password', label: 'Password' },
+      { field: 'confirmPassword', label: 'Confirm Password' }
+    ];
+
+    for (const { field, label } of requiredFields) {
+      if (!formData[field] || formData[field].trim() === '') {
+        toast.error(`${label} is required`, {
+          duration: 3000,
+          position: 'top-center',
+          style: {
+            background: '#ef4444',
+            color: '#fff',
+            padding: '16px',
+            borderRadius: '10px',
+            fontSize: '16px',
+            fontWeight: '600',
+          },
+        });
+        setLoading(false);
+        return;
+      }
+    }
+
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match", {
         duration: 3000,
@@ -65,6 +98,47 @@ const SignUpForm = () => {
       });
       setLoading(false);
       return;
+    }
+
+    // Validate mobile number starts with 6-9
+    if (!/^[6-9]/.test(formData.mobileNumber)) {
+      toast.error("Mobile number must start with 6, 7, 8, or 9", {
+        duration: 3000,
+        position: 'top-center',
+        style: {
+          background: '#ef4444',
+          color: '#fff',
+          padding: '16px',
+          borderRadius: '10px',
+          fontSize: '16px',
+          fontWeight: '600',
+        },
+      });
+      setLoading(false);
+      return;
+    }
+
+    // Validate referral code - if provided and starts with 2, it's likely a roll number
+    if (formData.referredBy && formData.referredBy.trim() !== '') {
+      const referralCode = formData.referredBy.trim();
+      
+      // Check if it starts with 2 (likely a roll number like 7377212CS101)
+      if (referralCode.startsWith('2')) {
+        toast.error("For KSRCT students: Enter your friend's mobile number, not their registration number", {
+          duration: 4000,
+          position: 'top-center',
+          style: {
+            background: '#ef4444',
+            color: '#fff',
+            padding: '16px',
+            borderRadius: '10px',
+            fontSize: '16px',
+            fontWeight: '600',
+          },
+        });
+        setLoading(false);
+        return;
+      }
     }
 
     try {
@@ -202,7 +276,7 @@ const SignUpForm = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-1.5 sm:space-y-2">
-              <label className="text-xs sm:text-sm text-gray-400 ml-1">Full Name</label>
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Full Name <span className="text-red-500">*</span></label>
               <div className="relative">
                 <input
                   required
@@ -218,7 +292,7 @@ const SignUpForm = () => {
             </div>
 
             <div className="space-y-1.5 sm:space-y-2">
-              <label className="text-xs sm:text-sm text-gray-400 ml-1">Gender</label>
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Gender <span className="text-red-500">*</span></label>
               <select
                 required
                 name="gender"
@@ -234,7 +308,7 @@ const SignUpForm = () => {
             </div>
 
             <div className="space-y-1.5 sm:space-y-2 md:col-span-2">
-              <label className="text-xs sm:text-sm text-gray-400 ml-1">College Name</label>
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">College Name <span className="text-red-500">*</span></label>
               <div className="relative">
                 <School className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
@@ -250,7 +324,7 @@ const SignUpForm = () => {
             </div>
 
             <div className="space-y-1.5 sm:space-y-2">
-              <label className="text-xs sm:text-sm text-gray-400 ml-1">Department</label>
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Department <span className="text-red-500">*</span></label>
               <div className="relative">
                 <BookOpen className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
@@ -266,7 +340,7 @@ const SignUpForm = () => {
             </div>
 
             <div className="space-y-1.5 sm:space-y-2">
-              <label className="text-xs sm:text-sm text-gray-400 ml-1">Year of Study</label>
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Year of Study <span className="text-red-500">*</span></label>
               <div className="relative">
                 <GraduationCap className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <select
@@ -286,7 +360,7 @@ const SignUpForm = () => {
             </div>
 
             <div className="space-y-1.5 sm:space-y-2 md:col-span-2">
-              <label className="text-xs sm:text-sm text-gray-400 ml-1">Register / Roll Number</label>
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Register / Roll Number <span className="text-red-500">*</span></label>
               <input
                 required
                 type="text"
@@ -322,7 +396,7 @@ const SignUpForm = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-1.5 sm:space-y-2 md:col-span-2">
-              <label className="text-xs sm:text-sm text-gray-400 ml-1">Mobile Number (WhatsApp)</label>
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Mobile Number (WhatsApp) <span className="text-red-500">*</span></label>
               <div className="relative">
                 <Phone className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
@@ -339,7 +413,7 @@ const SignUpForm = () => {
             </div>
 
             <div className="space-y-1.5 sm:space-y-2 md:col-span-2">
-              <label className="text-xs sm:text-sm text-gray-400 ml-1">Email Address</label>
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Email Address <span className="text-red-500">*</span></label>
               <div className="relative">
                 <Mail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
@@ -355,7 +429,7 @@ const SignUpForm = () => {
             </div>
 
             <div className="space-y-1.5 sm:space-y-2">
-              <label className="text-xs sm:text-sm text-gray-400 ml-1">Password</label>
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Password <span className="text-red-500">*</span></label>
               <div className="relative">
                 <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
@@ -371,7 +445,7 @@ const SignUpForm = () => {
             </div>
 
             <div className="space-y-1.5 sm:space-y-2">
-              <label className="text-xs sm:text-sm text-gray-400 ml-1">Confirm Password</label>
+              <label className="text-xs sm:text-sm text-gray-400 ml-1">Confirm Password <span className="text-red-500">*</span></label>
               <div className="relative">
                 <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
