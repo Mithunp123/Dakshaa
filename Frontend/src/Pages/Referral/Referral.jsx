@@ -142,8 +142,8 @@ const Referral = () => {
                           scale: [1, 1.1, 1]
                         }}
                         transition={{ 
-                          rotateY: { duration: 3, repeat: Infinity, ease: "linear" },
-                          scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                          rotateY: { duration: 10, repeat: Infinity, ease: "linear" },
+                          scale: { duration: 5, repeat: Infinity, ease: "easeInOut" }
                         }}
                         className="relative"
                       >
