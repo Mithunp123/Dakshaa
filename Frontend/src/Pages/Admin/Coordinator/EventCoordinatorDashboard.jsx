@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   QrCode, 
   Camera, 
@@ -21,7 +22,8 @@ import {
   Moon,
   RefreshCw,
   Phone,
-  Download
+  Download,
+  LogOut
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -42,6 +44,7 @@ const formatDakshaaId = (uuid) => {
 };
 
 const EventCoordinatorDashboard = () => {
+  const navigate = useNavigate();
   const [assignedEvents, setAssignedEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [participants, setParticipants] = useState([]);
@@ -53,6 +56,10 @@ const EventCoordinatorDashboard = () => {
   const [cameraId, setCameraId] = useState(null);
   const [cameras, setCameras] = useState([]);
   const [cameraError, setCameraError] = useState(null);
+  
+  // PWA Install
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showInstallButton, setShowInstallButton] = useState(false);
   
   // Session type for attendance
   const [selectedSession, setSelectedSession] = useState('morning');
@@ -93,8 +100,24 @@ const EventCoordinatorDashboard = () => {
   useEffect(() => {
     fetchAssignedEvents();
     getCameras();
+    
+    // PWA Install Prompt
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallButton(true);
+    };
+    
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    
+    // Check if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setShowInstallButton(false);
+    }
+    
     return () => {
       stopScanning();
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
 
@@ -436,6 +459,47 @@ const EventCoordinatorDashboard = () => {
     }
   };
 
+  const handleInstallApp = async () => {
+    // Check if already running as installed app
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                         window.navigator.standalone === true;
+    
+    if (isStandalone) {
+      toast.success('App is already installed! 🎉', { duration: 3000 });
+      return;
+    }
+    
+    if (!deferredPrompt) {
+      // Show manual installation instructions
+      toast((t) => (
+        <div className="text-left">
+          <p className="font-bold mb-2">📱 How to Install:</p>
+          <p className="text-sm mb-1">• Chrome/Edge: Menu → "Install app"</p>
+          <p className="text-sm mb-1">• Safari: Share → "Add to Home Screen"</p>
+          <p className="text-sm">• Firefox: Menu → "Install"</p>
+        </div>
+      ), { duration: 5000 });
+      return;
+    }
+    
+    try {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        toast.success('App installed successfully! 📱', { duration: 3000 });
+        setShowInstallButton(false);
+      } else {
+        toast('Installation cancelled', { duration: 2000 });
+      }
+      
+      setDeferredPrompt(null);
+    } catch (error) {
+      console.error('Installation error:', error);
+      toast.error('Installation failed. Try browser menu → Install app');
+    }
+  };
+
   const exportToExcel = () => {
     if (!selectedEvent || participants.length === 0) {
       alert('No participants to export');
@@ -701,6 +765,16 @@ const EventCoordinatorDashboard = () => {
     audio.play().catch(() => {});
   };
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate('/login');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      toast.error('Failed to logout');
+    }
+  };
+
   // Toast notification for success (replaces full-screen notification)
   const showSuccessToast = (name, session = 'morning') => {
     const sessionLabel = session === 'evening' ? 'PM' : 'AM';
@@ -754,118 +828,147 @@ const EventCoordinatorDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white pb-24 md:pb-8">
+    <div className="min-h-screen bg-slate-950 text-white pb-32">
       {/* Toast notifications */}
       <Toaster position="top-center" toastOptions={{ duration: 2000 }} />
       
       {/* Mobile Header */}
-      <div className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-xl border-b border-white/10 p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <h1 className="text-2xl font-bold font-orbitron text-secondary">COORDINATOR</h1>
-            <p className="text-xs text-gray-400">Mobile Action Panel</p>
+      <div className="sticky top-0 z-40 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20">
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold font-orbitron bg-gradient-to-r from-secondary to-cyan-500 bg-clip-text text-transparent">COORDINATOR</h1>
+              <p className="text-xs text-gray-400">Mobile Action Panel</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <motion.button
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleInstallApp}
+                className="w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl flex items-center justify-center border border-green-500/30 shadow-lg shadow-green-500/20 hover:shadow-green-500/40 transition-all"
+                title="Install App"
+              >
+                <Download className="text-green-500" size={20} />
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={handleLogout}
+                className="w-12 h-12 bg-gradient-to-br from-red-500/20 to-rose-500/20 rounded-2xl flex items-center justify-center border border-red-500/30 shadow-lg shadow-red-500/20 hover:shadow-red-500/40 transition-all"
+                title="Logout"
+              >
+                <LogOut className="text-red-500" size={20} />
+              </motion.button>
+              <div className="w-12 h-12 bg-gradient-to-br from-secondary/20 to-cyan-500/20 rounded-2xl flex items-center justify-center border border-secondary/30 shadow-inner">
+                <QrCode className="text-secondary" size={24} />
+              </div>
+            </div>
           </div>
-          <div className="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center border border-secondary/20">
-            <QrCode className="text-secondary" size={24} />
-          </div>
-        </div>
 
-        {/* Event Selector with Registration Count */}
-        <select
-          value={selectedEvent?.id || selectedEvent?.event_id || ''}
-          onChange={(e) => {
-            const event = assignedEvents.find(ev => (ev.id || ev.event_id) === e.target.value);
-            setSelectedEvent(event);
-          }}
-          className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary transition-all font-bold"
-        >
-          {assignedEvents.map(event => (
-            <option key={event.id || event.event_id} value={event.id || event.event_id} className="bg-slate-900">
-              {event.name || event.event_id} ({event.registeredCount || 0} registered)
-            </option>
-          ))}
-        </select>
+          {/* Event Selector with Registration Count */}
+          <select
+            value={selectedEvent?.id || selectedEvent?.event_id || ''}
+            onChange={(e) => {
+              const event = assignedEvents.find(ev => (ev.id || ev.event_id) === e.target.value);
+              setSelectedEvent(event);
+            }}
+            className="w-full bg-gradient-to-r from-white/5 to-white/10 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all font-bold shadow-inner"
+          >
+            {assignedEvents.map(event => (
+              <option key={event.id || event.event_id} value={event.id || event.event_id} className="bg-slate-900">
+                {event.name || event.event_id} ({event.registeredCount || 0} registered)
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Session Selector */}
-      <div className="flex gap-2 px-4 py-2">
-        <button
+      <div className="flex gap-3 px-4 py-3 bg-gradient-to-b from-slate-900/50 to-transparent">
+        <motion.button
+          whileTap={{ scale: 0.95 }}
           onClick={() => setSelectedSession('morning')}
-          className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+          className={`flex-1 py-4 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
             selectedSession === 'morning'
-              ? 'bg-yellow-500 text-white shadow-lg shadow-yellow-500/20'
-              : 'bg-white/5 text-gray-400 border border-white/10'
+              ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-lg shadow-yellow-500/30'
+              : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
           }`}
         >
-          <Sun size={18} />
+          <Sun size={20} />
           Forenoon
-        </button>
-        <button
+        </motion.button>
+        <motion.button
+          whileTap={{ scale: 0.95 }}
           onClick={() => setSelectedSession('evening')}
-          className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+          className={`flex-1 py-4 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
             selectedSession === 'evening'
-              ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-              : 'bg-white/5 text-gray-400 border border-white/10'
+              ? 'bg-gradient-to-r from-indigo-500 to-blue-500 text-white shadow-lg shadow-indigo-500/30'
+              : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
           }`}
         >
-          <Moon size={18} />
+          <Moon size={20} />
           Afternoon
-        </button>
+        </motion.button>
       </div>
 
       {/* Stats Row - Now with session breakdown */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 text-center">
-          <Users className="mx-auto text-blue-500 mb-2" size={24} />
-          <p className="text-2xl font-bold text-blue-500">{stats.registered}</p>
-          <p className="text-xs text-gray-400 uppercase">Registered</p>
-        </div>
-        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-4 text-center">
-          <Sun className="mx-auto text-yellow-500 mb-2" size={24} />
-          <p className="text-2xl font-bold text-yellow-500">{stats.morningCheckedIn}</p>
-          <p className="text-xs text-gray-400 uppercase">Forenoon ✓</p>
-        </div>
-        <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-4 text-center">
-          <Moon className="mx-auto text-indigo-500 mb-2" size={24} />
-          <p className="text-2xl font-bold text-indigo-500">{stats.eveningCheckedIn}</p>
-          <p className="text-xs text-gray-400 uppercase">Afternoon ✓</p>
-        </div>
-        <div className="bg-secondary/10 border border-secondary/20 rounded-2xl p-4 text-center">
-          <Clock className="mx-auto text-secondary mb-2" size={24} />
-          <p className="text-2xl font-bold text-secondary">
+      <div className="grid grid-cols-2 gap-3 p-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-gradient-to-br from-blue-500/20 via-blue-500/10 to-transparent border border-blue-500/30 rounded-2xl p-5 text-center shadow-lg"
+        >
+          <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mx-auto mb-2">
+            <Users className="text-blue-400" size={24} />
+          </div>
+          <p className="text-3xl font-bold text-blue-400 mb-1">{stats.registered}</p>
+          <p className="text-xs text-gray-400 uppercase tracking-wider">Registered</p>
+        </motion.div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-gradient-to-br from-yellow-500/20 via-yellow-500/10 to-transparent border border-yellow-500/30 rounded-2xl p-5 text-center shadow-lg"
+        >
+          <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center mx-auto mb-2">
+            <Sun className="text-yellow-400" size={24} />
+          </div>
+          <p className="text-3xl font-bold text-yellow-400 mb-1">{stats.morningCheckedIn}</p>
+          <p className="text-xs text-gray-400 uppercase tracking-wider">Forenoon ✓</p>
+        </motion.div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-gradient-to-br from-indigo-500/20 via-indigo-500/10 to-transparent border border-indigo-500/30 rounded-2xl p-5 text-center shadow-lg"
+        >
+          <div className="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center mx-auto mb-2">
+            <Moon className="text-indigo-400" size={24} />
+          </div>
+          <p className="text-3xl font-bold text-indigo-400 mb-1">{stats.eveningCheckedIn}</p>
+          <p className="text-xs text-gray-400 uppercase tracking-wider">Afternoon ✓</p>
+        </motion.div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-gradient-to-br from-secondary/20 via-secondary/10 to-transparent border border-secondary/30 rounded-2xl p-5 text-center shadow-lg"
+        >
+          <div className="w-12 h-12 bg-secondary/20 rounded-xl flex items-center justify-center mx-auto mb-2">
+            <Clock className="text-secondary" size={24} />
+          </div>
+          <p className="text-3xl font-bold text-secondary mb-1">
             {selectedSession === 'morning' ? stats.morningRemaining : stats.eveningRemaining}
           </p>
-          <p className="text-xs text-gray-400 uppercase">
+          <p className="text-xs text-gray-400 uppercase tracking-wider">
             {selectedSession === 'morning' ? 'AM Left' : 'PM Left'}
           </p>
-        </div>
-      </div>
-
-      {/* Tab Navigation */}
-      <div className="flex gap-2 p-1 bg-white/5 border-y border-white/10 overflow-x-auto">
-        {[
-          { id: 'scanner', label: 'QR Scanner', icon: Camera },
-          { id: 'participants', label: 'Participants', icon: Users },
-          { id: 'manual', label: 'Manual', icon: Search },
-          { id: 'winners', label: 'Winners', icon: Trophy }
-        ].map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 px-4 py-3 text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2 ${
-              activeTab === tab.id
-                ? 'text-secondary border-b-2 border-secondary'
-                : 'text-gray-400'
-            }`}
-          >
-            <tab.icon size={18} />
-            {tab.label}
-          </button>
-        ))}
+        </motion.div>
       </div>
 
       {/* Tab Content */}
-      <div className="p-4">
+      <div className="p-4 pb-6">
         <AnimatePresence mode="wait">
           {/* QR SCANNER TAB */}
           {activeTab === 'scanner' && (
@@ -1288,6 +1391,39 @@ const EventCoordinatorDashboard = () => {
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+
+      {/* Bottom Tab Navigation - Mobile App Style */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-slate-950 via-slate-900 to-slate-900/95 backdrop-blur-xl border-t border-white/10 shadow-2xl shadow-black/50">
+        <div className="flex gap-1 p-2 px-3 safe-area-bottom">
+          {[
+            { id: 'scanner', label: 'Scanner', icon: Camera },
+            { id: 'participants', label: 'List', icon: Users },
+            { id: 'manual', label: 'Manual', icon: Search },
+            { id: 'winners', label: 'Winners', icon: Trophy }
+          ].map(tab => (
+            <motion.button
+              key={tab.id}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 px-2 py-3 text-xs font-bold transition-all whitespace-nowrap flex flex-col items-center justify-center gap-1.5 rounded-2xl relative ${
+                activeTab === tab.id
+                  ? 'bg-gradient-to-br from-secondary/30 to-secondary/20 text-secondary shadow-lg shadow-secondary/20'
+                  : 'text-gray-500 active:bg-white/5'
+              }`}
+            >
+              {activeTab === tab.id && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-secondary/10 border border-secondary/30 rounded-2xl"
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                />
+              )}
+              <tab.icon size={22} className="relative z-10" />
+              <span className="relative z-10">{tab.label}</span>
+            </motion.button>
+          ))}
+        </div>
       </div>
     </div>
   );
