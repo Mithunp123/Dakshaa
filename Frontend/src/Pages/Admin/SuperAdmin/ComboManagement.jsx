@@ -17,6 +17,7 @@ import {
   Tag
 } from 'lucide-react';
 import comboService from '../../../services/comboService';
+import { supabase } from '../../../supabase';
 
 const ComboManagement = () => {
   const [combos, setCombos] = useState([]);
@@ -178,6 +179,42 @@ const ComboManagement = () => {
 
 // Combo Card Component
 const ComboCard = ({ combo, onEdit, onDelete, onToggleStatus }) => {
+  const [eventNames, setEventNames] = React.useState({});
+
+  // Helper to check if value is UUID
+  const isUUID = (value) => {
+    if (!value || typeof value !== 'string') return false;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(value);
+  };
+
+  // Fetch event names for UUIDs in quotas
+  React.useEffect(() => {
+    const fetchEventNames = async () => {
+      if (!combo.category_quotas) return;
+      
+      const uuids = Object.values(combo.category_quotas).filter(val => isUUID(val));
+      if (uuids.length === 0) return;
+
+      try {
+        const { data } = await supabase
+          .from('events')
+          .select('id, name')
+          .in('id', uuids);
+        
+        const namesMap = {};
+        data?.forEach(event => {
+          namesMap[event.id] = event.name;
+        });
+        setEventNames(namesMap);
+      } catch (error) {
+        console.error('Error fetching event names:', error);
+      }
+    };
+
+    fetchEventNames();
+  }, [combo.category_quotas]);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -211,20 +248,33 @@ const ComboCard = ({ combo, onEdit, onDelete, onToggleStatus }) => {
         </span>
       </div>
 
-      {/* Category Quotas */}
+      {/* Category Quotas with UUID/Count Detection */}
       <div className="mb-4">
         <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Category Requirements:</p>
         <div className="space-y-2">
-          {combo.category_quotas && Object.entries(combo.category_quotas).map(([category, count]) => (
-            count > 0 && (
-              <div key={category} className="flex items-center gap-2 text-sm">
-                <Check size={14} className="text-green-400" />
-                <span className="font-medium">{count}x</span>
-                <span>{category}</span>
-                <span className="text-xs text-gray-500">events</span>
-              </div>
-            )
-          ))}
+          {combo.category_quotas && Object.entries(combo.category_quotas).map(([category, value]) => {
+            const isSpecificEvent = isUUID(value);
+            return (
+              value && (
+                <div key={category} className="flex items-center gap-2 text-sm">
+                  <Check size={14} className={isSpecificEvent ? "text-purple-400" : "text-green-400"} />
+                  {isSpecificEvent ? (
+                    <>
+                      <span className="font-medium text-purple-400">Specific:</span>
+                      <span className="text-gray-300">{eventNames[value] || 'Loading...'}</span>
+                      <span className="text-xs text-gray-500">({category})</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-medium">{value}x</span>
+                      <span>{category}</span>
+                      <span className="text-xs text-gray-500">events</span>
+                    </>
+                  )}
+                </div>
+              )
+            );
+          })}
           {(!combo.category_quotas || Object.keys(combo.category_quotas).length === 0) && (
             <p className="text-xs text-gray-500">No category requirements set</p>
           )}
@@ -267,34 +317,107 @@ const ComboCard = ({ combo, onEdit, onDelete, onToggleStatus }) => {
 
 // Combo Modal Component
 const ComboModal = ({ isOpen, onClose, onSuccess, editingCombo }) => {
-  const CATEGORIES = ['Technical', 'Non-Technical', 'Workshop', 'Conference', 'Cultural', 'Sports', 'Gaming', 'Other'];
+  const CATEGORIES = ['Technical', 'Non-Technical', 'Workshop', 'Hackathon', 'Conference', 'Cultural', 'Sports', 'Gaming', 'Other'];
   
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: 0,
+    originalPrice: 0,
+    discountPercentage: 0,
     isActive: true,
-    categoryQuotas: {} // e.g., { "Workshop": 2, "Technical": 3 }
+    displayOrder: 0,
+    maxPurchases: 100,
+    badgeText: '',
+    badgeColor: '#10b981',
+    categoryQuotas: {}, // Can store either UUID or count: { "Workshop": "uuid-123" } or { "Workshop": 2 }
+    totalEventsRequired: 2
   });
+  const [categorySpecificEvents, setCategorySpecificEvents] = useState({}); // { "Technical": "uuid", ... }
+  const [categoryCounts, setCategoryCounts] = useState({}); // { "Technical": 2, ... }
+  const [availableEvents, setAvailableEvents] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [eventsLoading, setEventsLoading] = useState(false);
+
+  // Fetch available events for dropdowns
+  useEffect(() => {
+    if (isOpen) {
+      fetchEvents();
+    }
+  }, [isOpen]);
+
+  const fetchEvents = async () => {
+    setEventsLoading(true);
+    try {
+      const { data, error } = await supabase.from('events').select('id, name, event_key, category').eq('is_active', true);
+      if (error) {
+        console.error('Error fetching events:', error);
+      } else {
+        console.log('Fetched events:', data);
+        setAvailableEvents(data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    }
+    setEventsLoading(false);
+  };
+
+  // Helper to check if a value is a UUID
+  const isUUID = (value) => {
+    if (!value || typeof value !== 'string') return false;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(value);
+  };
 
   useEffect(() => {
     if (isOpen) {
       if (editingCombo) {
+        const quotas = editingCombo.category_quotas || {};
+        const specificEvents = {};
+        const counts = {};
+
+        // Separate UUIDs and counts
+        Object.entries(quotas).forEach(([category, value]) => {
+          if (isUUID(value)) {
+            specificEvents[category] = value;
+          } else if (typeof value === 'number' && value > 0) {
+            counts[category] = value;
+          }
+        });
+
+        setCategorySpecificEvents(specificEvents);
+        setCategoryCounts(counts);
+
         setFormData({
-          name: editingCombo.combo_name,
+          name: editingCombo.name || editingCombo.combo_name,
           description: editingCombo.description || '',
           price: editingCombo.price,
+          originalPrice: editingCombo.original_price || 0,
+          discountPercentage: editingCombo.discount_percentage || 0,
           isActive: editingCombo.is_active,
-          categoryQuotas: editingCombo.category_quotas || {}
+          displayOrder: editingCombo.display_order || 0,
+          maxPurchases: editingCombo.max_purchases || 100,
+          badgeText: editingCombo.badge_text || '',
+          badgeColor: editingCombo.badge_color || '#10b981',
+          categoryQuotas: quotas,
+          totalEventsRequired: editingCombo.total_events_required || 2
         });
       } else {
+        setCategorySpecificEvents({});
+        setCategoryCounts({});
         setFormData({
           name: '',
           description: '',
           price: 0,
+          originalPrice: 0,
+          discountPercentage: 0,
           isActive: true,
-          categoryQuotas: {}
+          displayOrder: 0,
+          maxPurchases: 100,
+          badgeText: '',
+          badgeColor: '#10b981',
+          categoryQuotas: {},
+          totalEventsRequired: 2
         });
       }
     }
@@ -303,13 +426,25 @@ const ComboModal = ({ isOpen, onClose, onSuccess, editingCombo }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation - check if category quotas total at least 2 events
-    const totalEvents = Object.values(formData.categoryQuotas)
-      .filter(v => typeof v === 'number' && v > 0)
-      .reduce((sum, val) => sum + val, 0);
+    // Build category quotas based on priority: specific event > count
+    const finalCategoryQuotas = {};
+    let totalEvents = 0;
+
+    CATEGORIES.forEach(category => {
+      // Priority 1: Check if a specific event is selected
+      if (categorySpecificEvents[category]) {
+        finalCategoryQuotas[category] = categorySpecificEvents[category]; // Store UUID
+        totalEvents += 1; // Each specific event counts as 1
+      }
+      // Priority 2: Check if a count is specified
+      else if (categoryCounts[category] && categoryCounts[category] > 0) {
+        finalCategoryQuotas[category] = parseInt(categoryCounts[category]); // Store count
+        totalEvents += parseInt(categoryCounts[category]);
+      }
+    });
 
     if (totalEvents < 2) {
-      alert('Category quotas must total at least 2 events');
+      alert('Category quotas must total at least 2 events (either specific events or counts)');
       return;
     }
 
@@ -320,9 +455,25 @@ const ComboModal = ({ isOpen, onClose, onSuccess, editingCombo }) => {
 
     setLoading(true);
 
+    // Prepare data for API
+    const apiData = {
+      name: formData.name,
+      description: formData.description,
+      price: formData.price,
+      originalPrice: formData.originalPrice,
+      discountPercentage: formData.discountPercentage,
+      categoryQuotas: finalCategoryQuotas,
+      totalEventsRequired: totalEvents,
+      isActive: formData.isActive,
+      displayOrder: formData.displayOrder,
+      maxPurchases: formData.maxPurchases,
+      badgeText: formData.badgeText,
+      badgeColor: formData.badgeColor
+    };
+
     const result = editingCombo
-      ? await comboService.updateCombo(editingCombo.combo_id, formData)
-      : await comboService.createCombo(formData);
+      ? await comboService.updateCombo(editingCombo.id || editingCombo.combo_id, apiData)
+      : await comboService.createCombo(apiData);
 
     if (result.success) {
       onSuccess();
@@ -387,68 +538,219 @@ const ComboModal = ({ isOpen, onClose, onSuccess, editingCombo }) => {
             </div>
 
             {/* Pricing */}
-            <div>
-              <label className="block text-sm font-bold mb-2 text-gray-400">Combo Price (₹) *</label>
-              <input
-                type="number"
-                required
-                min="1"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
-                placeholder="399"
-              />
-              <p className="text-xs text-gray-500 mt-2">
-                Students will select events matching the category quotas at purchase time
-              </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">Combo Price (₹) *</label>
+                <input
+                  type="number"
+                  required
+                  min="1"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                  placeholder="399"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">Original Price (₹)</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={formData.originalPrice}
+                  onChange={(e) => setFormData({ ...formData, originalPrice: parseInt(e.target.value) || 0 })}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                  placeholder="599"
+                />
+                <p className="text-xs text-gray-500 mt-1">For showing discount</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">Discount %</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={formData.discountPercentage}
+                  onChange={(e) => setFormData({ ...formData, discountPercentage: parseInt(e.target.value) || 0 })}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                  placeholder="33"
+                />
+              </div>
             </div>
 
-            {/* Category Quotas */}
+            {/* Additional Settings */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">Display Order</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={formData.displayOrder}
+                  onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                  placeholder="0"
+                />
+                <p className="text-xs text-gray-500 mt-1">Lower = shown first</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">Max Purchases</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={formData.maxPurchases}
+                  onChange={(e) => setFormData({ ...formData, maxPurchases: parseInt(e.target.value) || 100 })}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                  placeholder="100"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">Badge Text</label>
+                <input
+                  type="text"
+                  value={formData.badgeText}
+                  onChange={(e) => setFormData({ ...formData, badgeText: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                  placeholder="POPULAR"
+                />
+              </div>
+            </div>
+
+            {/* Pricing note */}
+            <div className="text-xs text-gray-500 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+              Students will select events matching the category quotas at purchase time
+            </div>
+
+            {/* Category Quotas - Dual Input System */}
             <div>
               <label className="block text-sm font-bold mb-2 text-gray-400">
                 Category Quotas * (Required - minimum 2 events total)
                 <span className="text-xs font-normal ml-2 text-gray-500">
-                  Define how many events from each category students must select
+                  Select a specific event OR set a count for each category
                 </span>
               </label>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {CATEGORIES.map(category => (
-                  <div key={category} className="bg-white/5 border border-white/10 rounded-xl p-3">
-                    <label className="block text-xs text-gray-400 mb-1">{category}</label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={formData.categoryQuotas[category] || 0}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value) || 0;
-                        setFormData({
-                          ...formData,
-                          categoryQuotas: {
-                            ...formData.categoryQuotas,
-                            [category]: value === 0 ? undefined : value
+              {eventsLoading && (
+                <div className="text-center py-4 text-gray-400">
+                  <Loader2 className="animate-spin inline mr-2" size={16} />
+                  Loading events...
+                </div>
+              )}
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {CATEGORIES.filter(category => {
+                  // Only show categories that have events in the database
+                  return availableEvents.some(event => 
+                    event.category?.toLowerCase().replace(/[-_\s]/g, '') === category.toLowerCase().replace(/[-_\s]/g, '')
+                  );
+                }).map(category => {
+                  // Get events for this category with flexible matching
+                  const categoryEvents = availableEvents.filter(event => 
+                    event.category?.toLowerCase().replace(/[-_\s]/g, '') === category.toLowerCase().replace(/[-_\s]/g, '')
+                  );
+                  
+                  return (
+                  <div key={category} className="bg-white/5 border border-white/10 rounded-xl p-4">
+                    <h4 className="text-sm font-bold text-gray-300 mb-3 capitalize">{category}</h4>
+                    
+                    {/* Specific Event Dropdown */}
+                    <div className="mb-3">
+                      <label className="block text-xs text-gray-400 mb-2">Specific Event</label>
+                      <select
+                        value={categorySpecificEvents[category] || ''}
+                        onChange={(e) => {
+                          setCategorySpecificEvents({
+                            ...categorySpecificEvents,
+                            [category]: e.target.value || undefined
+                          });
+                          // Clear count when specific event is selected
+                          if (e.target.value) {
+                            setCategoryCounts({
+                              ...categoryCounts,
+                              [category]: undefined
+                            });
                           }
-                        });
-                      }}
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-center focus:outline-none focus:border-secondary"
-                      placeholder="0"
-                    />
+                        }}
+                        className="w-full bg-gray-800 text-white border border-white/10 rounded-lg px-3 py-2 focus:outline-none focus:border-secondary"
+                        style={{ backgroundColor: '#1f2937', color: 'white' }}
+                      >
+                        <option value="" style={{ backgroundColor: '#1f2937', color: 'white' }}>-- None --</option>
+                        {categoryEvents.map(event => (
+                          <option key={event.id} value={event.id} style={{ backgroundColor: '#1f2937', color: 'white' }}>
+                            {event.name}
+                          </option>
+                        ))}
+                      </select>
+                      {categoryEvents.length > 0 && (
+                        <p className="text-xs text-gray-500 mt-1">{categoryEvents.length} event{categoryEvents.length > 1 ? 's' : ''} available</p>
+                      )}
+                    </div>
+                    
+                    {/* OR Separator */}
+                    <div className="text-center text-xs text-gray-500 font-bold my-2">- OR -</div>
+                    
+                    {/* Count Input */}
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-2">Event Count</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={categoryCounts[category] || ''}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0;
+                          setCategoryCounts({
+                            ...categoryCounts,
+                            [category]: value === 0 ? undefined : value
+                          });
+                          // Clear specific event when count is set
+                          if (value > 0) {
+                            setCategorySpecificEvents({
+                              ...categorySpecificEvents,
+                              [category]: undefined
+                            });
+                          }
+                        }}
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-center focus:outline-none focus:border-secondary"
+                        placeholder="0"
+                      />
+                    </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
               
+              {!eventsLoading && availableEvents.length === 0 && (
+                <div className="text-center py-4 text-gray-400 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
+                  <AlertCircle className="inline mr-2" size={16} />
+                  No active events found. Please create and activate events first.
+                </div>
+              )}
+              
               {/* Quota Summary */}
-              {Object.keys(formData.categoryQuotas).some(k => formData.categoryQuotas[k] > 0) && (
+              {(Object.keys(categorySpecificEvents).some(k => categorySpecificEvents[k]) || 
+                Object.keys(categoryCounts).some(k => categoryCounts[k] > 0)) && (
                 <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
                   <p className="text-xs text-blue-400 mb-2 font-bold">Student Selection Requirements:</p>
                   <div className="flex flex-wrap gap-2">
-                    {Object.entries(formData.categoryQuotas)
-                      .filter(([_, count]) => count > 0)
-                      .map(([category, count]) => (
-                        <span key={category} className="text-xs px-2 py-1 bg-blue-500/20 rounded-lg">
-                          {count} {category}
-                        </span>
-                      ))}
+                    {CATEGORIES.map(category => {
+                      if (categorySpecificEvents[category]) {
+                        const event = availableEvents.find(e => e.id === categorySpecificEvents[category]);
+                        return (
+                          <span key={category} className="text-xs px-2 py-1 bg-green-500/20 rounded-lg">
+                            Specific: {event ? event.name : 'Loading...'}
+                          </span>
+                        );
+                      } else if (categoryCounts[category] > 0) {
+                        return (
+                          <span key={category} className="text-xs px-2 py-1 bg-blue-500/20 rounded-lg">
+                            {categoryCounts[category]} {category}
+                          </span>
+                        );
+                      }
+                      return null;
+                    })}
                   </div>
                 </div>
               )}
