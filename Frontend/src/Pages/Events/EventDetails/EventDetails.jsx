@@ -365,7 +365,7 @@ const EventDetails = () => {
       description:
         "The AI Mystery Box Challenge is a one-day technical event designed to test participants’ analytical thinking, creativity, and practical skills in Artificial Intelligence and Machine Learning. This event offers a unique, problem-solving experience where teams are challenged with an unknown AI task revealed only at the start of the competition. Participants will receive a mystery box containing a real-world dataset and a problem statement. Once the box is opened upon official announcement, teams must quickly analyze the problem, design an appropriate machine learning solution, and develop a working model within the given time. To enhance practical applicability, teams are also required to integrate their model with a functional web interface, simulating industry-level AI deployment.The event encourages collaborative teamwork, effective time management, and hands- on implementation of AI concepts such as data preprocessing, model selection, training, evaluation, and deployment. With internet access permitted, participants can explore libraries, frameworks, and documentation to refine their solutions.The AI Mystery Box Challenge will be conducted at AI Lab 2 with a registration fee of ₹250 per head. This event is ideal for students who are passionate about AI, Data Science, and real-time problem solving, and who wish to showcase their technical expertise in a competitive environment.",
       image: Tech1,
-      rounds: [
+      /*rounds: [
         {
           title: "",
           description: [
@@ -374,7 +374,24 @@ const EventDetails = () => {
           ],
         },
         
-      ],
+      ],*//*
+      rewards: [
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,000",
+        },
+        {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹1,500",
+        },
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],*/
       rules: [
         "Participants must bring their own laptop; a minimum Intel i5 processor is required to ensure smooth model development and execution.",
         "Teams must consist of 2 to 3 members, and all members must be present throughout the event.",
@@ -427,7 +444,7 @@ const EventDetails = () => {
           },
         ],
       },
-      registrationLink: "https://forms.gle/JzY7C819nFQnmC2D9",
+      registrationLink: "",
     },
     "technical-event-2": {
       title: "System Sense – Usability & Analysis Challenge",
@@ -466,6 +483,24 @@ const EventDetails = () => {
           ],
         },
       ],
+
+      /*rewards: [
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,000",
+        },
+        {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹1,500",
+        },
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],*/
       rules: [
         "The competition consists of two rounds, conducted within a total duration of 2–3 hours.",
         "Participants may compete individually or in teams of two.",
@@ -502,7 +537,7 @@ const EventDetails = () => {
           },
         ],
       },
-      registrationLink: "https://forms.gle/rdVwYuEvx9Bpi5zk9", // Registration link
+      registrationLink: "", // Registration link
     },
 
     "technical-event-3": {
@@ -563,7 +598,7 @@ const EventDetails = () => {
         ],
       },
 
-      registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
+      registrationLink: "", // Registration link
     },
 
     "technical-event-4": {
@@ -582,6 +617,9 @@ const EventDetails = () => {
           description:"Submitted reels will be evaluated based on scientific understanding, originality, presentation quality, and audience impact. Shortlisted entries will be considered for final ranking and prizes.",
         }
       ],
+      
+
+
       rules: [
         "Participation is open to UG and PG students.",
 
@@ -1332,7 +1370,7 @@ const EventDetails = () => {
           {
             round: "Event Timing",
             date: "February 13, 2026",
-            time: "time need",
+            time: "9:30 AM - 3:00 PM",
             location: "Homi J Baba Hall (Conference Hall) (MCT Block)",
           },
         ],
@@ -2856,7 +2894,7 @@ const EventDetails = () => {
     {
       round: "Event Timing",
       date: "February 14, 2026",
-      time: "10:00 AM to 12.30PM",
+      time: "10:30 AM to 12.30PM",
       location: "Hall No: MC 306",
     },
   ],
@@ -4593,6 +4631,35 @@ image: workshop5,
             )}
           </div>
         </div>
+
+
+        {/* Rewards and Recognition Section */}
+        <div className="border border-primary-dark p-2 mb-5 " id="Rewards">
+          <div className="border border-primary-dark shadow-lg p-4 md:p-10">
+            <h2 className="text-center font-semibold text-2xl md:text-3xl mb-5 text-primary border border-primary-dark bg-primary-dark/30 px-3 py-3">
+              Rewards and Recognition
+            </h2>
+
+            {/* Prize List */}
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-12">
+              {event.rewards && event.rewards.map((reward, index) => {
+                const orderClass = index === 1 ? "order-1 sm:order-2 sm:mb-16" : index === 0 ? "order-2 sm:order-1 sm:mt-16" : "order-3 sm:mt-16";
+                return (
+                  <div key={index} className={`flex flex-col items-center bg-primary-dark/30 border border-primary-dark p-6 rounded-lg w-full max-w-xs shadow-md ${orderClass}`}>
+                    <span className="text-2xl font-bold">
+                      {reward.emoji} {reward.position}
+                    </span>
+                    <span className="text-3xl font-semibold text-white mt-2">
+                      {reward.amount}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+
         {/* Contact Section */}
         <ScrollAnimation>
           <div className="border border-primary-dark p-3 mt-6" id="Contact">

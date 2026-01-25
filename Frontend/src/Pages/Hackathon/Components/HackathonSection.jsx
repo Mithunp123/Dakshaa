@@ -55,7 +55,7 @@ const HackathonSection = () => {
         {
           position: "2nd Prize",
           emoji: "🥈",
-          amount: "₹30,000",
+          amount: "₹20,000",
         },
         {
           position: "1st Prize",
