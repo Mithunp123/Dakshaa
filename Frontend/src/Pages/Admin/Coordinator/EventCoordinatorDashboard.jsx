@@ -19,7 +19,9 @@ import {
   Clock,
   Sun,
   Moon,
-  RefreshCw
+  RefreshCw,
+  Phone,
+  Download
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -434,6 +436,47 @@ const EventCoordinatorDashboard = () => {
     }
   };
 
+  const exportToExcel = () => {
+    if (!selectedEvent || participants.length === 0) {
+      alert('No participants to export');
+      return;
+    }
+
+    // Prepare CSV data
+    const headers = ['S.No', 'Name', 'Dakshaa ID', 'Roll Number', 'College', 'Phone', 'Morning Attendance', 'Evening Attendance', 'Registration Date'];
+    
+    const rows = participants.map((p, index) => [
+      index + 1,
+      p.profiles?.full_name || 'N/A',
+      formatDakshaaId(p.user_id),
+      p.profiles?.roll_number || p.profiles?.roll_no || 'N/A',
+      p.profiles?.college_name || 'N/A',
+      p.profiles?.phone || 'N/A',
+      p.morningAttended ? 'Present' : 'Absent',
+      p.eveningAttended ? 'Present' : 'Absent',
+      p.created_at ? new Date(p.created_at).toLocaleDateString() : 'N/A'
+    ]);
+
+    // Create CSV content
+    let csvContent = headers.join(',') + '\n';
+    rows.forEach(row => {
+      csvContent += row.map(cell => `"${cell}"`).join(',') + '\n';
+    });
+
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    const fileName = `${selectedEvent?.name || 'event'}_participants_${new Date().toISOString().split('T')[0]}.csv`;
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', fileName);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // Use effect to initialize scanner when scanning state becomes true
   useEffect(() => {
     if (scanning && !html5QrCodeRef.current?.isScanning) {
@@ -802,6 +845,7 @@ const EventCoordinatorDashboard = () => {
       <div className="flex gap-2 p-1 bg-white/5 border-y border-white/10 overflow-x-auto">
         {[
           { id: 'scanner', label: 'QR Scanner', icon: Camera },
+          { id: 'participants', label: 'Participants', icon: Users },
           { id: 'manual', label: 'Manual', icon: Search },
           { id: 'winners', label: 'Winners', icon: Trophy }
         ].map(tab => (
@@ -946,6 +990,149 @@ const EventCoordinatorDashboard = () => {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* PARTICIPANTS TAB */}
+          {activeTab === 'participants' && (
+            <motion.div
+              key="participants"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-4"
+            >
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-lg flex items-center gap-2">
+                    <Users className="text-secondary" size={20} />
+                    All Registered Participants
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={exportToExcel}
+                      className="px-3 py-2 bg-green-500/20 text-green-500 rounded-lg text-sm font-bold hover:bg-green-500 hover:text-white transition-all flex items-center gap-2"
+                    >
+                      <Download size={16} />
+                      Export
+                    </button>
+                    <span className="px-3 py-1 bg-secondary/20 text-secondary rounded-lg text-sm font-bold">
+                      {participants.length} Total
+                    </span>
+                  </div>
+                </div>
+
+                <div className="relative mb-4">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
+                  <input
+                    type="text"
+                    placeholder="Search participants..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-3 focus:outline-none focus:border-secondary transition-all"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  {filteredParticipants.length > 0 ? (
+                    filteredParticipants.map((p, index) => {
+                      const hasAnyAttendance = p.morningAttended || p.eveningAttended;
+                      return (
+                        <div
+                          key={p.id}
+                          className={`p-4 rounded-xl border transition-all ${
+                            hasAnyAttendance
+                              ? 'bg-green-500/5 border-green-500/20'
+                              : 'bg-white/5 border-white/10'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-start gap-3 flex-1">
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                                hasAnyAttendance ? 'bg-green-500/20' : 'bg-secondary/20'
+                              }`}>
+                                <span className="font-bold text-sm">
+                                  {index + 1}
+                                </span>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-bold text-sm">{p.profiles?.full_name || 'N/A'}</p>
+                                <p className="text-xs text-secondary font-mono">{formatDakshaaId(p.user_id)}</p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {p.profiles?.roll_number || p.profiles?.roll_no || 'No Roll Number'}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  {p.profiles?.college_name || 'No College Info'}
+                                </p>
+                                {p.profiles?.phone && (
+                                  <a
+                                    href={`tel:${p.profiles.phone}`}
+                                    className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 mt-1 w-fit"
+                                  >
+                                    <Phone size={12} />
+                                    {p.profiles.phone}
+                                  </a>
+                                )}
+                                
+                                {/* Attendance Status */}
+                                <div className="flex gap-1 mt-2">
+                                  {p.morningAttended ? (
+                                    <span className="text-xs px-2 py-0.5 bg-yellow-500/20 text-yellow-500 rounded flex items-center gap-1">
+                                      <CheckCircle2 size={12} /> AM
+                                    </span>
+                                  ) : (
+                                    <span className="text-xs px-2 py-0.5 bg-gray-500/20 text-gray-500 rounded">
+                                      AM ✗
+                                    </span>
+                                  )}
+                                  {p.eveningAttended ? (
+                                    <span className="text-xs px-2 py-0.5 bg-indigo-500/20 text-indigo-500 rounded flex items-center gap-1">
+                                      <CheckCircle2 size={12} /> PM
+                                    </span>
+                                  ) : (
+                                    <span className="text-xs px-2 py-0.5 bg-gray-500/20 text-gray-500 rounded">
+                                      PM ✗
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {hasAnyAttendance && (
+                              <div className="flex-shrink-0">
+                                <CheckCircle2 className="text-green-500" size={20} />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-12">
+                      <Users className="mx-auto text-gray-600 mb-3" size={48} />
+                      <p className="text-gray-400">
+                        {searchTerm ? 'No participants match your search' : 'No participants registered yet'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Summary Card */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 text-center">
+                  <CheckCircle2 className="mx-auto text-green-500 mb-2" size={20} />
+                  <p className="text-xl font-bold text-green-500">{attendedParticipants.length}</p>
+                  <p className="text-xs text-gray-400">Attended</p>
+                </div>
+                <div className="bg-gray-500/10 border border-gray-500/20 rounded-2xl p-4 text-center">
+                  <AlertCircle className="mx-auto text-gray-500 mb-2" size={20} />
+                  <p className="text-xl font-bold text-gray-500">
+                    {participants.length - attendedParticipants.length}
+                  </p>
+                  <p className="text-xs text-gray-400">Not Attended</p>
                 </div>
               </div>
             </motion.div>
