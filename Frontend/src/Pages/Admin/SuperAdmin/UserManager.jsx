@@ -365,7 +365,7 @@ const UserManager = () => {
                     </div>
                     <div className="flex items-center gap-2 text-gray-400">
                       <span className="text-xs">Year:</span>
-                      <span className="font-medium text-gray-300">{user.year || 'N/A'}</span>
+                      <span className="font-medium text-gray-300">{user.year_of_study || 'N/A'}</span>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-sm">
@@ -564,9 +564,9 @@ const UserManager = () => {
                           onSave={(val) => handleUpdateProfile(selectedUser.id, { department: val })}
                         />
                         <EditableField 
-                          label="Year" 
-                          value={selectedUser.year} 
-                          onSave={(val) => handleUpdateProfile(selectedUser.id, { year: val })}
+                          label="Year of Study" 
+                          value={selectedUser.year_of_study} 
+                          onSave={(val) => handleUpdateProfile(selectedUser.id, { year_of_study: val })}
                         />
                         <EditableField 
                           label="Gender" 
