@@ -446,7 +446,7 @@ const RegistrationForm = () => {
   // Memoized categories - prevents recalculation on every render
   const categories = useMemo(() => {
     // Define the preferred categories as requested by user - these will ALWAYS be shown
-    const alwaysShowCategories = ["Technical", "Non-Technical", "Team Events", "Hackathon"];
+    const alwaysShowCategories = ["Technical", "Non-Technical", "Team Events", "Hackathon", "Sports"];
     
     // Additional categories that only show if events exist
     const optionalCategories = ["Conference", "Workshop"];
@@ -544,12 +544,14 @@ const RegistrationForm = () => {
       if (categoryFilter === "ALL") {
         matchesCategory = true;
       } else if (categoryFilter === "Team Events") {
-        matchesCategory = isTeamEvent;
+        // Check both the boolean flag and team size
+        matchesCategory = isTeamEvent || (event.is_team_event === true);
       } else if (categoryFilter === "Hackathon") {
         // Match if category or name contains "hackathon"
         matchesCategory = eventCategory.includes("hackathon") || eventName.includes("hackathon");
       } else {
-        matchesCategory = event.category === categoryFilter;
+        // Case-insensitive comparison for category
+        matchesCategory = eventCategory === categoryFilter.toLowerCase();
       }
 
       return matchesSearch && matchesCategory;
@@ -2074,6 +2076,7 @@ const RegistrationForm = () => {
                                             cat === "Hackathon" ? "HACKATHON" :
                                             cat === "Conference" ? "CONFERENCE" :
                                             cat === "Workshop" ? "WORKSHOP" :
+                                            cat === "Sports" ? "SPORTS" :
                                             cat.toUpperCase();
                           
                           return (
