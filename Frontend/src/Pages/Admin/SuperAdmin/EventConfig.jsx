@@ -19,7 +19,9 @@ import {
   TrendingUp,
   Calendar,
   Lock,
-  Unlock
+  Unlock,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import eventConfigService from '../../../services/eventConfigService';
 
@@ -27,13 +29,14 @@ const EventConfig = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({});
+  const [editingEvent, setEditingEvent] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterType, setFilterType] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [expandedDescriptions, setExpandedDescriptions] = useState({});
   const [stats, setStats] = useState({
     totalEvents: 0,
     openEvents: 0,
@@ -72,26 +75,8 @@ const EventConfig = () => {
   };
 
   const startEditing = (event) => {
-    setEditingId(event.id);
-    setEditForm({
-      name: event.name,
-      description: event.description || '',
-      category: event.category || 'Technical',
-      price: event.price,
-      capacity: event.capacity,
-      type: event.type,
-      is_open: event.is_open
-    });
-  };
-
-  const handleUpdate = async (eventId) => {
-    const result = await eventConfigService.updateEvent(eventId, editForm);
-    if (result.success) {
-      setEditingId(null);
-      fetchEvents();
-    } else {
-      alert('Update failed: ' + result.error);
-    }
+    setEditingEvent(event);
+    setShowEditModal(true);
   };
 
   const handleToggleStatus = async (eventId) => {
@@ -143,14 +128,48 @@ const EventConfig = () => {
     }
   };
 
+  const handleBulkCategoryStatusChange = async (category, status) => {
+    // Get IDs of events in the specified category
+    const categoryEvents = events.filter(e => 
+      e.category && e.category.toLowerCase() === category.toLowerCase()
+    );
+    const eventIds = categoryEvents.map(e => e.id);
+    
+    if (eventIds.length === 0) {
+      alert(`No events found in ${category} category`);
+      return;
+    }
+    
+    const action = status ? 'open' : 'close';
+    const confirmMessage = `Are you sure you want to ${action} all ${eventIds.length} events in the ${category} category?`;
+    
+    if (!confirm(confirmMessage)) return;
+
+    setLoading(true);
+    const result = await eventConfigService.updateEventsStatus(eventIds, status);
+    
+    if (result.success) {
+      setTimeout(async () => {
+        await fetchEvents();
+        setLoading(false);
+      }, 500);
+    } else {
+      alert(`Bulk ${action} for ${category} failed: ` + result.error);
+      setLoading(false);
+    }
+  };
+
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         event.event_key.toLowerCase().includes(searchTerm.toLowerCase());
+                         (event.event_key || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || 
                          (filterStatus === 'open' && event.is_open) ||
                          (filterStatus === 'closed' && !event.is_open);
-    const matchesType = filterType === 'all' || event.type === filterType;
-    const matchesCategory = filterCategory === 'all' || event.category === filterCategory;
+    const matchesType = filterType === 'all' || 
+                       (filterType === 'SOLO' && !event.is_team_event) ||
+                       (filterType === 'TEAM' && event.is_team_event);
+    const matchesCategory = filterCategory === 'all' || 
+                           (event.category && event.category.toLowerCase() === filterCategory.toLowerCase());
     return matchesSearch && matchesStatus && matchesType && matchesCategory;
   });
 
@@ -287,6 +306,8 @@ const EventConfig = () => {
             <option value="Non-Technical" className="bg-slate-900">Non-Technical</option>
             <option value="Workshop" className="bg-slate-900">Workshop</option>
             <option value="Conference" className="bg-slate-900">Conference</option>
+            <option value="Hackathon" className="bg-slate-900">Hackathon</option>
+            <option value="Sports" className="bg-slate-900">Sports</option>
           </select>
         </div>
 
@@ -309,8 +330,37 @@ const EventConfig = () => {
         </div>
       </div>
 
-      {/* Events Table */}
-      <div className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden">
+      {/* Category Bulk Actions */}
+      <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <Settings size={20} className="text-secondary" />
+          Bulk Actions by Category
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {['Technical', 'Non-Technical', 'Workshop', 'Conference', 'Hackathon', 'Sports'].map(category => (
+            <div key={category} className="bg-white/5 border border-white/10 rounded-2xl p-4">
+              <p className="text-sm font-bold mb-3 text-gray-300">{category}</p>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => handleBulkCategoryStatusChange(category, true)}
+                  className="px-3 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1"
+                >
+                  <Unlock size={14} /> Open
+                </button>
+                <button
+                  onClick={() => handleBulkCategoryStatusChange(category, false)}
+                  className="px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1"
+                >
+                  <Lock size={14} /> Close
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Events Table - Desktop View */}
+      <div className="hidden lg:block bg-white/5 border border-white/10 rounded-3xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -318,6 +368,7 @@ const EventConfig = () => {
                 <th className="p-6 font-bold text-gray-400 uppercase tracking-wider text-xs">Event</th>
                 <th className="p-6 font-bold text-gray-400 uppercase tracking-wider text-xs">Category</th>
                 <th className="p-6 font-bold text-gray-400 uppercase tracking-wider text-xs">Type</th>
+                <th className="p-6 font-bold text-gray-400 uppercase tracking-wider text-xs">Team Size</th>
                 <th className="p-6 font-bold text-gray-400 uppercase tracking-wider text-xs">Price</th>
                 <th className="p-6 font-bold text-gray-400 uppercase tracking-wider text-xs">Capacity</th>
                 <th className="p-6 font-bold text-gray-400 uppercase tracking-wider text-xs">Fill Rate</th>
@@ -328,105 +379,80 @@ const EventConfig = () => {
             <tbody className="divide-y divide-white/5">
               {filteredEvents.map((event) => {
                 const fillRate = (event.current_registrations / event.capacity) * 100;
-                const isEditing = editingId === event.id;
 
                 return (
                   <tr key={event.id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="p-6">
-                      {isEditing ? (
-                        <div className="space-y-2">
-                          <input 
-                            type="text" 
-                            value={editForm.name}
-                            onChange={(e) => setEditForm({...editForm, name: e.target.value})}
-                            className="bg-slate-900 border border-white/20 rounded-lg px-3 py-2 w-full focus:border-secondary outline-none"
-                            placeholder="Event Name"
-                          />
-                          <input 
-                            type="text" 
-                            value={editForm.description}
-                            onChange={(e) => setEditForm({...editForm, description: e.target.value})}
-                            className="bg-slate-900 border border-white/20 rounded-lg px-3 py-2 w-full focus:border-secondary outline-none text-sm"
-                            placeholder="Description"
-                          />
-                        </div>
-                      ) : (
-                        <div>
-                          <p className="font-bold">{event.name}</p>
-                          <p className="text-xs text-gray-500 font-mono">{event.event_key}</p>
-                          {event.description && (
-                            <p className="text-xs text-gray-400 mt-1">{event.description}</p>
-                          )}
-                        </div>
-                      )}
+                      <div>
+                        <p className="font-bold">{event.name}</p>
+                        <p className="text-xs text-gray-500 font-mono">{event.event_key}</p>
+                        {event.description && (
+                          <div className="mt-1">
+                            <p className={`text-xs text-gray-400 ${
+                              !expandedDescriptions[event.id] ? 'line-clamp-2' : ''
+                            }`}>
+                              {event.description}
+                            </p>
+                            {event.description.length > 100 && (
+                              <button
+                                onClick={() => setExpandedDescriptions(prev => ({
+                                  ...prev,
+                                  [event.id]: !prev[event.id]
+                                }))}
+                                className="text-xs text-secondary hover:text-primary mt-1 flex items-center gap-1 transition-colors"
+                              >
+                                {expandedDescriptions[event.id] ? (
+                                  <>
+                                    <ChevronUp size={12} /> Show Less
+                                  </>
+                                ) : (
+                                  <>
+                                    <ChevronDown size={12} /> Show More
+                                  </>
+                                )}
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="p-6">
-                      {isEditing ? (
-                        <select
-                          value={editForm.category}
-                          onChange={(e) => setEditForm({...editForm, category: e.target.value})}
-                          className="bg-slate-900 border border-white/20 rounded-lg px-3 py-2 focus:border-secondary outline-none"
-                        >
-                          <option value="Technical">Technical</option>
-                          <option value="Non-Technical">Non-Technical</option>
-                          <option value="Workshop">Workshop</option>
-                          <option value="Conference">Conference</option>
-                        </select>
-                      ) : (
-                        <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-wider">
-                          {event.category || 'Uncategorized'}
-                        </span>
-                      )}
+                      <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-wider">
+                        {event.category || 'Uncategorized'}
+                      </span>
                     </td>
                     <td className="p-6">
-                      {isEditing ? (
-                        <select
-                          value={editForm.type}
-                          onChange={(e) => setEditForm({...editForm, type: e.target.value})}
-                          className="bg-slate-900 border border-white/20 rounded-lg px-3 py-2 focus:border-secondary outline-none"
-                        >
-                          <option value="SOLO">SOLO</option>
-                          <option value="TEAM">TEAM</option>
-                        </select>
-                      ) : (
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                          event.type === 'SOLO' 
-                            ? 'bg-blue-500/10 text-blue-400' 
-                            : 'bg-purple-500/10 text-purple-400'
-                        }`}>
-                          {event.type}
-                        </span>
-                      )}
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                        event.is_team_event 
+                          ? 'bg-purple-500/10 text-purple-400' 
+                          : 'bg-blue-500/10 text-blue-400'
+                      }`}>
+                        {event.is_team_event ? 'TEAM' : 'SOLO'}
+                      </span>
                     </td>
                     <td className="p-6">
-                      {isEditing ? (
-                        <input 
-                          type="number" 
-                          value={editForm.price}
-                          onChange={(e) => setEditForm({...editForm, price: parseInt(e.target.value)})}
-                          className="bg-slate-900 border border-white/20 rounded-lg px-3 py-2 w-24 focus:border-secondary outline-none"
-                        />
-                      ) : (
+                      {event.is_team_event ? (
                         <div className="flex items-center gap-2">
-                          <DollarSign size={14} className="text-gray-500" />
-                          <span className="font-bold">₹{event.price}</span>
+                          <Users size={14} className="text-purple-400" />
+                          <span className="text-sm">
+                            {event.min_team_size || 1} - {event.max_team_size || 1}
+                          </span>
                         </div>
+                      ) : (
+                        <span className="text-gray-500 text-sm">-</span>
                       )}
                     </td>
                     <td className="p-6">
-                      {isEditing ? (
-                        <input 
-                          type="number" 
-                          value={editForm.capacity}
-                          onChange={(e) => setEditForm({...editForm, capacity: parseInt(e.target.value)})}
-                          className="bg-slate-900 border border-white/20 rounded-lg px-3 py-2 w-24 focus:border-secondary outline-none"
-                        />
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <Users size={14} className="text-gray-500" />
-                          <span>{event.current_registrations || 0} / {event.capacity}</span>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <DollarSign size={14} className="text-gray-500" />
+                        <span className="font-bold">₹{event.price}</span>
+                      </div>
+                    </td>
+                    <td className="p-6">
+                      <div className="flex items-center gap-2">
+                        <Users size={14} className="text-gray-500" />
+                        <span>{event.current_registrations || 0} / {event.capacity}</span>
+                      </div>
                     </td>
                     <td className="p-6">
                       <div className="flex items-center gap-3">
@@ -447,66 +473,35 @@ const EventConfig = () => {
                       </div>
                     </td>
                     <td className="p-6">
-                      {isEditing ? (
-                        <button
-                          onClick={() => setEditForm({...editForm, is_open: !editForm.is_open})}
-                          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                            editForm.is_open
-                              ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                              : 'bg-gray-500/20 text-gray-400 hover:bg-gray-500/30'
-                          }`}
-                        >
-                          {editForm.is_open ? <Unlock size={12} /> : <Lock size={12} />}
-                          {editForm.is_open ? 'Open' : 'Closed'}
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleToggleStatus(event.id)}
-                          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                            event.is_open
-                              ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                              : 'bg-gray-500/20 text-gray-400 hover:bg-gray-500/30'
-                          }`}
-                        >
-                          {event.is_open ? <Unlock size={12} /> : <Lock size={12} />}
-                          {event.is_open ? 'Open' : 'Closed'}
-                        </button>
-                      )}
+                      <button
+                        onClick={() => handleToggleStatus(event.id)}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                          event.is_open
+                            ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                            : 'bg-gray-500/20 text-gray-400 hover:bg-gray-500/30'
+                        }`}
+                      >
+                        {event.is_open ? <Unlock size={12} /> : <Lock size={12} />}
+                        {event.is_open ? 'Open' : 'Closed'}
+                      </button>
                     </td>
                     <td className="p-6 text-right">
-                      {isEditing ? (
-                        <div className="flex items-center justify-end gap-2">
-                          <button 
-                            onClick={() => handleUpdate(event.id)}
-                            className="p-2 bg-green-500/20 text-green-500 rounded-lg hover:bg-green-500 hover:text-white transition-all"
-                          >
-                            <Save size={18} />
-                          </button>
-                          <button 
-                            onClick={() => setEditingId(null)}
-                            className="p-2 bg-red-500/20 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"
-                          >
-                            <X size={18} />
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-end gap-2">
-                          <button 
-                            onClick={() => startEditing(event)}
-                            className="p-2 bg-white/5 text-gray-400 rounded-lg hover:bg-secondary hover:text-white transition-all"
-                            title="Edit Event"
-                          >
-                            <Edit2 size={18} />
-                          </button>
-                          <button 
-                            onClick={() => handleDelete(event.id)}
-                            className="p-2 bg-white/5 text-gray-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"
-                            title="Delete Event"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      )}
+                      <div className="flex items-center justify-end gap-2">
+                        <button 
+                          onClick={() => startEditing(event)}
+                          className="p-2 bg-white/5 text-gray-400 rounded-lg hover:bg-secondary hover:text-white transition-all"
+                          title="Edit Event"
+                        >
+                          <Edit2 size={18} />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(event.id)}
+                          className="p-2 bg-white/5 text-gray-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"
+                          title="Delete Event"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -514,6 +509,148 @@ const EventConfig = () => {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Events Cards - Mobile View */}
+      <div className="lg:hidden space-y-4">
+        {filteredEvents.map((event) => {
+          const fillRate = (event.current_registrations / event.capacity) * 100;
+          
+          return (
+            <motion.div
+              key={event.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gradient-to-br from-slate-900/90 to-slate-800/50 border border-white/10 rounded-3xl p-5 space-y-4 shadow-xl"
+            >
+              {/* Event Name & Key */}
+              <div>
+                <h3 className="text-base font-bold leading-snug">{event.name}</h3>
+                <p className="text-[10px] text-gray-500 font-mono mt-1">{event.event_key}</p>
+                {event.description && (
+                  <div className="mt-2">
+                    <p className={`text-xs text-gray-400 leading-relaxed ${
+                      !expandedDescriptions[event.id] ? 'line-clamp-2' : ''
+                    }`}>
+                      {event.description}
+                    </p>
+                    {event.description.length > 100 && (
+                      <button
+                        onClick={() => setExpandedDescriptions(prev => ({
+                          ...prev,
+                          [event.id]: !prev[event.id]
+                        }))}
+                        className="text-[11px] text-secondary hover:text-primary mt-2 flex items-center gap-1 transition-colors font-medium"
+                      >
+                        {expandedDescriptions[event.id] ? (
+                          <>
+                            <ChevronUp size={12} /> Show Less
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown size={12} /> Show More
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Badges Row */}
+              <div className="flex flex-wrap gap-2">
+                <span className="px-3 py-1.5 bg-primary/10 text-primary rounded-full text-[10px] font-bold uppercase tracking-wide">
+                  {event.category || 'Uncategorized'}
+                </span>
+                <span className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${
+                  event.is_team_event 
+                    ? 'bg-purple-500/10 text-purple-400' 
+                    : 'bg-blue-500/10 text-blue-400'
+                }`}>
+                  {event.is_team_event ? 'TEAM' : 'SOLO'}
+                </span>
+                <button
+                  onClick={() => handleToggleStatus(event.id)}
+                  className={`px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wide ${
+                    event.is_open
+                      ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                      : 'bg-gray-500/20 text-gray-400 hover:bg-gray-500/30'
+                  }`}
+                >
+                  {event.is_open ? 'OPEN' : 'CLOSED'}
+                </button>
+              </div>
+
+              {/* Info Grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white/5 border border-white/5 rounded-2xl p-3.5">
+                  <p className="text-[10px] text-gray-400 mb-1.5 uppercase tracking-wide font-medium">Price</p>
+                  <p className="text-lg font-bold flex items-center gap-1">
+                    <DollarSign size={16} className="text-gray-500" />
+                    ₹{event.price}
+                  </p>
+                </div>
+                
+                <div className="bg-white/5 border border-white/5 rounded-2xl p-3.5">
+                  <p className="text-[10px] text-gray-400 mb-1.5 uppercase tracking-wide font-medium">Capacity</p>
+                  <p className="text-sm font-bold flex items-center gap-1">
+                    <Users size={16} className="text-gray-500" />
+                    {event.current_registrations || 0} / {event.capacity}
+                  </p>
+                </div>
+
+                {event.is_team_event && (
+                  <div className="col-span-2 bg-purple-500/5 border border-purple-500/20 rounded-2xl p-3.5">
+                    <p className="text-[10px] text-gray-400 mb-1.5 uppercase tracking-wide font-medium">Team Size</p>
+                    <p className="text-sm font-bold flex items-center gap-1 text-purple-400">
+                      <Users size={16} />
+                      {event.min_team_size || 1} - {event.max_team_size || 1}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Fill Rate */}
+              <div className="bg-white/5 border border-white/5 rounded-2xl p-3.5">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] text-gray-400 uppercase tracking-wide font-medium">Fill Rate</span>
+                  <span className={`text-base font-bold ${getFillRateColor(fillRate)}`}>
+                    {fillRate.toFixed(0)}%
+                  </span>
+                </div>
+                <div className="bg-white/5 rounded-full h-2.5 overflow-hidden shadow-inner">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${fillRate}%` }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className={`h-full ${
+                      fillRate >= 90 ? 'bg-red-500' :
+                      fillRate >= 70 ? 'bg-orange-500' :
+                      'bg-green-500'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2.5 pt-1">
+                <button 
+                  onClick={() => startEditing(event)}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 bg-gradient-to-r from-secondary/20 to-primary/20 hover:from-secondary/30 hover:to-primary/30 border border-secondary/30 hover:border-secondary rounded-2xl text-sm font-bold transition-all shadow-lg shadow-secondary/10"
+                >
+                  <Edit2 size={16} />
+                  Edit
+                </button>
+                <button 
+                  onClick={() => handleDelete(event.id)}
+                  className="flex items-center justify-center gap-2 px-4 py-3.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500 text-red-400 rounded-2xl text-sm font-bold transition-all"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
 
       {filteredEvents.length === 0 && (
@@ -529,7 +666,426 @@ const EventConfig = () => {
         onClose={() => setShowAddModal(false)}
         onSuccess={fetchEvents}
       />
+
+      {/* Edit Event Modal */}
+      <EditEventModal 
+        isOpen={showEditModal}
+        event={editingEvent}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditingEvent(null);
+        }}
+        onSuccess={fetchEvents}
+      />
     </div>
+  );
+};
+
+// Edit Event Modal Component
+const EditEventModal = ({ isOpen, event, onClose, onSuccess }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    venue: '',
+    category: 'Technical',
+    event_type: 'SOLO',
+    price: 0,
+    capacity: 100,
+    is_team_event: false,
+    min_team_size: 1,
+    max_team_size: 1,
+    is_open: true,
+    is_active: true,
+    current_status: 'upcoming',
+    event_date: '',
+    start_time: '',
+    end_time: '',
+    coordinator_name: '',
+    coordinator_contact: ''
+  });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (event) {
+      setFormData({
+        name: event.name || '',
+        description: event.description || '',
+        venue: event.venue || '',
+        category: event.category || 'Technical',
+        event_type: event.type || 'SOLO',
+        price: event.price || 0,
+        capacity: event.capacity || 100,
+        is_team_event: event.type === 'TEAM',
+        min_team_size: event.min_team_size || 1,
+        max_team_size: event.max_team_size || 1,
+        is_open: event.is_open ?? true,
+        is_active: event.is_active ?? true,
+        current_status: event.current_status || 'upcoming',
+        event_date: event.event_date || '',
+        start_time: event.start_time || '',
+        end_time: event.end_time || '',
+        coordinator_name: event.coordinator_name || '',
+        coordinator_contact: event.coordinator_contact || ''
+      });
+    }
+  }, [event]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!event) return;
+    
+    setLoading(true);
+
+    const result = await eventConfigService.updateEvent(event.id, formData);
+    
+    if (result.success) {
+      onSuccess();
+      onClose();
+    } else {
+      alert('Failed to update event: ' + result.error);
+    }
+    
+    setLoading(false);
+  };
+
+  if (!isOpen || !event) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          onClick={(e) => e.stopPropagation()}
+          className="bg-slate-900 border border-white/10 rounded-3xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold">Edit Event</h3>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Event ID (read-only) */}
+            <div>
+              <label className="block text-sm font-bold mb-2 text-gray-400">
+                Event ID
+              </label>
+              <input
+                type="text"
+                value={event.event_key || event.id}
+                disabled
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-gray-500 cursor-not-allowed"
+              />
+              <p className="text-xs text-gray-500 mt-1">Cannot be changed</p>
+            </div>
+
+            {/* Event Name */}
+            <div>
+              <label className="block text-sm font-bold mb-2 text-gray-400">
+                Event Name *
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-bold mb-2 text-gray-400">
+                Description
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                rows={3}
+              />
+            </div>
+
+            {/* Category and Event Type */}
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">
+                  Category *
+                </label>
+                <select
+                  required
+                  value={formData.category}
+                  onChange={(e) => setFormData({...formData, category: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                >
+                  <option value="Technical" className="bg-slate-900">Technical</option>
+                  <option value="Non-Technical" className="bg-slate-900">Non-Technical</option>
+                  <option value="Workshop" className="bg-slate-900">Workshop</option>
+                  <option value="Conference" className="bg-slate-900">Conference</option>
+                  <option value="Hackathon" className="bg-slate-900">Hackathon</option>
+                  <option value="Sports" className="bg-slate-900">Sports</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">
+                  Event Type
+                </label>
+                <select
+                  value={formData.event_type}
+                  onChange={(e) => setFormData({...formData, event_type: e.target.value})}
+                  disabled
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-gray-500 cursor-not-allowed"
+                >
+                  <option value="SOLO" className="bg-slate-900">SOLO</option>
+                  <option value="TEAM" className="bg-slate-900">TEAM</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Price, Capacity, Venue */}
+            <div className="grid grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">
+                  Price (₹) *
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  value={formData.price}
+                  onChange={(e) => setFormData({...formData, price: parseInt(e.target.value) || 0})}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">
+                  Capacity *
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="1"
+                  value={formData.capacity}
+                  onChange={(e) => setFormData({...formData, capacity: parseInt(e.target.value) || 1})}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">
+                  Venue
+                </label>
+                <input
+                  type="text"
+                  value={formData.venue}
+                  onChange={(e) => setFormData({...formData, venue: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                />
+              </div>
+            </div>
+
+            {/* Registration Open, Event Active, Current Status */}
+            <div className="grid grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">
+                  Registration Open
+                </label>
+                <select
+                  value={formData.is_open ? 'Yes' : 'No'}
+                  onChange={(e) => setFormData({...formData, is_open: e.target.value === 'Yes'})}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                >
+                  <option value="Yes" className="bg-slate-900">Yes</option>
+                  <option value="No" className="bg-slate-900">No</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">
+                  Event Active
+                </label>
+                <select
+                  value={formData.is_active ? 'Yes' : 'No'}
+                  onChange={(e) => setFormData({...formData, is_active: e.target.value === 'Yes'})}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                >
+                  <option value="Yes" className="bg-slate-900">Yes</option>
+                  <option value="No" className="bg-slate-900">No</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">
+                  Current Status
+                </label>
+                <select
+                  value={formData.current_status}
+                  onChange={(e) => setFormData({...formData, current_status: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                >
+                  <option value="upcoming" className="bg-slate-900">Upcoming</option>
+                  <option value="ongoing" className="bg-slate-900">Ongoing</option>
+                  <option value="completed" className="bg-slate-900">Completed</option>
+                  <option value="cancelled" className="bg-slate-900">Cancelled</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Team Settings (if team event) */}
+            {formData.event_type === 'TEAM' && (
+              <div className="grid grid-cols-3 gap-6 bg-purple-500/5 border border-purple-500/20 rounded-2xl p-4">
+                <div>
+                  <label className="block text-sm font-bold mb-2 text-gray-400">
+                    Is Team Event
+                  </label>
+                  <select
+                    value={formData.is_team_event ? 'Yes' : 'No (Individual)'}
+                    onChange={(e) => setFormData({...formData, is_team_event: e.target.value.startsWith('Yes')})}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                  >
+                    <option value="Yes" className="bg-slate-900">Yes</option>
+                    <option value="No (Individual)" className="bg-slate-900">No (Individual)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold mb-2 text-gray-400">
+                    Min Team Size
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={formData.min_team_size}
+                    onChange={(e) => setFormData({...formData, min_team_size: parseInt(e.target.value) || 1})}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold mb-2 text-gray-400">
+                    Max Team Size
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={formData.max_team_size}
+                    onChange={(e) => setFormData({...formData, max_team_size: parseInt(e.target.value) || 1})}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Event Date and Time */}
+            <div className="grid grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">
+                  Event Date
+                </label>
+                <input
+                  type="date"
+                  value={formData.event_date}
+                  onChange={(e) => setFormData({...formData, event_date: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">
+                  Start Time
+                </label>
+                <input
+                  type="time"
+                  value={formData.start_time}
+                  onChange={(e) => setFormData({...formData, start_time: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">
+                  End Time
+                </label>
+                <input
+                  type="time"
+                  value={formData.end_time}
+                  onChange={(e) => setFormData({...formData, end_time: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                />
+              </div>
+            </div>
+
+            {/* Coordinator Details */}
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">
+                  Coordinator Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.coordinator_name}
+                  onChange={(e) => setFormData({...formData, coordinator_name: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-gray-400">
+                  Coordinator Contact
+                </label>
+                <input
+                  type="tel"
+                  value={formData.coordinator_contact}
+                  onChange={(e) => setFormData({...formData, coordinator_contact: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-4 pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-6 py-3 bg-white/5 rounded-2xl font-bold hover:bg-white/10 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-secondary to-primary rounded-2xl font-bold hover:shadow-lg hover:shadow-secondary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="animate-spin" size={20} />
+                    Saving Changes...
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2">
+                    <Save size={20} />
+                    Save Changes
+                  </span>
+                )}
+              </button>
+            </div>
+          </form>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 
@@ -543,6 +1099,8 @@ const AddEventModal = ({ isOpen, onClose, onSuccess }) => {
     price: 0,
     type: 'SOLO',
     capacity: 100,
+    min_team_size: 1,
+    max_team_size: 4,
     is_open: true
   });
   const [loading, setLoading] = useState(false);
@@ -564,6 +1122,8 @@ const AddEventModal = ({ isOpen, onClose, onSuccess }) => {
         price: 0,
         type: 'SOLO',
         capacity: 100,
+        min_team_size: 1,
+        max_team_size: 4,
         is_open: true
       });
     } else {
@@ -645,6 +1205,8 @@ const AddEventModal = ({ isOpen, onClose, onSuccess }) => {
                 <option value="Non-Technical" className="bg-slate-900">Non-Technical</option>
                 <option value="Workshop" className="bg-slate-900">Workshop</option>
                 <option value="Conference" className="bg-slate-900">Conference</option>
+                <option value="Hackathon" className="bg-slate-900">Hackathon</option>
+                <option value="Sports" className="bg-slate-900">Sports</option>
               </select>
             </div>
 
@@ -722,6 +1284,41 @@ const AddEventModal = ({ isOpen, onClose, onSuccess }) => {
                 />
               </div>
             </div>
+
+            {/* Team Size Settings (if TEAM type) */}
+            {formData.type === 'TEAM' && (
+              <div className="grid grid-cols-2 gap-6 bg-purple-500/5 border border-purple-500/20 rounded-2xl p-4">
+                <div>
+                  <label className="block text-sm font-bold mb-2 text-gray-400">
+                    Min Team Size *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={formData.min_team_size || 1}
+                    onChange={(e) => setFormData({...formData, min_team_size: parseInt(e.target.value) || 1})}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                    placeholder="2"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold mb-2 text-gray-400">
+                    Max Team Size *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={formData.max_team_size || 4}
+                    onChange={(e) => setFormData({...formData, max_team_size: parseInt(e.target.value) || 4})}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
+                    placeholder="4"
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center gap-3">
               <input
