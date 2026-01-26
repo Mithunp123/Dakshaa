@@ -25,20 +25,14 @@ if (supabaseAnonKey.length < 100) {
   throw new Error('Supabase Anon Key appears to be invalid. Please check your .env file.');
 }
 
-console.log('✅ Supabase client initializing...');
-console.log('URL:', supabaseUrl);
-console.log('Key length:', supabaseAnonKey.length, 'characters');
-
 // Migrate session from sessionStorage to localStorage (one-time migration)
 try {
   const sessionKey = `sb-${supabaseUrl.split('//')[1].split('.')[0]}-auth-token`;
   const sessionData = window.sessionStorage.getItem(sessionKey);
   
   if (sessionData && !window.localStorage.getItem(sessionKey)) {
-    console.log('🔄 Migrating session from sessionStorage to localStorage...');
     window.localStorage.setItem(sessionKey, sessionData);
     window.sessionStorage.removeItem(sessionKey);
-    console.log('✅ Session migrated successfully!');
   }
 } catch (migrationError) {
   console.warn('⚠️ Session migration failed (non-critical):', migrationError.message);
@@ -60,28 +54,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 // Debug: Check session on initialization
-(async () => {
-  const sessionKey = `sb-${supabaseUrl.split('//')[1].split('.')[0]}-auth-token`;
-  const storedSession = window.localStorage.getItem(sessionKey);
-  console.log('🔐 Session storage check:', {
-    hasStoredSession: !!storedSession,
-    sessionKeyUsed: sessionKey
-  });
-  
-  // Also try to parse and validate the stored session
-  if (storedSession) {
-    try {
-      const parsed = JSON.parse(storedSession);
-      console.log('🔐 Stored session details:', {
-        hasAccessToken: !!parsed.access_token,
-        hasRefreshToken: !!parsed.refresh_token,
-        expiresAt: parsed.expires_at ? new Date(parsed.expires_at * 1000).toLocaleString() : 'none'
-      });
-    } catch (e) {
-      console.warn('⚠️ Could not parse stored session');
-    }
-  }
-})();
+// Session storage is now configured to use localStorage
 
 // Test connection on initialization
 supabase.from('profiles').select('count', { count: 'exact', head: true })
@@ -99,12 +72,8 @@ supabase.from('profiles').select('count', { count: 'exact', head: true })
       } else if (error.message.includes('JWT')) {
         console.error('🔥 Invalid API key! Check .env configuration.');
       }
-    } else {
-      console.log('✅ Supabase connection test successful');
     }
   })
   .catch(err => {
     console.error('❌ Supabase initialization error:', err);
   });
-
-console.log('✅ Supabase client initialized successfully');
