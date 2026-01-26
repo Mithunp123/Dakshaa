@@ -16,16 +16,15 @@ export default function SupabaseHealthCheck({ children }) {
         .select('count', { count: 'exact', head: true });
 
       if (healthError) {
-        console.error('🔥 Supabase health check failed:', healthError);
+        console.error('🔥health check failed:', healthError);
         setIsHealthy(false);
         setError(healthError.message);
       } else {
-        console.log('✅ Supabase health check passed');
         setIsHealthy(true);
         setError(null);
       }
     } catch (err) {
-      console.error('❌ Health check error:', err);
+      console.error('❌health check error:', err);
       setIsHealthy(false);
       setError(err.message || 'Unknown error');
     } finally {
