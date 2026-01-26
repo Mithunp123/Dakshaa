@@ -645,6 +645,11 @@ const HackathonSection = () => {
             <p className="text-lg md:text-xl mb-4 text-sky-600 text-justify">
               {event.description}
             </p>
+            
+            <p className="text-xl font-bold text-yellow-400 animate-pulse">
+              Registration Begins on 27-01-2026
+            </p>
+
             {/* Register Now Button */}
             <motion.button
               className="mb-4 w-60 md:w-auto px-6 py-3 bg-primary clip bg-opacity-70 border-2 border-primary-dark hover:bg-primary-dark transition-all text-white font-semibold text-xl shadow-xl"
