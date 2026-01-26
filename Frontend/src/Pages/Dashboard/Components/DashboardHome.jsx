@@ -78,7 +78,6 @@ const DashboardHome = () => {
   useEffect(() => {
     // Prevent double-fetch in StrictMode
     if (isFetchingRef.current) {
-      console.log('⏭️ Skipping duplicate dashboard fetch');
       return;
     }
     isFetchingRef.current = true;
@@ -95,30 +94,40 @@ const DashboardHome = () => {
         isFetchingRef.current = false;
       });
     }
+  }, []);
 
-    // Set up real-time subscription for registration updates
+  // Separate useEffect for real-time subscription to avoid cleanup issues
+  useEffect(() => {
     const storedUser = getStoredUser();
-    if (storedUser) {
-      const registrationSubscription = supabase
-        .channel('student-registration-updates')
-        .on(
-          'postgres_changes',
-          { 
-            event: '*', 
-            schema: 'public', 
-            table: 'registrations',
-            filter: `user_id=eq.${storedUser.id}`
-          },
-          () => {
+    if (!storedUser) return;
+
+    let subscribed = false;
+    const registrationSubscription = supabase
+      .channel('student-registration-updates')
+      .on(
+        'postgres_changes',
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'registrations',
+          filter: `user_id=eq.${storedUser.id}`
+        },
+        () => {
+          if (subscribed) {
             fetchDashboardData();
           }
-        )
-        .subscribe();
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          subscribed = true;
+        }
+      });
 
-      return () => {
-        supabase.removeChannel(registrationSubscription);
-      };
-    }
+    return () => {
+      subscribed = false;
+      supabase.removeChannel(registrationSubscription);
+    };
   }, []);
 
   const fetchDashboardData = async (skipLoading = false) => {
@@ -224,7 +233,6 @@ const DashboardHome = () => {
 
       // Cache for quick reload (short duration)
       sessionStorage.setItem('dashboard_data', JSON.stringify(dashboardData));
-      console.log('✅ Dashboard data fetched and cached');
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
