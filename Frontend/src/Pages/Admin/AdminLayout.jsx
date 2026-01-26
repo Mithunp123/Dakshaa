@@ -34,7 +34,7 @@ const roleDisplayInfo = {
 };
 
 const AdminLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1024);
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
@@ -44,6 +44,13 @@ const AdminLayout = () => {
   useEffect(() => {
     checkUserRole();
   }, []);
+
+  // Close sidebar on mobile when route changes
+  useEffect(() => {
+    if (window.innerWidth < 1024) {
+      setIsSidebarOpen(false);
+    }
+  }, [location.pathname]);
 
   const checkUserRole = async () => {
     try {
@@ -130,57 +137,72 @@ const AdminLayout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex">
+    <div className="min-h-screen bg-slate-950 text-white flex relative">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsSidebarOpen(true)}
+        className="lg:hidden fixed top-4 left-4 z-40 p-3 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg hover:bg-slate-800 transition-all"
+      >
+        <Menu size={24} className="text-secondary" />
+      </button>
+
+      {/* Overlay for mobile */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsSidebarOpen(false)}
+            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+          />
+        )}
+      </AnimatePresence>
+
       {/* Sidebar */}
-      <aside 
+      <motion.aside 
+        initial={false}
+        animate={{
+          x: isSidebarOpen ? 0 : -280,
+        }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         className={`${
-          isSidebarOpen ? 'w-64' : 'w-20'
-        } bg-slate-900/50 border-r border-white/10 backdrop-blur-xl transition-all duration-300 flex flex-col fixed h-full z-50`}
+          isSidebarOpen ? 'w-64' : 'w-64'
+        } bg-slate-900/95 lg:bg-slate-900/50 border-r border-white/10 backdrop-blur-xl flex flex-col fixed h-full z-50 lg:translate-x-0 shadow-2xl lg:shadow-none`}
       >
         <div className="p-6 flex items-center justify-between">
-          {isSidebarOpen && (
-            <motion.h2 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-xl font-bold font-orbitron text-secondary"
-            >
-              DAKSHAA ADMIN
-            </motion.h2>
-          )}
+          <motion.h2 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-xl font-bold font-orbitron text-secondary"
+          >
+            DAKSHAA ADMIN
+          </motion.h2>
           <button 
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            onClick={() => setIsSidebarOpen(false)}
             className="p-2 hover:bg-white/5 rounded-lg transition-colors"
           >
-            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            <X size={20} />
           </button>
         </div>
 
         {/* User Role Badge */}
         {userRole && roleDisplayInfo[userRole] && (
           <div className={`mx-4 mb-4 p-3 rounded-xl bg-${roleDisplayInfo[userRole].color}-500/10 border border-${roleDisplayInfo[userRole].color}-500/20`}>
-            {isSidebarOpen ? (
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg bg-${roleDisplayInfo[userRole].color}-500/20 flex items-center justify-center`}>
-                  {React.createElement(roleDisplayInfo[userRole].icon, { 
-                    size: 20, 
-                    className: `text-${roleDisplayInfo[userRole].color}-500` 
-                  })}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-white truncate">{userName}</p>
-                  <p className={`text-xs text-${roleDisplayInfo[userRole].color}-400`}>
-                    {roleDisplayInfo[userRole].label}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="flex justify-center">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-lg bg-${roleDisplayInfo[userRole].color}-500/20 flex items-center justify-center`}>
                 {React.createElement(roleDisplayInfo[userRole].icon, { 
                   size: 20, 
                   className: `text-${roleDisplayInfo[userRole].color}-500` 
                 })}
               </div>
-            )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-white truncate">{userName}</p>
+                <p className={`text-xs text-${roleDisplayInfo[userRole].color}-400`}>
+                  {roleDisplayInfo[userRole].label}
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -191,6 +213,11 @@ const AdminLayout = () => {
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={() => {
+                  if (window.innerWidth < 1024) {
+                    setIsSidebarOpen(false);
+                  }
+                }}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${
                   isActive 
                     ? 'bg-secondary text-white shadow-lg shadow-secondary/20' 
@@ -198,10 +225,8 @@ const AdminLayout = () => {
                 }`}
               >
                 <item.icon size={20} className={isActive ? 'text-white' : 'group-hover:text-secondary'} />
-                {isSidebarOpen && (
-                  <span className="font-medium whitespace-nowrap">{item.label}</span>
-                )}
-                {isActive && isSidebarOpen && (
+                <span className="font-medium whitespace-nowrap">{item.label}</span>
+                {isActive && (
                   <ChevronRight size={16} className="ml-auto" />
                 )}
               </Link>
@@ -215,13 +240,13 @@ const AdminLayout = () => {
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all"
           >
             <LogOut size={20} />
-            {isSidebarOpen && <span className="font-medium">Logout</span>}
+            <span className="font-medium">Logout</span>
           </button>
         </div>
-      </aside>
+      </motion.aside>
 
       {/* Main Content */}
-      <main className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-20'} p-8`}>
+      <main className="flex-1 w-full lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8">
         <div className="max-w-7xl mx-auto">
           <Outlet />
         </div>
