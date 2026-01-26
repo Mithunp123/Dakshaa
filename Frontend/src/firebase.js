@@ -24,12 +24,9 @@ let analytics = null;
 if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
   try {
     analytics = getAnalytics(app);
-    console.log('✅ Firebase Analytics initialized');
   } catch (error) {
     console.warn('⚠️ Firebase Analytics initialization failed:', error.message);
   }
-} else {
-  console.log('⏭️ Firebase Analytics skipped (development mode)');
 }
 
 export { app, analytics };
