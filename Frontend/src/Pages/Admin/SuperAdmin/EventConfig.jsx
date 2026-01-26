@@ -872,13 +872,16 @@ const EditEventModal = ({ isOpen, event, onClose, onSuccess }) => {
 
               <div>
                 <label className="block text-sm font-bold mb-2 text-gray-400">
-                  Event Type
+                  Event Type *
                 </label>
                 <select
                   value={formData.event_type}
-                  onChange={(e) => setFormData({...formData, event_type: e.target.value})}
-                  disabled
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-gray-500 cursor-not-allowed"
+                  onChange={(e) => setFormData({
+                    ...formData, 
+                    event_type: e.target.value,
+                    is_team_event: e.target.value === 'TEAM'
+                  })}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
                 >
                   <option value="SOLO" className="bg-slate-900">SOLO</option>
                   <option value="TEAM" className="bg-slate-900">TEAM</option>
