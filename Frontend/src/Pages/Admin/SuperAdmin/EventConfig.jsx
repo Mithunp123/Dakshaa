@@ -114,17 +114,32 @@ const EventConfig = () => {
     if (!confirm(confirmMessage)) return;
 
     setLoading(true);
-    const result = await eventConfigService.updateEventsStatus(eventIds, status);
     
-    if (result.success) {
-      // Small delay to ensure DB update propagates before refetch
-      setTimeout(async () => {
-        await fetchEvents();
-        setLoading(false);
-      }, 500);
-    } else {
-      alert(`Bulk ${action} failed: ` + result.error);
-      setLoading(false);
+    // Update each event individually
+    let successCount = 0;
+    let failCount = 0;
+    
+    for (const eventId of eventIds) {
+      const event = events.find(e => e.id === eventId);
+      // Only toggle if the event's current status is different from target status
+      if (event && event.is_open !== status) {
+        const result = await eventConfigService.toggleEventStatus(eventId);
+        if (result.success) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } else {
+        successCount++; // Already in desired state
+      }
+    }
+    
+    // Refresh events list
+    await fetchEvents();
+    setLoading(false);
+    
+    if (failCount > 0) {
+      alert(`Completed: ${successCount} events updated, ${failCount} failed`);
     }
   };
 
@@ -146,16 +161,32 @@ const EventConfig = () => {
     if (!confirm(confirmMessage)) return;
 
     setLoading(true);
-    const result = await eventConfigService.updateEventsStatus(eventIds, status);
     
-    if (result.success) {
-      setTimeout(async () => {
-        await fetchEvents();
-        setLoading(false);
-      }, 500);
-    } else {
-      alert(`Bulk ${action} for ${category} failed: ` + result.error);
-      setLoading(false);
+    // Update each event individually
+    let successCount = 0;
+    let failCount = 0;
+    
+    for (const eventId of eventIds) {
+      const event = events.find(e => e.id === eventId);
+      // Only toggle if the event's current status is different from target status
+      if (event && event.is_open !== status) {
+        const result = await eventConfigService.toggleEventStatus(eventId);
+        if (result.success) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } else {
+        successCount++; // Already in desired state
+      }
+    }
+    
+    // Refresh events list
+    await fetchEvents();
+    setLoading(false);
+    
+    if (failCount > 0) {
+      alert(`Completed: ${successCount} events updated, ${failCount} failed`);
     }
   };
 
@@ -712,10 +743,10 @@ const EditEventModal = ({ isOpen, event, onClose, onSuccess }) => {
         description: event.description || '',
         venue: event.venue || '',
         category: event.category || 'Technical',
-        event_type: event.type || 'SOLO',
+        event_type: event.is_team_event ? 'TEAM' : 'SOLO',
         price: event.price || 0,
         capacity: event.capacity || 100,
-        is_team_event: event.type === 'TEAM',
+        is_team_event: event.is_team_event || false,
         min_team_size: event.min_team_size || 1,
         max_team_size: event.max_team_size || 1,
         is_open: event.is_open ?? true,
