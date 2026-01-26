@@ -297,14 +297,15 @@ const Overview = () => {
     setLoadingEvents(true);
     try {
       const { data, error } = await supabase
-        .from('events')
-        .select('id, event_id, name, category')
+        .from('events_config')
+        .select('id, name, category')
         .order('name');
 
       if (error) throw error;
       setEvents(data || []);
     } catch (error) {
       console.error('Error fetching events:', error);
+      alert('Failed to fetch events: ' + error.message);
     } finally {
       setLoadingEvents(false);
     }
@@ -324,7 +325,8 @@ const Overview = () => {
       const { data: registrations, error } = await supabase
         .from('event_registrations_config')
         .select('*')
-        .eq('event_id', event.id);
+        .eq('event_id', event.id)
+        .eq('payment_status', 'PAID');
 
       console.log('Fetching registrations for event:', event.name, 'ID:', event.id, 'Result:', registrations);
 
@@ -479,26 +481,45 @@ const Overview = () => {
   const downloadAllEventsReport = async () => {
     setDownloadingReport(true);
     try {
+      console.log('Starting Excel report generation...');
+      console.log('Total events to process:', events.length);
+      
       const wb = XLSX.utils.book_new();
       let hasData = false;
+      let processedEvents = 0;
 
       for (const event of events) {
+        console.log(`Processing event: ${event.name} (ID: ${event.id})`);
+        
         // Fetch registrations for this event - use event.id (UUID) not event_id (text)
-        const { data: registrations } = await supabase
+        const { data: registrations, error: regError } = await supabase
           .from('event_registrations_config')
           .select('*')
-          .eq('event_id', event.id);
+          .eq('event_id', event.id)
+          .eq('payment_status', 'PAID');
+
+        if (regError) {
+          console.error(`Error fetching registrations for ${event.name}:`, regError);
+          continue;
+        }
+
+        console.log(`Found ${registrations?.length || 0} paid registrations for ${event.name}`);
 
         if (!registrations || registrations.length === 0) continue;
 
         hasData = true;
+        processedEvents++;
 
         // Fetch user profiles
         const userIds = [...new Set(registrations.map(r => r.user_id))];
-        const { data: profiles } = await supabase
+        const { data: profiles, error: profileError } = await supabase
           .from('profiles')
           .select('id, full_name, email, mobile_number, college_name, department, roll_number')
           .in('id', userIds);
+
+        if (profileError) {
+          console.error(`Error fetching profiles for ${event.name}:`, profileError);
+        }
 
         const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
 
@@ -515,14 +536,15 @@ const Overview = () => {
             'Roll Number': profile.roll_number || 'N/A',
             'Registration Type': reg.registration_type || 'individual',
             'Team Name': reg.team_name || '-',
-            'Payment Status': reg.payment_status || 'PENDING',
+            'Payment Status': reg.payment_status || 'PAID',
             'Payment Amount': reg.payment_amount || 0,
             'Registered At': reg.registered_at ? new Date(reg.registered_at).toLocaleString() : 'N/A'
           };
         });
 
         // Create worksheet with event name (max 31 chars for Excel sheet name)
-        const sheetName = event.name.substring(0, 31).replace(/[\\/*?[\]]/g, '');
+        // Remove invalid characters: : \ / ? * [ ]
+        const sheetName = event.name.substring(0, 31).replace(/[:\\\/\*\?\[\]]/g, '');
         const ws = XLSX.utils.json_to_sheet(excelData);
 
         // Set column widths
@@ -533,18 +555,26 @@ const Overview = () => {
         ];
 
         XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        console.log(`Added sheet for ${event.name}`);
       }
 
+      console.log(`Processed ${processedEvents} events with data`);
+
       if (!hasData) {
-        alert('No registration data found for any event');
+        alert('No paid registrations found for any event. Only paid registrations are included in reports.');
         return;
       }
 
       // Download
-      XLSX.writeFile(wb, `All_Events_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
+      const filename = `All_Events_Paid_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
+      console.log('Downloading file:', filename);
+      XLSX.writeFile(wb, filename);
+      
+      alert(`Report downloaded successfully! Includes ${processedEvents} events with paid registrations.`);
+      setShowReportModal(false);
     } catch (error) {
       console.error('Error generating all events report:', error);
-      alert('Failed to generate report');
+      alert('Failed to generate report: ' + (error.message || 'Unknown error'));
     } finally {
       setDownloadingReport(false);
     }
