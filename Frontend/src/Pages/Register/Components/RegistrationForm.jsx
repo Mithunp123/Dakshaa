@@ -979,14 +979,6 @@ const RegistrationForm = () => {
          return;
       }
 
-      console.log('📡 Calling backend /payment/initiate with:', {
-        user_id: user.id,
-        booking_id: bookingId,
-        booking_type: 'mixed_registration',
-        registrations: mixedRegistrations,
-        amount: totalAmount,
-      });
-
       // Call backend to get payment data
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const backendResponse = await fetch(`${apiUrl}/payment/initiate`, {
@@ -1003,9 +995,7 @@ const RegistrationForm = () => {
         }),
       });
 
-      console.log('📡 Backend response status:', backendResponse.status);
       const backendResult = await backendResponse.json();
-      console.log('📡 Backend result:', backendResult);
 
       if (!backendResult.success) {
         throw new Error(backendResult.error || 'Failed to prepare payment');
@@ -1013,7 +1003,6 @@ const RegistrationForm = () => {
 
       // Step 3: Backend returns payment URL from gateway
       const paymentUrl = backendResult.payment_url;
-      console.log('Payment Gateway URL:', paymentUrl);
       
       // Track pending payments in localStorage for each event
       selectedEvents.forEach(eventId => {
