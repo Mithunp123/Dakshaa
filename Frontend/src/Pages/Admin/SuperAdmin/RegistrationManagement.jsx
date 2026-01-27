@@ -319,48 +319,69 @@ const RegistrationManagement = () => {
 
   const loadRegistrationCounts = async () => {
     try {
-      // Count individual registrations (is_team = false or null)
-      const { count: individualCount } = await supabase
-        .from('event_registrations_config')
-        .select('*', { count: 'exact', head: true })
-        .eq('payment_status', 'PAID')
-        .or('is_team.is.null,is_team.eq.false');
-
-      // Count team registrations (unique teams)
-      const { data: teamData } = await supabase
-        .from('event_registrations_config')
-        .select('team_id', { count: 'exact' })
-        .eq('payment_status', 'PAID')
-        .eq('is_team', true)
-        .not('team_id', 'is', null);
+      console.log('📊 Loading registration counts...');
       
-      const uniqueTeams = new Set(teamData?.map(r => r.team_id).filter(Boolean));
-      const teamCount = uniqueTeams.size;
-
-      // Count team leaders (is_team_leader = true)
-      const { count: teamLeaderCount } = await supabase
+      // 1. Count individual PAID registrations
+      const { count: individualCount, error: individualError } = await supabase
         .from('event_registrations_config')
         .select('*', { count: 'exact', head: true })
-        .eq('payment_status', 'PAID')
-        .eq('is_team', true)
-        .eq('is_team_leader', true);
+        .eq('payment_status', 'PAID');
 
-      // Count team members (is_team = true but is_team_leader = false/null)
-      const { count: teamMemberCount } = await supabase
-        .from('event_registrations_config')
+      if (individualError) {
+        console.error('❌ Error loading individual registrations:', individualError);
+      } else {
+        console.log('✅ Individual PAID registrations:', individualCount);
+      }
+
+      // 2. Count total active teams
+      const { count: teamCount, error: teamError } = await supabase
+        .from('teams')
         .select('*', { count: 'exact', head: true })
-        .eq('payment_status', 'PAID')
-        .eq('is_team', true)
-        .or('is_team_leader.is.null,is_team_leader.eq.false');
+        .eq('is_active', true);
 
-      setRegistrationCounts({
+      if (teamError) {
+        console.error('❌ Error loading teams:', teamError);
+      } else {
+        console.log('✅ Total active teams:', teamCount);
+      }
+
+      // 3. Count team leaders (role='leader' in team_members)
+      const { count: teamLeaderCount, error: leaderError } = await supabase
+        .from('team_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('role', 'leader')
+        .in('status', ['joined', 'active']);
+
+      if (leaderError) {
+        console.error('❌ Error loading team leaders:', leaderError);
+      } else {
+        console.log('✅ Team leaders:', teamLeaderCount);
+      }
+
+      // 4. Count team members (role='member' in team_members)
+      const { count: teamMemberCount, error: memberError } = await supabase
+        .from('team_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('role', 'member')
+        .in('status', ['joined', 'active']);
+
+      if (memberError) {
+        console.error('❌ Error loading team members:', memberError);
+      } else {
+        console.log('✅ Team members:', teamMemberCount);
+      }
+
+      const counts = {
         individual: individualCount || 0,
-        team: teamCount,
+        team: teamCount || 0,
         teamLeader: teamLeaderCount || 0,
         teamMember: teamMemberCount || 0
-      });
+      };
+
+      console.log('📊 Final registration counts:', counts);
+      setRegistrationCounts(counts);
     } catch (error) {
-      console.error('Error loading registration counts:', error);
+      console.error('❌ Error loading registration counts:', error);
     }
   };
 
