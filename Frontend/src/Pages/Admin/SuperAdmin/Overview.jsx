@@ -175,16 +175,17 @@ const Overview = () => {
       console.log('📊 SuperAdmin Overview: Fetching stats...');
       if (!loading) setRefreshing(true);
 
-      // Fetch Total Registrations
-      console.log('👥 Fetching total registrations...');
+      // Fetch Total Registrations (PAID only)
+      console.log('👥 Fetching total paid registrations...');
       const { count: regCount, error: regError } = await supabase
         .from('event_registrations_config')
-        .select('*', { count: 'exact', head: true });
+        .select('*', { count: 'exact', head: true })
+        .eq('payment_status', 'PAID');
 
       if (regError) {
         console.error('❌ Error fetching registrations:', regError);
       } else {
-        console.log('✅ Total registrations:', regCount);
+        console.log('✅ Total paid registrations:', regCount);
       }
 
       // Fetch Total Revenue - get registrations with payment
@@ -243,11 +244,12 @@ const Overview = () => {
         console.log('✅ Total events:', totalEventCount);
       }
 
-      // Fetch Recent Registrations (with proper FK reference)
-      console.log('📋 Fetching recent registrations...');
+      // Fetch Recent Registrations (PAID only, with proper FK reference)
+      console.log('📋 Fetching recent paid registrations...');
       const { data: recent, error: recentError } = await supabase
         .from('event_registrations_config')
         .select('*')
+        .eq('payment_status', 'PAID')
         .order('registered_at', { ascending: false })
         .limit(5);
 
@@ -582,7 +584,7 @@ const Overview = () => {
 
   const statCards = [
     {
-      label: 'Total Registrations',
+      label: 'Paid Registrations',
       value: stats.totalRegistrations,
       icon: Users,
       color: 'text-blue-400',
@@ -772,7 +774,7 @@ const Overview = () => {
         {/* Recent Activity */}
         <div className="lg:col-span-2 bg-white/5 border border-white/10 rounded-3xl p-8">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold">Recent Registrations</h3>
+            <h3 className="text-xl font-bold">Recent Paid Registrations</h3>
             <button className="text-secondary text-sm font-bold hover:underline">View All</button>
           </div>
           <div className="space-y-4">
