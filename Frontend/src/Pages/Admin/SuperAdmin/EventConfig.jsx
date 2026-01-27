@@ -947,21 +947,6 @@ const EditEventModal = ({ isOpen, event, onClose, onSuccess }) => {
                   <option value="No" className="bg-slate-900">No</option>
                 </select>
               </div>
-
-              <div>
-                <label className="block text-sm font-bold mb-2 text-gray-400">
-                  Event Active
-                </label>
-                <select
-                  value={formData.is_active ? 'Yes' : 'No'}
-                  onChange={(e) => setFormData({...formData, is_active: e.target.value === 'Yes'})}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary"
-                >
-                  <option value="Yes" className="bg-slate-900">Yes</option>
-                  <option value="No" className="bg-slate-900">No</option>
-                </select>
-              </div>
-
               <div>
                 <label className="block text-sm font-bold mb-2 text-gray-400">
                   Current Status
