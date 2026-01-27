@@ -23,11 +23,15 @@ import {
   RefreshCw,
   Phone,
   Download,
-  LogOut
+  LogOut,
+  LayoutDashboard,
+  ClipboardList
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
 import { Html5Qrcode } from 'html5-qrcode';
 import toast, { Toaster } from 'react-hot-toast';
+import Overview from '../SuperAdmin/Overview';
+import RegistrationManagement from '../SuperAdmin/RegistrationManagement';
 import {
   checkCameraSupport,
   getCameraErrorMessage,
@@ -828,62 +832,70 @@ const EventCoordinatorDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white pb-32">
-      {/* Toast notifications */}
+    <div className="flex h-screen bg-slate-950 text-white overflow-hidden">
       <Toaster position="top-center" toastOptions={{ duration: 2000 }} />
-      
-      {/* Mobile Header */}
-      <div className="sticky top-0 z-40 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20">
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold font-orbitron bg-gradient-to-r from-secondary to-cyan-500 bg-clip-text text-transparent">COORDINATOR</h1>
-              <p className="text-xs text-gray-400">Mobile Action Panel</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <motion.button
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleInstallApp}
-                className="w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl flex items-center justify-center border border-green-500/30 shadow-lg shadow-green-500/20 hover:shadow-green-500/40 transition-all"
-                title="Install App"
-              >
-                <Download className="text-green-500" size={20} />
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={handleLogout}
-                className="w-12 h-12 bg-gradient-to-br from-red-500/20 to-rose-500/20 rounded-2xl flex items-center justify-center border border-red-500/30 shadow-lg shadow-red-500/20 hover:shadow-red-500/40 transition-all"
-                title="Logout"
-              >
-                <LogOut className="text-red-500" size={20} />
-              </motion.button>
-              <div className="w-12 h-12 bg-gradient-to-br from-secondary/20 to-cyan-500/20 rounded-2xl flex items-center justify-center border border-secondary/30 shadow-inner">
-                <QrCode className="text-secondary" size={24} />
-              </div>
-            </div>
-          </div>
 
-          {/* Event Selector with Registration Count */}
-          <select
-            value={selectedEvent?.id || selectedEvent?.event_id || ''}
-            onChange={(e) => {
-              const event = assignedEvents.find(ev => (ev.id || ev.event_id) === e.target.value);
-              setSelectedEvent(event);
-            }}
-            className="w-full bg-gradient-to-r from-white/5 to-white/10 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all font-bold shadow-inner"
-          >
-            {assignedEvents.map(event => (
-              <option key={event.id || event.event_id} value={event.id || event.event_id} className="bg-slate-900">
-                {event.name || event.event_id} ({event.registeredCount || 0} registered)
-              </option>
+      {/* Sidebar */}
+      <div className="w-64 bg-slate-900 border-r border-white/10 flex flex-col shrink-0 z-50 hidden md:flex">
+        <div className="p-6 border-b border-white/10">
+           <h1 className="text-xl font-bold font-orbitron bg-gradient-to-r from-secondary to-cyan-500 bg-clip-text text-transparent">
+             COORDINATOR
+           </h1>
+           <p className="text-xs text-gray-500 mt-1">Dashboard Panel</p>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+            {[
+              { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+              { id: 'registrations', label: 'Registrations', icon: ClipboardList },
+              { id: 'scanner', label: 'Global Scanner', icon: Camera },
+              { id: 'winners', label: 'Winners', icon: Trophy },
+              { id: 'participants', label: 'Participants List', icon: Users },
+              { id: 'manual', label: 'Manual Entry', icon: Search },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
+                  activeTab === item.id
+                    ? 'bg-secondary/20 text-secondary border border-secondary/20'
+                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <item.icon size={20} />
+                {item.label}
+              </button>
             ))}
-          </select>
+        </div>
+
+        <div className="p-4 border-t border-white/10 space-y-2">
+            {deferredPrompt && (
+              <button
+                onClick={handleInstallApp}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all"
+              >
+                <Download size={20} />
+                Install App
+              </button>
+            )}
+            <button
+               onClick={handleLogout}
+               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all"
+            >
+               <LogOut size={20} />
+               Logout
+            </button>
         </div>
       </div>
 
-      {/* Session Selector */}
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+          
+          <div className="flex-1 overflow-y-auto p-4 md:p-6">
+
+      {/* Session Selector & Stats - Hidden everywhere as we moved controls inside relevant tabs */}
+      {false && (
+        <>
       <div className="flex gap-3 px-4 py-3 bg-gradient-to-b from-slate-900/50 to-transparent">
         <motion.button
           whileTap={{ scale: 0.95 }}
@@ -966,10 +978,38 @@ const EventCoordinatorDashboard = () => {
           </p>
         </motion.div>
       </div>
+        </>
+      )}
 
       {/* Tab Content */}
       <div className="p-4 pb-6">
         <AnimatePresence mode="wait">
+          {/* OVERVIEW TAB */}
+          {activeTab === 'overview' && (
+            <motion.div
+              key="overview"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="pb-20"
+            >
+              <Overview coordinatorEvents={assignedEvents} />
+            </motion.div>
+          )}
+
+          {/* REGISTRATIONS TAB */}
+          {activeTab === 'registrations' && (
+            <motion.div
+              key="registrations"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="pb-20"
+            >
+              <RegistrationManagement coordinatorEvents={assignedEvents} />
+            </motion.div>
+          )}
+
           {/* QR SCANNER TAB */}
           {activeTab === 'scanner' && (
             <motion.div
@@ -1000,11 +1040,28 @@ const EventCoordinatorDashboard = () => {
                     <div>
                       <h3 className="text-2xl font-bold mb-2">Ready to Scan</h3>
                       <p className="text-gray-400">Tap below to start QR code scanner</p>
-                      <p className="text-xs text-gray-500 mt-2">
-                        Session: <span className={selectedSession === 'morning' ? 'text-yellow-500' : 'text-indigo-500'}>
-                          {selectedSession === 'morning' ? 'Morning (AM)' : 'Evening (PM)'}
-                        </span>
-                      </p>
+                      <div className="flex items-center justify-center gap-3 mt-4">
+                          <button
+                            onClick={() => setSelectedSession('morning')}
+                            className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${
+                                selectedSession === 'morning'
+                                ? 'bg-yellow-500 text-white shadow-lg shadow-yellow-500/30'
+                                : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                            }`}
+                          >
+                             <Sun size={16} /> Morning
+                          </button>
+                          <button
+                            onClick={() => setSelectedSession('evening')}
+                            className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${
+                                selectedSession === 'evening'
+                                ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30'
+                                : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                            }`}
+                          >
+                             <Moon size={16} /> Afternoon
+                          </button>
+                      </div>
                     </div>
                     {cameraError ? (
                       <div className="flex flex-col gap-3">
@@ -1250,17 +1307,42 @@ const EventCoordinatorDashboard = () => {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-4"
             >
-              {/* Current Session Indicator */}
-              <div className={`p-3 rounded-xl text-center font-bold ${
-                selectedSession === 'morning' 
-                  ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' 
-                  : 'bg-indigo-500/20 text-indigo-500 border border-indigo-500/30'
-              }`}>
-                {selectedSession === 'morning' ? (
-                  <span className="flex items-center justify-center gap-2"><Sun size={18} /> Marking FORENOON Session</span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2"><Moon size={18} /> Marking AFTERNOON Session</span>
-                )}
+              {/* Current Session Indicator & Toggle */}
+              <div className="flex flex-col gap-3 py-2">
+                <div className={`p-3 rounded-xl text-center font-bold ${
+                  selectedSession === 'morning' 
+                    ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' 
+                    : 'bg-indigo-500/20 text-indigo-500 border border-indigo-500/30'
+                }`}>
+                  {selectedSession === 'morning' ? (
+                    <span className="flex items-center justify-center gap-2"><Sun size={18} /> Marking FORENOON Session</span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-2"><Moon size={18} /> Marking AFTERNOON Session</span>
+                  )}
+                </div>
+                
+                <div className="flex items-center justify-center gap-3">
+                    <button
+                      onClick={() => setSelectedSession('morning')}
+                      className={`flex-1 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${
+                          selectedSession === 'morning'
+                          ? 'bg-yellow-500 text-white shadow-lg shadow-yellow-500/30'
+                          : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                      }`}
+                    >
+                        <Sun size={16} /> Morning
+                    </button>
+                    <button
+                      onClick={() => setSelectedSession('evening')}
+                      className={`flex-1 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${
+                          selectedSession === 'evening'
+                          ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30'
+                          : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                      }`}
+                    >
+                        <Moon size={16} /> Afternoon
+                    </button>
+                </div>
               </div>
 
               <div className="relative">
@@ -1393,37 +1475,7 @@ const EventCoordinatorDashboard = () => {
         </AnimatePresence>
       </div>
 
-      {/* Bottom Tab Navigation - Mobile App Style */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-slate-950 via-slate-900 to-slate-900/95 backdrop-blur-xl border-t border-white/10 shadow-2xl shadow-black/50">
-        <div className="flex gap-1 p-2 px-3 safe-area-bottom">
-          {[
-            { id: 'scanner', label: 'Scanner', icon: Camera },
-            { id: 'participants', label: 'List', icon: Users },
-            { id: 'manual', label: 'Manual', icon: Search },
-            { id: 'winners', label: 'Winners', icon: Trophy }
-          ].map(tab => (
-            <motion.button
-              key={tab.id}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 px-2 py-3 text-xs font-bold transition-all whitespace-nowrap flex flex-col items-center justify-center gap-1.5 rounded-2xl relative ${
-                activeTab === tab.id
-                  ? 'bg-gradient-to-br from-secondary/30 to-secondary/20 text-secondary shadow-lg shadow-secondary/20'
-                  : 'text-gray-500 active:bg-white/5'
-              }`}
-            >
-              {activeTab === tab.id && (
-                <motion.div
-                  layoutId="activeTab"
-                  className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-secondary/10 border border-secondary/30 rounded-2xl"
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                />
-              )}
-              <tab.icon size={22} className="relative z-10" />
-              <span className="relative z-10">{tab.label}</span>
-            </motion.button>
-          ))}
-        </div>
+          </div>
       </div>
     </div>
   );

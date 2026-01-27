@@ -20,7 +20,7 @@ import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const Overview = () => {
+const Overview = ({ coordinatorEvents }) => {
   const [stats, setStats] = useState({
     totalRegistrations: 0,
     totalRevenue: 0,
@@ -168,19 +168,32 @@ const Overview = () => {
       supabase.removeChannel(registrationChannel);
       supabase.removeChannel(eventChannel);
     };
-  }, []);
+  }, [coordinatorEvents]);
 
   const fetchStats = async () => {
     try {
       console.log('📊 SuperAdmin Overview: Fetching stats...');
       if (!loading) setRefreshing(true);
 
+      // Coordinator Filter
+      const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
+      const allowedEventIds = hasCoordinatorFilter ? coordinatorEvents.map(e => (e.id || e.event_id)) : null;
+
+      const applyFilter = (query, column = 'event_id') => {
+        if (hasCoordinatorFilter && allowedEventIds) {
+          return query.in(column, allowedEventIds);
+        }
+        return query;
+      };
+
       // Fetch Total Registrations (PAID only)
       console.log('👥 Fetching total paid registrations...');
-      const { count: regCount, error: regError } = await supabase
+      let regQuery = supabase
         .from('event_registrations_config')
         .select('*', { count: 'exact', head: true })
         .eq('payment_status', 'PAID');
+      
+      const { count: regCount, error: regError } = await applyFilter(regQuery);
 
       if (regError) {
         console.error('❌ Error fetching registrations:', regError);
@@ -190,10 +203,12 @@ const Overview = () => {
 
       // Fetch Total Revenue - get registrations with payment
       console.log('💰 Fetching paid registrations...');
-      const { data: paidRegistrations, error: paidError } = await supabase
+      let paidQuery = supabase
         .from('event_registrations_config')
         .select('payment_amount')
         .eq('payment_status', 'PAID');
+      
+      const { data: paidRegistrations, error: paidError } = await applyFilter(paidQuery);
 
       if (paidError) {
         console.error('❌ Error fetching paid registrations:', paidError);
@@ -209,9 +224,11 @@ const Overview = () => {
 
       // Fetch Total Check-ins
       console.log('✓ Fetching check-ins...');
-      const { count: checkinCount, error: checkinError } = await supabase
+      let checkinQuery = supabase
         .from('attendance')
         .select('*', { count: 'exact', head: true });
+        
+      const { count: checkinCount, error: checkinError } = await applyFilter(checkinQuery);
 
       if (checkinError) {
         console.error('❌ Error fetching check-ins:', checkinError);
@@ -221,10 +238,12 @@ const Overview = () => {
 
       // Fetch Active Events
       console.log('📅 Fetching active events...');
-      const { count: activeEventCount, error: activeError } = await supabase
+      let activeQuery = supabase
         .from('events_config')
         .select('*', { count: 'exact', head: true })
         .eq('is_open', true);
+        
+      const { count: activeEventCount, error: activeError } = await applyFilter(activeQuery, 'id');
 
       if (activeError) {
         console.error('❌ Error fetching active events:', activeError);
@@ -234,9 +253,11 @@ const Overview = () => {
 
       // Fetch Total Events
       console.log('📅 Fetching total events...');
-      const { count: totalEventCount, error: totalError } = await supabase
+      let totalQuery = supabase
         .from('events_config')
         .select('*', { count: 'exact', head: true });
+        
+      const { count: totalEventCount, error: totalError } = await applyFilter(totalQuery, 'id');
 
       if (totalError) {
         console.error('❌ Error fetching total events:', totalError);
@@ -246,12 +267,14 @@ const Overview = () => {
 
       // Fetch Recent Registrations (PAID only, with proper FK reference)
       console.log('📋 Fetching recent paid registrations...');
-      const { data: recent, error: recentError } = await supabase
+      let recentQuery = supabase
         .from('event_registrations_config')
         .select('*')
         .eq('payment_status', 'PAID')
         .order('registered_at', { ascending: false })
         .limit(5);
+
+      const { data: recent, error: recentError } = await applyFilter(recentQuery);
 
       // Fetch user profiles separately for recent registrations
       let recentWithProfiles = [];
@@ -298,10 +321,20 @@ const Overview = () => {
   const fetchEventsForReport = async () => {
     setLoadingEvents(true);
     try {
-      const { data, error } = await supabase
+      // Coordinator Filter
+      const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
+      const allowedEventIds = hasCoordinatorFilter ? coordinatorEvents.map(e => e.id) : null;
+
+      let query = supabase
         .from('events_config')
         .select('id, name, category')
         .order('name');
+
+      if (hasCoordinatorFilter && allowedEventIds) {
+        query = query.in('id', allowedEventIds);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setEvents(data || []);
@@ -592,7 +625,8 @@ const Overview = () => {
       trend: '+12%',
       isUp: true
     },
-    {
+    // Only show Revenue if NOT viewing as a coordinator with filtered events
+    ...(!coordinatorEvents || coordinatorEvents.length === 0 ? [{
       label: 'Total Revenue',
       value: `₹${stats.totalRevenue.toLocaleString()}`,
       icon: CreditCard,
@@ -600,7 +634,7 @@ const Overview = () => {
       bg: 'bg-green-400/10',
       trend: '+8%',
       isUp: true
-    },
+    }] : []),
     {
       label: 'Live Check-ins',
       value: stats.totalCheckins,
@@ -643,9 +677,9 @@ const Overview = () => {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {/* Open All Events Button - Epic Design - Only show if not all events are open */}
+          {/* Open All Events Button - Epic Design - Only show if not all events are open and NOT coordinator mode */}
           <AnimatePresence>
-            {!allEventsOpen && (
+            {!allEventsOpen && (!coordinatorEvents || coordinatorEvents.length === 0) && (
               <motion.button
                 onClick={startCountdown}
                 disabled={openingEvents}
@@ -718,9 +752,9 @@ const Overview = () => {
             )}
           </AnimatePresence>
           
-          {/* Events Already Open Badge */}
+          {/* Events Already Open Badge - Hide for Coordinator */}
           <AnimatePresence>
-            {allEventsOpen && (
+            {allEventsOpen && (!coordinatorEvents || coordinatorEvents.length === 0) && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -814,12 +848,15 @@ const Overview = () => {
               >
                 <FileSpreadsheet size={18} /> Generate Report
               </button>
-              <button className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
-                <Users size={18} /> Export User List
-              </button>
+              {!coordinatorEvents && (
+                <button className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                  <Users size={18} /> Export User List
+                </button>
+              )}
             </div>
           </div>
 
+          {!coordinatorEvents && (
           <div className="bg-white/5 border border-white/10 rounded-3xl p-8">
             <h3 className="text-xl font-bold mb-4">System Status</h3>
             <div className="space-y-4">
@@ -843,6 +880,7 @@ const Overview = () => {
               </div>
             </div>
           </div>
+          )}
         </div>
       </div>
 

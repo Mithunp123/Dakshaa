@@ -20,11 +20,13 @@ import {
   ChevronRight,
   Package,
   Phone,
-  ArrowRight
+  ArrowRight,
+  Download
 } from "lucide-react";
 import { supabase } from "../../../supabase";
+import * as XLSX from 'xlsx';
 
-const RegistrationManagement = () => {
+const RegistrationManagement = ({ coordinatorEvents }) => {
   const [eventStats, setEventStats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -278,7 +280,10 @@ const RegistrationManagement = () => {
   const loadEventStats = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
+      const allowedEventIds = hasCoordinatorFilter ? coordinatorEvents.map(e => (e.id || e.event_id)) : null;
+
+      let query = supabase
         .from('events_config')
         .select(`
           id,
@@ -290,6 +295,12 @@ const RegistrationManagement = () => {
           is_open
         `)
         .order('name');
+        
+      if (hasCoordinatorFilter && allowedEventIds) {
+        query = query.in('id', allowedEventIds);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -320,12 +331,20 @@ const RegistrationManagement = () => {
   const loadRegistrationCounts = async () => {
     try {
       console.log('📊 Loading registration counts...');
+      const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
+      const allowedEventIds = hasCoordinatorFilter ? coordinatorEvents.map(e => (e.id || e.event_id)) : null;
       
       // 1. Count individual PAID registrations
-      const { count: individualCount, error: individualError } = await supabase
+      let individualQuery = supabase
         .from('event_registrations_config')
         .select('*', { count: 'exact', head: true })
         .eq('payment_status', 'PAID');
+
+      if (hasCoordinatorFilter && allowedEventIds) {
+        individualQuery = individualQuery.in('event_id', allowedEventIds);
+      }
+      
+      const { count: individualCount, error: individualError } = await individualQuery;
 
       if (individualError) {
         console.error('❌ Error loading individual registrations:', individualError);
@@ -334,10 +353,16 @@ const RegistrationManagement = () => {
       }
 
       // 2. Count total active teams
-      const { count: teamCount, error: teamError } = await supabase
+      let teamQuery = supabase
         .from('teams')
         .select('*', { count: 'exact', head: true })
         .eq('is_active', true);
+
+      if (hasCoordinatorFilter && allowedEventIds) {
+        teamQuery = teamQuery.in('event_id', allowedEventIds);
+      }
+        
+      const { count: teamCount, error: teamError } = await teamQuery;
 
       if (teamError) {
         console.error('❌ Error loading teams:', teamError);
@@ -345,12 +370,25 @@ const RegistrationManagement = () => {
         console.log('✅ Total active teams:', teamCount);
       }
 
+      // Fetch team IDs if filtered, to filter members
+      let allowedTeamIds = null;
+      if (hasCoordinatorFilter && allowedEventIds) {
+          const { data: teamsData } = await supabase.from('teams').select('id').in('event_id', allowedEventIds);
+          if (teamsData) allowedTeamIds = teamsData.map(t => t.id);
+      }
+
       // 3. Count team leaders (role='leader' in team_members)
-      const { count: teamLeaderCount, error: leaderError } = await supabase
+      let leaderQuery = supabase
         .from('team_members')
         .select('*', { count: 'exact', head: true })
         .eq('role', 'leader')
         .in('status', ['joined', 'active']);
+
+      if (allowedTeamIds) {
+          leaderQuery = leaderQuery.in('team_id', allowedTeamIds);
+      }
+        
+      const { count: teamLeaderCount, error: leaderError } = await leaderQuery;
 
       if (leaderError) {
         console.error('❌ Error loading team leaders:', leaderError);
@@ -359,11 +397,17 @@ const RegistrationManagement = () => {
       }
 
       // 4. Count team members (role='member' in team_members)
-      const { count: teamMemberCount, error: memberError } = await supabase
+      let memberQuery = supabase
         .from('team_members')
         .select('*', { count: 'exact', head: true })
         .eq('role', 'member')
         .in('status', ['joined', 'active']);
+
+      if (allowedTeamIds) {
+          memberQuery = memberQuery.in('team_id', allowedTeamIds);
+      }
+        
+      const { count: teamMemberCount, error: memberError } = await memberQuery;
 
       if (memberError) {
         console.error('❌ Error loading team members:', memberError);
@@ -388,30 +432,83 @@ const RegistrationManagement = () => {
   const loadEventRegistrations = async (eventId) => {
     setLoadingDetails(true);
     try {
-      const { data, error } = await supabase
+      // 1. Fetch registrations
+      const { data: regs, error: regsError } = await supabase
         .from('event_registrations_config')
-        .select(`
-          *,
-          profiles!inner(
-            id,
-            full_name,
-            email,
-            phone,
-            college_name,
-            department,
-            roll_no
-          )
-        `)
+        .select('*')
         .eq('event_id', eventId)
+        .eq('payment_status', 'PAID')
         .order('registered_at', { ascending: false });
 
-      if (error) throw error;
-      setEventRegistrations(data || []);
+      if (regsError) throw regsError;
+
+      if (!regs || regs.length === 0) {
+        setEventRegistrations([]);
+        setLoadingDetails(false);
+        return;
+      }
+
+      // 2. Fetch profiles manualy to avoid join errors on missing columns
+      const userIds = [...new Set(regs.map(r => r.user_id))];
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, mobile_number, college_name, department, roll_number')
+        .in('id', userIds);
+      
+      if (profilesError) throw profilesError;
+
+      const profileMap = new Map(profiles.map(p => [p.id, p]));
+
+      // 3. Combine data
+      const combined = regs.map(r => {
+        const profile = profileMap.get(r.user_id) || {};
+        return {
+          ...r,
+          profiles: {
+            full_name: profile.full_name || 'Unknown',
+            email: profile.email || 'N/A',
+            phone: profile.mobile_number || 'N/A',
+            college_name: profile.college_name || 'N/A',
+            department: profile.department || 'N/A',
+            roll_no: profile.roll_number || 'N/A'
+          }
+        };
+      });
+
+      setEventRegistrations(combined);
     } catch (error) {
       console.error('Error loading event registrations:', error);
     } finally {
       setLoadingDetails(false);
     }
+  };
+
+  const handleDownloadExcel = () => {
+    if (!eventRegistrations || eventRegistrations.length === 0) {
+        alert("No data to download");
+        return;
+    }
+
+    const dataToExport = eventRegistrations.map(reg => ({
+        "Name": reg.profiles.full_name,
+        "Roll Number": reg.profiles.roll_no,
+        "College": reg.profiles.college_name,
+        "Department": reg.profiles.department,
+        "Email": reg.profiles.email,
+        "Phone": reg.profiles.phone,
+        "Payment Status": reg.payment_status,
+        "Registered At": new Date(reg.registered_at).toLocaleString()
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(dataToExport);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Participants");
+
+    // Generate filename
+    const eventName = selectedEvent?.name || "Event";
+    const fileName = `${eventName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_participants.xlsx`;
+
+    XLSX.writeFile(wb, fileName);
   };
 
   const handleEventClick = async (event) => {
@@ -905,15 +1002,24 @@ const RegistrationManagement = () => {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-2xl font-bold">Registered Participants</h3>
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
-            <input
-              type="text"
-              placeholder="Search participants..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-secondary"
-            />
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleDownloadExcel}
+              className="flex items-center gap-2 px-4 py-2 bg-green-500/10 text-green-400 border border-green-500/20 rounded-xl hover:bg-green-500/20 transition-all"
+            >
+              <Download size={18} />
+              Export Excel
+            </button>
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
+              <input
+                type="text"
+                placeholder="Search participants..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-12 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-secondary"
+              />
+            </div>
           </div>
         </div>
 
