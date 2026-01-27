@@ -544,18 +544,24 @@ const EventDetails = () => {
     },
 
     "technical-event-3": {
-      title: " VibeCode’26 (Vibe coding partnered with Lovable.AI) ",
+      title: " 24-Hour Vibe Coding Hackathon ",
       price: "₹250",
       description:
-        " “Launch Something Lovable” in 24 Hours is a high-energy, in-person vibe coding hackathon where teams build and ship real MVPs using Lovable, focusing on product thinking, usability, and real-world impact.",
+        "The 24-Hour Vibe Coding Hackathon is an intensive, creativity-driven coding event where participants design and prototype real-world software solutions using Lovable AI. The hackathon emphasizes problem-first thinking, rapid iteration, and meaningful impact rather than product pitching or hardware-based development.Participants will receive problem statements on the spot and are expected to ideate, build, and present a working solution within 24 hours using limited AI credits—encouraging smart, intentional, and efficient development",
       image: Tech3,
      
-      rules: [
-        "Only registered participants are permitted to attend the workshop.",
-        "Participants must bring their own laptop with internet access.",
-        "Full-day attendance and punctuality are mandatory.",
-        "All participants must follow the instructions of the Lovable.AI team and organizers.",
-      ],
+     rules: [
+  "Each participant is allotted 100 Lovable AI credits.",
+  "Credits are non-transferable.",
+  "Teams must manage credits responsibly.",
+  "No additional credits will be issued under any circumstances.",
+  "All development must occur within the 24-hour hackathon window.",
+  "Use of pre-built or previously developed projects is strictly prohibited.",
+  "Internet access is permitted for learning and documentation.",
+  "Open-source libraries may be used unless explicitly restricted.",
+  "Usage of AI tools is prohibited except Lovable AI."
+],
+
       schedule: [
         {
           round: "Event Timing",
