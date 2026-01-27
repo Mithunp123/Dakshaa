@@ -344,8 +344,8 @@ const HackathonSection = () => {
     },
     "hackathon-4": {
       id: "hackathon-4",
-      title: "VibeCode-26",
-      description: "“Launch Something Lovable” in 24 Hours is a high-energy, in-person vibe coding hackathon where teams build and ship real MVPs using Lovable, focusing on product thinking, usability, and real-world impact.",
+      title: "24-Hour Vibe Coding Hackathon",
+      description: "The 24-Hour Vibe Coding Hackathon is an intensive, creativity-driven coding event where participants design and prototype real-world software solutions using Lovable AI. The hackathon emphasizes problem-first thinking, rapid iteration, and meaningful impact rather than product pitching or hardware-based development.Participants will receive problem statements on the spot and are expected to ideate, build, and present a working solution within 24 hours using limited AI credits—encouraging smart, intentional, and efficient development",
       rewards: [
         {
           position: "1st Prize",
@@ -365,21 +365,48 @@ const HackathonSection = () => {
       ],
       rounds: [
         {
-          title: "Topics",
+          title: "Themes",
           description: [
-            "VibeCode’26",
+            "Industry-Specific",
+            "Social & Community Impact",
+            "Education & Upskilling",
+            "Open Innovation",
           ],
         },
         {
-          title: "Round: Creation",
+          title: "Round -1 : Mid Evaluation (Checkpoint)",
+          description: [
+            "Review of progress and direction",
+            "Feedback-oriented and non-eliminatory",
+          ],},
+          {
+            title: "Round -2 :Final Presentation",  
+            description: [
+              "Final project demo and presentation",
+              "Comprehensive assessment of the solution",],
+            
         },
       ],
+       submissionRequirements: [
+  " A working prototype or functional demonstration",
+  "A brief description covering the problem statement",
+  "A brief description covering the solution approach",
+  "A brief description covering the target audience",
+  "A brief description covering the expected impact"
+],
+
       rules: [
-        "Only registered participants are permitted to attend the workshop.",
-        "Participants must bring their own laptop with internet access.",
-        "Full-day attendance and punctuality are mandatory.",
-        "All participants must follow the instructions of the Lovable.AI team and organizers."
-      ],
+  "Each participant is allotted 100 Lovable AI credits.",
+  "Credits are non-transferable.",
+  "Teams must manage credits responsibly.",
+  "No additional credits will be issued under any circumstances.",
+  "All development must occur within the 24-hour hackathon window.",
+  "Use of pre-built or previously developed projects is strictly prohibited.",
+  "Internet access is permitted for learning and documentation.",
+  "Open-source libraries may be used unless explicitly restricted.",
+  "Usage of AI tools is prohibited except Lovable AI."
+],
+
       schedule: [
         {
           round: "Venue",
@@ -614,6 +641,26 @@ const HackathonSection = () => {
     transition: { duration: 0.5 },
   };
 
+  const navigationItems = useMemo(() => {
+    const items = [{ label: "Rewards", target: "Rewards" }];
+
+    if (hasRounds()) {
+      items.push({ label: "Rounds", target: "Rounds" });
+    }
+
+    if (event.submissionRequirements?.length) {
+      items.push({ label: "Submission Requirements", target: "SubmissionRequirements" });
+    }
+
+    items.push(
+      { label: "Rules", target: "Rules" },
+      { label: "Schedule", target: "Schedule" },
+      { label: "Contact", target: "Contact" }
+    );
+
+    return items;
+  }, [event]);
+
   return (
     <motion.div
       initial="initial"
@@ -666,28 +713,25 @@ const HackathonSection = () => {
 
         {/* Rest of the content */}
         <div className="flex flex-col md:flex-row justify-center my-10 gap-4">
-          {[ "Rewards", "Rounds", "Rules", "Schedule", "Contact"].map(
-            (item, index) => (
-              <motion.div
-                key={index}
-                className="border-2 border-primary-dark p-1"
-                whileHover={{ scale: 1.05 }}
-                onClick={() => {
-                  const element = document.getElementById(item);
-                  if (element) {
-                    element.scrollIntoView({ behavior: "smooth" });
-                  }
-                  else{
-                    console.log("Not found");
-                  }
-                }}
-              >
-                <h1 className="bg-primary-dark cursor-default px-4 md:px-10 py-3 text-primary bg-opacity-80 clip-bottom-right-2">
-                  {item}
-                </h1>
-              </motion.div>
-            )
-          )}
+          {navigationItems.map((item) => (
+            <motion.div
+              key={item.target}
+              className="border-2 border-primary-dark p-1"
+              whileHover={{ scale: 1.05 }}
+              onClick={() => {
+                const element = document.getElementById(item.target);
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                } else {
+                  console.log("Not found");
+                }
+              }}
+            >
+              <h1 className="bg-primary-dark cursor-default px-4 md:px-10 py-3 text-primary bg-opacity-80 clip-bottom-right-2">
+                {item.label}
+              </h1>
+            </motion.div>
+          ))}
         </div>
 
         {/* Problem Statements<div className="border border-primary-dark p-2 mb-6 " id="PS">
@@ -803,6 +847,26 @@ const HackathonSection = () => {
                         {round.description}
                       </p>
                     )}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {event.submissionRequirements?.length > 0 && (
+          <div className="border border-primary-dark p-2 mt-6" id="SubmissionRequirements">
+            <div className="border border-primary-dark shadow-lg p-4 md:p-10">
+              <h2 className="text-center font-semibold text-2xl md:text-3xl mb-5 text-primary border border-primary-dark bg-primary-dark/30 px-3 py-3">
+                Submission Requirements
+              </h2>
+
+              <div className="flex flex-col gap-7">
+                {event.submissionRequirements.map((requirement, index) => (
+                  <motion.div key={index} className="flex flex-col gap-3">
+                    <h1 className="font-medium text-lg md:text-xl text-primary">
+                      {requirement}
+                    </h1>
                   </motion.div>
                 ))}
               </div>
