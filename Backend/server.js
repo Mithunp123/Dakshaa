@@ -747,45 +747,88 @@ app.post("/payment/initiate", async (req, res) => {
            const itemTotal = price * count;
            totalCalculatedAmount += itemTotal;
 
-           // Create Inactive Team NOW
-           const { data: newTeam, error: teamErr } = await supabase
-             .from('teams')
-             .insert({
-                team_name: item.team_name,
-                event_id: item.event_id,
-                leader_id: user_id,
-                created_by: user_id,
-                is_active: false,
-                max_members: count
-             })
-             .select()
-             .single();
+           // Create Inactive Team NOW (with Retry)
+           let newTeam = null;
+           let teamErr = null;
+           let retryCount = 0;
+           const MAX_RETRIES = 3;
+
+           while (retryCount < MAX_RETRIES) {
+             const result = await supabase
+               .from('teams')
+               .insert({
+                  team_name: item.team_name,
+                  event_id: item.event_id,
+                  leader_id: user_id,
+                  created_by: user_id,
+                  is_active: false,
+                  max_members: count
+               })
+               .select()
+               .single();
+             
+             newTeam = result.data;
+             teamErr = result.error;
+
+             if (!teamErr) break; // Success
+             
+             // If error is related to fetch/connection, retry
+             const updateErrMsg = teamErr?.message || JSON.stringify(teamErr);
+             if (updateErrMsg.includes('fetch failed') || updateErrMsg.includes('ECONNRESET')) {
+                console.log(`⚠️ Team creation retry ${retryCount + 1}/${MAX_RETRIES} for ${item.team_name}...`);
+                await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+                retryCount++;
+             } else {
+                break; // Not a transient error
+             }
+           }
            
            if (teamErr) {
              console.error("Mixed reg team creation failed:", teamErr);
              return res.status(500).json({success:false, error: "Failed to create team"});
            }
 
-           // Add leader to team_members immediately
-           await supabase.from('team_members').insert({
-               team_id: newTeam.id,
-               user_id: user_id,
-               role: 'leader',
-               status: 'joined'
-           });
+           // Add leader to team_members immediately (with basic retry)
+           let memberAdded = false;
+           retryCount = 0;
+           
+           while (retryCount < MAX_RETRIES && !memberAdded) {
+               const { error: memberErr } = await supabase.from('team_members').insert({
+                   team_id: newTeam.id,
+                   user_id: user_id,
+                   role: 'leader',
+                   status: 'joined'
+               });
+               
+               if (!memberErr) {
+                   memberAdded = true;
+               } else {
+                   const msg = memberErr?.message || '';
+                   if (msg.includes('fetch failed') || msg.includes('ECONNRESET')) {
+                        console.log(`⚠️ Team member add retry ${retryCount + 1}/${MAX_RETRIES}...`);
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        retryCount++;
+                   } else {
+                       console.error("Failed to add team leader:", memberErr);
+                       break;
+                   }
+               }
+           }
 
            processedRegistrations.push({
              ...item,
              team_id: newTeam.id,
              amount: itemTotal,
-             price_per_member: price
+             price_per_member: price,
+             real_event_name: event.name
            });
 
         } else {
            totalCalculatedAmount += price;
            processedRegistrations.push({
              ...item,
-             amount: price
+             amount: price,
+             real_event_name: event.name
            });
         }
       }
@@ -1000,7 +1043,8 @@ app.post("/payment/initiate", async (req, res) => {
           member_count: member_count || 0,
           total_amount: computedAmount,
           price_per_member: pricePerMember,
-          unpaid_members_count: unpaidMembersCount || member_count || 0
+          unpaid_members_count: unpaidMembersCount || member_count || 0,
+          event_name_real: teamEventRow?.name
         }
       };
     } else if (booking_type === 'combo') {
@@ -1543,7 +1587,7 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
               registrations.push({
                 user_id: user_id,
                 event_id: eventId,
-                event_name: teamInfo?.teamName || null, // Store team name for team events
+                event_name: event.name || event.title,
                 payment_status: 'PAID',
                 transaction_id: payment_id || txn_id,
                 combo_purchase_id: booking_id
@@ -1667,7 +1711,7 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
               const registrations = unpaidMembers.map(member => ({
                 user_id: member.user_id,
                 event_id: teamData.event_id,
-                event_name: teamData.team_name,
+                event_name: teamData.event_name_real || teamData.team_name,
                 payment_status: 'PAID',
                 payment_amount: totalPaymentAmount,
                 transaction_id: payment_id || txn_id
@@ -1753,7 +1797,7 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
                       const { error: regErr } = await supabase.from('event_registrations_config').upsert({
                           user_id: user_id,
                           event_id: item.event_id,
-                          event_name: item.team_name,
+                          event_name: item.real_event_name || item.team_name,
                           payment_status: 'PAID',
                           payment_amount: item.amount,
                           transaction_id: payment_id || txn_id
@@ -1765,6 +1809,7 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
                       const { error: regErr } = await supabase.from('event_registrations_config').upsert({
                           user_id: user_id,
                           event_id: item.event_id,
+                          event_name: item.real_event_name,
                           payment_status: 'PAID',
                           payment_amount: item.amount,
                           transaction_id: payment_id || txn_id
@@ -2206,4 +2251,4 @@ app.get("/api/schedule", async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-});//on 24-01-2026
+});//on 27-01-2026
