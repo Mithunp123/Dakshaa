@@ -10,6 +10,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="format-detection" content="telephone=no" />
     
+    <!-- Prevent Caching -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
     
@@ -67,6 +72,32 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Clear Cache Script -->
+    <script>
+        // CLEANUP: Force clear cache and unregister service workers
+        (async function cleanupCache() {
+            try {
+                // 1. Clear Cache Storage
+                if ('caches' in window) {
+                    const keys = await caches.keys();
+                    await Promise.all(keys.map(key => caches.delete(key)));
+                    console.log('✅ Cache storage cleared');
+                }
+
+                // 2. Unregister existing Service Workers
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (const registration of registrations) {
+                        await registration.unregister();
+                        console.log('✅ Service Worker unregistered');
+                    }
+                }
+            } catch (error) {
+                console.warn('Cache cleanup error:', error);
+            }
+        })();
+    </script>
     
     <!-- Service Worker Registration -->
     <script>
