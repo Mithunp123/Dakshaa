@@ -20,6 +20,7 @@ import txtwk from "./assets/txtwk.jpeg";
 import vlsiwk from "./assets/vlsiwk.jpeg";
 import comingsoon from "./assets/comingsoon.jpg";
 import startuptn from "./assets/startuptn.png";
+import lovable from "./assets/lovable.png";
 
 
 
@@ -31,7 +32,7 @@ function Sponsors() {
   const cosponser=[comingsoon];
   const ecosystem=[startuptn];
 
-  const eventSponsors = [aidswk,aimlwk,btwk,civilwk,csbswk,csewk,ecewk,eeewk,ftwk,iprwk,itwk,mcawk,mctwk,mechwk,txtwk,vlsiwk ];
+  const eventSponsors = [lovable,aidswk,aimlwk,btwk,civilwk,csbswk,csewk,ecewk,eeewk,ftwk,iprwk,itwk,mcawk,mctwk,mechwk,txtwk,vlsiwk ];
   const stallsponsors = [comingsoon];
 
   const letter = "Sponsors";

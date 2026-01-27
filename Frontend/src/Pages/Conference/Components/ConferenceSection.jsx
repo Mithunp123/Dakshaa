@@ -4,40 +4,75 @@ import { motion } from "framer-motion";
 import { X, MapPin, Calendar, Users, Mail, Phone } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import btcon from "../../../assets/conference/bt_con.png";
-import eeecon from "../../../assets/conference/eee_con.png";
+import btcon from "../../../assets/conference/school_of_science.png";
+import eeecon from "../../../assets/conference/school_of_electrical.png";
+import cscon from "../../../assets/conference/school_of_compu.png";
+import mechcon from "../../../assets/conference/school_of_mech.png";
 
 // Conference data
 const conferences = [
   {
     id: 1,
     img: btcon,
-    title: "National Conference on Mechanical Automation & Building Science",
-    shortTitle: "NCMABS 2026",
-    department: "School of Building & Mechanical Sciences",
+    title: "National Conference on Converging Life Sciences with Smart Technologies",
+    shortTitle: "National Conference on Converging Life Sciences with Smart Technologies",
+    department: "School of Life Sciences",
     description:
-      "The School of Building & Mechanical Sciences at KSRCT focuses on engineering excellence, innovation, and hands-on learning in mechanical, mechatronics, and civil engineering. It offers state-of-the-art facilities, an industry-driven curriculum, and advanced research opportunities.",
+      "The National Conference on Converging Life Sciences with Smart Technologies aims to provide a scholarly platform for students, researchers, and academicians to present innovative research and interdisciplinary advancements that integrate life sciences with emerging smart technologies such as Artificial Intelligence, Machine Learning, IoT, Data Analytics, Automation, and Digital Health. The conference promotes knowledge exchange, research collaboration, and dissemination of high-quality scientific work.",
     topics: [
-      "Sustainable Building Materials",
-      "Structural Health Monitoring",
-      "Ground Improvement Techniques",
-      "Geotextiles and Geosynthetics Applications",
-      "Environmental Monitoring and Treatment",
-      "Transportation Planning and Smart Cities",
-      "Remote Sensing and GIS Applications",
-      "River Basin and Watershed Management",
-      "Automation and Construction Project Management",
-      "AI & ML Integration in Civil Engineering",
+      "Converging Life Sciences with Smart Technologies",
     ],
-    date: "March 2026",
+    rules: [
+      "A paper may be authored by one or two members only.",
+      "Participants may submit either an Abstract or a Full Paper.",
+      "Full papers meeting the prescribed standards will be published in the Conference Proceedings.",
+      "Selected full papers will be recommended for Scopus-indexed journal publication, subject to journal review and compliance.",
+      "All submissions must be original, unpublished, and free from plagiarism as per UGC/AICTE norms.",
+      "Each paper will be allotted 10 minutes for presentation, followed by a questioning (Q&A) session with the judges/panel members.",
+      "Papers must strictly follow the conference formatting guidelines and undergo a peer-review process.",
+      "At least one author must register and present the paper.",
+      "The Organizing Committee’s decision shall be final in all matters related to acceptance and publication.",
+
+    ],
+    eligibility: [
+      "Undergraduate (UG) and Postgraduate (PG) Students",
+      "Research Scholars",
+      "Academicians",
+
+    ],
+    registrationdetails:[
+      " Including one author per paper : ₹300",
+      " Additional author per head : ₹150",
+    ],
+
+    date: "13 February 2026 ",
     venue: "KSRCT Campus",
-    registrationFee: "₹300",
-    facultyCo: "Dr. S. Vadivel",
-    facultyCoNo: "+91 97906 32171",
-    studentCo1: "A. Shanmugeshwara",
-    studentCoNo1: "+91 94871 19381",
-    email: "ncistemm@ksrct.ac.in",
-    registrationLink: "https://forms.gle/rfUU9yyQm6VeyX9x8",
+    contact: {
+        facultyCoordinator: [
+          {
+            name: "Dr. S Poornima",
+            phone: "+91 99946 25815",
+            email: "",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: "  Ms. M. Jerin Jenifer",
+            phone: "+91 93615 56956",
+            email: "",
+          },
+          {
+            name: "Mr. S. Vairabalaji",
+            phone: "+91 70944 84560",
+            email: "",
+          },
+          {
+            name : "Mr. S. Muralidhar",
+            phone:"+91 63821 51595"
+          }
+        ],
+      },
+    registrationLink: " ",
   },
   {
     id: 2,
@@ -71,7 +106,7 @@ const conferences = [
   },
   {
     id: 3,
-    img: btcon,
+    img: cscon,
     title: "Applications of Artificial Intelligence and Cybersecurity",
     shortTitle: "AI & Cybersecurity 2026",
     department: "School of Computing Sciences",
@@ -101,7 +136,7 @@ const conferences = [
   },
   {
     id: 4,
-    img: btcon,
+    img: mechcon,
     title: "Technological Innovations in Life Science towards Sustainability",
     shortTitle: "Life Science Innovations 2026",
     department: "School of Life Sciences",
@@ -336,12 +371,6 @@ const ConferenceSection = () => {
                       <Users className="w-5 h-5 text-primary" />
                       <span className="text-sm">{selectedConference.department}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-primary">
-                      <span className="text-xl font-bold">
-                        {selectedConference.registrationFee}
-                      </span>
-                      <span className="text-sm text-gray-400">Registration Fee</span>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -394,38 +423,131 @@ const ConferenceSection = () => {
                 )}
               </div>
 
-              {/* Coordinators Section */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div className="border-2 border-primary/30 bg-primary/5 p-5">
-                  <p className="text-white/60 text-sm uppercase tracking-widest mb-3">
-                    Faculty Coordinator
-                  </p>
-                  <div className="text-white/90 space-y-1">
-                    <p className="font-medium">{selectedConference.facultyCo}</p>
-                    <p className="text-sm text-primary">{selectedConference.facultyCoNo}</p>
+              {/* Rules Section */}
+              {selectedConference.rules && selectedConference.rules.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Submission Rules
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {selectedConference.rules.map((rule, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="flex items-start gap-2 text-gray-300"
+                      >
+                        <span className="text-primary mt-1">▸</span>
+                        <span className="text-sm">{rule}</span>
+                      </motion.div>
+                    ))}
                   </div>
                 </div>
+              )}
 
-                <div className="border-2 border-primary/30 bg-primary/5 p-5">
-                  <p className="text-white/60 text-sm uppercase tracking-widest mb-3">
-                    Student Coordinator
-                  </p>
-                  <div className="text-white/90 space-y-1">
-                    <p className="font-medium">{selectedConference.studentCo1}</p>
-                    <p className="text-sm text-primary">{selectedConference.studentCoNo1}</p>
+              {/* Eligibility Section */}
+              {selectedConference.eligibility && selectedConference.eligibility.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Eligibility Criteria
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {selectedConference.eligibility.map((criterion, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="flex items-start gap-2 text-gray-300"
+                      >
+                        <span className="text-primary mt-1">▸</span>
+                        <span className="text-sm">{criterion}</span>
+                      </motion.div>
+                    ))}
                   </div>
                 </div>
-              </div>
+              )}
+
+              {/* Registration Fee Section */}
+              {selectedConference.registrationdetails && Array.isArray(selectedConference.registrationdetails) && selectedConference.registrationdetails.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Registration Fee
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {selectedConference.registrationdetails.map((fee, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="flex items-start gap-2 text-gray-300"
+                      >
+                        <span className="text-primary mt-1">▸</span>
+                        <span className="text-sm">{fee}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Contact Section */}
+              {selectedConference.contact && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Contact Information
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Faculty Coordinator */}
+                    <div className="border-2 border-primary/30 bg-primary/5 p-5">
+                      <p className="text-white/60 text-sm uppercase tracking-widest mb-3">
+                        Faculty Coordinator
+                      </p>
+                      {selectedConference.contact.facultyCoordinator.map((coordinator, index) => (
+                        <div key={index} className="text-white/90 space-y-1 mb-4">
+                          <p className="font-medium">{coordinator.name}</p>
+                          {coordinator.phone && (
+                            <p className="text-sm text-primary">{coordinator.phone}</p>
+                          )}
+                          {coordinator.email && (
+                            <p className="text-sm text-primary">{coordinator.email}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Student Coordinator */}
+                    <div className="border-2 border-primary/30 bg-primary/5 p-5">
+                      <p className="text-white/60 text-sm uppercase tracking-widest mb-3">
+                        Student Coordinator
+                      </p>
+                      {selectedConference.contact.studentCoordinator.map((coordinator, index) => (
+                        <div key={index} className="text-white/90 space-y-1 mb-4">
+                          <p className="font-medium">{coordinator.name}</p>
+                          {coordinator.phone && (
+                            <p className="text-sm text-primary">{coordinator.phone}</p>
+                          )}
+                          {coordinator.email && (
+                            <p className="text-sm text-primary">{coordinator.email}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Contact Information */}
               <div className="border-2 border-primary/30 bg-primary/5 p-5 mb-8">
                 <p className="text-white/60 text-sm uppercase tracking-widest mb-3">
-                  Contact Information
+                  General Contact Information
                 </p>
                 <div className="flex flex-col gap-2 text-white/90">
                   <div className="flex items-center gap-2">
                     <Mail className="w-4 h-4 text-primary" />
-                    <span className="text-sm">{selectedConference.email}</span>
+                    <span className="text-sm">ncistemm@ksrct.ac.in</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Phone className="w-4 h-4 text-primary" />
@@ -441,7 +563,7 @@ const ConferenceSection = () => {
                   window.open(selectedConference.registrationLink, "_blank")
                 }
               >
-                REGISTER NOW - {selectedConference.registrationFee}
+                REGISTER NOW
               </button>
             </div>
           </motion.div>
