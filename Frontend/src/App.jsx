@@ -24,7 +24,7 @@ import SupabaseHealthCheck from "./Components/SupabaseHealthCheck";
 // Lazy Load Pages with preload functions for faster navigation
 const Home = lazy(() => import("./Pages/Home/Home"));
 const Events = lazy(() => import("./Pages/Events/Events"));
-const GuestLecture = lazy(() => import("./Pages/GuestLecture/GuestLecture"));
+const Conference = lazy(() => import("./Pages/Conference/Conference"));
 const Workshop = lazy(() => import("./Pages/Workshop/Workshop"));
 const Sponsors = lazy(() => import("./Pages/Sponsors/Sponsors"));
 const Contact = lazy(() => import("./Pages/Home/Components/Contact"));
@@ -168,7 +168,7 @@ function AppContent() {
             />
             <Route path="/events" element={<Events />} />
             <Route path="/sponsors" element={<Sponsors />} />
-            <Route path="/events/conference" element={<GuestLecture />} />
+            <Route path="/events/conference" element={<Conference />} />
             <Route path="/events/workshop" element={<Workshop />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/events/hormonics" element={<Harmonics />} />

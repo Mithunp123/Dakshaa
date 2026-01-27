@@ -7,7 +7,7 @@ import NonTechnicalImage from "../../assets/EventsImages/non-technical.png";
 import Cultural from "../../assets/EventsImages/culturals.jpg";
 import Workshop from "../../assets/EventsImages/workshop.jpg";
 import HackathonImage from "../../assets/Hackathon.png";
-import ConferenceImage from "../../assets/conference/1.png";
+import ConferenceImage from "../../assets/conference/conference.jpeg";
 
 // Import event data from separate files
 import { technicalEvents } from "../../data/technicalEvents";
@@ -148,7 +148,8 @@ const Events = () => {
   const title = "Events";
 
   const handleSlideClick = (eventId) => {
-    if (eventId === "conference") {
+    // Check if it's a conference event (starts with "conference")
+    if (eventId && eventId.startsWith("conference")) {
       navigate("/events/conference");
     } else {
       navigate(`/event/${eventId}`);
