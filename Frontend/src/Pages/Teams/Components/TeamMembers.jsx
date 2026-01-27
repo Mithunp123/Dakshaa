@@ -21,6 +21,7 @@ import harish from "../../../assets/team_members/harish.png";
 import hariprakash from "../../../assets/team_members/Hariprakash.png";
 import deekshana from "../../../assets/team_members/Deekshana.jpg";
 import deepak from "../../../assets/team_members/Deepak.png";
+import Vikas from "../../../assets/team_members/Vikas.png";
 
 
 const chiefCoordinator = [
@@ -51,6 +52,7 @@ const eventCoordinators = [
 
 const developers = [
   //{ id: 1, name: "Giridharan M", department: "AIML", img: giri, role: "Lead Developer", associationLogo: aevaLogo },
+  {id: 2, name: "Vikas T", department: "Artificix", img: Vikas, role: " Developer", associationLogo: aidsasso},
 ]
 
 const designers = [
