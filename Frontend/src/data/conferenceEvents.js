@@ -1,5 +1,4 @@
-import conf1 from "../assets/conference/bt_con.png";
-import conf2 from "../assets/conference/eee_con.png";
+import conf1 from "../assets/conference/confermain.png";
 
 /*
 Conference Events:
