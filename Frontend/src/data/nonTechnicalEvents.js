@@ -19,6 +19,8 @@ import nontech17 from "../assets/EventsImages/EventDetails/Nontech/mct_nontech1.
 import nontech18 from "../assets/EventsImages/EventDetails/Nontech/mech_nontech.png";
 import nontech19 from "../assets/EventsImages/EventDetails/Nontech/txt_nontech.png";
 import nontech20 from "../assets/EventsImages/EventDetails/Nontech/vlsi_nontech.png";
+import nontech21 from "../assets/EventsImages/EventDetails/Nontech/turf_csbs.png";
+
 
 /*
   nontech-aids :AI MEME CONTEST
@@ -41,6 +43,7 @@ import nontech20 from "../assets/EventsImages/EventDetails/Nontech/vlsi_nontech.
   nontech-mech:FREEZEFRAME
   nontect-txt: T2T-Trash 2 Textile
   nontech-vlsi: BlindBites: Taste it. Find it
+  nontech-csbs: TURF WARS
 */
 export const nonTechnicalEvents = [
   {
@@ -143,5 +146,9 @@ export const nonTechnicalEvents = [
     eventId: "nontech-vlsi",
     price: 100,
   },
-
+{
+    image: nontech21,
+    eventId: "nontech-csbs1",
+    price: 100,
+}
 ];

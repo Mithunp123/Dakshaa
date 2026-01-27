@@ -84,6 +84,7 @@ import NonTech17 from "../../../assets/EventsImages/EventDetails/Nontech/mct_non
 import NonTech18 from "../../../assets/EventsImages/EventDetails/Nontech/mech_nontech.png";
 import NonTech19 from "../../../assets/EventsImages/EventDetails/Nontech/txt_nontech.png";
 import NonTech20 from "../../../assets/EventsImages/EventDetails/Nontech/vlsi_nontech.png";
+import NonTech21 from "../../../assets/EventsImages/EventDetails/Nontech/turf_csbs.png";
 
 /* Workshop Events List
 workshop-aids: Agentic AI
@@ -263,6 +264,7 @@ const EventDetails = () => {
   nontech-mech:FREEZEFRAME
   nontect-txt: T2T-Trash 2 Textile
   nontech-vlsi: BlindBites: Taste it. Find it
+  nontech-csbs: TURF WARS
 */
 'nontech-aids' :'non-technical-event-1',
 'nontech-aids1': 'non-technical-event-2',
@@ -284,6 +286,7 @@ const EventDetails = () => {
 'nontech-mech': 'non-technical-event-18',
 'nontect-txt': 'non-technical-event-19',
 'nontech-vlsi': 'non-technical-event-20',
+'nontech-csbs1':'non-technical-event-21',
 
 
     // Cultural Events
@@ -1834,7 +1837,7 @@ const EventDetails = () => {
           ],
         },
   
-        registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9", // Registration link
+        registrationLink: "", // Registration link
       },
       /*"technical-event-16": {
         title: "Code, Click, Done: Mobile AppDevelopment in a day.",
@@ -3190,6 +3193,101 @@ const EventDetails = () => {
         email: " ",
       },
     ],
+  },
+
+      registrationLink: "", // Registration link
+    },
+
+
+    "non-technical-event-21": {
+  title: "POWERHOUSE CHAMPION TROPHY(TURF CRICKET)",
+      price: "₹750 per team",
+  description:
+    "Powerhouse Champion Trophy is a fast-paced cricket tournament focused on skill, discipline, and team strength. With strict rules and limited overs, it promises intense competition and fair play",
+  image: NonTech21,
+  rounds: [
+    {
+      title: "Round 1",
+      description:
+        "Teams will be divided into three groups and ranked based on points and net run rate.",
+    },
+    {
+      title: "Round 2",
+      description:"The top three teams and one committee team will qualify for the Semi-Finals.",
+    },
+    {
+      title: "Round 3",
+      description:"Winners of the Semi-Finals will compete in the Final match.",
+    },
+  ],
+
+
+  rewards: [
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹3,000",
+        },
+        {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹5,000",
+        },
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹1,500",
+        },
+      ],
+  rules: [
+  "Each team must consist of 7 players, with 2 additional substitute players.",
+  "Each match will be 5 overs per innings.",
+  "A bowler is allowed to bowl a maximum of 2 overs.",
+  "Boundaries and sixes are valid only on the front side; shots to other sides will count only as running runs.",
+  "Only standing bowling is permitted; any other action will be considered a No Ball.",
+  "Any delivery bowled above 80 kmph will be considered a No Ball, followed by a Free Hit.",
+  "A batsman can be dismissed only by bowled, caught, or run out.",
+  "In the event of a tie, a Super Over will be played to decide the winner.",
+  "Teams must report at least 10 minutes before the scheduled match time, and carrying a valid College ID card is mandatory.",
+  "A player is allowed to represent only one team throughout the tournament.",
+  "Use of profanity, consumption of alcohol, or participation under the influence of alcohol is strictly prohibited on the field.",
+  "Umpire and organizer decisions are final and binding."
+],
+
+  schedule: [
+    {
+      round: "Event Session",
+      date: "February 14, 2026",
+      time: "9.00 AM to 01.00 PM",
+      location: "KSRCT Hostel Turf",
+    },
+  ],
+  contact: {
+    facultyCoordinator: [
+      {
+        name: "Mr. K. Karthikeyan",
+       
+        phone: " +91 9952475246",
+        email: "",
+      },
+     
+    ],
+    studentCoordinator: [
+      {
+        name: "S. Kishorekumar",
+       
+        phone: "+91 9344276110",
+        email: " ",
+      },
+      {
+        name: "C. Yogeshwaran",
+       
+        phone: "+91 8610388095",
+        email: " ",
+      },
+     
+    ],
+    
   },
 
       registrationLink: "", // Registration link

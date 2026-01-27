@@ -16,7 +16,6 @@ import itasso from "../assest/zita_it_logo.png";
 
 
 import kavinesh from "../../../assets/team_members/kavinesh.jpg";
-import kaviyarasu from "../../../assets/team_members/kaviyarasu.jpg";
 import narendhar from "../../../assets/team_members/Narendhar.png";
 import harish from "../../../assets/team_members/harish.png";
 import hariprakash from "../../../assets/team_members/Hariprakash.png";
@@ -25,7 +24,7 @@ import deepak from "../../../assets/team_members/Deepak.png";
 
 
 const chiefCoordinator = [
-  { id: 14, name: "Kavinesh", department: "", img: kavinesh, role: "AEVA", phone: "+91 63820 60464", associationLogo: aevaLogo },
+   { id: 14, name: "Kavinesh", department: "", img: kavinesh, role: "AEVA", phone: "+91 63820 60464", associationLogo: aevaLogo },
 ];
 
 const jointCoordinators = [

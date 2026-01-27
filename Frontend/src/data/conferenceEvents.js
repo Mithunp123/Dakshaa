@@ -10,4 +10,8 @@ export const conferenceEvents = [
     image: ConferenceImage,
     eventId: "conference",
   },
+  {
+    image: ConferenceImage,
+    eventId: "conference",
+  }
 ];
