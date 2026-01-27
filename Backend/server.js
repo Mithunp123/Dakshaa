@@ -1740,12 +1740,25 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
                 console.error('❌ Error details:', JSON.stringify(regError, null, 2));
               } else {
                 if (teamData.team_id) {
-                     // Check if team is inactive (new creation) and activate it
-                     const { data: teamStatus } = await supabase.from('teams').select('is_active').eq('id', teamData.team_id).single();
-                     if (teamStatus && !teamStatus.is_active) {
-                         await supabase.from('teams').update({ is_active: true }).eq('id', teamData.team_id);
-                         console.log("✅ Activated team:", teamData.team_id);
-                     }
+                     // Update Team Stats (Active, Amount, Members)
+                     const { data: currentTeam } = await supabase
+                        .from('teams')
+                        .select('is_active, total_paid_amount, paid_members')
+                        .eq('id', teamData.team_id)
+                        .single();
+                     
+                     const currentAmount = Number(currentTeam?.total_paid_amount || 0);
+                     const currentMembers = Number(currentTeam?.paid_members || 0);
+                     const newAmount = Number(teamData.total_amount || 0);
+                     const newMembers = registrations.length;
+
+                     await supabase.from('teams').update({ 
+                         is_active: true, // Always ensure active on payment
+                         total_paid_amount: currentAmount + newAmount,
+                         paid_members: currentMembers + newMembers
+                     }).eq('id', teamData.team_id);
+                     
+                     console.log(`✅ Updated team ${teamData.team_id}: Active=true, TotalPaid=${currentAmount + newAmount}`);
                 }
                 console.log(`✅ Team payment processed successfully: ${registrations.length} new registrations for team ${teamData.team_id}`);
                 
@@ -1783,10 +1796,20 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
             
             for (const item of mixedData) {
                  if (item.type === 'team') {
-                     // Activate the team
+                     // Activate the team and update stats
                      if (item.team_id) {
-                         await supabase.from('teams').update({ is_active: true }).eq('id', item.team_id);
-                         console.log("✅ Activated mixed team:", item.team_id);
+                         const { data: mTeam } = await supabase.from('teams').select('total_paid_amount, paid_members').eq('id', item.team_id).single();
+                         const mCurrentAmt = Number(mTeam?.total_paid_amount || 0);
+                         const mCurrentMem = Number(mTeam?.paid_members || 0);
+                         const mNewAmt = Number(item.amount || 0);
+                         const mNewMem = Number(item.member_count || 1);
+
+                         await supabase.from('teams').update({ 
+                             is_active: true,
+                             total_paid_amount: mCurrentAmt + mNewAmt,
+                             paid_members: mCurrentMem + mNewMem
+                         }).eq('id', item.team_id);
+                         console.log(`✅ Activated mixed team ${item.team_id}: Amount=${mCurrentAmt + mNewAmt}`);
                      }
                      // Create registrations for members (currently only leader is in newly created team)
                      // But for Mixed reg, we just add the leader or whomever the current user is.
@@ -2251,4 +2274,4 @@ app.get("/api/schedule", async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-});//on 27-01-2026
+});//on 24-01-2026
