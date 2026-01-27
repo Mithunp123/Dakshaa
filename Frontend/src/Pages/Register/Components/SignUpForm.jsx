@@ -288,7 +288,7 @@ const SignUpForm = () => {
                   className="w-full bg-gray-900/50 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
                 />
               </div>
-              <p className="text-[9px] sm:text-[10px] text-gray-500 ml-1 italic">This exact name will appear on your certificates.</p>
+               <p className="text-[9px] sm:text-[10px] text-cyan-400 ml-1 italic font-medium">This exact name will appear on your certificates.</p>
             </div>
 
             <div className="space-y-1.5 sm:space-y-2">
@@ -321,6 +321,7 @@ const SignUpForm = () => {
                   className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
                 />
               </div>
+              <p className="text-[9px] sm:text-[10px] text-cyan-400 ml-1 italic font-medium">This exact name will appear on your certificates.</p>
             </div>
 
             <div className="space-y-1.5 sm:space-y-2">
@@ -337,6 +338,7 @@ const SignUpForm = () => {
                   className="w-full bg-gray-900/50 border border-white/10 rounded-xl pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all"
                 />
               </div>
+              <p className="text-[9px] sm:text-[10px] text-cyan-400 ml-1 italic font-medium">This exact name will appear on your certificates.</p>
             </div>
 
             <div className="space-y-1.5 sm:space-y-2">
