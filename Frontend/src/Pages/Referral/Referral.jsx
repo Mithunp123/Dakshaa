@@ -228,7 +228,7 @@ const Referral = () => {
             <div className="flex gap-3">
               <span className="text-secondary font-bold min-w-[24px]">2.</span>
               <p>
-                <span className="font-semibold text-white">DakshaaT26 Users:</span> Share your Dakshaa ID (e.g., DAK26-XXXXXXXX) with friends
+                <span className="font-semibold text-white">DakshaaT26 Users (Participants):</span> Share your Dakshaa ID (e.g., DAK26-XXXXXXXX) with friends
               </p>
             </div>
             
