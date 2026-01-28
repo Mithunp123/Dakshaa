@@ -30,7 +30,7 @@ const CyrusNametag = ({ bone }) => {
 };
 
 function Model(props) {
-  const { scene, animations } = useGLTF('/models/robot_optimized.glb');
+  const { scene, animations } = useGLTF('/models/robot_playground.glb');
   const group = useRef();
   const { actions, names } = useAnimations(animations, group);
   const rightArmRef = useRef();
