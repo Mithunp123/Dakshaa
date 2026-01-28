@@ -3,13 +3,21 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Radio,
   Clock,
+  MapPin,
+  AlertTriangle,
+  Zap,
+  Calendar,
   ArrowLeft
 } from "lucide-react";
 import { supabase } from "../../supabase";
 import { useNavigate } from "react-router-dom";
 
 const LiveStatusBoard = () => {
+  const [nowHappening, setNowHappening] = useState([]);
+  const [upNext, setUpNext] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
   const [totalRegistrations, setTotalRegistrations] = useState(0);
+  const [categoryStats, setCategoryStats] = useState([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const navigate = useNavigate();
 
@@ -17,30 +25,25 @@ const LiveStatusBoard = () => {
     fetchLiveData();
 
     // Set up realtime subscriptions
+    const eventsChannel = supabase
+      .channel("events_changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "events" }, () => {
+        fetchLiveData();
+      })
+      .subscribe();
+      
     const registrationsChannel = supabase
       .channel("registrations_changes")
-      .on("postgres_changes", { event: "*", schema: "public", table: "event_registrations_config" }, (payload) => {
-        console.log('Registration change:', payload);
-        // On INSERT with PAID status, increment
-        if (payload.eventType === 'INSERT' && payload.new && payload.new.payment_status === 'PAID') {
-          setTotalRegistrations(prev => prev + 1);
-        }
-        // On UPDATE from non-PAID to PAID, increment
-        else if (payload.eventType === 'UPDATE' && payload.new && payload.new.payment_status === 'PAID' && 
-                 payload.old && payload.old.payment_status !== 'PAID') {
-          setTotalRegistrations(prev => prev + 1);
-        }
+      .on("postgres_changes", { event: "*", schema: "public", table: "registrations" }, () => {
+        fetchStats();
+        fetchCategoryStats();
       })
       .subscribe();
 
-    const profilesChannel = supabase
-      .channel("profiles_changes")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "profiles" }, (payload) => {
-        // Only count if it's a student role
-        if (payload.new && payload.new.role === 'student') {
-          console.log('New student registered:', payload);
-          setTotalRegistrations(prev => prev + 1);
-        }
+    const announcementsChannel = supabase
+      .channel("announcements_changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "announcements" }, () => {
+        fetchAnnouncements();
       })
       .subscribe();
 
@@ -49,37 +52,128 @@ const LiveStatusBoard = () => {
       setCurrentTime(new Date());
     }, 1000);
 
+    // Refresh data every 30 seconds
+    const dataInterval = setInterval(fetchLiveData, 30000);
+
     return () => {
+      eventsChannel.unsubscribe();
       registrationsChannel.unsubscribe();
-      profilesChannel.unsubscribe();
+      announcementsChannel.unsubscribe();
       clearInterval(timeInterval);
+      clearInterval(dataInterval);
     };
   }, []);
 
   const fetchLiveData = async () => {
-    await Promise.all([fetchStats()]);
+    await Promise.all([fetchEvents(), fetchAnnouncements(), fetchStats(), fetchCategoryStats()]);
   };
 
   const fetchStats = async () => {
     try {
-      // Count only student registrations (exclude admin roles)
-      const [studentsResult, regsResult] = await Promise.all([
-        supabase.from('profiles')
-          .select('*', { count: 'exact', head: true })
-          .eq('role', 'student'),
-        supabase.from('event_registrations_config')
-          .select('*', { count: 'exact', head: true })
-          .eq('payment_status', 'PAID')
-      ]);
+      const { data, error } = await supabase.rpc("get_live_stats");
       
-      setTotalRegistrations((studentsResult.count || 0) + (regsResult.count || 0));
+      if (!error && data) {
+        setTotalRegistrations(data.total_registrations);
+      } else {
+        // Fallback or retry logic could go here
+        console.error("Error fetching stats:", error);
+      }
     } catch (error) {
-      console.error("Error fetching stats:", error);
-      // Fallback to 0 if error
-      setTotalRegistrations(0);
+      console.error("Error calling get_live_stats:", error);
     }
   };
 
+  const fetchCategoryStats = async () => {
+    try {
+      const { data, error } = await supabase.rpc("get_live_category_stats");
+      
+      if (!error && data) {
+        setCategoryStats(data);
+      } else {
+        console.error("Error fetching category stats:", error);
+      }
+    } catch (error) {
+      console.error("Error calling get_live_category_stats:", error);
+    }
+  };
+
+  const fetchEvents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("events")
+        .select("*")
+        .order("start_time", { ascending: true });
+
+      if (error) throw error;
+
+      const now = new Date();
+      
+      // Events currently happening
+      const live = (data || []).filter(event => event.current_status === "live");
+      
+      // Events starting within 1 hour
+      const upcoming = (data || []).filter(event => {
+        if (!event.start_time || event.current_status === "live" || event.current_status === "ended") return false;
+        const startTime = new Date(event.start_time);
+        const diffMs = startTime - now;
+        const diffHours = diffMs / (1000 * 60 * 60);
+        return diffHours >= 0 && diffHours <= 1;
+      });
+
+      setNowHappening(live);
+      setUpNext(upcoming);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
+  };
+
+  const fetchAnnouncements = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("announcements")
+        .select("*")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+      setAnnouncements(data || []);
+    } catch (error) {
+      console.error("Error fetching announcements:", error);
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "live":
+        return "from-green-500 to-emerald-500";
+      case "delayed":
+        return "from-yellow-500 to-orange-500";
+      case "scheduled":
+        return "from-blue-500 to-cyan-500";
+      default:
+        return "from-gray-500 to-gray-600";
+    }
+  };
+
+  const getAnnouncementColor = (type) => {
+    switch (type) {
+      case "urgent":
+        return "from-red-500/20 to-red-600/10 border-red-500/50";
+      case "success":
+        return "from-green-500/20 to-green-600/10 border-green-500/50";
+      case "warning":
+        return "from-yellow-500/20 to-yellow-600/10 border-yellow-500/50";
+      default:
+        return "from-blue-500/20 to-blue-600/10 border-blue-500/50";
+    }
+  };
+
+  const formatTime = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+  };
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
@@ -138,7 +232,7 @@ const LiveStatusBoard = () => {
                 transition={{ type: "spring", bounce: 0.5, delay: 0.2 }}
                 className="mt-16 flex flex-col items-center"
             >
-                <div className="text-gray-400 text-2xl font-medium uppercase tracking-[0.2em] mb-4">Registered Students</div>
+                <div className="text-gray-400 text-2xl font-medium uppercase tracking-[0.2em] mb-4">Total Registrations</div>
                 <div className="text-[12rem] leading-none font-bold bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 bg-clip-text text-transparent filter drop-shadow-[0_0_30px_rgba(59,130,246,0.5)]">
                     {totalRegistrations.toLocaleString()}
                 </div>
@@ -147,7 +241,22 @@ const LiveStatusBoard = () => {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                     </span>
-                    <span className="text-sm font-semibold tracking-wider">LIVE UPDATES</span>
+                    <span className="text-sm font-semibold tracking-wider">LIVE UPDATING</span>
+                </div>
+            
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-16 w-full max-w-6xl px-4">
+                  {categoryStats.map((stat, index) => (
+                    <motion.div 
+                      key={stat.category}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 + (index * 0.1) }}
+                      className="flex flex-col items-center p-6 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors"
+                    >
+                      <div className="text-gray-400 text-sm font-bold uppercase tracking-widest mb-3 text-center h-10 flex items-center justify-center">{stat.category}</div>
+                      <div className="text-4xl font-bold bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent font-mono">{stat.count.toLocaleString()}</div>
+                    </motion.div>
+                  ))}
                 </div>
             </motion.div>
             </motion.div>
