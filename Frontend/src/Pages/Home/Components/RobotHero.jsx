@@ -131,6 +131,9 @@ function Model(props) {
 const RobotHero = () => {
   const [loadError, setLoadError] = useState(false);
 
+  // Detect mobile device
+  const isMobile = /iPhone|iPad|iPod|Android|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
   useEffect(() => {
     // Handle WebGL context loss
     const handleContextLost = (event) => {
@@ -175,7 +178,7 @@ const RobotHero = () => {
   }
 
   return (
-    <div className="w-full h-[280px] xs:h-[320px] sm:h-[400px] md:h-[500px] lg:h-[600px] relative z-20 cursor-grab active:cursor-grabbing">
+    <div className={`w-full h-[280px] xs:h-[320px] sm:h-[400px] md:h-[500px] lg:h-[600px] relative z-20 ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''}`}>
       <Canvas
         camera={{ position: [0, 2, 10], fov: 35 }}
         gl={{ 
@@ -215,6 +218,11 @@ const RobotHero = () => {
           autoRotateSpeed={0.8}
           maxPolarAngle={Math.PI / 1.5}
           minPolarAngle={Math.PI / 3}
+          // Disable all touch controls on mobile to allow page scrolling
+          enabled={!isMobile}
+          enablePan={!isMobile}
+          enableRotate={!isMobile}
+          // On mobile, only auto-rotate is active
         />
         <Environment preset="night" />
       </Canvas>
