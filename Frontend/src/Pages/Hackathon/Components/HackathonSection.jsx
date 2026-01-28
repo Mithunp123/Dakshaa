@@ -1,54 +1,17 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { supabase } from "../../../supabase";
 import { motion } from "framer-motion";
-import { ChevronDown, ChevronUp, ArrowLeft } from "lucide-react"; 
+import { ChevronDown, ChevronUp, ArrowLeft, Trophy } from "lucide-react"; 
 import { useNavigate, useLocation } from "react-router-dom";
 import { hackathonEvents } from "../../../data/hackathonEvents";
 
-
-const HackathonSection = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    };
-    fetchUser();
-    
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-  
-  // Extract event ID from the current pathname
-  const rawEventId = useMemo(() => {
-    const path = location.pathname;
-    if (path.includes('/event/hackathon-1')) return 'hackathon-1';
-    if (path.includes('/event/hackathon-2')) return 'hackathon-2';
-    if (path.includes('/event/hackathon-3')) return 'hackathon-3';
-    if (path.includes('/event/hackathon-4')) return 'hackathon-4';
-    if (path.includes('/event/hackathon-5')) return 'hackathon-5';
-    if (path.includes('/event/hackathon-6')) return 'hackathon-6';
-    return 'hackathon-1'; // default fallback
-  }, [location.pathname]);
-  
-  // Find the correct hackathon event by eventId
-  const currentHackathonEvent = useMemo(() => {
-    return hackathonEvents.find(event => event.eventId === rawEventId) || hackathonEvents[0];
-  }, [rawEventId]);
-  
-  // Hackathon Events Content - Separate content for each event
-  const hackathonEventDetails = {
-    "hackathon-1": {
+// Hackathon Events Content - Separate content for each event
+export const hackathonEventDetails = {
+  "hackathon-1": {
       id: "hackathon-1",
       title: "Neura-Hack 2.0 (36 Hours Hackathon)",
+      date: "12th Feb - 13th Feb, 2026",
+      venue: "IT PARK",
       registrationLink: "",
       description: "NeuroHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, Defend, and Secure technology to shape the future of digital innovation.",
       rewards: [
@@ -94,7 +57,6 @@ const HackathonSection = () => {
       ],
       schedule: [
         {
-          round: "Event",
           date: "12th Feb - 13th Feb, 2026",
           time: "9:00 AM to 9:00 PM",
           location: "IT PARK",
@@ -119,6 +81,8 @@ const HackathonSection = () => {
     "hackathon-2": {
       id: "hackathon-2",
       title: "BioNexathon 2026 (24 Hours Hackathon)",
+      date: "February 13 2026 to February 14, 2026",
+      venue: "Seminar Hall",
       description: "A platform for students, researchers, and professionals to present and discuss recent advancements in biotechnology. Includes keynote lectures, panel discussions, and interactive sessions. Focus on innovation, research impact, and interdisciplinary collaboration. Encourages networking and knowledge exchange among participants.",
       eligibility: {
         categories: [
@@ -252,11 +216,11 @@ const HackathonSection = () => {
           },
           {
             name: "Mr. P. Nishaanth",
-            phone: "9843493094",
+            phone: "+91 98434 93094",
           },
           {
             name: "Mr. M. Karunamurthy",
-            phone: "8925243072",
+            phone: "+91 89252 43072",
           },
         ],
       },
@@ -264,7 +228,9 @@ const HackathonSection = () => {
     "hackathon-3": {
       id: "hackathon-3",
       title: "NeuroCode 2.0",
-      registrationLink: "https://forms.gle/example3",
+      date: "February 13 2026 ",
+      venue: "computer Lab",
+      registrationLink: " ",
       description: "Code Relay is a team-based web design challenge where a reference website design is provided. Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
       rewards: [
         {
@@ -285,7 +251,7 @@ const HackathonSection = () => {
       ],
       rounds: [
         {
-          title: "Topics",
+          title: "Round details",
           description: [
             "Relay the logic",
             "Round 1: Code Debug Sprint (30 Minutes) – Elimination Round Concept",
@@ -316,7 +282,6 @@ const HackathonSection = () => {
       ],
       schedule: [
         {
-          round: "Venue",
           date: "February 13, 2026",
           time: "09:00 AM",
           location: "Computer Lab",
@@ -333,11 +298,11 @@ const HackathonSection = () => {
         studentCoordinator: [
           {
             name: "Mr.S.Sujith",
-            phone: "9361796047",
+            phone: "+91 93617 96047",
           },
           {
             name: "Ms.G.Kari Vikashini",
-            phone: "9384525869",
+            phone: "+91 93845 25869",
           },
         ],
       },
@@ -345,6 +310,8 @@ const HackathonSection = () => {
     "hackathon-4": {
       id: "hackathon-4",
       title: "24-Hour Vibe Coding Hackathon",
+      date: "February 13, 2026",
+      venue: "AB lab 3",
       description: "The 24-Hour Vibe Coding Hackathon is an intensive, creativity-driven coding event where participants design and prototype real-world software solutions using Lovable AI. The hackathon emphasizes problem-first thinking, rapid iteration, and meaningful impact rather than product pitching or hardware-based development.Participants will receive problem statements on the spot and are expected to ideate, build, and present a working solution within 24 hours using limited AI credits—encouraging smart, intentional, and efficient development",
       rewards: [
         {
@@ -409,7 +376,7 @@ const HackathonSection = () => {
 
       schedule: [
         {
-          round: "Venue",
+          
           date: "February 13, 2026",
           time: "09:00 AM",
           location: "AB lab 3",
@@ -419,31 +386,31 @@ const HackathonSection = () => {
         facultyCoordinator: [
           {
             name: "Mr. S.Insol Rajasekar",
-            phone: "8220512436",
+            phone: "+91 82205 12436",
             email: "",
           },
           {
             name: "Mr.K.Praveen",
-            phone: "9500918101",
+            phone: "+91 95009 18101",
             email: "",
           },
         ],
         studentCoordinator: [
           {
             name: "Ms.Dhinesha",
-            phone: "9942687393",
+            phone: "+91 99426 87393",
           },
           {
             name: "Ms.R.Monika",
-            phone: "9363607816",
+            phone: "+91 93636 07816",
           },
           {
             name: "Mr.D.Adith",
-            phone: "7094278374",
+            phone: "+91 70942 78374",
           },
           {
             name: "Mr.M.Madhukumar",
-            phone: "9942687393",
+            phone: "+91 99426 87393",
           },
         ],
       },
@@ -451,6 +418,8 @@ const HackathonSection = () => {
     "hackathon-5": {
       id: "hackathon-5",
       title: "Startup Pitch 2026",
+      date: "To be Announced",
+      venue: "Innovation Hub, Building C",
       description: "Startup Pitch is an entrepreneurial hackathon where teams develop business ideas and prototypes. Focus is on feasibility, market potential, and innovation.",
       rewards: [
         {
@@ -493,8 +462,8 @@ const HackathonSection = () => {
       ],
       schedule: [
         {
-          round: "Venue",
-          date: "June 5, 2026",
+         
+          date: "To be Announced",
           time: "02:00 PM",
           location: "Innovation Hub, Building C",
         },
@@ -519,6 +488,8 @@ const HackathonSection = () => {
     "hackathon-6": {
       id: "hackathon-6",
       title: "Designathon 2026",
+      date: "February 13, 2026",
+      venue: "Idea lab [ Main Building ]",
       description: "Designathon challenges individuals to solve an engineering problem within a limited time. Participants develop creative design solutions using logical and technical thinking. Originality, feasibility, and time management are key evaluation criteria.",
       rewards: [
         {
@@ -559,7 +530,7 @@ const HackathonSection = () => {
       ],
       schedule: [
         {
-          round: "Venue",
+         
           date: "February 13, 2026",
           time: "09:00 AM",
           location: "Idea lab [ Main Building ]",
@@ -581,12 +552,12 @@ const HackathonSection = () => {
         studentCoordinator: [
           {
             name: "Mr.G.S.Priyan",
-            phone: "8668057985",
+            phone: "+91 86680 57985",
             email: "",
           },
             {
             name: "Mr. S.Vijayaragavan",
-            phone: "8124547760",
+            phone: "+91 81245 47760",
             email: "",
           },
             {
@@ -598,6 +569,44 @@ const HackathonSection = () => {
       },
     },
   };
+
+const HackathonSection = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    fetchUser();
+    
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+  
+  // Extract event ID from the current pathname
+  const rawEventId = useMemo(() => {
+    const path = location.pathname;
+    if (path.includes('/event/hackathon-1')) return 'hackathon-1';
+    if (path.includes('/event/hackathon-2')) return 'hackathon-2';
+    if (path.includes('/event/hackathon-3')) return 'hackathon-3';
+    if (path.includes('/event/hackathon-4')) return 'hackathon-4';
+    if (path.includes('/event/hackathon-5')) return 'hackathon-5';
+    if (path.includes('/event/hackathon-6')) return 'hackathon-6';
+    return 'hackathon-1'; // default fallback
+  }, [location.pathname]);
+  
+  // Find the correct hackathon event by eventId
+  const currentHackathonEvent = useMemo(() => {
+    return hackathonEvents.find(event => event.eventId === rawEventId) || hackathonEvents[0];
+  }, [rawEventId]);
   
   const event = hackathonEventDetails[rawEventId] || hackathonEventDetails["hackathon-1"];
 
@@ -706,7 +715,7 @@ const HackathonSection = () => {
               animate="animate" // Ensure the animation is always running
               onClick={() => handleRegisterClick()} // Open registration link in a new tab
             >
-              REGISTER NOW!
+              {user ? 'REGISTER NOW!' : 'SIGN IN TO REGISTER'}
             </motion.button>
           </div>
         </div>
@@ -803,21 +812,62 @@ const HackathonSection = () => {
               Rewards and Recognition
             </h2>
 
-            {/* Prize List */}
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-12">
-              {event.rewards && event.rewards.map((reward, index) => {
-                const orderClass = index === 1 ? "order-1 sm:order-2 sm:mb-16" : index === 0 ? "order-2 sm:order-1 sm:mt-16" : "order-3 sm:mt-16";
-                return (
-                  <div key={index} className={`flex flex-col items-center bg-primary-dark/30 border border-primary-dark p-6 rounded-lg w-full max-w-xs shadow-md ${orderClass}`}>
-                    <span className="text-2xl font-bold">
-                      {reward.emoji} {reward.position}
-                    </span>
-                    <span className="text-3xl font-semibold text-white mt-2">
-                      {reward.amount}
-                    </span>
-                  </div>
-                );
-              })}
+            {/* Podium Prize Layout */}
+            <div className="flex justify-center items-end gap-4 sm:gap-8 px-4">
+              {event.rewards && (() => {
+                // Create podium order: 2nd, 1st, 3rd (traditional podium layout)
+                const first = event.rewards.find(r => r.position.includes('1st'));
+                const second = event.rewards.find(r => r.position.includes('2nd'));
+                const third = event.rewards.find(r => r.position.includes('3rd'));
+                const orderedRewards = [second, first, third].filter(Boolean);
+                
+                return orderedRewards.map((reward, index) => {
+                  const isFirst = reward.position.includes('1st');
+                  const isSecond = reward.position.includes('2nd');
+                  const isThird = reward.position.includes('3rd');
+                  
+                  const trophySize = isFirst ? 'w-20 h-20 sm:w-28 sm:h-28' : isSecond ? 'w-16 h-16 sm:w-20 sm:h-20' : 'w-14 h-14 sm:w-16 sm:h-16';
+                  const trophyColor = isFirst ? 'text-yellow-400' : isSecond ? 'text-gray-300' : 'text-orange-400';
+                  const podiumSize = isFirst ? 'w-28 sm:w-40 h-44 sm:h-56' : isSecond ? 'w-24 sm:w-32 h-32 sm:h-40' : 'w-20 sm:w-28 h-24 sm:h-32';
+                  const numberSize = isFirst ? 'text-5xl sm:text-6xl' : isSecond ? 'text-4xl sm:text-5xl' : 'text-3xl sm:text-4xl';
+                  const position = isFirst ? '1' : isSecond ? '2' : '3';
+                  
+                  return (
+                    <motion.div 
+                      key={index}
+                      initial={{ opacity: 0, y: 50 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 + index * 0.1, duration: 0.5 }}
+                      className="flex flex-col items-center"
+                    >
+                      <Trophy className={`${trophySize} mb-3 ${trophyColor}`} />
+                      <div className={`bg-cyan-500/80 ${podiumSize} flex flex-col items-center justify-center rounded-t-lg`}>
+                        <span className={`text-white ${numberSize} font-bold`}>{position}</span>
+                      </div>
+                    </motion.div>
+                  );
+                });
+              })()}
+            </div>
+
+            {/* Prize Details Below Podium */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+              {event.rewards && event.rewards.map((reward, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 + index * 0.1, duration: 0.5 }}
+                  className="bg-primary-dark/30 border border-primary-dark p-4 rounded-lg text-center"
+                >
+                  <span className="text-xl font-bold block mb-2">
+                    {reward.emoji} {reward.position}
+                  </span>
+                  <span className="text-2xl font-semibold text-white">
+                    {reward.amount}
+                  </span>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>

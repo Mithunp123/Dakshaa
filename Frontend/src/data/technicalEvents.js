@@ -1,21 +1,21 @@
 import Tech1 from "../assets/EventsImages/EventDetails/TechnicalImages/aids_tech.png";
 import Tech2 from "../assets/EventsImages/EventDetails/TechnicalImages/csbs_tech.png";
-//import Tech3 from "../assets/EventsImages/EventDetails/TechnicalImages/aiml_tech.png";
+import Tech3 from "../assets/EventsImages/EventDetails/TechnicalImages/aiml_tech.png";
 import Tech4 from "../assets/EventsImages/EventDetails/TechnicalImages/bt_tech.png";
-//import Tech5 from "../assets/EventsImages/EventDetails/TechnicalImages/bt_tech1.png";
+import Tech5 from "../assets/EventsImages/EventDetails/TechnicalImages/bt_tech1.png";
 import Tech6 from "../assets/EventsImages/EventDetails/TechnicalImages/bt_tech2.png";
 import Tech7 from "../assets/EventsImages/EventDetails/TechnicalImages/civil_tech.png";
 import Tech8 from "../assets/EventsImages/EventDetails/TechnicalImages/civil_tech1.png";
-//import Tech9 from "../assets/EventsImages/EventDetails/TechnicalImages/cse_tech.png";
+import Tech9 from "../assets/EventsImages/EventDetails/TechnicalImages/cse_tech.png";
 import Tech10 from "../assets/EventsImages/EventDetails/TechnicalImages/cse_tech1.png";
 import Tech11 from "../assets/EventsImages/EventDetails/TechnicalImages/ece_tech.png";
 import Tech12 from "../assets/EventsImages/EventDetails/TechnicalImages/eee_tech.png";
 import Tech13 from "../assets/EventsImages/EventDetails/TechnicalImages/eee_tech1.png";
 import Tech14 from "../assets/EventsImages/EventDetails/TechnicalImages/ft_tech.png";
-//import Tech15 from "../assets/EventsImages/EventDetails/TechnicalImages/it_tech.png";
+import Tech15 from "../assets/EventsImages/EventDetails/TechnicalImages/it_tech.png";
 import Tech16 from "../assets/EventsImages/EventDetails/TechnicalImages/mct_tech.png";
 import Tech17 from "../assets/EventsImages/EventDetails/TechnicalImages/mech_tech.png";
-//import Tech18 from "../assets/EventsImages/EventDetails/TechnicalImages/mech_tech1.png";
+import Tech18 from "../assets/EventsImages/EventDetails/TechnicalImages/mech_tech1.png";
 import Tech19 from "../assets/EventsImages/EventDetails/TechnicalImages/txt_tech.png";
 import Tech20 from "../assets/EventsImages/EventDetails/TechnicalImages/txt_tech1.png";
 import Tech21 from "../assets/EventsImages/EventDetails/TechnicalImages/vlsi_tech.png";
@@ -35,7 +35,7 @@ export const technicalEvents = [
     eventId: "tech-csbs",
     price: 250,
   },
-  /*({
+  /*{
     image: Tech3,
     eventId: "tech-aiml",
     price: 250,

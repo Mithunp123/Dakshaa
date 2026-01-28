@@ -169,6 +169,7 @@ function AppContent() {
             <Route path="/events" element={<Events />} />
             <Route path="/sponsors" element={<Sponsors />} />
             <Route path="/events/conference" element={<Conference />} />
+            <Route path="/events/hackathon" element={<Hackathon />} />
             <Route path="/events/workshop" element={<Workshop />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/events/hormonics" element={<Harmonics />} />
