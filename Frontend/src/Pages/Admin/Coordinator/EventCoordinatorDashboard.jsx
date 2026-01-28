@@ -48,7 +48,6 @@ const formatDakshaaId = (uuid) => {
 };
 
 const EventCoordinatorDashboard = () => {
-  const navigate = useNavigate();
   const [assignedEvents, setAssignedEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [participants, setParticipants] = useState([]);
@@ -60,10 +59,6 @@ const EventCoordinatorDashboard = () => {
   const [cameraId, setCameraId] = useState(null);
   const [cameras, setCameras] = useState([]);
   const [cameraError, setCameraError] = useState(null);
-  
-  // PWA Install
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [showInstallButton, setShowInstallButton] = useState(false);
   
   // Session type for attendance
   const [selectedSession, setSelectedSession] = useState('morning');
@@ -104,24 +99,8 @@ const EventCoordinatorDashboard = () => {
   useEffect(() => {
     fetchAssignedEvents();
     getCameras();
-    
-    // PWA Install Prompt
-    const handleBeforeInstallPrompt = (e) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      setShowInstallButton(true);
-    };
-    
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    
-    // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setShowInstallButton(false);
-    }
-    
     return () => {
       stopScanning();
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
 
@@ -463,87 +442,7 @@ const EventCoordinatorDashboard = () => {
     }
   };
 
-  const handleInstallApp = async () => {
-    // Check if already running as installed app
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                         window.navigator.standalone === true;
-    
-    if (isStandalone) {
-      toast.success('App is already installed! 🎉', { duration: 3000 });
-      return;
-    }
-    
-    if (!deferredPrompt) {
-      // Show manual installation instructions
-      toast((t) => (
-        <div className="text-left">
-          <p className="font-bold mb-2">📱 How to Install:</p>
-          <p className="text-sm mb-1">• Chrome/Edge: Menu → "Install app"</p>
-          <p className="text-sm mb-1">• Safari: Share → "Add to Home Screen"</p>
-          <p className="text-sm">• Firefox: Menu → "Install"</p>
-        </div>
-      ), { duration: 5000 });
-      return;
-    }
-    
-    try {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      
-      if (outcome === 'accepted') {
-        toast.success('App installed successfully! 📱', { duration: 3000 });
-        setShowInstallButton(false);
-      } else {
-        toast('Installation cancelled', { duration: 2000 });
-      }
-      
-      setDeferredPrompt(null);
-    } catch (error) {
-      console.error('Installation error:', error);
-      toast.error('Installation failed. Try browser menu → Install app');
-    }
-  };
-
-  const exportToExcel = () => {
-    if (!selectedEvent || participants.length === 0) {
-      alert('No participants to export');
-      return;
-    }
-
-    // Prepare CSV data
-    const headers = ['S.No', 'Name', 'Dakshaa ID', 'Roll Number', 'College', 'Phone', 'Morning Attendance', 'Evening Attendance', 'Registration Date'];
-    
-    const rows = participants.map((p, index) => [
-      index + 1,
-      p.profiles?.full_name || 'N/A',
-      formatDakshaaId(p.user_id),
-      p.profiles?.roll_number || p.profiles?.roll_no || 'N/A',
-      p.profiles?.college_name || 'N/A',
-      p.profiles?.phone || 'N/A',
-      p.morningAttended ? 'Present' : 'Absent',
-      p.eveningAttended ? 'Present' : 'Absent',
-      p.created_at ? new Date(p.created_at).toLocaleDateString() : 'N/A'
-    ]);
-
-    // Create CSV content
-    let csvContent = headers.join(',') + '\n';
-    rows.forEach(row => {
-      csvContent += row.map(cell => `"${cell}"`).join(',') + '\n';
-    });
-
-    // Create download link
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    const fileName = `${selectedEvent?.name || 'event'}_participants_${new Date().toISOString().split('T')[0]}.csv`;
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', fileName);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  // Removed handleInstallApp and exportToExcel functions from the new structure
 
   // Use effect to initialize scanner when scanning state becomes true
   useEffect(() => {
@@ -769,16 +668,6 @@ const EventCoordinatorDashboard = () => {
     audio.play().catch(() => {});
   };
 
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      navigate('/login');
-    } catch (error) {
-      console.error('Error logging out:', error);
-      toast.error('Failed to logout');
-    }
-  };
-
   // Toast notification for success (replaces full-screen notification)
   const showSuccessToast = (name, session = 'morning') => {
     const sessionLabel = session === 'evening' ? 'PM' : 'AM';
@@ -832,184 +721,118 @@ const EventCoordinatorDashboard = () => {
   }
 
   return (
-    <div className="flex h-screen bg-slate-950 text-white overflow-hidden">
+    <div className="min-h-screen bg-slate-950 text-white pb-24 md:pb-8">
+      {/* Toast notifications */}
       <Toaster position="top-center" toastOptions={{ duration: 2000 }} />
-
-      {/* Sidebar */}
-      <div className="w-64 bg-slate-900 border-r border-white/10 flex flex-col shrink-0 z-50 hidden md:flex">
-        <div className="p-6 border-b border-white/10">
-           <h1 className="text-xl font-bold font-orbitron bg-gradient-to-r from-secondary to-cyan-500 bg-clip-text text-transparent">
-             COORDINATOR
-           </h1>
-           <p className="text-xs text-gray-500 mt-1">Dashboard Panel</p>
+      
+      {/* Mobile Header */}
+      <div className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-xl border-b border-white/10 p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h1 className="text-2xl font-bold font-orbitron text-secondary">COORDINATOR</h1>
+            <p className="text-xs text-gray-400">Mobile Action Panel</p>
+          </div>
+          <div className="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center border border-secondary/20">
+            <QrCode className="text-secondary" size={24} />
+          </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-            {[
-              { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-              { id: 'registrations', label: 'Registrations', icon: ClipboardList },
-              { id: 'scanner', label: 'Global Scanner', icon: Camera },
-              { id: 'winners', label: 'Winners', icon: Trophy },
-              { id: 'participants', label: 'Participants List', icon: Users },
-              { id: 'manual', label: 'Manual Entry', icon: Search },
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
-                  activeTab === item.id
-                    ? 'bg-secondary/20 text-secondary border border-secondary/20'
-                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                }`}
-              >
-                <item.icon size={20} />
-                {item.label}
-              </button>
-            ))}
-        </div>
-
-        <div className="p-4 border-t border-white/10 space-y-2">
-            {deferredPrompt && (
-              <button
-                onClick={handleInstallApp}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all"
-              >
-                <Download size={20} />
-                Install App
-              </button>
-            )}
-            <button
-               onClick={handleLogout}
-               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all"
-            >
-               <LogOut size={20} />
-               Logout
-            </button>
-        </div>
+        {/* Event Selector with Registration Count */}
+        <select
+          value={selectedEvent?.id || selectedEvent?.event_id || ''}
+          onChange={(e) => {
+            const event = assignedEvents.find(ev => (ev.id || ev.event_id) === e.target.value);
+            setSelectedEvent(event);
+          }}
+          className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:outline-none focus:border-secondary transition-all font-bold"
+        >
+          {assignedEvents.map(event => (
+            <option key={event.id || event.event_id} value={event.id || event.event_id} className="bg-slate-900">
+              {event.name || event.event_id} ({event.registeredCount || 0} registered)
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-          
-          <div className="flex-1 overflow-y-auto p-4 md:p-6">
-
-      {/* Session Selector & Stats - Hidden everywhere as we moved controls inside relevant tabs */}
-      {false && (
-        <>
-      <div className="flex gap-3 px-4 py-3 bg-gradient-to-b from-slate-900/50 to-transparent">
-        <motion.button
-          whileTap={{ scale: 0.95 }}
+      {/* Session Selector */}
+      <div className="flex gap-2 px-4 py-2">
+        <button
           onClick={() => setSelectedSession('morning')}
-          className={`flex-1 py-4 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+          className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
             selectedSession === 'morning'
-              ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-lg shadow-yellow-500/30'
-              : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+              ? 'bg-yellow-500 text-white shadow-lg shadow-yellow-500/20'
+              : 'bg-white/5 text-gray-400 border border-white/10'
           }`}
         >
-          <Sun size={20} />
+          <Sun size={18} />
           Forenoon
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.95 }}
+        </button>
+        <button
           onClick={() => setSelectedSession('evening')}
-          className={`flex-1 py-4 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+          className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
             selectedSession === 'evening'
-              ? 'bg-gradient-to-r from-indigo-500 to-blue-500 text-white shadow-lg shadow-indigo-500/30'
-              : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+              ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+              : 'bg-white/5 text-gray-400 border border-white/10'
           }`}
         >
-          <Moon size={20} />
+          <Moon size={18} />
           Afternoon
-        </motion.button>
+        </button>
       </div>
 
       {/* Stats Row - Now with session breakdown */}
-      <div className="grid grid-cols-2 gap-3 p-4">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-gradient-to-br from-blue-500/20 via-blue-500/10 to-transparent border border-blue-500/30 rounded-2xl p-5 text-center shadow-lg"
-        >
-          <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mx-auto mb-2">
-            <Users className="text-blue-400" size={24} />
-          </div>
-          <p className="text-3xl font-bold text-blue-400 mb-1">{stats.registered}</p>
-          <p className="text-xs text-gray-400 uppercase tracking-wider">Registered</p>
-        </motion.div>
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-gradient-to-br from-yellow-500/20 via-yellow-500/10 to-transparent border border-yellow-500/30 rounded-2xl p-5 text-center shadow-lg"
-        >
-          <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center mx-auto mb-2">
-            <Sun className="text-yellow-400" size={24} />
-          </div>
-          <p className="text-3xl font-bold text-yellow-400 mb-1">{stats.morningCheckedIn}</p>
-          <p className="text-xs text-gray-400 uppercase tracking-wider">Forenoon ✓</p>
-        </motion.div>
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-gradient-to-br from-indigo-500/20 via-indigo-500/10 to-transparent border border-indigo-500/30 rounded-2xl p-5 text-center shadow-lg"
-        >
-          <div className="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center mx-auto mb-2">
-            <Moon className="text-indigo-400" size={24} />
-          </div>
-          <p className="text-3xl font-bold text-indigo-400 mb-1">{stats.eveningCheckedIn}</p>
-          <p className="text-xs text-gray-400 uppercase tracking-wider">Afternoon ✓</p>
-        </motion.div>
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-gradient-to-br from-secondary/20 via-secondary/10 to-transparent border border-secondary/30 rounded-2xl p-5 text-center shadow-lg"
-        >
-          <div className="w-12 h-12 bg-secondary/20 rounded-xl flex items-center justify-center mx-auto mb-2">
-            <Clock className="text-secondary" size={24} />
-          </div>
-          <p className="text-3xl font-bold text-secondary mb-1">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
+        <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 text-center">
+          <Users className="mx-auto text-blue-500 mb-2" size={24} />
+          <p className="text-2xl font-bold text-blue-500">{stats.registered}</p>
+          <p className="text-xs text-gray-400 uppercase">Registered</p>
+        </div>
+        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-4 text-center">
+          <Sun className="mx-auto text-yellow-500 mb-2" size={24} />
+          <p className="text-2xl font-bold text-yellow-500">{stats.morningCheckedIn}</p>
+          <p className="text-xs text-gray-400 uppercase">Forenoon ✓</p>
+        </div>
+        <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-4 text-center">
+          <Moon className="mx-auto text-indigo-500 mb-2" size={24} />
+          <p className="text-2xl font-bold text-indigo-500">{stats.eveningCheckedIn}</p>
+          <p className="text-xs text-gray-400 uppercase">Afternoon ✓</p>
+        </div>
+        <div className="bg-secondary/10 border border-secondary/20 rounded-2xl p-4 text-center">
+          <Clock className="mx-auto text-secondary mb-2" size={24} />
+          <p className="text-2xl font-bold text-secondary">
             {selectedSession === 'morning' ? stats.morningRemaining : stats.eveningRemaining}
           </p>
-          <p className="text-xs text-gray-400 uppercase tracking-wider">
+          <p className="text-xs text-gray-400 uppercase">
             {selectedSession === 'morning' ? 'AM Left' : 'PM Left'}
           </p>
-        </motion.div>
+        </div>
       </div>
-        </>
-      )}
+
+      {/* Tab Navigation */}
+      <div className="flex gap-2 p-1 bg-white/5 border-y border-white/10 overflow-x-auto">
+        {[
+          { id: 'scanner', label: 'QR Scanner', icon: Camera },
+          { id: 'manual', label: 'Manual', icon: Search },
+          { id: 'winners', label: 'Winners', icon: Trophy }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 px-4 py-3 text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2 ${
+              activeTab === tab.id
+                ? 'text-secondary border-b-2 border-secondary'
+                : 'text-gray-400'
+            }`}
+          >
+            <tab.icon size={18} />
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
       {/* Tab Content */}
-      <div className="p-4 pb-6">
+      <div className="p-4">
         <AnimatePresence mode="wait">
-          {/* OVERVIEW TAB */}
-          {activeTab === 'overview' && (
-            <motion.div
-              key="overview"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="pb-20"
-            >
-              <Overview coordinatorEvents={assignedEvents} />
-            </motion.div>
-          )}
-
-          {/* REGISTRATIONS TAB */}
-          {activeTab === 'registrations' && (
-            <motion.div
-              key="registrations"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="pb-20"
-            >
-              <RegistrationManagement coordinatorEvents={assignedEvents} />
-            </motion.div>
-          )}
-
           {/* QR SCANNER TAB */}
           {activeTab === 'scanner' && (
             <motion.div
@@ -1040,28 +863,11 @@ const EventCoordinatorDashboard = () => {
                     <div>
                       <h3 className="text-2xl font-bold mb-2">Ready to Scan</h3>
                       <p className="text-gray-400">Tap below to start QR code scanner</p>
-                      <div className="flex items-center justify-center gap-3 mt-4">
-                          <button
-                            onClick={() => setSelectedSession('morning')}
-                            className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${
-                                selectedSession === 'morning'
-                                ? 'bg-yellow-500 text-white shadow-lg shadow-yellow-500/30'
-                                : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
-                            }`}
-                          >
-                             <Sun size={16} /> Morning
-                          </button>
-                          <button
-                            onClick={() => setSelectedSession('evening')}
-                            className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${
-                                selectedSession === 'evening'
-                                ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30'
-                                : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
-                            }`}
-                          >
-                             <Moon size={16} /> Afternoon
-                          </button>
-                      </div>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Session: <span className={selectedSession === 'morning' ? 'text-yellow-500' : 'text-indigo-500'}>
+                          {selectedSession === 'morning' ? 'Morning (AM)' : 'Evening (PM)'}
+                        </span>
+                      </p>
                     </div>
                     {cameraError ? (
                       <div className="flex flex-col gap-3">
@@ -1155,149 +961,6 @@ const EventCoordinatorDashboard = () => {
             </motion.div>
           )}
 
-          {/* PARTICIPANTS TAB */}
-          {activeTab === 'participants' && (
-            <motion.div
-              key="participants"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="space-y-4"
-            >
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-lg flex items-center gap-2">
-                    <Users className="text-secondary" size={20} />
-                    All Registered Participants
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={exportToExcel}
-                      className="px-3 py-2 bg-green-500/20 text-green-500 rounded-lg text-sm font-bold hover:bg-green-500 hover:text-white transition-all flex items-center gap-2"
-                    >
-                      <Download size={16} />
-                      Export
-                    </button>
-                    <span className="px-3 py-1 bg-secondary/20 text-secondary rounded-lg text-sm font-bold">
-                      {participants.length} Total
-                    </span>
-                  </div>
-                </div>
-
-                <div className="relative mb-4">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
-                  <input
-                    type="text"
-                    placeholder="Search participants..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-3 focus:outline-none focus:border-secondary transition-all"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  {filteredParticipants.length > 0 ? (
-                    filteredParticipants.map((p, index) => {
-                      const hasAnyAttendance = p.morningAttended || p.eveningAttended;
-                      return (
-                        <div
-                          key={p.id}
-                          className={`p-4 rounded-xl border transition-all ${
-                            hasAnyAttendance
-                              ? 'bg-green-500/5 border-green-500/20'
-                              : 'bg-white/5 border-white/10'
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex items-start gap-3 flex-1">
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                                hasAnyAttendance ? 'bg-green-500/20' : 'bg-secondary/20'
-                              }`}>
-                                <span className="font-bold text-sm">
-                                  {index + 1}
-                                </span>
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-bold text-sm">{p.profiles?.full_name || 'N/A'}</p>
-                                <p className="text-xs text-secondary font-mono">{formatDakshaaId(p.user_id)}</p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                  {p.profiles?.roll_number || p.profiles?.roll_no || 'No Roll Number'}
-                                </p>
-                                <p className="text-xs text-gray-500 truncate">
-                                  {p.profiles?.college_name || 'No College Info'}
-                                </p>
-                                {p.profiles?.phone && (
-                                  <a
-                                    href={`tel:${p.profiles.phone}`}
-                                    className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 mt-1 w-fit"
-                                  >
-                                    <Phone size={12} />
-                                    {p.profiles.phone}
-                                  </a>
-                                )}
-                                
-                                {/* Attendance Status */}
-                                <div className="flex gap-1 mt-2">
-                                  {p.morningAttended ? (
-                                    <span className="text-xs px-2 py-0.5 bg-yellow-500/20 text-yellow-500 rounded flex items-center gap-1">
-                                      <CheckCircle2 size={12} /> AM
-                                    </span>
-                                  ) : (
-                                    <span className="text-xs px-2 py-0.5 bg-gray-500/20 text-gray-500 rounded">
-                                      AM ✗
-                                    </span>
-                                  )}
-                                  {p.eveningAttended ? (
-                                    <span className="text-xs px-2 py-0.5 bg-indigo-500/20 text-indigo-500 rounded flex items-center gap-1">
-                                      <CheckCircle2 size={12} /> PM
-                                    </span>
-                                  ) : (
-                                    <span className="text-xs px-2 py-0.5 bg-gray-500/20 text-gray-500 rounded">
-                                      PM ✗
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-
-                            {hasAnyAttendance && (
-                              <div className="flex-shrink-0">
-                                <CheckCircle2 className="text-green-500" size={20} />
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div className="text-center py-12">
-                      <Users className="mx-auto text-gray-600 mb-3" size={48} />
-                      <p className="text-gray-400">
-                        {searchTerm ? 'No participants match your search' : 'No participants registered yet'}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Summary Card */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 text-center">
-                  <CheckCircle2 className="mx-auto text-green-500 mb-2" size={20} />
-                  <p className="text-xl font-bold text-green-500">{attendedParticipants.length}</p>
-                  <p className="text-xs text-gray-400">Attended</p>
-                </div>
-                <div className="bg-gray-500/10 border border-gray-500/20 rounded-2xl p-4 text-center">
-                  <AlertCircle className="mx-auto text-gray-500 mb-2" size={20} />
-                  <p className="text-xl font-bold text-gray-500">
-                    {participants.length - attendedParticipants.length}
-                  </p>
-                  <p className="text-xs text-gray-400">Not Attended</p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
           {/* MANUAL ATTENDANCE TAB */}
           {activeTab === 'manual' && (
             <motion.div
@@ -1307,42 +970,17 @@ const EventCoordinatorDashboard = () => {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-4"
             >
-              {/* Current Session Indicator & Toggle */}
-              <div className="flex flex-col gap-3 py-2">
-                <div className={`p-3 rounded-xl text-center font-bold ${
-                  selectedSession === 'morning' 
-                    ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' 
-                    : 'bg-indigo-500/20 text-indigo-500 border border-indigo-500/30'
-                }`}>
-                  {selectedSession === 'morning' ? (
-                    <span className="flex items-center justify-center gap-2"><Sun size={18} /> Marking FORENOON Session</span>
-                  ) : (
-                    <span className="flex items-center justify-center gap-2"><Moon size={18} /> Marking AFTERNOON Session</span>
-                  )}
-                </div>
-                
-                <div className="flex items-center justify-center gap-3">
-                    <button
-                      onClick={() => setSelectedSession('morning')}
-                      className={`flex-1 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${
-                          selectedSession === 'morning'
-                          ? 'bg-yellow-500 text-white shadow-lg shadow-yellow-500/30'
-                          : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
-                      }`}
-                    >
-                        <Sun size={16} /> Morning
-                    </button>
-                    <button
-                      onClick={() => setSelectedSession('evening')}
-                      className={`flex-1 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${
-                          selectedSession === 'evening'
-                          ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30'
-                          : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
-                      }`}
-                    >
-                        <Moon size={16} /> Afternoon
-                    </button>
-                </div>
+              {/* Current Session Indicator */}
+              <div className={`p-3 rounded-xl text-center font-bold ${
+                selectedSession === 'morning' 
+                  ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' 
+                  : 'bg-indigo-500/20 text-indigo-500 border border-indigo-500/30'
+              }`}>
+                {selectedSession === 'morning' ? (
+                  <span className="flex items-center justify-center gap-2"><Sun size={18} /> Marking FORENOON Session</span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2"><Moon size={18} /> Marking AFTERNOON Session</span>
+                )}
               </div>
 
               <div className="relative">
@@ -1473,9 +1111,6 @@ const EventCoordinatorDashboard = () => {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
-
-          </div>
       </div>
     </div>
   );

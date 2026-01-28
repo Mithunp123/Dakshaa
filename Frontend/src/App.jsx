@@ -212,7 +212,7 @@ function AppContent() {
               path="/admin"
               element={
                 <ProtectedRoute
-                  allowedRoles={["super_admin", "registration_admin"]}
+                  allowedRoles={["super_admin", "registration_admin", "event_coordinator"]}
                 >
                   <AdminLayout />
                 </ProtectedRoute>
@@ -350,9 +350,19 @@ function AppContent() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="coordinator"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={["event_coordinator", "super_admin"]}
+                  >
+                    <EventCoordinatorDashboard />
+                  </ProtectedRoute>
+                }
+              />
             </Route>
 
-            {/* Event Coordinator Routes - Standalone (No Sidebar) */}
+            {/* Legacy standalone coordinator route - redirect to admin/coordinator */}
             <Route
               path="/coordinator"
               element={

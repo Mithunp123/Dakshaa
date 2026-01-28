@@ -110,7 +110,7 @@ const AdminLayout = () => {
 
     if (userRole === 'event_coordinator' || userRole === 'super_admin') {
       items.push(
-        { label: 'Coordinator Panel', icon: Shield, path: '/coordinator' }
+        { label: 'Coordinator Panel', icon: Shield, path: '/admin/coordinator' }
       );
     }
 

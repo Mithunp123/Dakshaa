@@ -16,6 +16,7 @@ import {
   Trophy,
   Building,
   Utensils,
+  UtensilsCrossed,
 } from "lucide-react";
 import EventCard from "./EventCard";
 import ComboCard from "./ComboCard";
@@ -1823,47 +1824,90 @@ const RegistrationForm = () => {
                 </div>
               </motion.div>
 
-              {/* Lunch Card - Below Combo */}
+              {/* Lunch Card - Command Line Style */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                whileHover={{ scale: 1.02, y: -5 }}
-                className="relative p-8 rounded-3xl overflow-hidden bg-gradient-to-br from-orange-900/30 to-red-950/30 border-2 border-orange-500/30 cursor-pointer"
-                onClick={() => navigate('/dashboard/bookings')}
+                className="relative p-6 rounded-2xl overflow-hidden bg-gray-800/50 border border-gray-700 hover:border-orange-500/50 transition-all"
               >
-                <div className="absolute top-4 right-4">
-                  <Utensils className="text-orange-400" size={32} />
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 bg-orange-500/20 rounded-lg">
+                    <UtensilsCrossed className="w-8 h-8 text-orange-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-white font-orbitron">Lunch</h2>
+                    <p className="text-gray-400 text-sm">Rs. 100 per lunch</p>
+                  </div>
                 </div>
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-bold text-white">
-                    Lunch
-                  </h3>
-                  <p className="text-orange-200 font-semibold">Rs. 100 per lunch</p>
-                  <p className="text-gray-400 text-sm">
-                    Only Lunch will be provided for 12th, 13th and 14th February. Reserve your meals.
-                  </p>
-                  <ul className="space-y-2">
-                    <li className="flex items-center text-gray-300 text-sm">
-                      <Calendar className="text-orange-400 mr-2" size={16} />
-                      February 12 Lunch
-                    </li>
-                    <li className="flex items-center text-gray-300 text-sm">
-                      <Calendar className="text-orange-400 mr-2" size={16} />
-                      February 13 Lunch
-                    </li>
-                    <li className="flex items-center text-gray-300 text-sm">
-                      <Calendar className="text-orange-400 mr-2" size={16} />
-                      February 14 Lunch
-                    </li>
-                  </ul>
-                  <button className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold rounded-xl transition-all shadow-lg">
-                    RESERVE NOW
-                  </button>
+
+                {/* Command Terminal Style */}
+                <div className="bg-black/60 border border-gray-600 rounded-lg p-4 font-mono text-sm mb-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex gap-1">
+                      <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                    </div>
+                    <span className="text-gray-400 text-xs">lunch-booking-terminal</span>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="text-green-400">
+                      <span className="text-blue-400">user@dakshaa</span>
+                      <span className="text-white">:</span>
+                      <span className="text-purple-400">~</span>
+                      <span className="text-white">$ </span>
+                      <span className="text-yellow-400">lunch --info</span>
+                    </div>
+                    <div className="text-gray-300 pl-4">
+                      <div>Available: Feb 12, 13, 14</div>
+                      <div>Price: Rs. 100 per lunch</div>
+                      <div>Status: Booking Open</div>
+                    </div>
+                    
+                    <div className="text-green-400 mt-3">
+                      <span className="text-blue-400">user@dakshaa</span>
+                      <span className="text-white">:</span>
+                      <span className="text-purple-400">~</span>
+                      <span className="text-white">$ </span>
+                      <span className="text-yellow-400">lunch --reserve</span>
+                    </div>
+                  </div>
                 </div>
+
+                <div className="space-y-4 mb-6">
+                  <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
+                    <p className="text-gray-300 text-sm leading-relaxed">
+                      Only Lunch will be provided for <strong>12th, 13th and 14th February</strong>. Register here to reserve your meals.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-gray-400 text-sm">
+                      <Calendar size={16} />
+                      <span>February 12 Lunch</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-400 text-sm">
+                      <Calendar size={16} />
+                      <span>February 13 Lunch</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-400 text-sm">
+                      <Calendar size={16} />
+                      <span>February 14 Lunch</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button 
+                  onClick={() => navigate('/dashboard/bookings')}
+                  className="w-full py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl font-semibold hover:from-orange-700 hover:to-red-700 transition-all shadow-lg hover:shadow-orange-500/50"
+                >
+                  RESERVE NOW
+                </button>
               </motion.div>
             </div>
-
+            
             {/* Special Events Section */}
             {specialEvents.length > 0 && (
               <div className="mt-16 space-y-6">
