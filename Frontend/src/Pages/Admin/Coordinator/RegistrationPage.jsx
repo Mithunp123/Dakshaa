@@ -23,24 +23,39 @@ const RegistrationPage = () => {
       
       // Only fetch coordinator assigned events
       if (profile?.role === 'event_coordinator') {
-        const { data: coords } = await supabase
+        const { data: coords, error: coordError } = await supabase
           .from('event_coordinators')
           .select('event_id')
           .eq('user_id', user.id);
         
+        if (coordError) {
+          console.error('❌ Error fetching coordinator assignments:', coordError);
+        }
+        
         const assignedEventIds = coords?.map(c => c.event_id) || []; // These are TEXT event_ids
         
+        console.log('🎯 Assigned Event IDs from coordinators table:', assignedEventIds);
+        console.log('📊 Number of assigned events:', assignedEventIds.length);
+        
         if (assignedEventIds.length > 0) {
-          const { data: assignedEvents } = await supabase
+          // Query events using TEXT event_id field
+          const { data: assignedEvents, error: eventsError } = await supabase
             .from('events')
             .select('*')
-            .in('event_id', assignedEventIds); // Query by event_id TEXT field
+            .in('event_id', assignedEventIds);
+          
+          if (eventsError) {
+            console.error('❌ Error fetching events:', eventsError);
+          }
+          
+          console.log('📊 Found events by event_id TEXT field:', assignedEvents?.length);
+          console.log('📊 Events data:', assignedEvents?.map(e => ({ id: e.id, event_id: e.event_id, name: e.name })));
           events = assignedEvents || [];
         }
       }
       
       console.log('👤 Coordinator Role:', profile?.role);
-      console.log('📋 Assigned Events for Registration:', events);
+      console.log('📋 Final Assigned Events for Registration:', events.length);
       setAssignedEvents(events);
     } catch (error) {
       console.error('Error fetching assigned events:', error);

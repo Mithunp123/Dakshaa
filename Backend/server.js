@@ -2162,6 +2162,536 @@ app.get("/api/admin/finance", async (req, res) => {
   }
 });
 
+/* 🟢 Team Management API Endpoints */
+
+// Get team statistics
+app.get("/api/admin/teams/statistics", async (req, res) => {
+  try {
+    const { event_id, user_id } = req.query;
+
+    // Get user role if user_id is provided
+    let userRole = null;
+    let accessibleEvents = [];
+    let assignedEventsCount = 0;
+    
+    if (user_id) {
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role, department, email, full_name')
+          .eq('id', user_id)
+          .single();
+        
+        if (profile) {
+          userRole = profile.role?.toLowerCase();
+          
+          // Get accessible events for coordinators
+          if (userRole === 'event_coordinator') {
+            // For event coordinators, get ALL active events (they coordinate multiple events)
+            // In a real system, you'd filter by coordinator assignment
+            const { data: events } = await supabase
+              .from('events')
+              .select('id, name')
+              .eq('is_active', true);
+            
+            accessibleEvents = events?.map(e => e.id) || [];
+            assignedEventsCount = accessibleEvents.length;
+            
+            console.log(`Event Coordinator ${profile.email} has access to ${assignedEventsCount} events:`, events?.map(e => e.name));
+          } else if (userRole === 'super_admin' || userRole === 'admin') {
+            const { data: events } = await supabase
+              .from('events')
+              .select('id, name')
+              .eq('is_active', true);
+            
+            accessibleEvents = events?.map(e => e.id) || [];
+            assignedEventsCount = accessibleEvents.length;
+          }
+        }
+      } catch (error) {
+        console.log('Error getting user profile:', error.message);
+      }
+    }
+
+    // Build queries
+    let teamsQuery = supabase
+      .from('teams')
+      .select('id', { count: 'exact', head: true });
+    
+    let membersQuery = supabase
+      .from('team_members')
+      .select('id, teams!inner(event_id)', { count: 'exact', head: true });
+    
+    let paidTeamsQuery = supabase
+      .from('teams')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_active', true);
+    
+    let revenueQuery = supabase
+      .from('teams')
+      .select('total_paid_amount')
+      .eq('is_active', true);
+
+    if (event_id) {
+      teamsQuery = teamsQuery.eq('event_id', event_id);
+      membersQuery = membersQuery.eq('teams.event_id', event_id);
+      paidTeamsQuery = paidTeamsQuery.eq('event_id', event_id);
+      revenueQuery = revenueQuery.eq('event_id', event_id);
+    } else if (userRole === 'event_coordinator' && accessibleEvents.length > 0) {
+      teamsQuery = teamsQuery.in('event_id', accessibleEvents);
+      membersQuery = membersQuery.in('teams.event_id', accessibleEvents);
+      paidTeamsQuery = paidTeamsQuery.in('event_id', accessibleEvents);
+      revenueQuery = revenueQuery.in('event_id', accessibleEvents);
+    }
+
+    const [teamsRes, membersRes, paidRes, revRes] = await Promise.all([
+      teamsQuery,
+      membersQuery,
+      paidTeamsQuery,
+      revenueQuery
+    ]);
+
+    if (teamsRes.error) throw teamsRes.error;
+    if (membersRes.error) throw membersRes.error;
+    if (paidRes.error) throw paidRes.error;
+    if (revRes.error) throw revRes.error;
+
+    const teamsCount = teamsRes.count || 0;
+    const membersCount = membersRes.count || 0;
+    const paidTeamsCount = paidRes.count || 0;
+    
+    let revenue = 0;
+    if (revRes.data) {
+      revenue = revRes.data.reduce((sum, team) => {
+        return sum + (parseFloat(team.total_paid_amount) || 0);
+      }, 0);
+    }
+
+    res.json({
+      success: true,
+      data: {
+        team_count: teamsCount,
+        paid_team_count: paidTeamsCount,
+        leader_count: teamsCount,
+        member_count: membersCount,
+        total_revenue: revenue,
+        assigned_events_count: assignedEventsCount,
+        user_role: userRole
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching team statistics:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get all teams with members
+app.get("/api/admin/teams", async (req, res) => {
+  try {
+    const {
+      limit = 100,
+      offset = 0,
+      event_id,
+      only_paid = false,
+      user_id
+    } = req.query;
+
+    // Get user role if user_id is provided
+    let userRole = null;
+    let accessibleEvents = null;
+    
+    if (user_id) {
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role, department, email, full_name')
+          .eq('id', user_id)
+          .single();
+        
+        if (profile) {
+          userRole = profile.role?.toLowerCase();
+          console.log(`User ${profile.email} has role: ${userRole}`);
+          
+          // If event coordinator, get their accessible events
+          if (userRole === 'event_coordinator') {
+            // For now, allowing all events for coordinators
+            // You can modify this logic based on your requirements
+            const { data: events } = await supabase
+              .from('events')
+              .select('id, name')
+              .eq('is_active', true);
+            
+            accessibleEvents = events?.map(e => e.id) || [];
+            console.log(`Event coordinator ${profile.email} has access to ${accessibleEvents.length} events:`, events?.map(e => e.name));
+          }
+        }
+      } catch (error) {
+        console.log('Error getting user profile:', error.message);
+      }
+    }
+
+    // Build teams query
+    let query = supabase
+      .from('teams')
+      .select('*');
+
+    console.log('Query parameters:', { event_id, user_id, userRole, accessibleEvents: accessibleEvents?.length });
+
+    if (event_id) {
+      query = query.eq('event_id', event_id);
+      console.log('Filtering by event_id:', event_id);
+    } else if (userRole === 'event_coordinator' && accessibleEvents && accessibleEvents.length > 0) {
+      // Filter teams by accessible events for coordinators
+      query = query.in('event_id', accessibleEvents);
+      console.log('Filtering coordinator accessible events:', accessibleEvents);
+    }
+
+    if (only_paid === 'true') {
+      query = query.eq('is_active', true);
+    }
+
+    const { data: teams, error: teamsError } = await query
+      .order('created_at', { ascending: false })
+      .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
+
+    if (teamsError) throw teamsError;
+
+    console.log(`Found ${teams?.length || 0} teams`);
+
+    if (!teams || teams.length === 0) {
+      return res.json({
+        success: true,
+        data: [],
+        user_role: userRole
+      });
+    }
+
+    const teamIds = teams.map(team => team.id);
+    const leaderIds = teams.map(team => team.leader_id).filter(Boolean);
+
+    // Fetch team members with profiles - matching the Python reference
+    const { data: members } = await supabase
+      .from('team_members')
+      .select(`
+        *,
+        profiles(
+          full_name,
+          mobile_number,
+          email
+        )
+      `)
+      .in('team_id', teamIds);
+
+    console.log(`Found ${members?.length || 0} team members for ${teamIds.length} teams`);
+
+    // Fetch leader profiles for ALL leader_ids to ensure we have them even if not in members list
+    const { data: leaderProfiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, mobile_number, email')
+      .in('id', leaderIds);
+
+    // Group members by team_id and create leader profiles map
+    const membersMap = {};
+    const leaderProfilesMap = {};
+    
+    // Process members data
+    members?.forEach(member => {
+      const teamId = member.team_id;
+      if (!membersMap[teamId]) {
+        membersMap[teamId] = [];
+      }
+      
+      membersMap[teamId].push({
+        id: member.id,
+        user_id: member.user_id,
+        full_name: member.profiles?.full_name || 'Unknown User',
+        mobile: member.profiles?.mobile_number || '',
+        email: member.profiles?.email || '',
+        role: member.role,
+        joined_at: member.joined_at
+      });
+    });
+
+    // Create leader profiles map
+    leaderProfiles?.forEach(profile => {
+      leaderProfilesMap[profile.id] = profile;
+    });
+
+    // For each team, also fetch registered participants from event_registrations_config
+    // to match team members with actual event registrations
+    const teamMembersWithRegistrations = {};
+    
+    for (const team of teams) {
+      if (team.event_id) {
+        try {
+          // Get event registrations for this event
+          const { data: registrations } = await supabase
+            .from('event_registrations_config')
+            .select(`
+              user_id,
+              payment_status,
+              payment_amount,
+              profiles(
+                full_name,
+                mobile_number,
+                email
+              )
+            `)
+            .eq('event_id', team.event_id)
+            .eq('payment_status', 'PAID'); // Only get paid registrations
+
+          if (registrations) {
+            // Match team members with event registrations
+            const teamMembers = membersMap[team.id] || [];
+            const registeredMembers = [];
+            
+            teamMembers.forEach(member => {
+              const registration = registrations.find(reg => reg.user_id === member.user_id);
+              if (registration) {
+                registeredMembers.push({
+                  ...member,
+                  payment_status: registration.payment_status,
+                  payment_amount: registration.payment_amount,
+                  // Use registration profile data as fallback
+                  full_name: member.full_name || registration.profiles?.full_name || 'Unknown User',
+                  mobile: member.mobile || registration.profiles?.mobile_number || '',
+                  email: member.email || registration.profiles?.email || ''
+                });
+              } else {
+                // Include team member even if not in registrations (might be unpaid)
+                registeredMembers.push(member);
+              }
+            });
+            
+            teamMembersWithRegistrations[team.id] = registeredMembers;
+          } else {
+            teamMembersWithRegistrations[team.id] = membersMap[team.id] || [];
+          }
+        } catch (error) {
+          console.log('Error fetching registrations for team:', team.id, error.message);
+          teamMembersWithRegistrations[team.id] = membersMap[team.id] || [];
+        }
+      } else {
+        teamMembersWithRegistrations[team.id] = membersMap[team.id] || [];
+      }
+    }
+
+    // Process teams data
+    const processedTeams = await Promise.all(
+      teams.map(async (team) => {
+        // Get team members with registrations
+        const teamMembers = teamMembersWithRegistrations[team.id] || [];
+        
+        // Resolve event information
+        let eventName = 'Unknown Event';
+        let realEventId = team.event_id;
+        
+        if (team.event_id) {
+          try {
+            const { data: event } = await supabase
+              .from('events')
+              .select('id, name, price')
+              .eq('id', team.event_id)
+              .single();
+            
+            if (event) {
+              eventName = event.name;
+              realEventId = event.id;
+            }
+          } catch (error) {
+            console.log('Event lookup failed for ID:', team.event_id, error.message);
+          }
+        }
+
+        // Get leader information - prioritize team.leader_id lookup
+        let leaderName = null;
+        let leaderMobile = null;
+        let leaderEmail = null;
+
+        // 1. Try direct lookup from profiles table fetch (most accurate to "leader_id")
+        if (team.leader_id) {
+          const leaderProfile = leaderProfilesMap[team.leader_id];
+          if (leaderProfile) {
+            leaderName = leaderProfile.full_name;
+            leaderMobile = leaderProfile.mobile_number;
+            leaderEmail = leaderProfile.email;
+          }
+        }
+
+        // 2. Fallback: created_by lookup in members
+        if (!leaderName && team.created_by) {
+          const creatorMember = teamMembers.find(m => m.user_id === team.created_by);
+          if (creatorMember) {
+            leaderName = creatorMember.full_name;
+            leaderMobile = creatorMember.mobile;
+            leaderEmail = creatorMember.email;
+          }
+        }
+
+        // 3. Fallback: role='leader' in members
+        if (!leaderName) {
+          const leaderMember = teamMembers.find(m => m.role === 'leader');
+          if (leaderMember) {
+            leaderName = leaderMember.full_name;
+            leaderMobile = leaderMember.mobile;
+            leaderEmail = leaderMember.email;
+          }
+        }
+
+        // Sort members (leaders first)
+        teamMembers.sort((a, b) => {
+          if (a.role === 'leader' && b.role !== 'leader') return -1;
+          if (a.role !== 'leader' && b.role === 'leader') return 1;
+          return 0;
+        });
+
+        // Create member names list for display (like in the reference image)
+        const memberNames = teamMembers
+          .filter(m => m.role !== 'leader') // Exclude leader from members list
+          .map(m => `${m.full_name} (member)`)
+          .join(', ');
+
+        const leaderDisplay = teamMembers
+          .filter(m => m.role === 'leader')
+          .map(m => `${m.full_name} (leader)`)
+          .join(', ');
+
+        console.log(`Team ${team.team_name}: Leader=${leaderName}, Members=${memberNames}`);
+
+        return {
+          ...team,
+          name: team.team_name || 'Unnamed Team',
+          event_name: eventName,
+          real_event_id: realEventId,
+          leader_name: leaderName,
+          leader_mobile: leaderMobile,
+          leader_email: leaderEmail,
+          member_count: teamMembers.length,
+          members_list: teamMembers,
+          member_names: memberNames, // For display like "Jithya.s (member), Jayashree (member)"
+          leader_display: leaderDisplay, // For display like "Kanika M (leader)"
+          payment_amount: parseFloat(team.total_paid_amount) || 0,
+          leader_payment_status: team.is_active ? 'PAID' : 'PENDING',
+          payment_status: team.is_active ? 'PAID' : 'PENDING'
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      data: processedTeams,
+      user_role: userRole,
+      total_accessible_events: accessibleEvents?.length || 'all'
+    });
+  } catch (error) {
+    console.error('Error fetching teams:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get team members
+app.get("/api/admin/teams/:teamId/members", async (req, res) => {
+  try {
+    const { teamId } = req.params;
+    const { event_id } = req.query;
+
+    const { data: members, error: membersError } = await supabase
+      .from('team_members')
+      .select('*')
+      .eq('team_id', teamId)
+      .order('role', { ascending: false })
+      .order('joined_at');
+
+    if (membersError) throw membersError;
+
+    if (!members || members.length === 0) {
+      return res.json({
+        success: true,
+        data: []
+      });
+    }
+
+    // Process each member
+    const processedMembers = await Promise.all(
+      members.map(async (member) => {
+        let profile = {};
+        let paymentInfo = {
+          payment_status: 'PENDING',
+          payment_amount: 0,
+          transaction_id: null,
+          reg_id: null
+        };
+
+        // Fetch profile information
+        if (member.user_id) {
+          try {
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('full_name, email, mobile_number, college_name')
+              .eq('id', member.user_id)
+              .single();
+            
+            if (profileData) {
+              profile = profileData;
+            }
+          } catch (error) {
+            console.log('Profile lookup failed:', error.message);
+          }
+
+          // Fetch payment status if event_id provided
+          if (event_id) {
+            try {
+              const { data: registration } = await supabase
+                .from('event_registrations_config')
+                .select('*')
+                .eq('event_id', event_id)
+                .eq('user_id', member.user_id)
+                .single();
+              
+              if (registration) {
+                paymentInfo = {
+                  payment_status: registration.payment_status || 'PENDING',
+                  payment_amount: registration.payment_amount || 0,
+                  transaction_id: registration.transaction_id,
+                  reg_id: registration.id
+                };
+              }
+            } catch (error) {
+              console.log('Payment lookup failed:', error.message);
+            }
+          }
+        }
+
+        return {
+          ...member,
+          full_name: profile.full_name || 'Unknown User',
+          email: profile.email || '',
+          mobile_number: profile.mobile_number || '',
+          college_name: profile.college_name || '',
+          ...paymentInfo
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      data: processedMembers
+    });
+  } catch (error) {
+    console.error('Error fetching team members:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Start Server
 /* 🟢 Route to Fetch Schedule Data */
 app.get("/api/schedule", async (req, res) => {

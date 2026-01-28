@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { supabase } from "../../../supabase";
 import * as XLSX from 'xlsx';
+import EventDetailsWithTeams from '../../../Components/Registration/EventDetailsWithTeams';
 
 const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) => {
   const [eventStats, setEventStats] = useState([]);
@@ -281,16 +282,22 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
     setLoading(true);
     try {
       const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
-      const allowedEventIds = hasCoordinatorFilter ? coordinatorEvents.map(e => (e.id || e.event_id)) : null;
-      console.log('📊 RegistrationManagement - coordinatorEvents:', coordinatorEvents);
+      // Extract both UUID id and TEXT event_id for flexible filtering
+      const allowedUUIDs = hasCoordinatorFilter ? coordinatorEvents.map(e => e.id).filter(Boolean) : null;
+      const allowedEventIds = hasCoordinatorFilter ? coordinatorEvents.map(e => e.event_id).filter(Boolean) : null;
+      
+      console.log('📊 RegistrationManagement - coordinatorEvents count:', coordinatorEvents?.length);
+      console.log('📊 RegistrationManagement - coordinatorEvents:', coordinatorEvents?.map(e => ({ id: e.id, event_id: e.event_id, name: e.name })));
       console.log('🔍 RegistrationManagement - hasCoordinatorFilter:', hasCoordinatorFilter);
-      console.log('🎯 RegistrationManagement - allowedEventIds:', allowedEventIds);
+      console.log('🎯 RegistrationManagement - allowedUUIDs:', allowedUUIDs);
+      console.log('🎯 RegistrationManagement - allowedEventIds (TEXT):', allowedEventIds);
 
       let query = supabase
         .from('events')
         .select(`
           id,
           name,
+          event_id,
           event_key,
           category,
           capacity,
@@ -299,11 +306,15 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         `)
         .order('name');
         
-      if (hasCoordinatorFilter && allowedEventIds) {
-        query = query.in('id', allowedEventIds);
+      if (hasCoordinatorFilter && allowedUUIDs && allowedUUIDs.length > 0) {
+        // Use the UUID id field for filtering (coordinator events have full data including UUID)
+        query = query.in('id', allowedUUIDs);
+        console.log('🔍 Filtering events by UUID ids:', allowedUUIDs.length);
       }
 
       const { data, error } = await query;
+
+      console.log('📊 Events query result:', data?.length, 'events found');
 
       if (error) throw error;
 
@@ -526,8 +537,8 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
   };
 
   const filteredStats = eventStats.filter(event => {
-    const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.event_key.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = event.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (event.event_key || event.event_id || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !categoryFilter || event.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
@@ -721,7 +732,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
                     <td className="p-4">
                       <div>
                         <p className="font-bold">{event.name}</p>
-                        <p className="text-xs text-gray-500">{event.event_key}</p>
+                        <p className="text-xs text-gray-500">{event.event_key || event.event_id || '-'}</p>
                       </div>
                     </td>
                     <td className="p-4">
@@ -973,7 +984,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
               <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg font-bold">
                 {selectedEvent.category}
               </span>
-              <span className="text-gray-400">Event Key: {selectedEvent.event_key}</span>
+              <span className="text-gray-400">Event Key: {selectedEvent.event_key || selectedEvent.event_id || '-'}</span>
             </div>
           </div>
           <div className="text-right">
@@ -1004,111 +1015,12 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         </div>
       </div>
 
-      {/* Registrations List */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-2xl font-bold">Registered Participants</h3>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleDownloadExcel}
-              className="flex items-center gap-2 px-4 py-2 bg-green-500/10 text-green-400 border border-green-500/20 rounded-xl hover:bg-green-500/20 transition-all"
-            >
-              <Download size={18} />
-              Export Excel
-            </button>
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
-              <input
-                type="text"
-                placeholder="Search participants..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-secondary"
-              />
-            </div>
-          </div>
-        </div>
-
-        {loadingDetails ? (
-          <div className="h-64 flex items-center justify-center">
-            <Loader2 className="w-10 h-10 animate-spin text-secondary" />
-          </div>
-        ) : (
-          <div className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="text-left p-4 text-gray-400 font-medium">Participant</th>
-                    <th className="text-left p-4 text-gray-400 font-medium">College</th>
-                    <th className="text-left p-4 text-gray-400 font-medium">Department</th>
-                    <th className="text-left p-4 text-gray-400 font-medium">Contact</th>
-                    <th className="text-center p-4 text-gray-400 font-medium">Status</th>
-                    <th className="text-center p-4 text-gray-400 font-medium">Registered At</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {eventRegistrations
-                    .filter(reg => {
-                      const profile = reg.profiles;
-                      return !searchTerm || 
-                             profile.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             profile.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             profile.roll_no.toLowerCase().includes(searchTerm.toLowerCase());
-                    })
-                    .map((reg, index) => (
-                      <motion.tr
-                        key={reg.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.03 }}
-                        className="border-b border-white/5 hover:bg-white/5 transition-colors"
-                      >
-                        <td className="p-4">
-                          <div>
-                            <p className="font-bold">{reg.profiles.full_name}</p>
-                            <p className="text-xs text-gray-500">{reg.profiles.roll_no}</p>
-                          </div>
-                        </td>
-                        <td className="p-4">
-                          <p className="text-sm">{reg.profiles.college_name}</p>
-                        </td>
-                        <td className="p-4">
-                          <p className="text-sm">{reg.profiles.department}</p>
-                        </td>
-                        <td className="p-4">
-                          <div className="text-sm">
-                            <p>{reg.profiles.email}</p>
-                            <p className="text-gray-500">{reg.profiles.phone}</p>
-                          </div>
-                        </td>
-                        <td className="p-4 text-center">
-                          <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
-                            reg.payment_status === 'PAID' ? 'bg-green-500/20 text-green-400' :
-                            reg.payment_status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-400' :
-                            'bg-red-500/20 text-red-400'
-                          }`}>
-                            {reg.payment_status}
-                          </span>
-                        </td>
-                        <td className="p-4 text-center text-sm text-gray-400">
-                          {new Date(reg.registered_at).toLocaleString()}
-                        </td>
-                      </motion.tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-
-            {eventRegistrations.length === 0 && (
-              <div className="p-12 text-center text-gray-500">
-                <Users size={48} className="mx-auto mb-4 opacity-50" />
-                <p>No registrations yet</p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      {/* Event Details with Teams Support */}
+      <EventDetailsWithTeams 
+        event={selectedEvent}
+        registrations={eventRegistrations}
+        showTeamDetails={true}
+      />
     </div>
   );
 };
