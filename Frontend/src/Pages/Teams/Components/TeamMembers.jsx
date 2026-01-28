@@ -24,7 +24,7 @@ import deepak from "../../../assets/team_members/Deepak.png";
 
 
 const chiefCoordinator = [
-   { id: 14, name: "Kavinesh", department: "", img: kavinesh, role: "AEVA", phone: "+91 63820 60464", associationLogo: aevaLogo },
+   { id: 14, name: "Kavinesh", department: "", img: kavinesh, role: "AEVA", phone: "+91 94892 43775", associationLogo: aevaLogo },
 ];
 
 const jointCoordinators = [

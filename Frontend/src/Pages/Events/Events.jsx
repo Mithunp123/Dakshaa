@@ -117,7 +117,7 @@ const Events = () => {
     {
       id: 7,
       image: NonTechnicalImage,
-      name: "Others",
+      name: "Expos & shows",
       descriptionImages: [],
     },
   ];
@@ -133,7 +133,7 @@ const Events = () => {
         'hackathon': 4,
         'workshop': 5,
         'conference': 6,
-        'others': 7
+        'expos-and-shows': 7
       };
       const eventId = categoryMap[categoryParam] || 1;
       setSelectedEvent(eventId);
@@ -168,7 +168,7 @@ const Events = () => {
     setSelectedEvent(id);
     
     // Update URL with selected category
-    const categoryNames = ['technical', 'non-technical', 'harmonicks', 'hackathon', 'workshop', 'conference', 'others'];
+    const categoryNames = ['technical', 'non-technical', 'harmonicks', 'hackathon', 'workshop', 'conference', 'expos-and-shows'];
     const categoryName = categoryNames[index];
     setSearchParams({ category: categoryName });
     
