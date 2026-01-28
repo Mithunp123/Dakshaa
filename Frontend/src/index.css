@@ -161,6 +161,34 @@
     display: none;
   }
   
+  /* Mobile robot area optimization */
+  @media (max-width: 768px) {
+    /* Ensure robot area allows scrolling on mobile */
+    .mobile-robot-scroll {
+      touch-action: pan-y pan-x !important;
+      -webkit-overflow-scrolling: touch;
+      pointer-events: auto;
+      overflow: visible;
+    }
+    
+    /* Disable all pointer events on robot decorative elements */
+    .mobile-robot-scroll * {
+      pointer-events: none;
+    }
+    
+    /* Re-enable only for the actual canvas */
+    .mobile-robot-scroll canvas {
+      pointer-events: none !important;
+    }
+    
+    /* Prevent iOS bounce on robot area */
+    .mobile-robot-container {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      will-change: scroll-position;
+    }
+  }
+  
   /* Responsive gap utilities */
   .gap-responsive {
     @apply gap-3 sm:gap-4 md:gap-6 lg:gap-8;

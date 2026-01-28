@@ -447,7 +447,7 @@ const RegistrationForm = () => {
   // Memoized categories - prevents recalculation on every render
   const categories = useMemo(() => {
     // Define the preferred categories as requested by user - these will ALWAYS be shown
-    const alwaysShowCategories = ["Technical", "Non-Technical", "Team Events", "Hackathon", "Workshop", "Sports"];
+    const alwaysShowCategories = ["Technical", "Non-Technical", "Team Events", "Hackathon", "Workshop", "Sports","Cultural"];
     
     // Additional categories that only show if events exist
     const optionalCategories = ["Conference"];
@@ -2111,6 +2111,7 @@ const RegistrationForm = () => {
                                             cat === "Conference" ? "CONFERENCE" :
                                             cat === "Workshop" ? "WORKSHOP" :
                                             cat === "Sports" ? "SPORTS" :
+                                            cat === "Cultural" ? "CULTURAL" :
                                             cat.toUpperCase();
                           
                           return (
@@ -2290,7 +2291,7 @@ const RegistrationForm = () => {
                     </button>
                     {/* Only show categories that are in the combo quotas */}
                     {Object.keys(selectedCombo?.category_quotas || {})
-                      .filter(cat => ["Technical", "Non-Technical", "Workshop", "Conference", "Team Events", "Hackathon"].includes(cat))
+                      .filter(cat => ["Technical", "Non-Technical", "Workshop", "Conference", "Team Events", "Hackathon", "Sports", "Cultural"].includes(cat))
                       .map((cat, index) => {
                         // Display proper names for categories
                         const displayName = cat === "Technical" ? "TECH" :
@@ -2299,6 +2300,8 @@ const RegistrationForm = () => {
                                           cat === "Hackathon" ? "HACKATHON" :
                                           cat === "Conference" ? "CONFERENCE" :
                                           cat === "Workshop" ? "WORKSHOP" :
+                                          cat === "Sports" ? "SPORTS" :
+                                          cat === "Cultural" ? "CULTURAL" :
                                           cat.toUpperCase();
                         
                         return (

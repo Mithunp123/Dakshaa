@@ -536,13 +536,20 @@ const UltraHeroSection = () => {
 
       {/* Right Content - Hero Image */}
       <motion.div
-        className="relative w-full lg:w-1/2 flex justify-center items-center order-1 lg:order-2 mb-6 lg:mb-0"
-        style={{ zIndex: 10, position: 'relative' }}
+        className={`relative w-full lg:w-1/2 flex justify-center items-center order-1 lg:order-2 mb-6 lg:mb-0 ${
+          isMobile ? 'pointer-events-none' : ''
+        }`}
+        style={{ 
+          zIndex: 10, 
+          position: 'relative',
+          // Ensure scroll works on mobile
+          touchAction: isMobile ? 'pan-y pan-x' : 'auto'
+        }}
         variants={itemVariants}
       >
         {/* Multi-layer glow effect */}
         <motion.div
-          className="absolute w-[80%] h-[80%] rounded-full blur-3xl"
+          className="absolute w-[80%] h-[80%] rounded-full blur-3xl pointer-events-none"
           style={{
             background: 'radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, rgba(249, 115, 22, 0.15) 50%, transparent 70%)',
           }}
@@ -557,7 +564,7 @@ const UltraHeroSection = () => {
         {[1, 2, 3].map((ring) => (
           <motion.div
             key={ring}
-            className="absolute rounded-full border border-sky-500/20"
+            className="absolute rounded-full border border-sky-500/20 pointer-events-none"
             style={{
               width: `${50 + ring * 15}%`,
               height: `${50 + ring * 15}%`,
@@ -608,17 +615,39 @@ const UltraHeroSection = () => {
 
         {/* Hero Image with 3D effect */}
         <motion.div
-          className={`relative z-10 w-full ${isMobile ? 'touch-pan-y' : ''}`}
+          className={`relative z-10 w-full ${
+            isMobile ? 'mobile-robot-scroll mobile-robot-container' : ''
+          }`}
           style={{
             transformStyle: "preserve-3d",
             perspective: "1000px",
-            // Allow scroll pass-through on mobile
-            touchAction: isMobile ? 'pan-y' : 'auto',
+            // Enhanced mobile scroll handling
+            touchAction: isMobile ? 'pan-y pan-x' : 'auto',
+            // Prevent iOS bounce scroll interference
+            WebkitOverflowScrolling: isMobile ? 'touch' : 'auto',
+            // Ensure this container allows scroll
+            overflow: isMobile ? 'visible' : 'hidden'
           }}
         >
           <Suspense fallback={<div className="w-full h-[400px] xs:h-[500px] sm:h-[600px] md:h-[700px]" />}>
-            <RobotHero />
+            {isMobile ? (
+              <div 
+                style={{
+                  // Mobile-specific optimizations
+                  willChange: 'auto', // Reduce GPU usage
+                  backfaceVisibility: 'hidden', // Improve performance
+                  transform: 'translateZ(0)', // Force hardware acceleration only when needed
+                }}
+              >
+                <RobotHero />
+              </div>
+            ) : (
+              <RobotHero />
+            )}
           </Suspense>
+          
+          {/* Gradient line below robot */}
+          <div className="mt-3 w-32 h-[1px] bg-gradient-to-r from-transparent via-orange-500/60 to-transparent mx-auto" style={{ transform: 'none' }}></div>
         </motion.div>
 
         {/* Tech circle overlay */}
