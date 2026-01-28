@@ -368,30 +368,6 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistere
                         Registered
                       </button>
                     )}
-                    {!isDisabled && canRegister && !isAlreadyRegistered && (
-                         <button
-                         onClick={() => {
-                             setShowModal(false);
-                             if (isTeamEvent) {
-                                // Prioritize title, then formatted ID
-                                const displayTitle = event.title || event.name || (event.event_id ? event.event_id.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'Unknown Event');
-                                
-                                navigate('/dashboard/teams', { 
-                                  state: { 
-                                    createTeam: true,
-                                    eventId: event.event_id || event.id,
-                                    eventName: displayTitle
-                                  } 
-                                });
-                              } else {
-                                if (onSelect) onSelect();
-                              }
-                         }}
-                         className="px-4 py-2 bg-secondary hover:bg-secondary/80 text-white rounded-lg transition-colors text-sm font-bold shadow-lg shadow-secondary/20"
-                     >
-                         {isSelected ? "Selected" : "Select Event"}
-                     </button>
-                    )}
                 </div>
               </motion.div>
             </motion.div>
