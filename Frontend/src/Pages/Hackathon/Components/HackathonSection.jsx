@@ -227,7 +227,7 @@ export const hackathonEventDetails = {
     },
     "hackathon-3": {
       id: "hackathon-3",
-      title: "Relay Edition",
+      title: "Neuro Code 2.O - Relay Edition",
       date: "February 13 2026 ",
       venue: "computer Lab",
       registrationLink: " ",
@@ -255,12 +255,7 @@ export const hackathonEventDetails = {
           description: [
             "Teams are given a faulty front-end codebase containing intentional logical, syntactical, and UI errors.",
             "The goal is to debug and make the website functionally correct and visually accurate within the time limit. ",
-            " Codebase includes HTML, CSS, and minimal JavaScript Errors may include",
-             "Broken layouts",
-              "Incorrect CSS selectors or properties",
-              "Missing or mismatched tags",
-              "UI alignment issues",
-              "Basic JS logic mistakes",
+            
 
           ],
         },
@@ -280,13 +275,7 @@ export const hackathonEventDetails = {
             "Total time: 45 minutes",
             "Each member codes for exactly 15 minutes",
             "Coding happens one after another",
-            "No verbal or non-verbal communication",
-           " No discussions, hints, or explanations",
-           " No code comments for guidance",
-            "No restarting or deleting previous work",
-            "Continue from the previous member’s code",
-            "Understand the existing structure",
-            "Improve or complete the design",
+           
 
           ],
         },

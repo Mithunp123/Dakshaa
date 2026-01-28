@@ -29,7 +29,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "AB 408",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "The AI Meme Contest is a fun-filled one-day non-technical event that combines creativity, humor, and artificial intelligence concepts through visually engaging memes. Participants will create original memes based on given AI-related themes using either AI-based tools or manual editing, with a strong focus on originality and ethical content creation. The event encourages innovative thinking and expressive digital creativity in a light-hearted competitive environment. It will be conducted at AB 408, with a registration fee of ₹150, and is open to both individuals and teams.",
     img: NonTech1,
@@ -103,7 +103,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "AB 410",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "The IPL Auction is an exciting strategy-based event that simulates the real Indian Premier League player auction experience, where participants act as franchise owners and build a balanced cricket team by analyzing player statistics and bidding within a limited virtual budget. The event emphasizes teamwork, financial planning, and quick decision-making, making it engaging for cricket enthusiasts and strategy lovers alike. It will be conducted for a duration of 3 hours at AB 410, with free registration for participants who have registered for any Technical Event, Non-Technical Event, or Workshop.",
     img: NonTech2,
@@ -162,7 +162,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "Dr. M S. Swaminathan Biotech Seminar Hall",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "Just-A-Minute (JAM) is a fast-paced speaking event where participants must speak on a given topic for one full minute without hesitation, repetition, or deviation. It tests quick thinking, clarity of thought, confidence, and effective communication skills in a fun and engaging way.",
     img: NonTech3,
@@ -216,7 +216,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "Civil CADD Laboratory",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "Civil Circuit (Connection) is an engaging non-technical event designed to test participants' speed, logical thinking, and basic technical understanding of civil engineering concepts. Through multiple interactive rounds, participants will identify connections between civil engineering terms, categorize materials and processes, and recognize logos of construction brands and government agencies. The event encourages teamwork, quick thinking, and industry awareness in a competitive yet fun environment.",
     img: NonTech4,
@@ -285,7 +285,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "AB 110",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "Emoji Pictionary is a fast-paced and entertaining non-technical event where participants decode famous movie titles, book plots, or well-known phrases represented entirely through emoji sequences. This event adds a digital twist to the classic game of Pictionary by replacing drawings with emojis, challenging participants' creativity, interpretation skills, and quick thinking. Teams race against time to correctly guess the answers based on visual emoji clues, making the event both fun and intellectually stimulating.",
     img: NonTech5,
@@ -357,7 +357,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "IT Park",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "Battle Arena is a high-intensity eSports competition designed to bring together skilled gamers in a professional and competitive environment. Participants compete in popular gaming titles such as EA Sports FC and Free Fire, showcasing precision, strategy, reflexes, and real-time decision-making. The event follows a structured knockout tournament format to identify and crown the ultimate champions of the arena.",
     img: NonTech6,
@@ -408,7 +408,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "Quadrangle Triangle, Main Building",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "Arangam Athira is a fun-filled musical entertainment event designed to test participants' love for music, memory, and spontaneity. Set in a lively DJ atmosphere, the event creates an energetic and engaging environment where rhythm meets challenge. Participants enjoy interactive music sessions focused purely on enjoyment, crowd interaction, and spontaneous performance rather than competition.",
     img: NonTech7,
@@ -466,7 +466,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "Quadrangle Triangle, Main Building",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "LineX is a robotics-based non-technical event where participants compete head-to-head by controlling robots using a remote control. The robots must navigate through a predefined track filled with multiple obstacles. The participant who completes the track in the shortest time is declared the winner. This event focuses on testing speed, precision, control skills, and the ability to handle robots effectively under competitive conditions.",
     img: NonTech8,
@@ -521,7 +521,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "Smart Classroom, Main Block",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "The Kahoot! Quiz Challenge is an exciting and interactive quiz event designed to test participants' knowledge, speed, and teamwork. Using the Kahoot platform, participants answer multiple-choice questions in real time through their smartphones. The quiz includes a mix of technical topics, general knowledge, and fun questions, making it both competitive and engaging. Accuracy and quick thinking are the key factors for success.",
     img: NonTech9,
@@ -575,7 +575,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "EE301",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "Twisted Tiles is a puzzle-based non-technical event designed to challenge participants' logical thinking and problem-solving abilities. Participants must analyze patterns, think critically, and solve puzzles within a limited time, making it an engaging test of focus, reasoning, and mental agility.",
     img: NonTech10,
@@ -636,7 +636,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "EE302",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "Logo Quiz is a non-technical event that tests participants' ability to identify logos related to brands, technology companies, and general knowledge. The event challenges visual recognition, memory, and quick recall skills in a fun and engaging quiz-based format.",
     img: NonTech11,
@@ -697,7 +697,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "EE303",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "Unit Wars is an educational quiz-based non-technical event focusing on fundamental and derived SI units used in science and engineering. The event challenges participants' conceptual understanding, memory, and speed, making it both informative and competitive.",
     img: NonTech12,
@@ -758,7 +758,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "To be announced",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "Unmasking Brands & Flavours is an interactive non-technical event that challenges participants' knowledge of corporate branding and food recognition. Through a fun, three-level game format, the event tests awareness, teamwork, and quick thinking by combining logo identification, performance-based guessing, and culinary knowledge in an engaging and competitive environment.",
     img: NonTech13,
@@ -827,7 +827,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "KSRCT IT Park",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "Treasure Hunt is an exciting team-based non-technical event that challenges participants to think creatively, solve clues, and work together under time pressure. Teams navigate through multiple checkpoints by cracking riddles, puzzles, physical tasks, and observation-based challenges spread across the campus. The first team to successfully complete all challenges and uncover the final treasure is declared the winner.",
     img: NonTech14,
@@ -887,7 +887,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "KSRCT F Block",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "Face Painting is a fun, creative, and engaging non-technical event that brings out the artistic talents of participants. This event offers a platform for students to express their imagination through colors, designs, and meaningful themes painted on faces. Participants can showcase styles such as cartoons, abstract art, nature-inspired patterns, cultural motifs, and message-driven creativity.",
     img: NonTech15,
@@ -956,7 +956,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "Hall No: MC 306",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "Mind Spark Arena is a three-round knowledge-based non-technical event designed to test participants' intelligence, observation skills, and brand awareness. Teams compete through a general quiz, a visual picture connection round, and a logo & brand tagline identification challenge. Participants must think fast, connect ideas smartly, and demonstrate their mental agility to win.",
     img: NonTech16,
@@ -1030,7 +1030,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "Robotics Laboratory",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "Tech Without Tech is a non-technical team event where participants are given a common technology or everyday system and must explain how it works without using any technical terms. Using simple language, real-life examples, gestures, or storytelling, participants make complex concepts understandable to a non-technical audience. The event tests creativity, communication skills, and the ability to simplify ideas effectively.",
     img: NonTech17,
@@ -1091,7 +1091,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "KSRCT Campus",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "Freezeframe is a creative photography contest focused on visual storytelling and awareness. Participants capture meaningful moments within the college campus without any editing or filters. The event promotes observational skills, creativity, and the ability to convey a message through a single photograph.",
     img: NonTech18,
@@ -1168,7 +1168,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "Wet Processing Lab – Textile Department",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "T2T – Trash 2 Textile is a creative non-technical event that focuses on transforming textile waste into innovative and useful products. Participants explore techniques for recycling, upcycling, and repurposing discarded fabrics, old garments, and textile scraps. The event encourages sustainability, hands-on creativity, and understanding how to turn waste into value in an eco-friendly manner.",
     img: NonTech19,
@@ -1232,7 +1232,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "Electronic Devices Laboratory, J Block 4th Floor",
-    price: "₹100",
+    price: "₹150 per Member",
     description:
       "BlindBites is a fun and interactive team-based non-technical event where participants work in pairs to identify mystery food items. One member tastes the food while the other listens to hints and guesses the item. The event tests teamwork, communication, and sensory observation. The winning team is determined by the least time taken to correctly identify all items.",
     img: NonTech20,
@@ -1310,7 +1310,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "KSRCT Hostel Turf",
-    price: "₹750 per team",
+    price: "₹150 per Member",
     description:
       "Powerhouse Champion Trophy is a fast-paced cricket tournament focused on skill, discipline, and team strength. With strict rules and limited overs, it promises intense competition and fair play",
     img: NonTech21,
