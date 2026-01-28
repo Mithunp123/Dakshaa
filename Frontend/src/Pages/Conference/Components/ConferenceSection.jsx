@@ -14,11 +14,11 @@ const conferences = [
   {
     id: 1,
     img: btcon,
-    title: "National Conference on Converging Life Sciences with Smart Technologies",
-    shortTitle: "National Conference on Converging Life Sciences with Smart Technologies",
+    title: "National Conference on Transforming Life Sciences through AI and Smart Technologies",
+    shortTitle: " National Conference on Transforming Life Sciences through AI and Smart Technologies",
     department: "School of Life Sciences",
     description:
-      "The National Conference on Converging Life Sciences with Smart Technologies aims to provide a scholarly platform for students, researchers, and academicians to present innovative research and interdisciplinary advancements that integrate life sciences with emerging smart technologies such as Artificial Intelligence, Machine Learning, IoT, Data Analytics, Automation, and Digital Health. The conference promotes knowledge exchange, research collaboration, and dissemination of high-quality scientific work.",
+      "National Conference on Transforming Life Sciences through AI and Smart Technologies aims to provide a scholarly platform for students, researchers, and academicians to present innovative research and interdisciplinary advancements that integrate life sciences with emerging smart technologies such as Artificial Intelligence, Machine Learning, IoT, Data Analytics, Automation, and Digital Health. The conference promotes knowledge exchange, research collaboration, and dissemination of high-quality scientific work.",
     topics: [
       "Converging Life Sciences with Smart Technologies",
     ],

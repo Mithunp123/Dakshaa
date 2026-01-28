@@ -558,12 +558,12 @@ export const hackathonEventDetails = {
         facultyCoordinator: [
           {
             name: "Dr.K.Santhanam",
-            phone: "",
+            phone: " +91 98428 87155",
             email: "",
           },
            {
             name: "Mr.S.Venkatesan",
-            phone: "",
+            phone: "+91 94430 15463",
             email: "",
           },
         ],
@@ -580,7 +580,7 @@ export const hackathonEventDetails = {
           },
             {
             name: "Ms. M.Nabishka",
-            phone: "",
+            phone: "+91 90254 65388",
             email: "",
           },
         ],

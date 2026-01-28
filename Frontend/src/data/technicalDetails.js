@@ -766,14 +766,14 @@ export const technicalDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. P.Sampath",
+          name: "Dr. P. Sampath",
           email: "",
-          phone: "",
+          phone: "+91 99621 16570",
         },
         {
           name: "Dr. S. Jeyaprakasam",
           email: "",
-          phone: "",
+          phone: "+91 98946 94658",
         },
       ],
       studentCoordinator: [
@@ -790,7 +790,7 @@ export const technicalDetails = [
         {
           name: "Ms.V.A.Santhanalakshimi",
           email: "",
-          phone: "",
+          phone: "+91 80569 10993",
         },
       ],
     },

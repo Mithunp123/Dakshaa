@@ -678,12 +678,12 @@ export const workshopDetails = [
       facultyCoordinator: [
         {
           name: "Dr. K. Raja",
-          phone: "",
+          phone: "+91 98423 14481",
           email: "",
         },
         {
           name: "Mr. C. Ramesh",
-          phone: "",
+          phone: " +91 96297 67778",
           email: "",
         },
       ],

@@ -63,7 +63,7 @@ export const culturalDetails = [
     schedule: [
       {
         date: "February 14, 2026",
-        time: "10:00 AM to 3:00 PM",
+        time: "09:00 AM to 3:00 PM",
         location: "KSRCT",
       },
     ],
@@ -120,7 +120,7 @@ export const culturalDetails = [
     schedule: [
       {
         date: "February 14, 2026",
-        time: "10:00 AM to 3:00 PM",
+        time: "09:00 AM to 3:00 PM",
         location: "KSRCT",
       },
     ],
@@ -166,7 +166,7 @@ export const culturalDetails = [
     date: "February 14, 2026",
     venue: "KSRCT",
     department: "Cultural Committee",
-    price: "₹300 (per team)",
+    price: "₹150 (per member)",
     rules: [
       "The event is open to all individual participants and teams. Teams may consist of 1 to 3 members",
       "The Short films can be based on any theme & genres without any vulgar content",
@@ -179,7 +179,7 @@ export const culturalDetails = [
     schedule: [
       {
         date: "February 14, 2026",
-        time: "10:00 AM to 03:00 PM",
+        time: "09:00 AM to 03:00 PM",
         location: "KSRCT",
       },
     ],
@@ -236,7 +236,7 @@ export const culturalDetails = [
     schedule: [
       {
         date: "February 14, 2026",
-        time: "10:00 AM to 03:00 PM",
+        time: "09:00 AM to 03:00 PM",
         location: "KSRCT",
       },
     ],
@@ -255,9 +255,9 @@ export const culturalDetails = [
       ],
       studentCoordinator: [
         {
-          name: "Mr.Kavin",
+          name: "Mr.S.Balamurugan",
           email: "",
-          phone: "+91 86104 75412",
+          phone: "+91 94877 07552",
         },
         {
           name: "Ms.Aashitha Firdous A",
@@ -292,7 +292,7 @@ export const culturalDetails = [
       {
       
         date: "February 14, 2026",
-        time: "10:00 AM to 03:00 PM",
+        time: "09:00 AM to 03:00 PM",
         location: "KSRCT",
       },
     ],
