@@ -21,6 +21,7 @@ import vlsiwk from "./assets/vlsiwk.jpeg";
 import comingsoon from "./assets/comingsoon.jpg";
 import startuptn from "./assets/startuptn.png";
 import lovable from "./assets/lovable.png";
+import titlesp from "./assets/atum.jpg";
 
 
 
@@ -28,7 +29,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 
 function Sponsors() {
-  const titlesponser =[comingsoon];
+  const titlesponser =[titlesp];
   const cosponser=[comingsoon];
   const ecosystem=[startuptn];
 
