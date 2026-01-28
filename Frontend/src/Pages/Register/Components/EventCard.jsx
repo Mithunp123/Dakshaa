@@ -269,7 +269,7 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistere
           </span>
         </div>
 
-        {/* Team Event Indicator */}
+        {/* Team Event Indicator 
         {isTeamEvent && !isDisabled && canRegister && (
           <div className="mt-2 px-3 py-2 bg-blue-500/10 border border-blue-500/20 rounded-xl">
             <p className="text-xs text-blue-400 font-semibold flex items-center gap-1.5">
@@ -277,7 +277,7 @@ const EventCard = ({ event, onSelect, isSelected, isDisabled, isAlreadyRegistere
               Click to create team in dashboard
             </p>
           </div>
-        )}
+        )}*/}
 
         {/* Premium/Featured Badge (if price > 500) */}
         {price > 500 && (
