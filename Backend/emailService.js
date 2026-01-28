@@ -512,121 +512,215 @@ const sendWelcomeEmail = async (userEmail, userName) => {
   }
 };
 
-// OTP email template
+// OTP email template matching the payment success email design
 const getOTPEmailTemplate = (userName, otpCode) => {
   return `
     <!DOCTYPE html>
     <html>
     <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <style>
-        body {
-          font-family: 'Arial', sans-serif;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          margin: 0;
-          padding: 20px;
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        body { 
+          font-family: 'Roboto', sans-serif; 
+          background-color: #0B1120; /* Deep dark blue background matching payment email */
+          margin: 0; 
+          padding: 0; 
+          -webkit-font-smoothing: antialiased; 
         }
-        .container {
-          max-width: 600px;
-          margin: 0 auto;
-          background: white;
-          border-radius: 15px;
-          overflow: hidden;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        .container { 
+          max-width: 500px; 
+          margin: 20px auto; 
+          background: #151e32; /* Slightly lighter card background */
+          border-radius: 16px; 
+          overflow: hidden; 
+          color: #e2e8f0;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+          border: 1px solid #1e293b;
         }
-        .header {
-          background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-          padding: 40px 20px;
-          text-align: center;
-          color: white;
+        .header { 
+          background: #0f172a; 
+          padding: 20px 15px; 
+          text-align: center; 
+          border-bottom: 1px solid #1e293b;
         }
         .header h1 {
           margin: 0;
-          font-size: 32px;
+          font-size: 24px;
           font-weight: bold;
+          color: #e2e8f0;
         }
-        .content {
-          padding: 40px 30px;
+        .header p {
+          margin: 8px 0 10px 0; 
+          font-size: 14px;
+          color: #06b6d4;
+          font-weight: 500;
+        }
+        .dhaskaa-logo {
+          max-height: 60px;
+          object-fit: contain;
+          margin-top: 8px;
+        }
+        .content { 
+          padding: 20px; 
+          text-align: center; 
+        }
+        
+        /* Security Badge */
+        .badge-container {
           text-align: center;
-        }
-        .otp-section {
-          background: #f0f9ff;
-          border: 2px solid #0ea5e9;
-          border-radius: 15px;
-          padding: 30px;
-          margin: 30px 0;
-        }
-        .otp-code {
-          font-size: 36px;
-          font-weight: bold;
-          color: #dc2626;
-          letter-spacing: 8px;
-          margin: 20px 0;
-          padding: 20px;
-          background: white;
-          border-radius: 10px;
-          display: inline-block;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .message {
-          font-size: 16px;
-          line-height: 1.6;
-          color: #333;
           margin-bottom: 20px;
         }
+        .security-badge {
+          background: rgba(239, 68, 68, 0.1); /* Transparent red */
+          color: #ef4444; /* Red text for security */
+          padding: 6px 16px;
+          border-radius: 20px;
+          font-size: 12px;
+          font-weight: bold;
+          display: inline-block;
+          border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .greeting {
+          color: #94a3b8;
+          font-size: 14px;
+          margin-bottom: 15px;
+          line-height: 1.5;
+        }
+        .greeting strong {
+          color: #06b6d4;
+        }
+        
+        .otp-section {
+          background: #1e293b;
+          border: 2px solid #06b6d4;
+          border-radius: 12px;
+          padding: 20px;
+          margin: 20px 0;
+        }
+        .otp-title {
+          color: #06b6d4;
+          font-size: 16px;
+          font-weight: bold;
+          margin-bottom: 15px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+        }
+        .otp-code {
+          font-size: 32px;
+          font-weight: bold;
+          color: #ef4444;
+          letter-spacing: 5px;
+          margin: 15px auto;
+          padding: 18px 30px;
+          background: #0f172a;
+          border-radius: 10px;
+          display: block;
+          width: fit-content;
+          text-align: center;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+          border: 1px solid #1e293b;
+          min-width: 180px;
+        }
+        .otp-description {
+          color: #64748b;
+          font-size: 12px;
+          margin: 10px 0 0 0;
+        }
+        
         .warning {
-          background: #fef3cd;
+          background: rgba(251, 191, 36, 0.1);
           border-left: 4px solid #fbbf24;
           padding: 15px;
-          margin: 20px 0;
-          border-radius: 5px;
+          margin: 18px 0;
+          border-radius: 8px;
+          text-align: left;
         }
         .warning p {
-          color: #92400e;
+          color: #fbbf24;
           margin: 0;
-          font-weight: bold;
+          font-weight: 500;
+          font-size: 12px;
+          line-height: 1.4;
         }
+        .warning p:first-child {
+          margin-bottom: 6px;
+        }
+        
+        .security-note {
+          color: #94a3b8;
+          font-size: 12px;
+          margin: 15px 0;
+          line-height: 1.4;
+        }
+        
         .footer {
-          background: #f8fafc;
-          padding: 30px;
+          background: #0f172a;
+          padding: 18px;
           text-align: center;
-          border-top: 2px solid #e2e8f0;
+          border-top: 1px solid #1e293b;
+        }
+        .ksrct-logo {
+          max-height: 50px;
+          opacity: 0.9;
+          margin: 10px 0;
         }
         .footer p {
           color: #64748b;
+          font-size: 12px;
+          margin: 4px 0;
+        }
+        .footer p:first-child {
+          color: #06b6d4;
+          font-weight: bold;
           font-size: 14px;
-          margin: 5px 0;
+          margin-bottom: 8px;
+        }
+        .footer p:last-child {
+          color: #475569;
+          font-size: 11px;
+          margin-top: 10px;
         }
       </style>
     </head>
     <body>
       <div class="container">
         <div class="header">
-          <h1>🔐 Password Reset</h1>
-          <p style="margin: 10px 0 0 0; font-size: 18px;">DaKshaa T26</p>
+          <h1>Password Reset</h1>
+          <img src="cid:dhaskaalogo" alt="DaKshaa T26 Logo" class="dhaskaa-logo" />
         </div>
         
         <div class="content">
-          <p class="message">Hello <strong>${userName}</strong>,</p>
-          <p class="message">You have requested to reset your password for your DaKshaa account.</p>
+          <div class="badge-container">
+            <span class="security-badge">Security Verification</span>
+          </div>
+
+          <p class="greeting">Hello <strong>${userName}</strong>,</p>
+          <p class="greeting">You have requested to reset your password for your DaKshaa account.</p>
           
           <div class="otp-section">
-            <h2 style="color: #0ea5e9; margin-bottom: 15px;">Your OTP Code</h2>
+            <div class="otp-title">
+               Your Verification Code
+            </div>
             <div class="otp-code">${otpCode}</div>
-            <p style="color: #64748b; margin: 15px 0 0 0;">Enter this code to reset your password</p>
+            <p class="otp-description">Enter this code to reset your password</p>
           </div>
           
           <div class="warning">
-            <p>⚠️ This OTP is valid for 5 minutes only</p>
-            <p>If you didn't request this, please ignore this email</p>
+            <p>⚠️ This verification code is valid for 5 minutes only</p>
+            <p>If you didn't request this password reset, please ignore this email</p>
           </div>
           
-          <p class="message">For security reasons, please do not share this code with anyone.</p>
+          <p class="security-note">For security reasons, please do not share this code with anyone. Our team will never ask for this code.</p>
         </div>
         
         <div class="footer">
-          <p><strong>DaKshaa T26</strong> - Technical Symposium</p>
-          <p>KSRCT College of Engineering</p>
-          <p style="color: #94a3b8;">This is an automated email. Please do not reply to this message.</p>
+          <img src="cid:ksrctlogo" alt="KSRCT Logo" class="ksrct-logo" />
+          <p>This is an automated email. Please do not reply to this message.</p>
         </div>
       </div>
     </body>
@@ -643,7 +737,19 @@ const sendOTPEmail = async (userEmail, userName, otpCode) => {
       from: `"DaKshaa T26" <${process.env.EMAIL_USER}>`,
       to: userEmail,
       subject: '🔐 Password Reset OTP - DaKshaa T26',
-      html: getOTPEmailTemplate(userName, otpCode)
+      html: getOTPEmailTemplate(userName, otpCode),
+      attachments: [
+        {
+          filename: 'logo.png',
+          path: path.join(__dirname, 'logo.png'),
+          cid: 'dhaskaalogo' // same cid value as in the html img src
+        },
+        {
+          filename: 'ksrct.png',
+          path: path.join(__dirname, 'ksrct.png'),
+          cid: 'ksrctlogo' // same cid value as in the html img src
+        }
+      ]
     };
 
     const info = await transporter.sendMail(mailOptions);

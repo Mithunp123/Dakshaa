@@ -66,10 +66,14 @@ const LiveStats = () => {
     console.log("Using fallback stats fetch...");
     try {
         // Fallback method using head count
-        // Using event_registrations_config as it seems to be the main table now
+        // Only count students (exclude admin roles)
         const [usersResult, regsResult] = await Promise.all([
-        supabase.from('profiles').select('*', { count: 'exact', head: true }),
-        supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).eq('payment_status', 'PAID')
+        supabase.from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .eq('role', 'student'),
+        supabase.from('event_registrations_config')
+          .select('*', { count: 'exact', head: true })
+          .eq('payment_status', 'PAID')
         ]);
 
         setStats({
@@ -88,7 +92,7 @@ const LiveStats = () => {
     // Create a channel for both tables
     const channel = supabase.channel('live-stats');
 
-    // Listen for new profiles (students joining)
+    // Listen for new profiles (students only)
     channel.on(
       'postgres_changes',
       { 
@@ -97,14 +101,17 @@ const LiveStats = () => {
         table: 'profiles' 
       },
       (payload) => {
-        console.log('New student onboarded!', payload);
-        setStats(prev => ({
-          ...prev,
-          users: prev.users + 1,
-          last_updated: new Date().toISOString()
-        }));
-        setIsLive(true);
-        setTimeout(() => setIsLive(false), 2000);
+        // Only count if it's a student role
+        if (payload.new && payload.new.role === 'student') {
+          console.log('New student onboarded!', payload);
+          setStats(prev => ({
+            ...prev,
+            users: prev.users + 1,
+            last_updated: new Date().toISOString()
+          }));
+          setIsLive(true);
+          setTimeout(() => setIsLive(false), 2000);
+        }
       }
     );
 
@@ -117,17 +124,27 @@ const LiveStats = () => {
         table: 'event_registrations_config' 
       },
       (payload) => {
-        // Only count if status is PAID
-        if (payload.new && payload.new.payment_status === 'PAID') {
-           // If it's an update, check if it was already PAID (to avoid double counting) - this is hard without old state in some cases
-           // But for simplicity, we just trigger a refresh or simplistic increment if it seems new
-           
-           // If INSERT, it's new paid.
-           // If UPDATE and previous wasn't paid... simplistic: just fetch fresh stats to be accurate
-           fetchInitialStats();
-           
-           setIsLive(true);
-           setTimeout(() => setIsLive(false), 2000);
+        console.log('Registration change detected:', payload);
+        // On INSERT with PAID status, increment
+        if (payload.eventType === 'INSERT' && payload.new && payload.new.payment_status === 'PAID') {
+          setStats(prev => ({
+            ...prev,
+            registrations: prev.registrations + 1,
+            last_updated: new Date().toISOString()
+          }));
+          setIsLive(true);
+          setTimeout(() => setIsLive(false), 2000);
+        }
+        // On UPDATE from non-PAID to PAID, increment
+        else if (payload.eventType === 'UPDATE' && payload.new && payload.new.payment_status === 'PAID' && 
+                 payload.old && payload.old.payment_status !== 'PAID') {
+          setStats(prev => ({
+            ...prev,
+            registrations: prev.registrations + 1,
+            last_updated: new Date().toISOString()
+          }));
+          setIsLive(true);
+          setTimeout(() => setIsLive(false), 2000);
         }
       }
     );
