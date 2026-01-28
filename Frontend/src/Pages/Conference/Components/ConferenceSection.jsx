@@ -45,7 +45,7 @@ const conferences = [
       " Additional author per head : ₹150",
     ],
 
-    date: "13 February 2026 ",
+    date: "12 February 2026 ",
     venue: "KSRCT Campus",
     contact: {
         facultyCoordinator: [
@@ -72,7 +72,7 @@ const conferences = [
           }
         ],
       },
-    registrationLink: " ",
+    
   },
   {
     id: 2,
@@ -94,7 +94,7 @@ const conferences = [
       "Low Power VLSI Design",
       "FPGA-Based VLSI Design",
     ],
-    date: "March 2026",
+    date: "12 February 2026",
     venue: "KSRCT Campus",
     registrationFee: "₹300",
     facultyCo: "Dr. R. Senthilkumar",
@@ -102,7 +102,7 @@ const conferences = [
     studentCo1: "K. Priya",
     studentCoNo1: "+91 87654 32109",
     email: "ncistemm@ksrct.ac.in",
-    registrationLink: "https://forms.gle/rfUU9yyQm6VeyX9x8",
+    
   },
   {
     id: 3,
@@ -124,7 +124,7 @@ const conferences = [
       "AI for Cybersecurity Policy and Governance",
       "Explainable AI (XAI) for Cybersecurity",
     ],
-    date: "March 2026",
+    date: "12 February 2026",
     venue: "KSRCT Campus",
     registrationFee: "₹300",
     facultyCo: "Dr. M. Anitha",
@@ -132,7 +132,7 @@ const conferences = [
     studentCo1: "S. Rahul",
     studentCoNo1: "+91 86543 21098",
     email: "ncistemm@ksrct.ac.in",
-    registrationLink: "https://forms.gle/rfUU9yyQm6VeyX9x8",
+    
   },
   {
     id: 4,
@@ -200,7 +200,7 @@ const conferences = [
         ],
       },
     ],
-    date: "March 2026",
+    date: "12 February 2026",
     venue: "KSRCT Campus",
     registrationFee: "₹300",
     facultyCo: "Dr. P. Karthik",
@@ -208,7 +208,6 @@ const conferences = [
     studentCo1: "N. Divya",
     studentCoNo1: "+91 85432 10987",
     email: "ncistemm@ksrct.ac.in",
-    registrationLink: "https://forms.gle/rfUU9yyQm6VeyX9x8",
   },
 ];
 
