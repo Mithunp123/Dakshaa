@@ -190,7 +190,14 @@ function AppContent() {
             <Route path="/feedback" element={<Feedback />} />
             <Route path="/terms" element={<TermsAndConditions />} />
             <Route path="/signup" element={<Register />} />
-            <Route path="/register-events" element={<EventRegistration />} />
+            <Route 
+              path="/register-events" 
+              element={
+                <ProtectedRoute allowedRoles={["student", "super_admin", "registration_admin", "event_coordinator", "volunteer"]}>
+                  <EventRegistration />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/scan" element={<Scan />} />
             <Route
               path="/dashboard/*"

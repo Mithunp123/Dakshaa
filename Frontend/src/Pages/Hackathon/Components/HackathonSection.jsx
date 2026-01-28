@@ -622,9 +622,13 @@ const HackathonSection = () => {
   };
 
   const handleRegisterClick = () => {
+    console.log('🎫 Hackathon Register click - user:', user ? 'logged in' : 'not logged in');
+    console.log('🎫 rawEventId:', rawEventId);
+    
     if (!user) {
-      // Not logged in - redirect to login with return URL
-      navigate('/login', { state: { returnTo: `/event/${rawEventId}` } });
+      // Not logged in - redirect to login with query params for registration intent
+      console.log('🔐 Redirecting to login with register=true, eventId:', rawEventId);
+      navigate(`/login?register=true&eventId=${encodeURIComponent(rawEventId)}`);
       return;
     }
     // Logged in - redirect to registration page with event pre-selected

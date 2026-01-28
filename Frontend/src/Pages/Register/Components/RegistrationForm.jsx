@@ -1824,7 +1824,7 @@ const RegistrationForm = () => {
                 </div>
               </motion.div>
 
-              {/* Lunch Card - Command Line Style */}
+              {/* Lunch Card - Command Line Style 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1841,7 +1841,7 @@ const RegistrationForm = () => {
                   </div>
                 </div>
 
-                {/* Command Terminal Style */}
+                
                 <div className="bg-black/60 border border-gray-600 rounded-lg p-4 font-mono text-sm mb-6">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="flex gap-1">
@@ -1906,6 +1906,7 @@ const RegistrationForm = () => {
                   RESERVE NOW
                 </button>
               </motion.div>
+              */}
             </div>
             
             {/* Special Events Section */}

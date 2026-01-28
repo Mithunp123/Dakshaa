@@ -65,8 +65,17 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Get return URL from state (passed from event registration)
+  // Get registration intent from URL query params (more reliable than state)
+  const searchParams = new URLSearchParams(location.search);
+  const registerFromUrl = searchParams.get('register') === 'true';
+  const eventIdFromUrl = searchParams.get('eventId');
+  
+  // Also check state for backward compatibility
   const returnTo = location.state?.returnTo;
+  const wantsToRegister = registerFromUrl || location.state?.wantsToRegister;
+  const eventId = eventIdFromUrl || location.state?.eventId;
+  
+  console.log('🔐 Login page loaded - wantsToRegister:', wantsToRegister, 'eventId:', eventId);
 
   // Check for email verification success from URL
   useEffect(() => {
@@ -195,17 +204,29 @@ const Login = () => {
 
       // Wait briefly to show success state, then redirect
       setTimeout(() => {
+        // Use the values from URL params or state that were captured at component level
+        console.log('🔄 Redirect check - wantsToRegister:', wantsToRegister, 'eventId:', eventId, 'returnTo:', returnTo, 'role:', role);
+        
         // Redirect based on role
         if (role === 'super_admin') {
           navigate('/admin');
         } else if (role === 'registration_admin') {
           navigate('/admin/desk');
         } else if (role === 'event_coordinator') {
-          navigate('/coordinator');
+          navigate('/admin/coordinator');
         } else if (role === 'volunteer') {
           navigate('/volunteer');
         } else {
-          // For students, check if there's a return URL (from event registration)
+          // For students, ALWAYS check registration intent first
+          if (wantsToRegister) {
+            // User wanted to register for events, redirect to register-events page
+            console.log('✅ Redirecting to register-events with eventId:', eventId);
+            navigate('/register-events', { 
+              state: eventId ? { selectedEventId: eventId } : undefined 
+            });
+            return;
+          }
+          // Otherwise check for return URL or go home
           navigate(returnTo || '/');
         }
       }, 1500);
