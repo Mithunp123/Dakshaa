@@ -802,9 +802,9 @@ export const nonTechnicalDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Mr. T. G. N. Nagarjun",
+          name: "Ms .B.Srinithi Priya",
           department: "",
-          phone: "+91 87543 94242",
+          phone: "+91 95976 21737",
           email: " ",
         },
       ],

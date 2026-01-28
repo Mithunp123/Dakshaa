@@ -227,11 +227,11 @@ export const hackathonEventDetails = {
     },
     "hackathon-3": {
       id: "hackathon-3",
-      title: "NeuroCode 2.0",
+      title: "Relay Edition",
       date: "February 13 2026 ",
       venue: "computer Lab",
       registrationLink: " ",
-      description: "Code Relay is a team-based web design challenge where a reference website design is provided. Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
+      description: "Relay Edition is a team-based web design challenge where a reference website design is provided. Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
       rewards: [
         {
           position: "1st Prize",
@@ -251,23 +251,52 @@ export const hackathonEventDetails = {
       ],
       rounds: [
         {
-          title: "Round details",
+          title: "Round-1",
           description: [
-            "Relay the logic",
-            "Round 1: Code Debug Sprint (30 Minutes) – Elimination Round Concept",
-            "Round 2: Reverse Layout Engineering (1 hour) ",
-            "Round 3: Final Showdown – Code Relay Edition (45 Minutes)"
+            "Teams are given a faulty front-end codebase containing intentional logical, syntactical, and UI errors.",
+            "The goal is to debug and make the website functionally correct and visually accurate within the time limit. ",
+            " Codebase includes HTML, CSS, and minimal JavaScript Errors may include",
+             "Broken layouts",
+              "Incorrect CSS selectors or properties",
+              "Missing or mismatched tags",
+              "UI alignment issues",
+              "Basic JS logic mistakes",
+
           ],
         },
         {
-          title: "Round: Implementation",
+          title: "Round-2",
           description: [
-            "Dataset analysis",
-            "Model development",
-            "Training and optimization",
-            "Final presentation",
+            "“See once. Build from memory.”",
+            "A live website is shown for 120 seconds",
+            "No screenshots / no notes",
+            
           ],
         },
+        {
+          title: "Round-3",
+          description: [
+            "Each team has 3 members",
+            "Total time: 45 minutes",
+            "Each member codes for exactly 15 minutes",
+            "Coding happens one after another",
+            "No verbal or non-verbal communication",
+           " No discussions, hints, or explanations",
+           " No code comments for guidance",
+            "No restarting or deleting previous work",
+            "Continue from the previous member’s code",
+            "Understand the existing structure",
+            "Improve or complete the design",
+
+          ],
+        },
+        {
+          title: "Task Details",
+          description: [
+            "A surprise website design is provided",
+          "Teams must recreate the design as accurately as possible",
+          ],
+        }
       ],
       rules: [
         "Mandatory CSS Grid",
@@ -297,8 +326,8 @@ export const hackathonEventDetails = {
         ],
         studentCoordinator: [
           {
-            name: "Mr.S.Sujith",
-            phone: "+91 93617 96047",
+            name: "Mr.M.Aanoor Elavarasan",
+            phone: "+91 97904 87629",
           },
           {
             name: "Ms.G.Kari Vikashini",
