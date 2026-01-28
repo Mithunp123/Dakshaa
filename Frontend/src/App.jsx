@@ -43,6 +43,7 @@ const Referral = lazy(() => import("./Pages/Referral/Referral"));
 const Feedback = lazy(() => import("./Pages/Feedback/Feedback"));
 const Scan = lazy(() => import("./Pages/Scan/Scan"));
 const Login = lazy(() => import("./Pages/Login/Login"));
+const ForgotPassword = lazy(() => import("./Pages/ForgotPassword/ForgotPassword"));
 const Leaderboard = lazy(() => import("./Pages/Leaderboard/Leaderboard"));
 const LiveStatusBoard = lazy(() => import("./Pages/LiveStatus/LiveStatusBoard"));
 const LiveStats = lazy(() => import("./Pages/LiveStatus/LiveStats"));
@@ -103,11 +104,12 @@ function AppContent() {
     location.pathname.startsWith("/volunteer");
   const isScan = location.pathname === "/scan";
   const isLogin = location.pathname === "/login";
+  const isForgotPassword = location.pathname === "/forgot-password";
   const isRegisterEvents = location.pathname === "/register-events";
   const isHome = location.pathname === "/";
 
   // Check if bottom navbar should be shown (mobile only, non-admin pages)
-  const showBottomNav = !isDashboard && !isAdmin && !isScan && !isLogin;
+  const showBottomNav = !isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword;
 
   // Prefetch critical pages after initial load for faster navigation
   useEffect(() => {
@@ -137,8 +139,8 @@ function AppContent() {
           <ParticlesComponent id="particlesBG" />
         </Suspense>
       )}
-      {!isDashboard && !isAdmin && !isScan && !isLogin && <Navbar />}
-      {!isDashboard && !isAdmin && !isScan && !isLogin && <Tags />}
+      {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && <Navbar />}
+      {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && <Tags />}
       <AnimatePresence>
         <Suspense key={location.key} fallback={<LoadingScreen variant="pulse" text="Loading..." />}>
           <Routes location={location} key={location.key}>
@@ -163,6 +165,14 @@ function AppContent() {
               element={
                 <AuthRedirect>
                   <Login />
+                </AuthRedirect>
+              }
+            />
+            <Route
+              path="/forgot-password"
+              element={
+                <AuthRedirect>
+                  <ForgotPassword />
                 </AuthRedirect>
               }
             />
@@ -411,9 +421,9 @@ function AppContent() {
         </Suspense>
       </AnimatePresence>
 
-      {!isDashboard && !isAdmin && !isScan && !isLogin && <UltraFooter />}
+      {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && <UltraFooter />}
       {!isAdmin && !isRegisterEvents && <FloatingDashboardButton />}
-      {!isDashboard && !isAdmin && !isScan && !isLogin && !isRegisterEvents && (
+      {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && !isRegisterEvents && (
         <FloatingCallButton />
       )}
       {showBottomNav && <BottomNavbar />}

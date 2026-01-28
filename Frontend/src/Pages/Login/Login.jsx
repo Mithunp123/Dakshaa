@@ -14,7 +14,9 @@ import {
   UserCog,
   ShieldCheck,
   CheckCircle2,
-  ArrowLeft
+  ArrowLeft,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 // Role information for display
@@ -59,6 +61,7 @@ const roleInfo = {
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [loginSuccess, setLoginSuccess] = useState(null);
@@ -305,13 +308,20 @@ const Login = () => {
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
                   <input 
-                    type="password" 
+                    type={showPassword ? "text" : "password"} 
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-xl py-3 sm:py-3.5 pl-12 pr-4 text-white text-base focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                    className="w-full bg-gray-900 border border-gray-700 rounded-xl py-3 sm:py-3.5 pl-12 pr-12 text-white text-base focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                     placeholder="••••••••"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                 </div>
               </div>
 
@@ -331,7 +341,10 @@ const Login = () => {
               </button>
             </form>
 
-            <div className="mt-6 text-center">
+            <div className="mt-6 text-center space-y-3">
+              <p className="text-gray-500 text-sm">
+                <Link to="/forgot-password" className="text-blue-400 hover:underline">Forgot password?</Link>
+              </p>
               <p className="text-gray-500 text-sm">
                 Don't have an account? <Link to="/signup" className="text-blue-400 hover:underline">Register here</Link>
               </p>

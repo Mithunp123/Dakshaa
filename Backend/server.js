@@ -2,7 +2,7 @@ const express = require("express");
 const { v4: uuidv4 } = require("uuid"); // Import UUID generator
 const supabase = require("./db"); // Import Supabase connection
 const cors = require('cors');
-const { sendWelcomeEmail, sendPaymentSuccessEmail } = require('./emailService');
+const { sendWelcomeEmail, sendPaymentSuccessEmail, sendOTPEmail } = require('./emailService');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -2271,6 +2271,272 @@ app.get("/api/schedule", async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+/* 🔐 FORGOT PASSWORD ROUTES */
+
+// Send OTP for password reset
+app.post("/forgot-password/send-otp", async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Email is required" 
+      });
+    }
+
+    // Check if user exists in profiles table
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, email, full_name')
+      .eq('email', email)
+      .single();
+    
+    if (profileError || !profileData) {
+      console.error('Error checking user in profiles:', profileError);
+      return res.status(404).json({ 
+        success: false, 
+        error: "No account found with this email address" 
+      });
+    }
+
+    const user = profileData;
+
+    // Generate 6-digit OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 5); // 5 minutes expiry
+
+    // Get client IP and user agent for security
+    const ipAddress = req.ip || req.connection.remoteAddress;
+    const userAgent = req.headers['user-agent'];
+
+    // Store OTP in database
+    const { error: insertError } = await supabase
+      .from('password_reset_otp')
+      .insert({
+        email: email,
+        otp_code: otpCode,
+        expires_at: expiresAt.toISOString(),
+        ip_address: ipAddress,
+        user_agent: userAgent
+      });
+
+    if (insertError) {
+      console.error('Error storing OTP:', insertError);
+      return res.status(500).json({ 
+        success: false, 
+        error: "Failed to generate OTP" 
+      });
+    }
+
+    // Get user's name from profiles data (already fetched)
+    const userName = user?.full_name || 'User';
+
+    // Send OTP email
+    const emailResult = await sendOTPEmail(email, userName, otpCode);
+    
+    if (!emailResult.success) {
+      console.error('Error sending OTP email:', emailResult.error);
+      return res.status(500).json({ 
+        success: false, 
+        error: "Failed to send OTP email" 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: "OTP sent successfully to your email" 
+    });
+
+  } catch (error) {
+    console.error('Send OTP error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Internal server error" 
+    });
+  }
+});
+
+// Verify OTP
+app.post("/forgot-password/verify-otp", async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    
+    if (!email || !otp) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Email and OTP are required" 
+      });
+    }
+
+    // Find and validate OTP
+    const { data: otpData, error: otpError } = await supabase
+      .from('password_reset_otp')
+      .select('*')
+      .eq('email', email)
+      .eq('otp_code', otp)
+      .eq('is_verified', false)
+      .eq('is_used', false)
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (otpError || !otpData) {
+      // Increment attempts for rate limiting
+      await supabase
+        .from('password_reset_otp')
+        .update({ attempts: supabase.raw('attempts + 1') })
+        .eq('email', email)
+        .eq('otp_code', otp);
+
+      return res.status(400).json({ 
+        success: false, 
+        error: "Invalid or expired OTP" 
+      });
+    }
+
+    // Mark OTP as verified
+    const { error: updateError } = await supabase
+      .from('password_reset_otp')
+      .update({ is_verified: true })
+      .eq('id', otpData.id);
+
+    if (updateError) {
+      console.error('Error updating OTP:', updateError);
+      return res.status(500).json({ 
+        success: false, 
+        error: "Failed to verify OTP" 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: "OTP verified successfully" 
+    });
+
+  } catch (error) {
+    console.error('Verify OTP error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Internal server error" 
+    });
+  }
+});
+
+// Reset password
+app.post("/forgot-password/reset-password", async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Email, OTP, and new password are required" 
+      });
+    }
+
+    // Validate password strength
+    const passwordValidation = validatePasswordStrength(newPassword);
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({ 
+        success: false, 
+        error: passwordValidation.errors.join('. ') 
+      });
+    }
+
+    // Verify OTP is valid and verified
+    const { data: otpData, error: otpError } = await supabase
+      .from('password_reset_otp')
+      .select('*')
+      .eq('email', email)
+      .eq('otp_code', otp)
+      .eq('is_verified', true)
+      .eq('is_used', false)
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (otpError || !otpData) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Invalid or expired OTP" 
+      });
+    }
+
+    // Get user from profiles table first to get the auth user ID
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, email, full_name')
+      .eq('email', email)
+      .single();
+    
+    if (profileError || !profileData) {
+      console.error('Error getting user from profiles:', profileError);
+      return res.status(404).json({ 
+        success: false, 
+        error: "User not found" 
+      });
+    }
+
+    // Update password using Supabase Auth Admin API
+    const { error: resetError } = await supabase.auth.admin.updateUserById(
+      profileData.id, 
+      { password: newPassword }
+    );
+
+    if (resetError) {
+      console.error('Error resetting password:', resetError);
+      return res.status(500).json({ 
+        success: false, 
+        error: "Failed to reset password" 
+      });
+    }
+
+    // Mark OTP as used
+    await supabase
+      .from('password_reset_otp')
+      .update({ is_used: true })
+      .eq('id', otpData.id);
+
+    res.json({ 
+      success: true, 
+      message: "Password reset successfully" 
+    });
+
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Internal server error" 
+    });
+  }
+});
+
+// Password validation function
+const validatePasswordStrength = (password) => {
+  const errors = [];
+  
+  if (password.length < 6) {
+    errors.push('Password must be at least 6 characters');
+  }
+  
+  if (!/[A-Z]/.test(password)) {
+    errors.push('Password must contain at least one uppercase letter');
+  }
+  
+  if (!/[!@#$%^&*()_+\-=\[\]{};:"\\|,.<>?]/.test(password)) {
+    errors.push('Password must contain at least one special character');
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors: errors
+  };
+};
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
