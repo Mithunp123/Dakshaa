@@ -245,6 +245,10 @@ const FloatingBadge = ({ text, position, delay }) => (
 
 const UltraHeroSection = () => {
   const navigate = useNavigate();
+
+  // Detect mobile device
+  const isMobile = /iPhone|iPad|iPod|Android|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
   // Optimization: useMotionValue prevents re-renders on mouse move
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -571,7 +575,7 @@ const UltraHeroSection = () => {
 
         {/* Orbiting elements with trails */}
         <motion.div
-          className="absolute w-full h-full"
+          className="absolute w-full h-full pointer-events-none"
           animate={{ rotate: 360 }}
           transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
         >
@@ -604,10 +608,12 @@ const UltraHeroSection = () => {
 
         {/* Hero Image with 3D effect */}
         <motion.div
-          className="relative z-10 w-full"
+          className={`relative z-10 w-full ${isMobile ? 'touch-pan-y' : ''}`}
           style={{
             transformStyle: "preserve-3d",
             perspective: "1000px",
+            // Allow scroll pass-through on mobile
+            touchAction: isMobile ? 'pan-y' : 'auto',
           }}
         >
           <Suspense fallback={<div className="w-full h-[400px] xs:h-[500px] sm:h-[600px] md:h-[700px]" />}>
