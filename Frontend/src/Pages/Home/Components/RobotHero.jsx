@@ -160,7 +160,7 @@ const RobotHero = () => {
 
   if (loadError) {
     return (
-      <div className="w-full h-[400px] xs:h-[500px] sm:h-[600px] md:h-[700px] relative z-20 flex items-center justify-center">
+      <div className="w-full h-[280px] xs:h-[320px] sm:h-[400px] md:h-[500px] lg:h-[600px] relative z-20 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-400 mb-4">3D view temporarily unavailable</p>
           <button
@@ -175,7 +175,7 @@ const RobotHero = () => {
   }
 
   return (
-    <div className="w-full h-[400px] xs:h-[500px] sm:h-[600px] md:h-[700px] relative z-20 cursor-grab active:cursor-grabbing">
+    <div className="w-full h-[280px] xs:h-[320px] sm:h-[400px] md:h-[500px] lg:h-[600px] relative z-20 cursor-grab active:cursor-grabbing">
       <Canvas
         camera={{ position: [0, 2, 10], fov: 35 }}
         gl={{ 
