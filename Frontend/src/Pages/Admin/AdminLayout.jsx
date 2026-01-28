@@ -20,7 +20,8 @@ import {
   Radio,
   ShieldCheck,
   Package,
-  Trophy
+  Trophy,
+  ClipboardList
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../supabase';
@@ -110,7 +111,10 @@ const AdminLayout = () => {
 
     if (userRole === 'event_coordinator' || userRole === 'super_admin') {
       items.push(
-        { label: 'Coordinator Panel', icon: Shield, path: '/admin/coordinator' }
+        { label: 'Overview', icon: LayoutDashboard, path: '/admin/coordinator/overview' },
+        { label: 'Registration Management', icon: ClipboardList, path: '/admin/coordinator/registration' },
+        { label: 'Global Scanner', icon: QrCode, path: '/admin/coordinator/global-scanner' },
+        { label: 'Event Scanner', icon: Shield, path: '/admin/coordinator' }
       );
     }
 
@@ -141,7 +145,7 @@ const AdminLayout = () => {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsSidebarOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-40 p-3 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg hover:bg-slate-800 transition-all"
+        className="fixed top-4 left-4 z-50 p-3 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg hover:bg-slate-800 transition-all"
       >
         <Menu size={24} className="text-secondary" />
       </button>
@@ -179,10 +183,10 @@ const AdminLayout = () => {
             DAKSHAA ADMIN
           </motion.h2>
           <button 
-            onClick={() => setIsSidebarOpen(false)}
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="p-2 hover:bg-white/5 rounded-lg transition-colors"
           >
-            <X size={20} />
+            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
 

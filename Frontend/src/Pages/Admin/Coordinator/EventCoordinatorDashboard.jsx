@@ -453,7 +453,9 @@ const EventCoordinatorDashboard = () => {
 
   const startScanning = () => {
     setScanning(true);
-    setActiveTab('scanner');
+    if (activeTab !== 'globalScanner') {
+      setActiveTab('scanner');
+    }
     setCameraError(null);
   };
 
@@ -535,13 +537,95 @@ const EventCoordinatorDashboard = () => {
     // Stop scanner temporarily to process
     await stopScanning();
 
-    // Mark attendance with current session and event from refs
-    await markAttendanceWithSessionAndEvent(decodedText, currentSession, currentEvent);
+    // For global scanner, check across all assigned events
+    if (activeTab === 'globalScanner') {
+      await markGlobalAttendance(decodedText);
+    } else {
+      // Mark attendance with current session and event from refs
+      await markAttendanceWithSessionAndEvent(decodedText, currentSession, currentEvent);
+    }
     
     // Auto-restart scanning after 1 second for quick successive scans
     setTimeout(() => {
       startScanning();
     }, 1000);
+  };
+
+  // Global scanner function to check across all assigned events
+  const markGlobalAttendance = async (userId) => {
+    try {
+      setSubmitting(true);
+      const { data: { user: coordinator } } = await supabase.auth.getUser();
+
+      // Fetch participant information
+      const { data: participant, error: participantError } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, phone, college')
+        .eq('id', userId)
+        .single();
+
+      if (participantError || !participant) {
+        playBuzzSound();
+        toast.error('Participant not found');
+        return;
+      }
+
+      // Check registrations across assigned events
+      const assignedEventIds = assignedEvents.map(event => event.id || event.event_id);
+      const { data: registrations, error: regError } = await supabase
+        .from('event_registrations_config')
+        .select(`
+          *,
+          events_config:event_id (id, name, event_key)
+        `)
+        .eq('user_id', userId)
+        .in('event_id', assignedEventIds)
+        .in('payment_status', ['PAID', 'completed']);
+
+      if (regError) {
+        console.error('Registration check error:', regError);
+        playBuzzSound();
+        toast.error('Error checking registrations');
+        return;
+      }
+
+      if (!registrations || registrations.length === 0) {
+        playBuzzSound();
+        toast.error(`${participant.full_name} is not registered for any of your assigned events`);
+        return;
+      }
+
+      // Show participant info with registered events
+      playTingSound();
+      toast.custom((t) => (
+        <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-blue-500 shadow-lg rounded-2xl pointer-events-auto p-4`}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+              <UserCheck className="text-blue-500" size={28} />
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-bold text-lg">{participant.full_name}</p>
+              <p className="text-white/80 text-sm">{formatDakshaaId(participant.id)}</p>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <p className="text-white/90 text-sm font-medium">Registered Events:</p>
+            {registrations.map((reg) => (
+              <div key={reg.id} className="text-white/80 text-xs px-2 py-1 bg-white/20 rounded">
+                {reg.events_config?.name || 'Unknown Event'}
+              </div>
+            ))}
+          </div>
+        </div>
+      ), { duration: 4000 });
+
+    } catch (error) {
+      console.error('Error in global scan:', error);
+      playBuzzSound();
+      toast.error('Error processing scan');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // This function uses explicit parameters to avoid closure issues
@@ -806,28 +890,6 @@ const EventCoordinatorDashboard = () => {
             {selectedSession === 'morning' ? 'AM Left' : 'PM Left'}
           </p>
         </div>
-      </div>
-
-      {/* Tab Navigation */}
-      <div className="flex gap-2 p-1 bg-white/5 border-y border-white/10 overflow-x-auto">
-        {[
-          { id: 'scanner', label: 'QR Scanner', icon: Camera },
-          { id: 'manual', label: 'Manual', icon: Search },
-          { id: 'winners', label: 'Winners', icon: Trophy }
-        ].map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 px-4 py-3 text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2 ${
-              activeTab === tab.id
-                ? 'text-secondary border-b-2 border-secondary'
-                : 'text-gray-400'
-            }`}
-          >
-            <tab.icon size={18} />
-            {tab.label}
-          </button>
-        ))}
       </div>
 
       {/* Tab Content */}

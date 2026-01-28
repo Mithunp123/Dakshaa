@@ -20,7 +20,7 @@ import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const Overview = ({ coordinatorEvents }) => {
+const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
   const [stats, setStats] = useState({
     totalRegistrations: 0,
     totalRevenue: 0,
@@ -48,7 +48,7 @@ const Overview = ({ coordinatorEvents }) => {
     try {
       console.log('🚀 Opening all events...');
       const { data, error } = await supabase
-        .from('events_config')
+        .from('events')
         .update({ is_open: true })
         .neq('is_open', true);
 
@@ -76,12 +76,12 @@ const Overview = ({ coordinatorEvents }) => {
   const checkAllEventsOpen = async () => {
     try {
       const { count: closedCount } = await supabase
-        .from('events_config')
+        .from('events')
         .select('*', { count: 'exact', head: true })
         .eq('is_open', false);
       
       const { count: nullCount } = await supabase
-        .from('events_config')
+        .from('events')
         .select('*', { count: 'exact', head: true })
         .is('is_open', null);
       
@@ -178,6 +178,9 @@ const Overview = ({ coordinatorEvents }) => {
       // Coordinator Filter
       const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
       const allowedEventIds = hasCoordinatorFilter ? coordinatorEvents.map(e => (e.id || e.event_id)) : null;
+      console.log('📊 Overview - coordinatorEvents:', coordinatorEvents);
+      console.log('🔍 Overview - hasCoordinatorFilter:', hasCoordinatorFilter);
+      console.log('🎯 Overview - allowedEventIds:', allowedEventIds);
 
       const applyFilter = (query, column = 'event_id') => {
         if (hasCoordinatorFilter && allowedEventIds) {
@@ -193,7 +196,8 @@ const Overview = ({ coordinatorEvents }) => {
         .select('*', { count: 'exact', head: true })
         .eq('payment_status', 'PAID');
       
-      const { count: regCount, error: regError } = await applyFilter(regQuery);
+      regQuery = applyFilter(regQuery);
+      const { count: regCount, error: regError } = await regQuery;
 
       if (regError) {
         console.error('❌ Error fetching registrations:', regError);
@@ -208,7 +212,8 @@ const Overview = ({ coordinatorEvents }) => {
         .select('payment_amount')
         .eq('payment_status', 'PAID');
       
-      const { data: paidRegistrations, error: paidError } = await applyFilter(paidQuery);
+      paidQuery = applyFilter(paidQuery);
+      const { data: paidRegistrations, error: paidError } = await paidQuery;
 
       if (paidError) {
         console.error('❌ Error fetching paid registrations:', paidError);
@@ -228,7 +233,8 @@ const Overview = ({ coordinatorEvents }) => {
         .from('attendance')
         .select('*', { count: 'exact', head: true });
         
-      const { count: checkinCount, error: checkinError } = await applyFilter(checkinQuery);
+      checkinQuery = applyFilter(checkinQuery);
+      const { count: checkinCount, error: checkinError } = await checkinQuery;
 
       if (checkinError) {
         console.error('❌ Error fetching check-ins:', checkinError);
@@ -239,11 +245,12 @@ const Overview = ({ coordinatorEvents }) => {
       // Fetch Active Events
       console.log('📅 Fetching active events...');
       let activeQuery = supabase
-        .from('events_config')
+        .from('events')
         .select('*', { count: 'exact', head: true })
         .eq('is_open', true);
         
-      const { count: activeEventCount, error: activeError } = await applyFilter(activeQuery, 'id');
+      activeQuery = applyFilter(activeQuery, 'id');
+      const { count: activeEventCount, error: activeError } = await activeQuery;
 
       if (activeError) {
         console.error('❌ Error fetching active events:', activeError);
@@ -254,10 +261,11 @@ const Overview = ({ coordinatorEvents }) => {
       // Fetch Total Events
       console.log('📅 Fetching total events...');
       let totalQuery = supabase
-        .from('events_config')
+        .from('events')
         .select('*', { count: 'exact', head: true });
         
-      const { count: totalEventCount, error: totalError } = await applyFilter(totalQuery, 'id');
+      totalQuery = applyFilter(totalQuery, 'id');
+      const { count: totalEventCount, error: totalError } = await totalQuery;
 
       if (totalError) {
         console.error('❌ Error fetching total events:', totalError);
@@ -274,7 +282,8 @@ const Overview = ({ coordinatorEvents }) => {
         .order('registered_at', { ascending: false })
         .limit(5);
 
-      const { data: recent, error: recentError } = await applyFilter(recentQuery);
+      recentQuery = applyFilter(recentQuery);
+      const { data: recent, error: recentError } = await recentQuery;
 
       // Fetch user profiles separately for recent registrations
       let recentWithProfiles = [];
@@ -326,7 +335,7 @@ const Overview = ({ coordinatorEvents }) => {
       const allowedEventIds = hasCoordinatorFilter ? coordinatorEvents.map(e => e.id) : null;
 
       let query = supabase
-        .from('events_config')
+        .from('events')
         .select('id, name, category')
         .order('name');
 
@@ -625,8 +634,8 @@ const Overview = ({ coordinatorEvents }) => {
       trend: '+12%',
       isUp: true
     },
-    // Only show Revenue if NOT viewing as a coordinator with filtered events
-    ...(!coordinatorEvents || coordinatorEvents.length === 0 ? [{
+    // Only show Revenue if NOT hiding financials
+    ...(!hideFinancials ? [{
       label: 'Total Revenue',
       value: `₹${stats.totalRevenue.toLocaleString()}`,
       icon: CreditCard,
@@ -677,9 +686,9 @@ const Overview = ({ coordinatorEvents }) => {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {/* Open All Events Button - Epic Design - Only show if not all events are open and NOT coordinator mode */}
+          {/* Open All Events Button - Epic Design - Only show if not all events are open and NOT hiding financials */}
           <AnimatePresence>
-            {!allEventsOpen && (!coordinatorEvents || coordinatorEvents.length === 0) && (
+            {!allEventsOpen && !hideFinancials && (
               <motion.button
                 onClick={startCountdown}
                 disabled={openingEvents}
@@ -848,7 +857,7 @@ const Overview = ({ coordinatorEvents }) => {
               >
                 <FileSpreadsheet size={18} /> Generate Report
               </button>
-              {!coordinatorEvents && (
+              {!hideFinancials && (
                 <button className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
                   <Users size={18} /> Export User List
                 </button>
@@ -856,7 +865,7 @@ const Overview = ({ coordinatorEvents }) => {
             </div>
           </div>
 
-          {!coordinatorEvents && (
+          {!hideFinancials && (
           <div className="bg-white/5 border border-white/10 rounded-3xl p-8">
             <h3 className="text-xl font-bold mb-4">System Status</h3>
             <div className="space-y-4">

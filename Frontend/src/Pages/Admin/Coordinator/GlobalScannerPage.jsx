@@ -1,0 +1,325 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { 
+  QrCode, 
+  Camera, 
+  UserCheck, 
+  Users, 
+  CheckCircle2,
+  AlertCircle,
+  X,
+  Loader2
+} from 'lucide-react';
+import { supabase } from '../../../supabase';
+import { Html5Qrcode } from 'html5-qrcode';
+import toast, { Toaster } from 'react-hot-toast';
+import {
+  checkCameraSupport,
+  getCameraErrorMessage,
+  getCameraConfig,
+  selectBestCamera,
+  requestCameraPermission,
+  vibrate
+} from '../../../utils/scannerConfig';
+
+const formatDakshaaId = (uuid) => {
+  if (!uuid) return 'N/A';
+  return `DK-${uuid.substring(0, 8).toUpperCase()}`;
+};
+
+const GlobalScannerPage = () => {
+  const [assignedEvents, setAssignedEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [scanning, setScanning] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [cameraError, setCameraError] = useState(null);
+  const scannerRef = useRef(null);
+  const html5QrCodeRef = useRef(null);
+
+  useEffect(() => {
+    fetchAssignedEvents();
+    getCameras();
+    return () => {
+      stopScanning();
+    };
+  }, []);
+
+  const fetchAssignedEvents = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: coords } = await supabase
+        .from('event_coordinators')
+        .select('event_id')
+        .eq('user_id', user.id);
+      
+      const assignedEventIds = coords?.map(c => c.event_id) || [];
+      
+      if (assignedEventIds.length > 0) {
+        const { data: events } = await supabase
+          .from('events_config')
+          .select('*')
+          .in('id', assignedEventIds);
+        setAssignedEvents(events || []);
+      }
+    } catch (error) {
+      console.error('Error fetching assigned events:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getCameras = async () => {
+    const support = checkCameraSupport();
+    if (!support.isSecureContext) {
+      setCameraError('HTTPS required for camera access');
+      return;
+    }
+
+    const permissionResult = await requestCameraPermission();
+    if (!permissionResult.success) {
+      setCameraError(permissionResult.error.message);
+      return;
+    }
+
+    try {
+      const devices = await Html5Qrcode.getCameras();
+      if (!devices || devices.length === 0) {
+        setCameraError('No cameras found');
+      }
+    } catch (error) {
+      const errorInfo = getCameraErrorMessage(error);
+      setCameraError(errorInfo.message);
+    }
+  };
+
+  const startScanning = async () => {
+    try {
+      setScanning(true);
+      setCameraError(null);
+      
+      if (!html5QrCodeRef.current) {
+        html5QrCodeRef.current = new Html5Qrcode("qr-scanner", { verbose: false });
+      }
+
+      const support = checkCameraSupport();
+      const config = getCameraConfig(support.isMobile);
+      
+      const isMobileDevice = /iPhone|iPad|iPod|Android|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const cameraConfig = isMobileDevice 
+        ? { facingMode: { exact: "environment" } }
+        : { facingMode: "user" };
+
+      await html5QrCodeRef.current.start(
+        cameraConfig,
+        config,
+        onScanSuccess,
+        () => {}
+      );
+    } catch (error) {
+      const errorInfo = getCameraErrorMessage(error);
+      setCameraError(errorInfo.message);
+      setScanning(false);
+    }
+  };
+
+  const stopScanning = async () => {
+    try {
+      if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
+        await html5QrCodeRef.current.stop();
+      }
+      setScanning(false);
+    } catch (error) {
+      console.error('Error stopping scanner:', error);
+      setScanning(false);
+    }
+  };
+
+  const onScanSuccess = async (decodedText) => {
+    vibrate(100);
+    await stopScanning();
+    await markGlobalAttendance(decodedText);
+    
+    setTimeout(() => {
+      startScanning();
+    }, 1000);
+  };
+
+  const markGlobalAttendance = async (userId) => {
+    try {
+      setSubmitting(true);
+
+      const { data: participant, error: participantError } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, phone, college')
+        .eq('id', userId)
+        .single();
+
+      if (participantError || !participant) {
+        toast.error('Participant not found');
+        return;
+      }
+
+      const assignedEventIds = assignedEvents.map(event => event.id);
+      const { data: registrations, error: regError } = await supabase
+        .from('event_registrations_config')
+        .select(`
+          *,
+          events_config:event_id (id, name, event_key)
+        `)
+        .eq('user_id', userId)
+        .in('event_id', assignedEventIds)
+        .in('payment_status', ['PAID', 'completed']);
+
+      if (regError) {
+        toast.error('Error checking registrations');
+        return;
+      }
+
+      if (!registrations || registrations.length === 0) {
+        toast.error(`${participant.full_name} is not registered for any of your assigned events`);
+        return;
+      }
+
+      toast.custom((t) => (
+        <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-blue-500 shadow-lg rounded-2xl pointer-events-auto p-4`}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+              <UserCheck className="text-blue-500" size={28} />
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-bold text-lg">{participant.full_name}</p>
+              <p className="text-white/80 text-sm">{formatDakshaaId(participant.id)}</p>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <p className="text-white/90 text-sm font-medium">Registered Events:</p>
+            {registrations.map((reg) => (
+              <div key={reg.id} className="text-white/80 text-xs px-2 py-1 bg-white/20 rounded">
+                {reg.events_config?.name || 'Unknown Event'}
+              </div>
+            ))}
+          </div>
+        </div>
+      ), { duration: 4000 });
+
+    } catch (error) {
+      console.error('Error in global scan:', error);
+      toast.error('Error processing scan');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 lg:p-8">
+      <Toaster position="top-right" />
+      
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-4xl mx-auto"
+      >
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-white font-orbitron mb-2">
+            Global Scanner
+          </h1>
+          <p className="text-gray-400">
+            Universal QR code scanner for participant verification
+          </p>
+        </div>
+
+        <div className="bg-slate-800/30 backdrop-blur-xl border border-white/10 rounded-3xl p-6 mb-8">
+          {cameraError && (
+            <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="text-amber-400 flex-shrink-0 mt-0.5" size={20} />
+                <div>
+                  <p className="text-amber-400 font-medium text-sm mb-1">Camera Unavailable</p>
+                  <p className="text-amber-300/80 text-xs">{cameraError}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!scanning ? (
+            <div className="text-center space-y-6">
+              <div className="w-32 h-32 mx-auto bg-secondary/10 rounded-[2rem] flex items-center justify-center border-4 border-secondary/20">
+                <QrCode className="text-secondary" size={64} />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+                  <Users className="mx-auto text-blue-500 mb-2" size={24} />
+                  <p className="text-blue-500 font-bold text-lg">
+                    {assignedEvents.reduce((acc, event) => acc + (event.registeredCount || 0), 0)}
+                  </p>
+                  <p className="text-gray-400 text-xs">Total Registered</p>
+                </div>
+                <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4">
+                  <CheckCircle2 className="mx-auto text-green-500 mb-2" size={24} />
+                  <p className="text-green-500 font-bold text-lg">
+                    {assignedEvents.reduce((acc, event) => acc + (event.attendedCount || 0), 0)}
+                  </p>
+                  <p className="text-gray-400 text-xs">Total Attended</p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-2">Ready to Scan</h3>
+                <p className="text-gray-400 mb-6">Universal participant verification across your assigned events</p>
+                
+                <button
+                  onClick={startScanning}
+                  disabled={cameraError}
+                  className="px-8 py-4 bg-secondary text-white font-bold text-lg rounded-2xl hover:bg-secondary-dark transition-all shadow-lg shadow-secondary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 mx-auto"
+                >
+                  <Camera size={24} />
+                  Start Global Scanner
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center space-y-4">
+              <div className="p-3 rounded-xl bg-secondary/10 border border-secondary/30">
+                <p className="text-xs text-gray-400 uppercase mb-1">Global Scanning Mode Active</p>
+                <p className="text-secondary font-bold">Scanning for any participant in your assigned events</p>
+              </div>
+              
+              <div 
+                id="qr-scanner" 
+                className="rounded-2xl overflow-hidden bg-black min-h-[400px]"
+              />
+              
+              <p className="text-sm text-gray-400">
+                Point camera at any participant QR code • Global verification enabled
+              </p>
+              
+              <button
+                onClick={stopScanning}
+                disabled={submitting}
+                className="px-6 py-3 bg-red-500/10 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 mx-auto"
+              >
+                {submitting ? (
+                  <Loader2 size={20} className="animate-spin" />
+                ) : (
+                  <X size={20} />
+                )}
+                {submitting ? 'Processing...' : 'Stop Scanner'}
+              </button>
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+export default GlobalScannerPage;

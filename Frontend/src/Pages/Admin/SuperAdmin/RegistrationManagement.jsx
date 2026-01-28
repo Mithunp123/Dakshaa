@@ -26,7 +26,7 @@ import {
 import { supabase } from "../../../supabase";
 import * as XLSX from 'xlsx';
 
-const RegistrationManagement = ({ coordinatorEvents }) => {
+const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) => {
   const [eventStats, setEventStats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -282,9 +282,12 @@ const RegistrationManagement = ({ coordinatorEvents }) => {
     try {
       const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
       const allowedEventIds = hasCoordinatorFilter ? coordinatorEvents.map(e => (e.id || e.event_id)) : null;
+      console.log('📊 RegistrationManagement - coordinatorEvents:', coordinatorEvents);
+      console.log('🔍 RegistrationManagement - hasCoordinatorFilter:', hasCoordinatorFilter);
+      console.log('🎯 RegistrationManagement - allowedEventIds:', allowedEventIds);
 
       let query = supabase
-        .from('events_config')
+        .from('events')
         .select(`
           id,
           name,
@@ -333,6 +336,7 @@ const RegistrationManagement = ({ coordinatorEvents }) => {
       console.log('📊 Loading registration counts...');
       const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
       const allowedEventIds = hasCoordinatorFilter ? coordinatorEvents.map(e => (e.id || e.event_id)) : null;
+      console.log('📊 Registration Counts - Coordinator Filter:', hasCoordinatorFilter, 'Allowed Event IDs:', allowedEventIds);
       
       // 1. Count individual PAID registrations
       let individualQuery = supabase
@@ -556,13 +560,15 @@ const RegistrationManagement = ({ coordinatorEvents }) => {
             </div>
           </div>
 
-          <button
-            onClick={() => setShowTransferModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-xl hover:bg-secondary/90 transition-colors shadow-lg shadow-secondary/20"
-          >
-            <ArrowRightLeft size={20} />
-            Transfer Event
-          </button>
+          {!hideFinancials && (
+            <button
+              onClick={() => setShowTransferModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-xl hover:bg-secondary/90 transition-colors shadow-lg shadow-secondary/20"
+            >
+              <ArrowRightLeft size={20} />
+              Transfer Event
+            </button>
+          )}
         </div>
 
         {/* Stats Cards */}
@@ -777,7 +783,7 @@ const RegistrationManagement = ({ coordinatorEvents }) => {
         </div>
 
         {/* Transfer Modal */}
-        {showTransferModal && (
+        {!hideFinancials && showTransferModal && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <motion.div 
                initial={{ opacity: 0, scale: 0.95 }}
