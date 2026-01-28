@@ -1,12 +1,10 @@
-
-
 import hackathon1 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon1.png";
 import hackathon2 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon2.png";
 import hackathon3 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon3.png";
 import hackathon4 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon4.png";
 import hackathon5 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon5.png";
 import hackathon6 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon6.png";
-
+import { hackathonEventDetails } from "../Pages/Hackathon/Components/HackathonSection";
 
 /*
 NeuroHack 2.O - hackathon1
@@ -17,30 +15,81 @@ STARTUP PITCH - hackathon5
 Designathon- hackathon6
 */
 
-
 export const hackathonEvents = [
   {
     image: hackathon1,
-    eventId: "hackathon-1",
+    eventId: "hackathon1",
+    title: "NeuroHack 2.0",
   },
   {
     image: hackathon2,
-    eventId: "hackathon-2",
+    eventId: "hackathon2",
+    title: "BioNexathon",
   },
   {
     image: hackathon3,
-    eventId: "hackathon-3",
+    eventId: "hackathon3",
+    title: "NeuroCode 2.0",
   },
   {
     image: hackathon4,
-    eventId: "hackathon-4",
+    eventId: "hackathon4",
+    title: "VibeCode-26",
   },
   {
     image: hackathon5,
-    eventId: "hackathon-5",
+    eventId: "hackathon5",
+    title: "Startup Pitch",
   },
   {
     image: hackathon6,
-    eventId: "hackathon-6",
+    eventId: "hackathon6",
+    title: "Designathon",
+  },
+];
+
+// Detailed hackathon data for modal display - mapped from HackathonSection
+export const hackathonDetails = [
+  {
+    ...hackathonEventDetails["hackathon-1"],
+    id: 1,
+    img: hackathon1,
+    shortTitle: hackathonEventDetails["hackathon-1"]?.title || "NeuroHack 2.0",
+    department: "Department of Computer Science and Engineering",
+  },
+  {
+    ...hackathonEventDetails["hackathon-2"],
+    id: 2,
+    img: hackathon2,
+    shortTitle: hackathonEventDetails["hackathon-2"]?.title || "BioNexathon",
+    department: "Department of Biotechnology",
+  },
+  {
+    ...hackathonEventDetails["hackathon-3"],
+    id: 3,
+    img: hackathon3,
+    shortTitle: hackathonEventDetails["hackathon-3"]?.title || "NeuroCode 2.0",
+    department: "Department of Information Technology",
+  },
+  {
+    ...hackathonEventDetails["hackathon-4"],
+    id: 4,
+    img: hackathon4,
+    shortTitle: hackathonEventDetails["hackathon-4"]?.title || "VibeCode-26",
+    department: "Department of Artificial Intelligence and Machine Learning",
+  },
+  {
+    ...hackathonEventDetails["hackathon-5"],
+    id: 5,
+    img: hackathon5,
+    shortTitle: hackathonEventDetails["hackathon-5"]?.title || "Startup Pitch",
+    department: "Department of Artificial Intelligence and Data Science",
+  },
+  {
+    ...hackathonEventDetails["hackathon-6"],
+    id: 6,
+    img: hackathon6,
+    shortTitle: hackathonEventDetails["hackathon-6"]?.title || "Designathon",
+    department: "Department of Mechanical Engineering",
   },
 ];

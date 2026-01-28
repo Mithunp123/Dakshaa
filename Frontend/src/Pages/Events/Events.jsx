@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { X, MapPin, Calendar, Users } from "lucide-react";
 import logo from "../../assets/logo1.png";
 import TechnicalImage from "../../assets/EventsImages/technical.png";
 import NonTechnicalImage from "../../assets/EventsImages/non-technical.png";
@@ -11,11 +12,14 @@ import ConferenceImage from "../../assets/conference/conference.jpeg";
 
 // Import event data from separate files
 import { technicalEvents } from "../../data/technicalEvents";
+import { technicalDetails } from "../../data/technicalDetails";
 import { nonTechnicalEvents } from "../../data/nonTechnicalEvents";
-import { culturalEvents } from "../../data/culturalEvents";
-import { hackathonEvents } from "../../data/hackathonEvents";
-import { workshopEvents } from "../../data/workshopEvents";
+import { nonTechnicalDetails } from "../../data/nonTechnicalDetails";
+import { culturalEvents, culturalDetails } from "../../data/culturalEvents";
+import { hackathonEvents, hackathonDetails } from "../../data/hackathonEvents";
+import { workshopEvents, workshopDetails } from "../../data/workshopEvents";
 import { conferenceEvents } from "../../data/conferenceEvents";
+import { supabase } from "../../supabase";
 
 const Events = () => {
   const [selectedEvent, setSelectedEvent] = useState(1);
@@ -25,8 +29,30 @@ const Events = () => {
   const [showCountdown, setShowCountdown] = useState(false);
   const [countdown, setCountdown] = useState(10);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [selectedHackathon, setSelectedHackathon] = useState(null);
+  const [selectedCultural, setSelectedCultural] = useState(null);
+  const [selectedWorkshop, setSelectedWorkshop] = useState(null);
+  const [selectedTechnical, setSelectedTechnical] = useState(null);
+  const [selectedNonTechnical, setSelectedNonTechnical] = useState(null);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const eventsRef = useRef(null);
+
+  // Check authentication status
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Check if user is admin
   useEffect(() => {
@@ -158,24 +184,56 @@ const Events = () => {
     // Check if it's a conference event (starts with "conference")
     if (eventId && eventId.startsWith("conference")) {
       navigate("/events/conference");
+    } else if (eventId && eventId.startsWith("hackathon")) {
+      // Check if it's a hackathon event - open modal instead of navigating
+      const hackathonId = parseInt(eventId.replace("hackathon", ""));
+      const hackathon = hackathonDetails.find(h => h.id === hackathonId);
+      if (hackathon) {
+        setSelectedHackathon(hackathon);
+      }
+    } else if (eventId && eventId.startsWith("cultural")) {
+      // Check if it's a cultural event - open modal instead of navigating
+      const cultural = culturalDetails.find(c => c.id === eventId);
+      if (cultural) {
+        setSelectedCultural(cultural);
+      }
+    } else if (eventId && eventId.startsWith("workshop")) {
+      // Check if it's a workshop event - open modal instead of navigating
+      const workshop = workshopDetails.find(w => w.id === eventId);
+      if (workshop) {
+        setSelectedWorkshop(workshop);
+      }
+    } else if (eventId && eventId.startsWith("tech")) {
+      // Check if it's a technical event - open modal instead of navigating
+      const technical = technicalDetails.find(t => t.id === eventId);
+      if (technical) {
+        setSelectedTechnical(technical);
+      }
+    } else if (eventId && eventId.startsWith("nontech")) {
+      // Check if it's a non-technical event - open modal instead of navigating
+      const nonTechnical = nonTechnicalDetails.find(nt => nt.id === eventId);
+      if (nonTechnical) {
+        setSelectedNonTechnical(nonTechnical);
+      }
     } else {
       navigate(`/event/${eventId}`);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white overflow-x-hidden pt-24 pb-12">
-      {/* Background Decorative Elements */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-[120px]" />
-      </div>
+    <>
+      <div className="min-h-screen bg-[#020617] text-white overflow-x-hidden pt-24 pb-12">
+        {/* Background Decorative Elements */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px]" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-[120px]" />
+        </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="container mx-auto px-4 relative z-10"
-      >
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="container mx-auto px-4 relative z-10"
+        >
         <h1 className="text-center font-orbitron font-bold text-4xl md:text-6xl mb-16 tracking-tighter">
           {title.split("").map((char, index) => (
             <motion.span
@@ -586,61 +644,101 @@ const Events = () => {
             </div>
 
             <div className="flex flex-wrap justify-center gap-8">
-              {selectedEventData?.descriptionImages.map((slide, index) => (
-                <motion.div
-                  key={`${slide.eventId}-${index}`}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="group relative w-full sm:w-[calc(50%-1rem)] lg:w-[calc(25%-1.5rem)] max-w-[300px]"
-                  onClick={() => handleSlideClick(slide.eventId)}
-                >
-                  {/* Cyber Card */}
-                  <div className="relative overflow-hidden bg-slate-900/50 border border-white/10 rounded-lg aspect-square cursor-pointer group-hover:border-secondary/50 transition-all duration-500">
-                    {/* Scanline Effect */}
-                    <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 bg-[length:100%_2px,3px_100%]" />
-
-                    {/* Corner Accents */}
-                    <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-secondary opacity-0 group-hover:opacity-100 transition-opacity z-20" />
-                    <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-secondary opacity-0 group-hover:opacity-100 transition-opacity z-20" />
-
-                    <img
-                      src={slide.image}
-                      alt="Event"
-                      className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
-                    />
-
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity z-10" />
-
-                    <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 z-20">
-                      <div className="flex items-center justify-between bg-secondary/20 border border-secondary/50 rounded-lg px-4 py-2 backdrop-blur-sm">
-                        <span className="text-xs font-orbitron text-secondary tracking-widest uppercase font-bold">
-                          Register Now
-                        </span>
-                        <motion.div
-                          animate={{ x: [0, 5, 0] }}
-                          transition={{ duration: 1.5, repeat: Infinity }}
-                        >
-                          <svg
-                            className="w-5 h-5 text-secondary"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M17 8l4 4m0 0l-4 4m4-4H3"
-                            />
-                          </svg>
-                        </motion.div>
+              {selectedEventData?.descriptionImages.map((slide, index) => {
+                const isHackathon = slide.eventId && slide.eventId.startsWith("hackathon");
+                
+                return (
+                  <motion.div
+                    key={`${slide.eventId}-${index}`}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="group relative w-full sm:w-[calc(50%-1rem)] lg:w-[calc(25%-1.5rem)] max-w-[300px]"
+                  >
+                    {isHackathon ? (
+                      // Hackathon: Workshop-style card with Register Now button at bottom
+                      <div className="text-white shadow-md overflow-hidden relative border-2 border-primary hover:border-secondary transition-colors duration-300 bg-primary/10 backdrop-blur-sm cursor-pointer group rounded-lg" onClick={() => handleSlideClick(slide.eventId)}>
+                        <div className="relative w-full aspect-square rounded-lg overflow-hidden">
+                          <img
+                            src={slide.image}
+                            alt={slide.title || "Hackathon Event"}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                          {/* Always visible Register Now button at bottom */}
+                          <div className="absolute bottom-0 left-0 right-0 p-3 z-20">
+                            <div className="bg-secondary/20 backdrop-blur-md border-2 border-secondary/60 hover:bg-secondary/30 hover:border-secondary transition-all duration-300 px-4 py-2 flex items-center justify-between group-hover:shadow-lg group-hover:shadow-secondary/50 rounded-lg">
+                              <span className="text-xs font-orbitron font-bold tracking-wider uppercase text-secondary">
+                                REGISTER NOW
+                              </span>
+                              <motion.div
+                                animate={{ x: [0, 5, 0] }}
+                                transition={{ duration: 1.5, repeat: Infinity }}
+                              >
+                                <svg
+                                  className="w-5 h-5 text-secondary"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                                  />
+                                </svg>
+                              </motion.div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+                    ) : (
+                      // Other events: Original cyber card style
+                      <div className="relative overflow-hidden bg-slate-900/50 border border-white/10 rounded-lg aspect-square cursor-pointer group-hover:border-secondary/50 transition-all duration-500" onClick={() => handleSlideClick(slide.eventId)}>
+                        {/* Scanline Effect */}
+                        <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 bg-[length:100%_2px,3px_100%]" />
+
+                        {/* Corner Accents */}
+                        <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-secondary opacity-0 group-hover:opacity-100 transition-opacity z-20" />
+                        <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-secondary opacity-0 group-hover:opacity-100 transition-opacity z-20" />
+
+                        <img
+                          src={slide.image}
+                          alt="Event"
+                          className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                        />
+
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity z-10" />
+                        <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 z-20">
+                          <div className="flex items-center justify-between bg-secondary/20 border border-secondary/50 rounded-lg px-4 py-2 backdrop-blur-sm">
+                            <span className="text-xs font-orbitron text-secondary tracking-widest uppercase font-bold">
+                              Register Now
+                            </span>
+                            <motion.div
+                              animate={{ x: [0, 5, 0] }}
+                              transition={{ duration: 1.5, repeat: Infinity }}
+                            >
+                              <svg
+                                className="w-5 h-5 text-secondary"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                                />
+                              </svg>
+                            </motion.div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         </AnimatePresence>
@@ -1010,8 +1108,1267 @@ const Events = () => {
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
-    </div>
+        </motion.div>
+      </div>
+
+      {/* Hackathon Modal - Moved outside main content for proper z-index stacking */}
+      {selectedHackathon && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black/90 backdrop-blur-md z-[9999] p-4"
+          onClick={() => setSelectedHackathon(null)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-slate-900 border-2 border-primary/50 relative max-w-6xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+              <button
+                className="absolute top-4 right-4 text-white/50 hover:text-white z-10 bg-slate-800/80 rounded-full p-2"
+                onClick={() => setSelectedHackathon(null)}
+              >
+                <X size={24} />
+              </button>
+
+              <div className="p-6 md:p-10">
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row gap-8 mb-8">
+                  <div className="w-full md:w-1/3">
+                    <img
+                      className="w-full aspect-square object-cover border-2 border-primary/30"
+                      src={selectedHackathon.img}
+                      alt={selectedHackathon.title}
+                    />
+                  </div>
+
+                  <div className="flex-1">
+                    <h2 className="text-2xl md:text-3xl font-bold text-primary mb-2">
+                      {selectedHackathon.shortTitle}
+                    </h2>
+                    <h3 className="text-lg text-gray-300 mb-4">
+                      {selectedHackathon.title}
+                    </h3>
+                    <div className="h-px bg-gradient-to-r from-primary/50 to-transparent mb-6" />
+
+                    <p className="text-gray-200 text-sm leading-relaxed mb-6">
+                      {selectedHackathon.description}
+                    </p>
+
+                    {/* Event Details */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                      <div className="flex items-center gap-2 text-gray-300">
+                        <Calendar className="w-5 h-5 text-primary" />
+                        <span className="text-sm">{selectedHackathon.date}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-300">
+                        <MapPin className="w-5 h-5 text-primary" />
+                        <span className="text-sm">{selectedHackathon.venue}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-300">
+                        <Users className="w-5 h-5 text-primary" />
+                        <span className="text-sm">{selectedHackathon.department}</span>
+                      </div>
+                    </div>
+
+                    {/* Register Button */}
+                    <button
+                      className="w-full md:w-auto px-8 py-3 bg-primary hover:bg-primary/90 text-white font-bold text-lg tracking-widest transition-all shadow-lg shadow-primary/20 border-2 border-primary"
+                      onClick={() => {
+                        if (!user) {
+                          // Not logged in - redirect to login with return URL
+                          setSelectedHackathon(null);
+                          navigate('/login', { state: { returnTo: `/event/${selectedHackathon.id}` } });
+                          return;
+                        }
+                        // Logged in - redirect to registration page with event pre-selected
+                        setSelectedHackathon(null);
+                        navigate('/register-events', { state: { selectedEventId: selectedHackathon.id } });
+                      }}
+                    >
+                      REGISTER NOW
+                    </button>
+                  </div>
+                </div>
+
+                {/* Rewards Section */}
+                {selectedHackathon.rewards && selectedHackathon.rewards.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                      Prizes & Rewards
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {selectedHackathon.rewards.map((reward, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: idx * 0.1 }}
+                          className="bg-gradient-to-br from-primary/20 to-secondary/20 p-4 rounded-lg text-center"
+                        >
+                          <div className="text-3xl mb-2">{reward.emoji}</div>
+                          <div className="text-lg font-bold text-white mb-1">{reward.position}</div>
+                          <div className="text-2xl font-bold text-primary">{reward.amount}</div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Rounds Section */}
+                {selectedHackathon.rounds && selectedHackathon.rounds.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                      Hackathon Rounds
+                    </h3>
+                    <div className="space-y-4">
+                      {selectedHackathon.rounds.map((round, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: idx * 0.05 }}
+                          className="bg-gradient-to-r from-primary/10 to-transparent p-4 rounded-lg"
+                        >
+                          <h4 className="text-lg font-semibold text-white mb-2">{round.title}</h4>
+                          {round.description && Array.isArray(round.description) && (
+                            <ul className="space-y-1">
+                              {round.description.map((desc, descIdx) => (
+                                <li key={descIdx} className="text-sm text-gray-300 flex items-start gap-2">
+                                  <span className="text-primary mt-1">▸</span>
+                                  <span>{desc}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Schedule Section */}
+                {selectedHackathon.schedule && selectedHackathon.schedule.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                      Event Schedule
+                    </h3>
+                    <div className="space-y-3">
+                      {selectedHackathon.schedule.map((event, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: idx * 0.05 }}
+                          className="bg-gradient-to-r from-secondary/10 to-transparent p-4 rounded-lg"
+                        >
+                          <div className="flex flex-wrap gap-4 text-sm text-gray-300">
+                            {event.round && <div><span className="text-primary font-semibold">Round:</span> {event.round}</div>}
+                            {event.date && <div><span className="text-primary font-semibold">Date:</span> {event.date}</div>}
+                            {event.time && <div><span className="text-primary font-semibold">Time:</span> {event.time}</div>}
+                            {event.location && <div><span className="text-primary font-semibold">Location:</span> {event.location}</div>}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Rules Section */}
+                {selectedHackathon.rules && selectedHackathon.rules.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                      Rules & Guidelines
+                    </h3>
+                    <div className="grid grid-cols-1 gap-3">
+                      {selectedHackathon.rules.map((rule, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: idx * 0.05 }}
+                          className="flex items-start gap-2 text-gray-300"
+                        >
+                          <span className="text-primary mt-1">▸</span>
+                          <span className="text-sm">{rule}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Eligibility Section */}
+                {selectedHackathon.eligibility && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                      Eligibility Criteria
+                    </h3>
+                    <div className="space-y-4">
+                      {selectedHackathon.eligibility.categories && Array.isArray(selectedHackathon.eligibility.categories) && (
+                        <div>
+                          <h4 className="text-sm font-semibold text-white mb-2">Eligible Participants:</h4>
+                          <div className="space-y-2">
+                            {selectedHackathon.eligibility.categories.map((category, idx) => (
+                              <motion.div
+                                key={idx}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.3, delay: idx * 0.05 }}
+                                className="flex items-start gap-2 text-gray-300"
+                              >
+                                <span className="text-primary mt-1">▸</span>
+                                <span className="text-sm">{category}</span>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {selectedHackathon.eligibility.teamSize && (
+                        <div className="bg-gradient-to-r from-primary/10 to-transparent p-4 rounded-lg">
+                          <h4 className="text-sm font-semibold text-white mb-2">Team Size:</h4>
+                          <div className="text-sm text-gray-300">
+                            <p><span className="text-primary">Minimum:</span> {selectedHackathon.eligibility.teamSize.minimum} member(s)</p>
+                            <p><span className="text-primary">Maximum:</span> {selectedHackathon.eligibility.teamSize.maximum} members</p>
+                            {selectedHackathon.eligibility.teamSize.note && (
+                              <p className="mt-2 italic"><span className="text-primary">Note:</span> {selectedHackathon.eligibility.teamSize.note}</p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Theme Section */}
+                {selectedHackathon.theme && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                      Hackathon Theme
+                    </h3>
+                    <div className="bg-gradient-to-r from-secondary/20 to-primary/20 p-4 rounded-lg">
+                      {selectedHackathon.theme.primary && (
+                        <p className="text-lg font-semibold text-white mb-3">{selectedHackathon.theme.primary}</p>
+                      )}
+                      {selectedHackathon.theme.details && Array.isArray(selectedHackathon.theme.details) && (
+                        <div className="space-y-2">
+                          {selectedHackathon.theme.details.map((detail, idx) => (
+                            <div key={idx} className="flex items-start gap-2 text-gray-300">
+                              <span className="text-primary mt-1">▸</span>
+                              <span className="text-sm">{detail}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Registration Fee Section */}
+                {selectedHackathon.registrationdetails && Array.isArray(selectedHackathon.registrationdetails) && selectedHackathon.registrationdetails.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                      Registration Details
+                    </h3>
+                    <div className="grid grid-cols-1 gap-3">
+                      {selectedHackathon.registrationdetails.map((detail, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: idx * 0.05 }}
+                          className="flex items-start gap-2 text-gray-300"
+                        >
+                          <span className="text-primary mt-1">▸</span>
+                          <span className="text-sm">{detail}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Contact Section */}
+                {selectedHackathon.contact && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                      Contact Information
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Faculty Coordinators */}
+                      {selectedHackathon.contact.facultyCoordinator && selectedHackathon.contact.facultyCoordinator.length > 0 && (
+                        <div>
+                          <h4 className="text-lg font-semibold text-secondary mb-3">
+                            Faculty Coordinators
+                          </h4>
+                          <div className="space-y-4">
+                            {selectedHackathon.contact.facultyCoordinator.map((faculty, idx) => (
+                              <div
+                                key={idx}
+                                className="bg-primary/5 border border-primary/20 p-4"
+                              >
+                                <p className="text-gray-200 font-medium mb-2">{faculty.name}</p>
+                                {faculty.phone && (
+                                  <p className="text-gray-400 text-sm">📞 {faculty.phone}</p>
+                                )}
+                                {faculty.email && (
+                                  <p className="text-gray-400 text-sm break-all">✉️ {faculty.email}</p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Student Coordinators */}
+                      {selectedHackathon.contact.studentCoordinator && selectedHackathon.contact.studentCoordinator.length > 0 && (
+                        <div>
+                          <h4 className="text-lg font-semibold text-secondary mb-3">
+                            Student Coordinators
+                          </h4>
+                          <div className="space-y-4">
+                            {selectedHackathon.contact.studentCoordinator.map((student, idx) => (
+                              <div
+                                key={idx}
+                                className="bg-primary/5 border border-primary/20 p-4"
+                              >
+                                <p className="text-gray-200 font-medium mb-2">{student.name}</p>
+                                {student.phone && (
+                                  <p className="text-gray-400 text-sm">📞 {student.phone}</p>
+                                )}
+                                {student.email && (
+                                  <p className="text-gray-400 text-sm break-all">✉️ {student.email}</p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+      {/* Cultural/Harmonicks Modal - Moved outside main content for proper z-index stacking */}
+      {selectedCultural && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black/90 backdrop-blur-md z-[9999] p-4"
+          onClick={() => setSelectedCultural(null)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-slate-900 border-2 border-primary/50 relative max-w-6xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-4 right-4 text-white/50 hover:text-white z-10 bg-slate-800/80 rounded-full p-2"
+              onClick={() => setSelectedCultural(null)}
+            >
+              <X size={24} />
+            </button>
+
+            <div className="p-6 md:p-10">
+              {/* Header Section */}
+              <div className="flex flex-col md:flex-row gap-8 mb-8">
+                <div className="w-full md:w-1/3">
+                  <img
+                    className="w-full aspect-square object-cover border-2 border-primary/30"
+                    src={selectedCultural.img}
+                    alt={selectedCultural.title}
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <h2 className="text-2xl md:text-3xl font-bold text-primary mb-2">
+                    {selectedCultural.shortTitle}
+                  </h2>
+                  <h3 className="text-lg text-gray-300 mb-4">
+                    {selectedCultural.title}
+                  </h3>
+                  <div className="h-px bg-gradient-to-r from-primary/50 to-transparent mb-6" />
+
+                  <p className="text-gray-200 text-sm leading-relaxed mb-6">
+                    {selectedCultural.description}
+                  </p>
+
+                  {/* Event Details */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <Calendar className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedCultural.date}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <MapPin className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedCultural.venue}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <Users className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedCultural.price}</span>
+                    </div>
+                  </div>
+
+                  {/* Register Button */}
+                  <button
+                    className="w-full md:w-auto px-8 py-3 bg-primary hover:bg-primary/90 text-white font-bold text-lg tracking-widest transition-all shadow-lg shadow-primary/20 border-2 border-primary"
+                    onClick={() => {
+                      if (!user) {
+                        // Not logged in - redirect to login with return URL
+                        setSelectedCultural(null);
+                        navigate('/login', { state: { returnTo: `/event/${selectedCultural.id}` } });
+                        return;
+                      }
+                      // Logged in - redirect to registration page with event pre-selected
+                      setSelectedCultural(null);
+                      navigate('/register-events', { state: { selectedEventId: selectedCultural.id } });
+                    }}
+                  >
+                    REGISTER NOW
+                  </button>
+                </div>
+              </div>
+
+              {/* Schedule Section */}
+              {selectedCultural.schedule && selectedCultural.schedule.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Event Schedule
+                  </h3>
+                  <div className="space-y-3">
+                    {selectedCultural.schedule.map((event, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="bg-gradient-to-r from-secondary/10 to-transparent p-4 rounded-lg"
+                      >
+                        <div className="flex flex-wrap gap-4 text-sm text-gray-300">
+                          {event.round && <div><span className="text-primary font-semibold">Round:</span> {event.round}</div>}
+                          {event.date && <div><span className="text-primary font-semibold">Date:</span> {event.date}</div>}
+                          {event.time && <div><span className="text-primary font-semibold">Time:</span> {event.time}</div>}
+                          {event.location && <div><span className="text-primary font-semibold">Location:</span> {event.location}</div>}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Rules Section */}
+              {selectedCultural.rules && selectedCultural.rules.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Rules & Guidelines
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {selectedCultural.rules.map((rule, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="flex items-start gap-2 text-gray-300"
+                      >
+                        <span className="text-primary mt-1">▸</span>
+                        <span className="text-sm">{rule}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Contact Section */}
+              {selectedCultural.contact && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Contact Information
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Faculty Coordinators */}
+                    {selectedCultural.contact.facultyCoordinator && selectedCultural.contact.facultyCoordinator.length > 0 && (
+                      <div>
+                        <h4 className="text-lg font-semibold text-secondary mb-3">
+                          Faculty Coordinators
+                        </h4>
+                        <div className="space-y-4">
+                          {selectedCultural.contact.facultyCoordinator.map((faculty, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-primary/5 border border-primary/20 p-4"
+                            >
+                              <p className="text-gray-200 font-medium mb-2">{faculty.name}</p>
+                              {faculty.phone && (
+                                <p className="text-gray-400 text-sm">📞 {faculty.phone}</p>
+                              )}
+                              {faculty.email && (
+                                <p className="text-gray-400 text-sm break-all">✉️ {faculty.email}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Student Coordinators */}
+                    {selectedCultural.contact.studentCoordinator && selectedCultural.contact.studentCoordinator.length > 0 && (
+                      <div>
+                        <h4 className="text-lg font-semibold text-secondary mb-3">
+                          Student Coordinators
+                        </h4>
+                        <div className="space-y-4">
+                          {selectedCultural.contact.studentCoordinator.map((student, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-primary/5 border border-primary/20 p-4"
+                            >
+                              <p className="text-gray-200 font-medium mb-2">{student.name}</p>
+                              {student.phone && (
+                                <p className="text-gray-400 text-sm">📞 {student.phone}</p>
+                              )}
+                              {student.email && (
+                                <p className="text-gray-400 text-sm break-all">✉️ {student.email}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Workshop Modal - Moved outside main content for proper z-index stacking */}
+      {selectedWorkshop && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black/90 backdrop-blur-md z-[9999] p-4"
+          onClick={() => setSelectedWorkshop(null)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-slate-900 border-2 border-primary/50 relative max-w-6xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-4 right-4 text-white/50 hover:text-white z-10 bg-slate-800/80 rounded-full p-2"
+              onClick={() => setSelectedWorkshop(null)}
+            >
+              <X size={24} />
+            </button>
+
+            <div className="p-6 md:p-10">
+              {/* Header Section */}
+              <div className="flex flex-col md:flex-row gap-8 mb-8">
+                <div className="w-full md:w-1/3">
+                  <img
+                    className="w-full aspect-square object-cover border-2 border-primary/30"
+                    src={selectedWorkshop.img}
+                    alt={selectedWorkshop.title}
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <h2 className="text-2xl md:text-3xl font-bold text-primary mb-2">
+                    {selectedWorkshop.shortTitle}
+                  </h2>
+                  <h3 className="text-lg text-gray-300 mb-4">
+                    {selectedWorkshop.title}
+                  </h3>
+                  <div className="h-px bg-gradient-to-r from-primary/50 to-transparent mb-6" />
+
+                  <p className="text-gray-200 text-sm leading-relaxed mb-6">
+                    {selectedWorkshop.description}
+                  </p>
+
+                  {/* Event Details */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <Calendar className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedWorkshop.date}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <MapPin className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedWorkshop.venue}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <Users className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedWorkshop.price}</span>
+                    </div>
+                  </div>
+
+                  {/* Register Button */}
+                  <button
+                    className="w-full md:w-auto px-8 py-3 bg-primary hover:bg-primary/90 text-white font-bold text-lg tracking-widest transition-all shadow-lg shadow-primary/20 border-2 border-primary"
+                    onClick={() => {
+                      if (!user) {
+                        // Not logged in - redirect to login with return URL
+                        setSelectedWorkshop(null);
+                        navigate('/login', { state: { returnTo: `/event/${selectedWorkshop.id}` } });
+                        return;
+                      }
+                      // Logged in - redirect to registration page with event pre-selected
+                      setSelectedWorkshop(null);
+                      navigate('/register-events', { state: { selectedEventId: selectedWorkshop.id } });
+                    }}
+                  >
+                    REGISTER NOW
+                  </button>
+                </div>
+              </div>
+
+              {/* Schedule Section */}
+              {selectedWorkshop.schedule && selectedWorkshop.schedule.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Workshop Schedule
+                  </h3>
+                  <div className="space-y-3">
+                    {selectedWorkshop.schedule.map((event, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="bg-gradient-to-r from-secondary/10 to-transparent p-4 rounded-lg"
+                      >
+                        <div className="flex flex-wrap gap-4 text-sm text-gray-300">
+                          {event.round && <div><span className="text-primary font-semibold">Session:</span> {event.round}</div>}
+                          {event.date && <div><span className="text-primary font-semibold">Date:</span> {event.date}</div>}
+                          {event.time && <div><span className="text-primary font-semibold">Time:</span> {event.time}</div>}
+                          {event.duration && <div><span className="text-primary font-semibold">Duration:</span> {event.duration}</div>}
+                          {event.location && <div><span className="text-primary font-semibold">Location:</span> {event.location}</div>}
+                          {event.venue && <div><span className="text-primary font-semibold">Venue:</span> {event.venue}</div>}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Contact Section */}
+              {selectedWorkshop.contact && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Contact Information
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Faculty Coordinators */}
+                    {selectedWorkshop.contact.facultyCoordinator && selectedWorkshop.contact.facultyCoordinator.length > 0 && (
+                      <div>
+                        <h4 className="text-lg font-semibold text-secondary mb-3">
+                          Faculty Coordinators
+                        </h4>
+                        <div className="space-y-4">
+                          {selectedWorkshop.contact.facultyCoordinator.map((faculty, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-primary/5 border border-primary/20 p-4"
+                            >
+                              <p className="text-gray-200 font-medium mb-2">{faculty.name}</p>
+                              {faculty.phone && (
+                                <p className="text-gray-400 text-sm">📞 {faculty.phone}</p>
+                              )}
+                              {faculty.email && (
+                                <p className="text-gray-400 text-sm break-all">✉️ {faculty.email}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Student Coordinators */}
+                    {selectedWorkshop.contact.studentCoordinator && selectedWorkshop.contact.studentCoordinator.length > 0 && (
+                      <div>
+                        <h4 className="text-lg font-semibold text-secondary mb-3">
+                          Student Coordinators
+                        </h4>
+                        <div className="space-y-4">
+                          {selectedWorkshop.contact.studentCoordinator.map((student, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-primary/5 border border-primary/20 p-4"
+                            >
+                              <p className="text-gray-200 font-medium mb-2">{student.name}</p>
+                              {student.phone && (
+                                <p className="text-gray-400 text-sm">📞 {student.phone}</p>
+                              )}
+                              {student.email && (
+                                <p className="text-gray-400 text-sm break-all">✉️ {student.email}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Technical Event Modal */}
+      {selectedTechnical && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black/90 backdrop-blur-md z-[9999] p-4"
+          onClick={() => setSelectedTechnical(null)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-slate-900 border-2 border-primary/50 rounded-lg relative max-w-6xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedTechnical(null)}
+              className="absolute top-4 right-4 text-white/50 hover:text-white z-10 bg-slate-800/80 rounded-full p-2"
+            >
+              <X size={24} />
+            </button>
+
+            <div className="p-6 md:p-10">\n              {/* Header Section */}
+              <div className="flex flex-col md:flex-row gap-8 mb-8">
+                <div className="w-full md:w-1/3">
+                  <img
+                    className="w-full aspect-square object-cover border-2 border-primary/30"
+                    src={selectedTechnical.img}
+                    alt={selectedTechnical.title}
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <h2 className="text-2xl md:text-3xl font-bold text-primary mb-2">
+                    {selectedTechnical.shortTitle}
+                  </h2>
+                  <h3 className="text-lg text-gray-300 mb-4">
+                    {selectedTechnical.title}
+                  </h3>
+                  <div className="h-px bg-gradient-to-r from-primary/50 to-transparent mb-6" />
+
+                  <p className="text-gray-200 text-sm leading-relaxed mb-6">
+                    {selectedTechnical.description}
+                  </p>
+
+                  {/* Event Details */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <Calendar className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedTechnical.date}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <MapPin className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedTechnical.venue}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <Users className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedTechnical.price}</span>
+                    </div>
+                  </div>
+
+                  {/* Register Button */}
+                  <button
+                    className="w-full md:w-auto px-8 py-3 bg-primary hover:bg-primary/90 text-white font-bold text-lg tracking-widest transition-all shadow-lg shadow-primary/20 border-2 border-primary"
+                    onClick={() => {
+                      if (!user) {
+                        setSelectedTechnical(null);
+                        navigate('/login', { state: { returnTo: `/event/${selectedTechnical.id}` } });
+                      } else {
+                        setSelectedTechnical(null);
+                        navigate('/register-events', { state: { selectedEventId: selectedTechnical.id } });
+                      }
+                    }}
+                  >
+                    REGISTER NOW
+                  </button>
+                </div>
+              </div>
+
+              {/* Schedule Section */}
+              {selectedTechnical.schedule && selectedTechnical.schedule.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Event Schedule
+                  </h3>
+                  <div className="space-y-3">
+                    {selectedTechnical.schedule.map((event, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="bg-gradient-to-r from-secondary/10 to-transparent p-4 rounded-lg"
+                      >
+                        <div className="flex flex-wrap gap-4 text-sm text-gray-300">
+                          {event.round && <div><span className="text-primary font-semibold">Round:</span> {event.round}</div>}
+                          {event.date && <div><span className="text-primary font-semibold">Date:</span> {event.date}</div>}
+                          {event.time && <div><span className="text-primary font-semibold">Time:</span> {event.time}</div>}
+                          {event.location && <div><span className="text-primary font-semibold">Location:</span> {event.location}</div>}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Rules Section */}
+              {selectedTechnical.rules && selectedTechnical.rules.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Rules & Guidelines
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {selectedTechnical.rules.map((rule, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="flex items-start gap-2 text-gray-300"
+                      >
+                        <span className="text-primary mt-1">▸</span>
+                        <span className="text-sm">{rule}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Topics Section */}
+              {selectedTechnical.topics && selectedTechnical.topics.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Topics
+                  </h3>
+                  <div className="bg-gradient-to-r from-secondary/20 to-primary/20 p-4 rounded-lg">
+                    <div className="space-y-2">
+                      {selectedTechnical.topics.map((topic, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: idx * 0.05 }}
+                          className="text-gray-300"
+                        >
+                          {topic.title && (
+                            <p className="text-lg font-semibold text-white mb-3">{topic.title}</p>
+                          )}
+                          {topic.description && Array.isArray(topic.description) && (
+                            <div className="space-y-2">
+                              {topic.description.map((detail, detailIdx) => (
+                                <div key={detailIdx} className="flex items-start gap-2 text-gray-300">
+                                  <span className="text-primary mt-1">▸</span>
+                                  <span className="text-sm">{detail}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Rounds Section */}
+              {selectedTechnical.rounds && selectedTechnical.rounds.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Event Rounds
+                  </h3>
+                  <div className="space-y-4">
+                    {selectedTechnical.rounds.map((round, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="bg-gradient-to-r from-primary/10 to-transparent p-4 rounded-lg"
+                      >
+                        <h4 className="text-lg font-semibold text-white mb-2">{round.title}</h4>
+                        {round.description && Array.isArray(round.description) && (
+                          <ul className="space-y-1">
+                            {round.description.map((desc, descIdx) => (
+                              <li key={descIdx} className="text-sm text-gray-300 flex items-start gap-2">
+                                <span className="text-primary mt-1">▸</span>
+                                <span>{desc}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Contact Section */}
+              {selectedTechnical.contact && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Contact Information
+                  </h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Faculty Coordinators */}
+                    {selectedTechnical.contact.facultyCoordinator && selectedTechnical.contact.facultyCoordinator.length > 0 && (
+                      <div>
+                        <h4 className="text-lg font-semibold text-secondary mb-3">
+                          Faculty Coordinators
+                        </h4>
+                        <div className="space-y-4">
+                          {selectedTechnical.contact.facultyCoordinator.map((faculty, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-primary/5 border border-primary/20 p-4"
+                            >
+                              <p className="text-gray-200 font-medium mb-2">{faculty.name}</p>
+                              {faculty.phone && (
+                                <p className="text-gray-400 text-sm">📞 {faculty.phone}</p>
+                              )}
+                              {faculty.email && (
+                                <p className="text-gray-400 text-sm break-all">✉️ {faculty.email}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Student Coordinators */}
+                    {selectedTechnical.contact.studentCoordinator && selectedTechnical.contact.studentCoordinator.length > 0 && (
+                      <div>
+                        <h4 className="text-lg font-semibold text-secondary mb-3">
+                          Student Coordinators
+                        </h4>
+                        <div className="space-y-4">
+                          {selectedTechnical.contact.studentCoordinator.map((student, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-primary/5 border border-primary/20 p-4"
+                            >
+                              <p className="text-gray-200 font-medium mb-2">{student.name}</p>
+                              {student.phone && (
+                                <p className="text-gray-400 text-sm">📞 {student.phone}</p>
+                              )}
+                              {student.email && (
+                                <p className="text-gray-400 text-sm break-all">✉️ {student.email}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Non-Technical Event Modal */}
+      {selectedNonTechnical && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black/90 backdrop-blur-md z-[9999] p-4"
+          onClick={() => setSelectedNonTechnical(null)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-slate-900 border-2 border-primary/50 rounded-lg relative max-w-6xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedNonTechnical(null)}
+              className="absolute top-4 right-4 text-white/50 hover:text-white z-10 bg-slate-800/80 rounded-full p-2"
+            >
+              <X size={24} />
+            </button>
+
+            <div className="p-6 md:p-10">
+              {/* Header Section */}
+              <div className="flex flex-col md:flex-row gap-8 mb-8">
+                <div className="w-full md:w-1/3">
+                  <img
+                    className="w-full aspect-square object-cover border-2 border-primary/30"
+                    src={selectedNonTechnical.img}
+                    alt={selectedNonTechnical.title}
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <h2 className="text-2xl md:text-3xl font-bold text-primary mb-2">
+                    {selectedNonTechnical.shortTitle}
+                  </h2>
+                  <h3 className="text-lg text-gray-300 mb-4">
+                    {selectedNonTechnical.title}
+                  </h3>
+                  <div className="h-px bg-gradient-to-r from-primary/50 to-transparent mb-6" />
+
+                  <p className="text-gray-200 text-sm leading-relaxed mb-6">
+                    {selectedNonTechnical.description}
+                  </p>
+
+                  {/* Event Details */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <Calendar className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedNonTechnical.date}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <MapPin className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedNonTechnical.venue}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <Users className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedNonTechnical.price}</span>
+                    </div>
+                  </div>
+
+                  {/* Register Button */}
+                  <button
+                    className="w-full md:w-auto px-8 py-3 bg-primary hover:bg-primary/90 text-white font-bold text-lg tracking-widest transition-all shadow-lg shadow-primary/20 border-2 border-primary"
+                    onClick={() => {
+                      if (!user) {
+                        setSelectedNonTechnical(null);
+                        navigate('/login', { state: { returnTo: `/event/${selectedNonTechnical.id}` } });
+                      } else {
+                        setSelectedNonTechnical(null);
+                        navigate('/register-events', { state: { selectedEventId: selectedNonTechnical.id } });
+                      }
+                    }}
+                  >
+                    REGISTER NOW
+                  </button>
+                </div>
+              </div>
+
+              {/* Schedule Section */}
+              {selectedNonTechnical.schedule && selectedNonTechnical.schedule.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Event Schedule
+                  </h3>
+                  <div className="space-y-3">
+                    {selectedNonTechnical.schedule.map((event, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="bg-gradient-to-r from-secondary/10 to-transparent p-4 rounded-lg"
+                      >
+                        <div className="flex flex-wrap gap-4 text-sm text-gray-300">
+                          {event.round && <div><span className="text-primary font-semibold">Round:</span> {event.round}</div>}
+                          {event.date && <div><span className="text-primary font-semibold">Date:</span> {event.date}</div>}
+                          {event.time && <div><span className="text-primary font-semibold">Time:</span> {event.time}</div>}
+                          {event.location && <div><span className="text-primary font-semibold">Location:</span> {event.location}</div>}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Rules Section */}
+              {selectedNonTechnical.rules && selectedNonTechnical.rules.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Rules & Guidelines
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {selectedNonTechnical.rules.map((rule, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="flex items-start gap-2 text-gray-300"
+                      >
+                        <span className="text-primary mt-1">▸</span>
+                        <span className="text-sm">{rule}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Rounds Section */}
+              {selectedNonTechnical.rounds && selectedNonTechnical.rounds.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Event Rounds
+                  </h3>
+                  <div className="space-y-4">
+                    {selectedNonTechnical.rounds.map((round, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="bg-gradient-to-r from-primary/10 to-transparent p-4 rounded-lg"
+                      >
+                        <h4 className="text-lg font-semibold text-white mb-2">{round.title}</h4>
+                        {round.description && typeof round.description === 'string' && (
+                          <p className="text-sm text-gray-300">{round.description}</p>
+                        )}
+                        {round.description && Array.isArray(round.description) && (
+                          <ul className="space-y-1">
+                            {round.description.map((desc, descIdx) => (
+                              <li key={descIdx} className="text-sm text-gray-300 flex items-start gap-2">
+                                <span className="text-primary mt-1">▸</span>
+                                <span>{desc}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Eligibility Section (for special events like cricket) */}
+              {selectedNonTechnical.eligibility && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Eligibility Criteria
+                  </h3>
+                  <div className="space-y-4">
+                    {selectedNonTechnical.eligibility.categories && Array.isArray(selectedNonTechnical.eligibility.categories) && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-white mb-2">Eligible Participants:</h4>
+                        <div className="space-y-2">
+                          {selectedNonTechnical.eligibility.categories.map((category, idx) => (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.3, delay: idx * 0.05 }}
+                              className="flex items-start gap-2 text-gray-300"
+                            >
+                              <span className="text-primary mt-1">▸</span>
+                              <span className="text-sm">{category}</span>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedNonTechnical.eligibility.teamSize && (
+                      <div className="bg-gradient-to-r from-primary/10 to-transparent p-4 rounded-lg">
+                        <h4 className="text-sm font-semibold text-white mb-2">Team Size:</h4>
+                        <div className="text-sm text-gray-300">
+                          <p><span className="text-primary">Minimum:</span> {selectedNonTechnical.eligibility.teamSize.minimum} member(s)</p>
+                          <p><span className="text-primary">Maximum:</span> {selectedNonTechnical.eligibility.teamSize.maximum} members</p>
+                          {selectedNonTechnical.eligibility.teamSize.note && (
+                            <p className="mt-2 italic"><span className="text-primary">Note:</span> {selectedNonTechnical.eligibility.teamSize.note}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Rewards Section (for special events) */}
+              {selectedNonTechnical.rewards && selectedNonTechnical.rewards.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Prizes & Rewards
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {selectedNonTechnical.rewards.map((reward, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.1 }}
+                        className="bg-gradient-to-br from-primary/20 to-secondary/20 p-4 rounded-lg text-center"
+                      >
+                        <div className="text-3xl mb-2">{reward.emoji}</div>
+                        <div className="text-lg font-bold text-white mb-1">{reward.position}</div>
+                        <div className="text-2xl font-bold text-primary">{reward.amount}</div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Contact Section */}
+              {selectedNonTechnical.contact && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Contact Information
+                  </h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Faculty Coordinators */}
+                    {selectedNonTechnical.contact.facultyCoordinator && selectedNonTechnical.contact.facultyCoordinator.length > 0 && (
+                      <div>
+                        <h4 className="text-lg font-semibold text-secondary mb-3">
+                          Faculty Coordinators
+                        </h4>
+                        <div className="space-y-4">
+                          {selectedNonTechnical.contact.facultyCoordinator.map((faculty, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-primary/5 border border-primary/20 p-4"
+                            >
+                              <p className="text-gray-200 font-medium mb-2">{faculty.name}</p>
+                              {faculty.phone && (
+                                <p className="text-gray-400 text-sm">📞 {faculty.phone}</p>
+                              )}
+                              {faculty.email && (
+                                <p className="text-gray-400 text-sm break-all">✉️ {faculty.email}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Student Coordinators */}
+                    {selectedNonTechnical.contact.studentCoordinator && selectedNonTechnical.contact.studentCoordinator.length > 0 && (
+                      <div>
+                        <h4 className="text-lg font-semibold text-secondary mb-3">
+                          Student Coordinators
+                        </h4>
+                        <div className="space-y-4">
+                          {selectedNonTechnical.contact.studentCoordinator.map((student, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-primary/5 border border-primary/20 p-4"
+                            >
+                              <p className="text-gray-200 font-medium mb-2">{student.name}</p>
+                              {student.phone && (
+                                <p className="text-gray-400 text-sm">📞 {student.phone}</p>
+                              )}
+                              {student.email && (
+                                <p className="text-gray-400 text-sm break-all">✉️ {student.email}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </>
   );
 };
 
