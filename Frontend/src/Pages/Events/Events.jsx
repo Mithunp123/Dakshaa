@@ -1177,12 +1177,12 @@ const Events = () => {
                         if (!user) {
                           // Not logged in - redirect to login with return URL
                           setSelectedHackathon(null);
-                          navigate('/login', { state: { returnTo: `/event/${selectedHackathon.id}` } });
+                          navigate('/login', { state: { returnTo: '/register-events' } });
                           return;
                         }
                         // Logged in - redirect to registration page with event pre-selected
                         setSelectedHackathon(null);
-                        navigate('/register-events', { state: { selectedEventId: selectedHackathon.id } });
+                        navigate('/register-events');
                       }}
                     >
                       REGISTER NOW
@@ -1516,12 +1516,12 @@ const Events = () => {
                       if (!user) {
                         // Not logged in - redirect to login with return URL
                         setSelectedCultural(null);
-                        navigate('/login', { state: { returnTo: `/event/${selectedCultural.id}` } });
+                        navigate('/login', { state: { returnTo: '/register-events' } });
                         return;
                       }
                       // Logged in - redirect to registration page with event pre-selected
                       setSelectedCultural(null);
-                      navigate('/register-events', { state: { selectedEventId: selectedCultural.id } });
+                      navigate('/register-events');
                     }}
                   >
                     REGISTER NOW
@@ -1710,12 +1710,12 @@ const Events = () => {
                       if (!user) {
                         // Not logged in - redirect to login with return URL
                         setSelectedWorkshop(null);
-                        navigate('/login', { state: { returnTo: `/event/${selectedWorkshop.id}` } });
+                        navigate('/login', { state: { returnTo: '/register-events' } });
                         return;
                       }
                       // Logged in - redirect to registration page with event pre-selected
                       setSelectedWorkshop(null);
-                      navigate('/register-events', { state: { selectedEventId: selectedWorkshop.id } });
+                      navigate('/register-events');
                     }}
                   >
                     REGISTER NOW
@@ -1882,10 +1882,10 @@ const Events = () => {
                     onClick={() => {
                       if (!user) {
                         setSelectedTechnical(null);
-                        navigate('/login', { state: { returnTo: `/event/${selectedTechnical.id}` } });
+                        navigate('/login', { state: { returnTo: '/register-events' } });
                       } else {
                         setSelectedTechnical(null);
-                        navigate('/register-events', { state: { selectedEventId: selectedTechnical.id } });
+                        navigate('/register-events');
                       }
                     }}
                   >
@@ -2142,10 +2142,10 @@ const Events = () => {
                     onClick={() => {
                       if (!user) {
                         setSelectedNonTechnical(null);
-                        navigate('/login', { state: { returnTo: `/event/${selectedNonTechnical.id}` } });
+                        navigate('/login', { state: { returnTo: '/register-events' } });
                       } else {
                         setSelectedNonTechnical(null);
-                        navigate('/register-events', { state: { selectedEventId: selectedNonTechnical.id } });
+                        navigate('/register-events');
                       }
                     }}
                   >

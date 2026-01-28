@@ -190,7 +190,14 @@ function AppContent() {
             <Route path="/feedback" element={<Feedback />} />
             <Route path="/terms" element={<TermsAndConditions />} />
             <Route path="/signup" element={<Register />} />
-            <Route path="/register-events" element={<EventRegistration />} />
+            <Route 
+              path="/register-events" 
+              element={
+                <ProtectedRoute allowedRoles={["student", "super_admin", "registration_admin", "event_coordinator", "volunteer"]}>
+                  <EventRegistration />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/scan" element={<Scan />} />
             <Route
               path="/dashboard/*"
@@ -213,7 +220,7 @@ function AppContent() {
               path="/admin"
               element={
                 <ProtectedRoute
-                  allowedRoles={["super_admin", "registration_admin"]}
+                  allowedRoles={["super_admin", "registration_admin", "event_coordinator"]}
                 >
                   <AdminLayout />
                 </ProtectedRoute>
@@ -351,9 +358,19 @@ function AppContent() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="coordinator"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={["event_coordinator", "super_admin"]}
+                  >
+                    <EventCoordinatorDashboard />
+                  </ProtectedRoute>
+                }
+              />
             </Route>
 
-            {/* Event Coordinator Routes - Standalone (No Sidebar) */}
+            {/* Legacy standalone coordinator route - redirect to admin/coordinator */}
             <Route
               path="/coordinator"
               element={

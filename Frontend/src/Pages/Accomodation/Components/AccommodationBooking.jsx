@@ -468,7 +468,7 @@ const AccommodationBooking = () => {
           )}
         </motion.div>
 
-        {/* Lunch Card */}
+        {/* Lunch Card 
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -527,6 +527,7 @@ const AccommodationBooking = () => {
             </button>
           )}
         </motion.div>
+        */}
       </div>
 
       {/* Booking Modal */}

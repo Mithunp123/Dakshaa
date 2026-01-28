@@ -326,9 +326,13 @@ const EventDetails = () => {
 
   // Handle registration click
   const handleRegisterClick = () => {
+    console.log('🎫 Register click - user:', user ? 'logged in' : 'not logged in');
+    console.log('🎫 databaseEventId:', databaseEventId);
+    
     if (!user) {
-      // Not logged in - redirect to login with return URL
-      navigate('/login', { state: { returnTo: `/event/${rawEventId}` } });
+      // Not logged in - redirect to login with query params for registration intent
+      console.log('🔐 Redirecting to login with register=true, eventId:', databaseEventId);
+      navigate(`/login?register=true&eventId=${encodeURIComponent(databaseEventId)}`);
       return;
     }
     // Logged in - redirect to registration page with event pre-selected
