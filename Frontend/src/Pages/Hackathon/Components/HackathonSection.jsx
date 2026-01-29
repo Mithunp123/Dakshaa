@@ -13,7 +13,7 @@ export const hackathonEventDetails = {
       date: "12th Feb - 13th Feb, 2026",
       venue: "IT PARK",
       registrationLink: "",
-      description: "NeuroHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, Defend, and Secure technology to shape the future of digital innovation.",
+      description: "NeuraHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, Defend, and Secure technology to shape the future of digital innovation.",
       rewards: [
         {
           position: "2nd Prize",
@@ -48,7 +48,7 @@ export const hackathonEventDetails = {
       ], */
       rules: [
         "Each team shall consist of two (2) to three (3) members.",
-        "NeuroHack 2.O is a continuous 36-hour hackathon with no breaks in development time.",
+        "NeuraHack 2.O is a continuous 36-hour hackathon with no breaks in development time.",
         "A total of two (2) evaluation rounds will be conducted during the hackathon period.",
         "Participants must bring their own laptops, peripherals, and required accessories.",
         "At least one team member must be present and actively working at all times throughout the 36-hour duration.",
@@ -227,7 +227,7 @@ export const hackathonEventDetails = {
     },
     "hackathon-3": {
       id: "hackathon-3",
-      title: "Neuro Code 2.O - Relay Edition",
+      title: "Neura Code 2.O - Relay Edition",
       date: "February 13 2026 ",
       venue: "computer Lab",
       registrationLink: " ",
