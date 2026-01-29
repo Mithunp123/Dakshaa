@@ -92,6 +92,9 @@ const RoleManagement = lazy(() => import("./Pages/Admin/SuperAdmin/RoleManagemen
 const ReferralManager = lazy(() => import("./Pages/Admin/SuperAdmin/ReferralManager"));
 const RegistrationAdminDashboard = lazy(() => import("./Pages/Admin/RegAdmin/RegistrationAdminDashboard"));
 const EventCoordinatorDashboard = lazy(() => import("./Pages/Admin/Coordinator/EventCoordinatorDashboard"));
+const CoordinatorOverviewPage = lazy(() => import("./Pages/Admin/Coordinator/OverviewPage"));
+const CoordinatorRegistrationPage = lazy(() => import("./Pages/Admin/Coordinator/RegistrationPage"));
+const CoordinatorGlobalScanner = lazy(() => import("./Pages/Admin/Coordinator/GlobalScannerPage"));
 const AttendanceScanner = lazy(() => import("./Pages/Admin/Volunteer/AttendanceScanner"));
 const VolunteerDashboard = lazy(() => import("./Pages/Admin/Volunteer/VolunteerDashboard"));
 
@@ -376,6 +379,36 @@ function AppContent() {
                     allowedRoles={["event_coordinator", "super_admin"]}
                   >
                     <EventCoordinatorDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="coordinator/overview"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={["event_coordinator", "super_admin"]}
+                  >
+                    <CoordinatorOverviewPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="coordinator/registration"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={["event_coordinator", "super_admin"]}
+                  >
+                    <CoordinatorRegistrationPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="coordinator/global-scanner"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={["event_coordinator", "super_admin"]}
+                  >
+                    <CoordinatorGlobalScanner />
                   </ProtectedRoute>
                 }
               />

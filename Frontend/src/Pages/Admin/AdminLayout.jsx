@@ -109,7 +109,8 @@ const AdminLayout = () => {
       );
     }
 
-    if (userRole === 'event_coordinator' || userRole === 'super_admin') {
+    // Event coordinator gets their own restricted menu items (not added for super_admin)
+    if (userRole === 'event_coordinator') {
       items.push(
         { label: 'Overview', icon: LayoutDashboard, path: '/admin/coordinator/overview' },
         { label: 'Registration Management', icon: ClipboardList, path: '/admin/coordinator/registration' },
