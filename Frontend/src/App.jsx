@@ -92,9 +92,6 @@ const RoleManagement = lazy(() => import("./Pages/Admin/SuperAdmin/RoleManagemen
 const ReferralManager = lazy(() => import("./Pages/Admin/SuperAdmin/ReferralManager"));
 const RegistrationAdminDashboard = lazy(() => import("./Pages/Admin/RegAdmin/RegistrationAdminDashboard"));
 const EventCoordinatorDashboard = lazy(() => import("./Pages/Admin/Coordinator/EventCoordinatorDashboard"));
-const CoordinatorOverview = lazy(() => import("./Pages/Admin/Coordinator/OverviewPage"));
-const CoordinatorRegistration = lazy(() => import("./Pages/Admin/Coordinator/RegistrationPage"));
-const CoordinatorGlobalScanner = lazy(() => import("./Pages/Admin/Coordinator/GlobalScannerPage"));
 const AttendanceScanner = lazy(() => import("./Pages/Admin/Volunteer/AttendanceScanner"));
 const VolunteerDashboard = lazy(() => import("./Pages/Admin/Volunteer/VolunteerDashboard"));
 
@@ -110,6 +107,7 @@ function AppContent() {
   const isForgotPassword = location.pathname === "/forgot-password";
   const isRegisterEvents = location.pathname === "/register-events";
   const isHome = location.pathname === "/";
+  const isLiveStats = location.pathname === "/live-stats";
 
   // Check if bottom navbar should be shown (mobile only, non-admin pages)
   const showBottomNav = !isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword;
@@ -381,36 +379,6 @@ function AppContent() {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="coordinator/overview"
-                element={
-                  <ProtectedRoute
-                    allowedRoles={["event_coordinator", "super_admin"]}
-                  >
-                    <CoordinatorOverview />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="coordinator/registration"
-                element={
-                  <ProtectedRoute
-                    allowedRoles={["event_coordinator", "super_admin"]}
-                  >
-                    <CoordinatorRegistration />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="coordinator/global-scanner"
-                element={
-                  <ProtectedRoute
-                    allowedRoles={["event_coordinator", "super_admin"]}
-                  >
-                    <CoordinatorGlobalScanner />
-                  </ProtectedRoute>
-                }
-              />
             </Route>
 
             {/* Legacy standalone coordinator route - redirect to admin/coordinator */}
@@ -455,8 +423,8 @@ function AppContent() {
       </AnimatePresence>
 
       {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && <UltraFooter />}
-      {!isAdmin && !isRegisterEvents && <FloatingDashboardButton />}
-      {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && !isRegisterEvents && (
+      {!isAdmin && !isRegisterEvents && !isLiveStats && <FloatingDashboardButton />}
+      {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && !isRegisterEvents && !isLiveStats && (
         <FloatingCallButton />
       )}
       {showBottomNav && <BottomNavbar />}
