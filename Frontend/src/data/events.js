@@ -4,7 +4,7 @@ import { workshopEvents } from "./workshopEvents";
 import { hackathonEvents } from "./hackathonEvents";
 import { nonTechnicalEvents } from "./nonTechnicalEvents";
 import { conferenceEvents } from "./conferenceEvents";
-//import { exposAndShowsEvents } from "./exposAndShowsEvents";
+import { exposAndShowsEvents } from "./exposAndShowsEvents";
 
 
 export const EVENTS_DATA = {
@@ -14,5 +14,5 @@ export const EVENTS_DATA = {
   hackathon: hackathonEvents,
   nonTechnical: nonTechnicalEvents,
   conference: conferenceEvents,
-  //exposAndShows: exposAndShowsEvents,
+  exposAndShows: exposAndShowsEvents,
 };

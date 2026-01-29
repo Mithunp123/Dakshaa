@@ -21,6 +21,9 @@ import harish from "../../../assets/team_members/harish.png";
 import hariprakash from "../../../assets/team_members/Hariprakash.png";
 import deekshana from "../../../assets/team_members/Deekshana.jpg";
 import deepak from "../../../assets/team_members/Deepak.png";
+import vikas from "../../../assets/team_members/vikas.png";
+import mithun from "../../../assets/team_members/mithun.jpeg";
+import giri from "../../../assets/team_members/giridharan.jpeg";
 
 
 const chiefCoordinator = [
@@ -50,11 +53,15 @@ const eventCoordinators = [
 ];
 
 const developers = [
-  //{ id: 1, name: "Giridharan M", department: "AIML", img: giri, role: "Lead Developer", associationLogo: aevaLogo },
+  { id: 2, name: "Vikas T", department: "Artificix", img: vikas, role: "Backend Developer", associationLogo: aidsasso },
+  { id: 3, name: "Mithun P", department: "Artificix", img: mithun, role: "Frontend Developer", associationLogo: aidsasso },
+  { id: 1, name: "Giridharan M", department: "AEVA", img: giri, role: "Lead Developer", associationLogo: aevaLogo },
+
 ]
 
 const designers = [
   //{ id: 7, name: "Balasaastha", department: "Department of IT", img: bala, role: "Web Designer", associationLogo: aevaLogo },
+
   ];
 
 const TechCard = ({ member, variant = "default", allowContact = false }) => {

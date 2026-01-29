@@ -19,6 +19,8 @@ import { culturalEvents, culturalDetails } from "../../data/culturalEvents";
 import { hackathonEvents, hackathonDetails } from "../../data/hackathonEvents";
 import { workshopEvents, workshopDetails } from "../../data/workshopEvents";
 import { conferenceEvents } from "../../data/conferenceEvents";
+import { exposAndShowsEvents } from "../../data/exposAndShowsEvents";
+import { exposAndShowsDetails } from "../../data/exposAndShowsDetails";
 import { supabase } from "../../supabase";
 
 const Events = () => {
@@ -34,6 +36,7 @@ const Events = () => {
   const [selectedWorkshop, setSelectedWorkshop] = useState(null);
   const [selectedTechnical, setSelectedTechnical] = useState(null);
   const [selectedNonTechnical, setSelectedNonTechnical] = useState(null);
+  const [selectedExpo, setSelectedExpo] = useState(null);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const eventsRef = useRef(null);
@@ -118,7 +121,7 @@ const Events = () => {
       id: 7,
       image: NonTechnicalImage,
       name: "Expos & shows",
-      descriptionImages: [],
+      descriptionImages: exposAndShowsEvents,
     },
   ];
 
@@ -202,6 +205,12 @@ const Events = () => {
       const workshop = workshopDetails.find(w => w.id === eventId);
       if (workshop) {
         setSelectedWorkshop(workshop);
+      }
+    } else if (eventId && eventId.startsWith("expo")) {
+      // Expos & Shows - open modal instead of navigating
+      const expo = exposAndShowsDetails.find(e => e.id === eventId);
+      if (expo) {
+        setSelectedExpo(expo);
       }
     } else if (eventId && eventId.startsWith("tech")) {
       // Check if it's a technical event - open modal instead of navigating
@@ -1804,6 +1813,146 @@ const Events = () => {
                               {student.email && (
                                 <p className="text-gray-400 text-sm break-all">✉️ {student.email}</p>
                               )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Expos & Shows Modal */}
+      {selectedExpo && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black/90 backdrop-blur-md z-[9999] p-4"
+          onClick={() => setSelectedExpo(null)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-slate-900 border-2 border-primary/50 relative max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-4 right-4 text-white/50 hover:text-white z-10 bg-slate-800/80 rounded-full p-2"
+              onClick={() => setSelectedExpo(null)}
+            >
+              <X size={24} />
+            </button>
+
+            <div className="p-6 md:p-8">
+              <div className="flex flex-col md:flex-row gap-8 mb-8">
+                <div className="w-full md:w-1/3">
+                  <img
+                    className="w-full aspect-square object-cover border-2 border-primary/30"
+                    src={selectedExpo.img}
+                    alt={selectedExpo.title}
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <h2 className="text-2xl md:text-3xl font-bold text-primary mb-2">
+                    {selectedExpo.shortTitle}
+                  </h2>
+                  <h3 className="text-lg text-gray-300 mb-4">
+                    {selectedExpo.title}
+                  </h3>
+                  <div className="h-px bg-gradient-to-r from-primary/50 to-transparent mb-6" />
+
+                  <p className="text-gray-200 text-sm leading-relaxed mb-6">
+                    {selectedExpo.description}
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <Calendar className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedExpo.date}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <MapPin className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedExpo.venue}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <Users className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedExpo.price}</span>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="inline-block px-4 py-2 bg-green-600/10 border border-green-600 text-green-300 rounded-md text-sm font-medium">
+                      Free Event — No Registration Required
+                    </div>
+                  </div>
+                </div>  
+              </div>
+
+              {selectedExpo.schedule && selectedExpo.schedule.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Schedule
+                  </h3>
+                  <div className="space-y-3">
+                    {selectedExpo.schedule.map((event, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="bg-gradient-to-r from-secondary/10 to-transparent p-4 rounded-lg"
+                      >
+                        <div className="flex flex-wrap gap-4 text-sm text-gray-300">
+                          {event.round && <div><span className="text-primary font-semibold">Session:</span> {event.round}</div>}
+                          {event.date && <div><span className="text-primary font-semibold">Date:</span> {event.date}</div>}
+                          {event.time && <div><span className="text-primary font-semibold">Time:</span> {event.time}</div>}
+                          {event.duration && <div><span className="text-primary font-semibold">Duration:</span> {event.duration}</div>}
+                          {event.location && <div><span className="text-primary font-semibold">Location:</span> {event.location}</div>}
+                          {event.venue && <div><span className="text-primary font-semibold">Venue:</span> {event.venue}</div>}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedExpo.contact && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Contact Information
+                  </h3>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {selectedExpo.contact.facultyCoordinator && selectedExpo.contact.facultyCoordinator.length > 0 && (
+                      <div>
+                        <h4 className="text-lg font-semibold text-secondary mb-3">Faculty Coordinators</h4>
+                        <div className="space-y-4">
+                          {selectedExpo.contact.facultyCoordinator.map((faculty, idx) => (
+                            <div key={idx} className="bg-primary/5 border border-primary/20 p-4">
+                              <p className="text-gray-200 font-medium mb-2">{faculty.name}</p>
+                              {faculty.designation && <p className="text-gray-400 text-sm mb-1">{faculty.designation}</p>}
+                              {faculty.phone && <p className="text-gray-400 text-sm">📞 {faculty.phone}</p>}
+                              {faculty.email && <p className="text-gray-400 text-sm break-all">✉️ {faculty.email}</p>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedExpo.contact.studentCoordinator && selectedExpo.contact.studentCoordinator.length > 0 && (
+                      <div>
+                        <h4 className="text-lg font-semibold text-secondary mb-3">Student Coordinators</h4>
+                        <div className="space-y-4">
+                          {selectedExpo.contact.studentCoordinator.map((student, idx) => (
+                            <div key={idx} className="bg-primary/5 border border-primary/20 p-4">
+                              <p className="text-gray-200 font-medium mb-2">{student.name}</p>
+                              {student.year && <p className="text-gray-400 text-sm mb-1">{student.year}</p>}
+                              {student.department && <p className="text-gray-400 text-sm mb-1">{student.department}</p>}
+                              {student.phone && <p className="text-gray-400 text-sm">📞 {student.phone}</p>}
+                              {student.email && <p className="text-gray-400 text-sm break-all">✉️ {student.email}</p>}
                             </div>
                           ))}
                         </div>

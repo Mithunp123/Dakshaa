@@ -20,7 +20,7 @@ const conferences = [
     description:
       "National Conference on Transforming Life Sciences through AI and Smart Technologies aims to provide a scholarly platform for students, researchers, and academicians to present innovative research and interdisciplinary advancements that integrate life sciences with emerging smart technologies such as Artificial Intelligence, Machine Learning, IoT, Data Analytics, Automation, and Digital Health. The conference promotes knowledge exchange, research collaboration, and dissemination of high-quality scientific work.",
     topics: [
-      "Converging Life Sciences with Smart Technologies",
+      "Transforming Life Sciences through AI and Smart Technologies",
     ],
     rules: [
       "A paper may be authored by one or two members only.",
@@ -46,7 +46,7 @@ const conferences = [
     ],
 
     date: "12 February 2026 ",
-    venue: "KSRCT Campus",
+    venue: "Dr. M S Swaminathan Biotech Seminar Hall",
     contact: {
         facultyCoordinator: [
           {

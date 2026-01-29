@@ -428,7 +428,7 @@ export const hackathonEventDetails = {
           },
           {
             name: "Mr.M.Madhukumar",
-            phone: "+91 99426 87393",
+            phone: "+91 97914 41235",
           },
         ],
       },
