@@ -183,16 +183,8 @@ const LiveStats = () => {
       const { data, error } = await supabase.rpc("get_live_category_stats");
       
       const processCategoryData = (rawData) => {
-        // Define desired categories and their DB mapping
-        const categoryMapping = {
-            'technical': 'Tech',
-            'non-technical': 'Non Tech',
-            'cultural': 'Culturals',
-            'workshop': 'Workshop',
-            'sports': 'Sports',
-            'hackathon': 'Hackathon'
-        };
-
+        console.log("Raw category data from RPC:", rawData);
+        
         // Initialize counts for required categories
         const finalStats = [
             { category: 'Workshop', count: 0, dbKey: 'workshop' },
@@ -203,19 +195,35 @@ const LiveStats = () => {
             { category: 'Hackathon', count: 0, dbKey: 'hackathon' }
         ];
 
-        // Map DB data to our structure
+        // Map DB data to our structure with flexible matching
         if (rawData && Array.isArray(rawData)) {
             rawData.forEach(item => {
-                // Find matching category in our final stats
-                const targetStat = finalStats.find(stat => stat.dbKey === (item.category || '').toLowerCase());
-                if (targetStat) {
-                    targetStat.count = item.count;
-                } else if (item.category) {
-                   // Optional: Add other categories found in DB but not in list?
-                   // For now, sticking to the requested list strictly as per user instructions
+                const category = (item.category || '').toLowerCase();
+                const count = item.count || 0;
+                
+                console.log(`Processing category: "${category}" with count: ${count}`);
+                
+                // Flexible category matching
+                if (category.includes('workshop') || category === 'workshops') {
+                    finalStats[0].count += count;
+                    console.log(`Added ${count} to Workshop, total now: ${finalStats[0].count}`);
+                } else if (category.includes('non-technical') || category === 'non-tech' || category === 'nontech') {
+                    finalStats[1].count += count;
+                } else if (category === 'technical' || (category.includes('tech') && !category.includes('non'))) {
+                    finalStats[2].count += count;
+                } else if (category.includes('cultural') || category === 'culturals') {
+                    finalStats[3].count += count;
+                } else if (category.includes('sport') || category === 'sports') {
+                    finalStats[4].count += count;
+                } else if (category.includes('hackathon') || category === 'hack') {
+                    finalStats[5].count += count;
+                } else {
+                    console.log(`Unmatched category: "${category}"`);
                 }
             });
         }
+        
+        console.log("Processed category stats:", finalStats);
         return finalStats;
       };
 
@@ -274,8 +282,11 @@ const LiveStats = () => {
          validRegs = paidRegs || [];
       }
 
-      // 4. Aggregate
+      // 4. Aggregate with debugging
       const counts = {};
+      console.log("Event category map:", eventCategoryMap);
+      console.log("Valid registrations count:", validRegs.length);
+      
       validRegs.forEach(reg => {
          const category = eventCategoryMap[reg.event_id]; // reg.event_id is uuid
          if (category) {
@@ -284,15 +295,26 @@ const LiveStats = () => {
          }
       });
       
-      // Construct final formatted array
+      console.log("Raw category counts:", counts);
+      
+      // Construct final formatted array with flexible matching
+      const workshopCount = (counts['workshop'] || 0) + (counts['workshops'] || 0);
+      const nonTechCount = (counts['non-technical'] || 0) + (counts['non-tech'] || 0) + (counts['nontech'] || 0);
+      const techCount = counts['technical'] || 0;
+      const culturalCount = (counts['cultural'] || 0) + (counts['culturals'] || 0);
+      const sportsCount = (counts['sports'] || 0) + (counts['sport'] || 0);
+      const hackathonCount = (counts['hackathon'] || 0) + (counts['hack'] || 0);
+      
        const finalStats = [
-            { category: 'Workshop', count: counts['workshop'] || 0 },
-            { category: 'Non Tech', count: counts['non-technical'] || 0 },
-            { category: 'Tech', count: counts['technical'] || 0 },
-            { category: 'Culturals', count: counts['cultural'] || 0 },
-            { category: 'Sports', count: counts['sports'] || 0 },
-            { category: 'Hackathon', count: counts['hackathon'] || 0 }
+            { category: 'Workshop', count: workshopCount },
+            { category: 'Non Tech', count: nonTechCount },
+            { category: 'Tech', count: techCount },
+            { category: 'Culturals', count: culturalCount },
+            { category: 'Sports', count: sportsCount },
+            { category: 'Hackathon', count: hackathonCount }
         ];
+        
+      console.log("Final fallback category stats:", finalStats);
 
       setCategoryStats(finalStats);
       
