@@ -498,13 +498,6 @@ const MyTeams = () => {
           <h2 className="text-xl font-bold">Team Management</h2>
           <p className="text-gray-400 text-xs">Manage your teams or join existing ones</p>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-secondary hover:bg-secondary-dark text-white font-bold rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(249,115,22,0.3)] text-sm"
-        >
-          <UserPlus size={18} />
-          Create New Team
-        </button>
       </div>
 
       {/* Tab Navigation */}
