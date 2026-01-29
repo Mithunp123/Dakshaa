@@ -183,8 +183,6 @@ const LiveStats = () => {
       const { data, error } = await supabase.rpc("get_live_category_stats");
       
       const processCategoryData = (rawData) => {
-        console.log("Raw category data from RPC:", rawData);
-        
         // Initialize counts for required categories
         const finalStats = [
             { category: 'Workshop', count: 0, dbKey: 'workshop' },
@@ -195,19 +193,16 @@ const LiveStats = () => {
             { category: 'Hackathon', count: 0, dbKey: 'hackathon' }
         ];
 
-        // Map DB data to our structure with flexible matching
+        // Map DB data to our structure with case-insensitive matching
         if (rawData && Array.isArray(rawData)) {
             rawData.forEach(item => {
-                const category = (item.category || '').toLowerCase();
+                const category = (item.category || '').toLowerCase().trim();
                 const count = item.count || 0;
                 
-                console.log(`Processing category: "${category}" with count: ${count}`);
-                
-                // Flexible category matching
+                // Case-insensitive category matching
                 if (category.includes('workshop') || category === 'workshops') {
                     finalStats[0].count += count;
-                    console.log(`Added ${count} to Workshop, total now: ${finalStats[0].count}`);
-                } else if (category.includes('non-technical') || category === 'non-tech' || category === 'nontech') {
+                } else if (category.includes('non-technical') || category === 'non-tech' || category === 'nontech' || category === 'non tech') {
                     finalStats[1].count += count;
                 } else if (category === 'technical' || (category.includes('tech') && !category.includes('non'))) {
                     finalStats[2].count += count;
@@ -217,20 +212,16 @@ const LiveStats = () => {
                     finalStats[4].count += count;
                 } else if (category.includes('hackathon') || category === 'hack') {
                     finalStats[5].count += count;
-                } else {
-                    console.log(`Unmatched category: "${category}"`);
                 }
             });
         }
         
-        console.log("Processed category stats:", finalStats);
         return finalStats;
       };
 
       if (!error && data) {
         setCategoryStats(processCategoryData(data));
       } else {
-        console.warn("RPC fetch failed, attempting client-side fallback...", error);
         await fetchCategoryStatsFallback();
       }
     } catch (error) {
@@ -282,24 +273,20 @@ const LiveStats = () => {
          validRegs = paidRegs || [];
       }
 
-      // 4. Aggregate with debugging
+      // 4. Aggregate counts
       const counts = {};
-      console.log("Event category map:", eventCategoryMap);
-      console.log("Valid registrations count:", validRegs.length);
       
       validRegs.forEach(reg => {
-         const category = eventCategoryMap[reg.event_id]; // reg.event_id is uuid
+         const category = eventCategoryMap[reg.event_id];
          if (category) {
-            const normalized = category.toLowerCase();
+            const normalized = category.toLowerCase().trim();
             counts[normalized] = (counts[normalized] || 0) + 1;
          }
       });
       
-      console.log("Raw category counts:", counts);
-      
-      // Construct final formatted array with flexible matching
+      // Construct final formatted array with case-insensitive matching
       const workshopCount = (counts['workshop'] || 0) + (counts['workshops'] || 0);
-      const nonTechCount = (counts['non-technical'] || 0) + (counts['non-tech'] || 0) + (counts['nontech'] || 0);
+      const nonTechCount = (counts['non-technical'] || 0) + (counts['non-tech'] || 0) + (counts['nontech'] || 0) + (counts['non tech'] || 0);
       const techCount = counts['technical'] || 0;
       const culturalCount = (counts['cultural'] || 0) + (counts['culturals'] || 0);
       const sportsCount = (counts['sports'] || 0) + (counts['sport'] || 0);
@@ -313,8 +300,6 @@ const LiveStats = () => {
             { category: 'Sports', count: sportsCount },
             { category: 'Hackathon', count: hackathonCount }
         ];
-        
-      console.log("Final fallback category stats:", finalStats);
 
       setCategoryStats(finalStats);
       
@@ -427,10 +412,24 @@ const LiveStats = () => {
            if (meta) {
                // Update Category
                if (meta.category) {
-                   const catKey = meta.category.toLowerCase();
-                   setCategoryStats(prev => prev.map(c => 
-                       c.dbKey === catKey ? { ...c, count: c.count + 1 } : c
-                   ));
+                   const catKey = meta.category.toLowerCase().trim();
+                   setCategoryStats(prev => prev.map(c => {
+                       // Check if this category matches any of our tracked categories
+                       if ((catKey.includes('workshop') || catKey === 'workshops') && c.category === 'Workshop') {
+                           return { ...c, count: c.count + 1 };
+                       } else if ((catKey.includes('non-technical') || catKey === 'non-tech' || catKey === 'nontech' || catKey === 'non tech') && c.category === 'Non Tech') {
+                           return { ...c, count: c.count + 1 };
+                       } else if ((catKey === 'technical' || (catKey.includes('tech') && !catKey.includes('non'))) && c.category === 'Tech') {
+                           return { ...c, count: c.count + 1 };
+                       } else if ((catKey.includes('cultural') || catKey === 'culturals') && c.category === 'Culturals') {
+                           return { ...c, count: c.count + 1 };
+                       } else if ((catKey.includes('sport') || catKey === 'sports') && c.category === 'Sports') {
+                           return { ...c, count: c.count + 1 };
+                       } else if ((catKey.includes('hackathon') || catKey === 'hack') && c.category === 'Hackathon') {
+                           return { ...c, count: c.count + 1 };
+                       }
+                       return c;
+                   }));
                }
                
                // Update Dept
