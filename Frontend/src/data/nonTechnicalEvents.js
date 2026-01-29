@@ -41,7 +41,7 @@ import nontech21 from "../assets/EventsImages/EventDetails/Nontech/turf_csbs.png
   nontech-mct: MIND SPARK
   nontech-mct1: TECH WITHOUT TECH
   nontech-mech:FREEZEFRAME
-  nontect-txt: T2T-Trash 2 Textile
+  nontech-txt: T2T-Trash 2 Textile
   nontech-vlsi: BlindBites: Taste it. Find it
   nontech-csbs: TURF WARS
 */
@@ -138,7 +138,7 @@ export const nonTechnicalEvents = [
   },
   {
     image: nontech19,
-    eventId: "nontect-txt",
+    eventId: "nontech-txt",
     price: 100,
   },
   {

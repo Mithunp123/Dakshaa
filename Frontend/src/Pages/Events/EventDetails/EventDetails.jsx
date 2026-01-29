@@ -259,7 +259,7 @@ const EventDetails = () => {
 'nontech-mct': 'non-technical-event-16',
 'nontech-mct1': 'non-technical-event-17',
 'nontech-mech': 'non-technical-event-18',
-'nontect-txt': 'non-technical-event-19',
+'nontech-txt': 'non-technical-event-19',
 'nontech-vlsi': 'non-technical-event-20',
 'nontech-csbs1':'non-technical-event-21',
 

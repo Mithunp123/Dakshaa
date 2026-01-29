@@ -1162,7 +1162,7 @@ export const nonTechnicalDetails = [
     registrationLink: " ",
   },
   {
-    id: "nontect-txt",
+    id: "nontech-txt",
     shortTitle: "T2T – Trash 2 Textile",
     title: "T2T – Trash 2 Textile",
     department: "Non-Technical Events",
