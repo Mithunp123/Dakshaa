@@ -21,7 +21,7 @@ import harish from "../../../assets/team_members/harish.png";
 import hariprakash from "../../../assets/team_members/Hariprakash.png";
 import deekshana from "../../../assets/team_members/Deekshana.jpg";
 import deepak from "../../../assets/team_members/Deepak.png";
-import vikas from "../../../assets/team_members/vikas.png";
+import vikas from "../../../assets/team_members/Vikas.png";
 import mithun from "../../../assets/team_members/mithun.jpeg";
 import giri from "../../../assets/team_members/giridharan.jpeg";
 
