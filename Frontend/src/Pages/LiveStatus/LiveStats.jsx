@@ -11,7 +11,7 @@ const getDeptFromId = (rawId) => {
     const eid = rawId.toLowerCase();
     
     // Order matters - specific to general
-    if (eid.includes("cse-aiml")) return "CSE-AIML";
+    if (eid.includes("cse-aiml")) return "AIML";
     if (eid.includes("aiml")) return "AIML";
     if (eid.includes("ai-ds") || eid.includes("aids")) return "AI-DS";
     if (eid.includes("csbs")) return "CSBS";
@@ -97,7 +97,24 @@ const LiveStats = () => {
      try {
        const { data, error } = await supabase.rpc("get_live_dept_stats");
        if (!error && data) {
-         setDeptStats(data);
+         // Post-processing to merge CSE-AIML into AIML
+         const mergedMap = {};
+         
+         data.forEach(item => {
+             let deptName = item.dept;
+             // Normalize variants
+             if (deptName === 'CSE-AIML' || deptName === 'Aiml') {
+                 deptName = 'AIML';
+             }
+             
+             mergedMap[deptName] = (mergedMap[deptName] || 0) + item.count;
+         });
+
+         const processedData = Object.keys(mergedMap)
+            .map(key => ({ dept: key, count: mergedMap[key] }))
+            .sort((a, b) => b.count - a.count);
+
+         setDeptStats(processedData);
        } else {
          console.warn("RPC dept stats fetch failed, attempting client-side fallback...", error);
          await fetchDeptStatsFallback();
@@ -172,7 +189,8 @@ const LiveStats = () => {
             'non-technical': 'Non Tech',
             'cultural': 'Culturals',
             'workshop': 'Workshop',
-            'sports': 'Sports'
+            'sports': 'Sports',
+            'hackathon': 'Hackathon'
         };
 
         // Initialize counts for required categories
@@ -181,7 +199,8 @@ const LiveStats = () => {
             { category: 'Non Tech', count: 0, dbKey: 'non-technical' },
             { category: 'Tech', count: 0, dbKey: 'technical' },
             { category: 'Culturals', count: 0, dbKey: 'cultural' },
-            { category: 'Sports', count: 0, dbKey: 'sports' }
+            { category: 'Sports', count: 0, dbKey: 'sports' },
+            { category: 'Hackathon', count: 0, dbKey: 'hackathon' }
         ];
 
         // Map DB data to our structure
@@ -271,7 +290,8 @@ const LiveStats = () => {
             { category: 'Non Tech', count: counts['non-technical'] || 0 },
             { category: 'Tech', count: counts['technical'] || 0 },
             { category: 'Culturals', count: counts['cultural'] || 0 },
-            { category: 'Sports', count: counts['sports'] || 0 }
+            { category: 'Sports', count: counts['sports'] || 0 },
+            { category: 'Hackathon', count: counts['hackathon'] || 0 }
         ];
 
       setCategoryStats(finalStats);
@@ -365,8 +385,11 @@ const LiveStats = () => {
         table: 'event_registrations_config' 
       },
       (payload) => {
-        // Only count if status is PAID
-        if (payload.new && payload.new.payment_status === 'PAID') {
+        const oldStatus = payload.old?.payment_status;
+        const newStatus = payload.new?.payment_status;
+
+        // Only count if status transitions to PAID (or is new and PAID)
+        if (oldStatus !== 'PAID' && newStatus === 'PAID') {
            // Optimistic update
            console.log("Realtime registration detected", payload);
            
@@ -605,7 +628,7 @@ const LiveStats = () => {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="grid grid-cols-5 gap-4 shrink-0"
+                    className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 shrink-0"
                 >
                     {categoryStats.map((stat, index) => (
                     <motion.div 
