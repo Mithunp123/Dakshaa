@@ -106,18 +106,18 @@ function About() {
                 Dakshaa T26
               </p>
               <p className="text-sky-400 font-poppins leading-5 sm:leading-7 mt-10 sm:mt-14 md:mt-16 text-justify text-xs sm:text-base md:text-lg pb-4 sm:pb-8 md:pb-10">
-                DaKshaa T26 is a premier National Level Techno-Cultural Fest
+                Dakshaa T26 is a premier National Level Techno-Cultural Fest
                 that brings together innovation, creativity, and talent under
                 one grand stage. Designed to foster technical excellence and
                 artistic expression, this fest serves as a vibrant platform for
                 students and professionals across the country to showcase their
                 skills, exchange ideas, and compete at the highest level. With a
-                perfect blend of technology, culture, and entertainment, DaKshaa
+                perfect blend of technology, culture, and entertainment, Dakshaa
                 T26 features an array of events, including technical challenges,
                 hackathons, workshops, cultural performances, and interactive
                 sessions with industry experts. Whether you're a tech enthusiast
                 eager to dive into the latest advancements or an artist looking
-                to mesmerize the audience, DaKshaa T26 has something for
+                to mesmerize the audience, Dakshaa T26 has something for
                 everyone. Join us as we celebrate innovation, embrace
                 creativity, and redefine excellence at one of the most awaited
                 techno-cultural festivals in the country!
@@ -137,18 +137,18 @@ function About() {
                 Dakshaa T26
               </p>
               <p className="text-sky-400 font-poppins leading-6 mt-16 text-justify pb-6">
-                DaKshaa T26 is a premier National Level Techno-Cultural Fest
+                Dakshaa T26 is a premier National Level Techno-Cultural Fest
                 that brings together innovation, creativity, and talent under
                 one grand stage. Designed to foster technical excellence and
                 artistic expression, this fest serves as a vibrant platform for
                 students and professionals across the country to showcase their
                 skills, exchange ideas, and compete at the highest level. With a
-                perfect blend of technology, culture, and entertainment, DaKshaa
+                perfect blend of technology, culture, and entertainment, Dakshaa
                 T26 features an array of events, including technical challenges,
                 hackathons, workshops, cultural performances, and interactive
                 sessions with industry experts. Whether you're a tech enthusiast
                 eager to dive into the latest advancements or an artist looking
-                to mesmerize the audience, DaKshaa T26 has something for
+                to mesmerize the audience, Dakshaa T26 has something for
                 everyone. Join us as we celebrate innovation, embrace
                 creativity, and redefine excellence at one of the most awaited
                 techno-cultural festivals in the country!
@@ -183,7 +183,7 @@ function About() {
                 <p className="text-sky-400 font-poppins leading-5 sm:leading-7 mt-10 sm:mt-14 md:mt-16 text-justify text-xs sm:text-base md:text-lg pb-4 sm:pb-8 md:pb-10">
                   StartupTN, in collaboration with K.S. Rangasamy College of
                   Technology, proudly presents the Idea Elevator Pitching
-                  Contest as part of DaKshaa T26. This prestigious event serves
+                  Contest as part of Dakshaa T26. This prestigious event serves
                   as a dynamic platform for aspiring students to showcase their
                   groundbreaking ideas in a fast-paced and impactful setting. As
                   a parallel session of the Global Startup Meet, the contest
@@ -218,7 +218,7 @@ function About() {
               <p className="text-sky-400 font-poppins leading-6 mt-16 text-justify pb-6">
                 StartupTN, in collaboration with K.S. Rangasamy College of
                 Technology, proudly presents the Idea Elevator Pitching Contest
-                as part of DaKshaa T26. This prestigious event serves as a
+                as part of Dakshaa T26. This prestigious event serves as a
                 dynamic platform for aspiring students to showcase their
                 groundbreaking ideas in a fast-paced and impactful setting. As a
                 parallel session of the Global Startup Meet, the contest brings

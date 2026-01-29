@@ -214,9 +214,9 @@ const AboutCard = ({ image, title, description, isReversed = false }) => {
 const StatsBar = () => {
   const stats = [
     { label: "Years of Excellence", value: "30+" },
-    { label: "Students", value: "8000+" },
-    { label: "Programs", value: "37" },
-    { label: "NIRF Ranking", value: "99" },
+    { label: "Students", value: "4000+" },
+    { label: "Programs", value: "21" },
+    { label: "Acers", value: "400+" },
   ];
 
   return (
@@ -260,7 +260,7 @@ const StatsBar = () => {
 function UltraAbout() {
   const ksrctDescription = `K.S.Rangasamy College of Technology (KSRCT) was started in 1994. Located near Tiruchengode, Tamil Nadu, it offers quality technical education with 14 U.G., 11 P.G. and 12 Ph.D. programs. Approved by AICTE and affiliated with Anna University, Chennai, KSRCT has Autonomous status from UGC. It ranked 99th in NIRF 2017 and 51-100 band in NIRF Innovation Ranking 2023 for Engineering. Accredited with NAAC A++ grade and NBA Tier 1 departments, it features modern infrastructure including AICTE-IDEA Lab, ATAL Community Innovation Centre, and MSME incubation centre. With NTTM funding of 6.5 crore rupees, it fosters cutting-edge research and collaborates with DST, DBT, DAE, CSIR, DRDO, and ISRO.`;
 
-  const dakshaaDescription = `DaKshaa T26 is a premier National Level Techno-Cultural Fest that brings together innovation, creativity, and talent under one grand stage. Designed to foster technical excellence and artistic expression, this fest serves as a vibrant platform for students and professionals across the country to showcase their skills, exchange ideas, and compete at the highest level. With a perfect blend of technology, culture, and entertainment, DaKshaa T26 features an array of events, including technical challenges, hackathons, workshops, cultural performances, and interactive sessions with industry experts. Whether you're a tech enthusiast eager to dive into the latest advancements or an artist looking to mesmerize the audience, DaKshaa T26 has something for everyone.`;
+  const dakshaaDescription = `Dakshaa T26 is a premier National Level Techno-Cultural Fest that brings together innovation, creativity, and talent under one grand stage. Designed to foster technical excellence and artistic expression, this fest serves as a vibrant platform for students and professionals across the country to showcase their skills, exchange ideas, and compete at the highest level. With a perfect blend of technology, culture, and entertainment, Dakshaa T26 features an array of events, including technical challenges, hackathons, workshops, cultural performances, and interactive sessions with industry experts. Whether you're a tech enthusiast eager to dive into the latest advancements or an artist looking to mesmerize the audience, Dakshaa T26 has something for everyone.`;
 
   return (
     <section className="relative w-full py-20 px-4 sm:px-8 lg:px-20 overflow-hidden bg-transparent">
@@ -290,7 +290,7 @@ function UltraAbout() {
         {/* Dakshaa Card */}
         <AboutCard
           image={logo}
-          title="DaKshaa T26"
+          title="Dakshaa T26"
           description={dakshaaDescription}
           isReversed
         />
