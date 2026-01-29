@@ -933,6 +933,20 @@ export const technicalDetails = [
       "The attendance is mandatory for all session to getting certificate",
       "Winner team will be awarded with prize amount",
     ],
+
+    topics: [
+      {
+        title: "TOPICS:",
+        description: [
+          "IoT (Internet of Things)",
+          "AI (Artificial Intelligence)",
+          "Embedded Systems",
+          "E-Vehicle and Autonomous Vehicle",
+          "VLSI (Very Large Scale Integration)",
+          "3D Printing",
+        ],
+      },
+    ], 
     schedule: [
       {
        
