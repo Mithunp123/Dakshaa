@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Users, Loader2, CheckCircle2, AlertCircle, CreditCard } from 'lucide-react';
 import { supabase } from '../../../supabase';
-import { createTeam } from '../../../services/teamService';
-import paymentService from '../../../services/paymentService'; // Import payment service
+import paymentService from '../../../services/paymentService'; // Payment service handles team creation now
 
 const CreateTeamModal = ({ isOpen, onClose, onTeamCreated, preSelectedEventId, preSelectedEventName }) => {
   const [formData, setFormData] = useState({

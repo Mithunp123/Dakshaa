@@ -516,6 +516,12 @@ export const getTeamMembers = async (teamId, eventId = null) => {
 
 export const createTeam = async (teamData) => {
   try {
+    // DEPRECATED: Direct team creation is no longer allowed
+    // Teams must be created through payment flow to ensure proper activation
+    console.error("❌ DEPRECATED: Direct createTeam is no longer allowed. Use paymentService.initiateTeamPayment instead");
+    throw new Error("Team creation requires payment. Please use the payment flow instead.");
+    
+    /* OLD IMPLEMENTATION - COMMENTED OUT TO PREVENT BYPASS
     // Debug: Check session
     const { data: { session } } = await supabase.auth.getSession();
     console.log('🔍 Session check:', session ? '✅ Active' : '❌ Missing');
@@ -559,7 +565,7 @@ export const createTeam = async (teamData) => {
         leader_id: user.id,
         created_by: user.id,
         max_members: maxMembers || 4,
-        is_active: true
+        is_active: true  // This was the problem - bypassing payment
       })
       .select()
       .single();
@@ -583,6 +589,7 @@ export const createTeam = async (teamData) => {
       data: team,
       error: null
     };
+    */
   } catch (error) {
     console.error("Error creating team:", error);
     return {

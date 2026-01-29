@@ -212,7 +212,7 @@ export const supabaseService = {
   async getUserTeams(userId) {
     try {
       // APPROACH 1: Get teams where user is leader/creator (avoids RLS recursion on team_members)
-      // Show ALL teams where user is leader (even inactive ones) so they can manage/add members
+      // For owned teams, show active ones in main list but keep inactive for management
       const { data: ownedTeams, error: ownedError } = await supabase
         .from("teams")
         .select("*")
@@ -267,6 +267,12 @@ export const supabaseService = {
       }
       
       console.log("Teams before filter:", teams.map(t => ({ id: t.id, name: t.team_name, is_active: t.is_active })));
+
+      // Filter teams: Only show active teams in dashboard
+      // This prevents teams created during payment (but payment not completed) from showing
+      teams = teams.filter(team => team.is_active === true);
+      
+      console.log("Teams after is_active filter:", teams.map(t => ({ id: t.id, name: t.team_name, is_active: t.is_active })));
 
       if (!teams || teams.length === 0) {
         return [];
