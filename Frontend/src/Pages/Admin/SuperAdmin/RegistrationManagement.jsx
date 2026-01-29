@@ -25,7 +25,11 @@ import {
 } from "lucide-react";
 import { supabase } from "../../../supabase";
 import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import EventDetailsWithTeams from '../../../Components/Registration/EventDetailsWithTeams';
+import logo1 from '../../../assets/logo1.png';
+import ksrctLogo from '../../../assets/ksrct.png';
 
 const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) => {
   const [eventStats, setEventStats] = useState([]);
@@ -35,6 +39,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [downloadingReport, setDownloadingReport] = useState(false);
   
   // New states for registration counts
   const [registrationCounts, setRegistrationCounts] = useState({
@@ -204,6 +209,285 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
     );
     
     setAvailableTargetEvents(compatibleEvents);
+  };
+
+  // Generate PDF Report for selected event
+  const generateRegistrationReport = async () => {
+    if (!selectedEvent) return;
+
+    setDownloadingReport(true);
+    try {
+      // Fetch detailed registrations for the selected event
+      let registrations = [];
+      
+      // Check if it's a team event based on event name/category
+      const teamEventKeywords = ['paper presentation', 'team', 'group', 'mct'];
+      const eventName = selectedEvent?.name?.toLowerCase() || '';
+      const isTeamEvent = teamEventKeywords.some(keyword => eventName.includes(keyword));
+
+      if (isTeamEvent) {
+        // For team events, fetch team data
+        const { data: teamData, error: teamError } = await supabase
+          .from('teams')
+          .select('*')
+          .eq('event_id', selectedEvent.id);
+
+        if (teamError) throw teamError;
+
+        // Get all team IDs and leader IDs
+        const teamIds = teamData?.map(team => team.id) || [];
+        const leaderIds = teamData?.map(team => team.leader_id).filter(Boolean) || [];
+        
+        // Fetch team members for all teams
+        const { data: teamMembers } = await supabase
+          .from('team_members')
+          .select('user_id, team_id')
+          .in('team_id', teamIds);
+        
+        // Get all unique user IDs (leaders + members)
+        const memberIds = teamMembers?.map(member => member.user_id) || [];
+        const allUserIds = [...new Set([...leaderIds, ...memberIds])];
+
+        // Fetch user profiles for all participants
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, email, mobile_number, college_name, department, roll_number')
+          .in('id', allUserIds);
+
+        const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+        const teamMemberMap = new Map();
+        
+        // Create team member mapping
+        teamMembers?.forEach(member => {
+          if (!teamMemberMap.has(member.team_id)) {
+            teamMemberMap.set(member.team_id, []);
+          }
+          teamMemberMap.get(member.team_id).push(member.user_id);
+        });
+
+        // Convert team data to individual participant format
+        registrations = [];
+        teamData?.forEach((team, teamIndex) => {
+          // Add team leader
+          if (team.leader_id) {
+            const leaderProfile = profileMap.get(team.leader_id);
+            if (leaderProfile) {
+              registrations.push({
+                sno: registrations.length + 1,
+                name: leaderProfile.full_name || 'N/A',
+                email: leaderProfile.email || 'N/A',
+                mobile: leaderProfile.mobile_number || 'N/A',
+                college: leaderProfile.college_name || 'N/A',
+                department: leaderProfile.department || 'N/A',
+                rollNumber: leaderProfile.roll_number || 'N/A',
+                teamName: team.team_name || `Team ${teamIndex + 1}`,
+                role: 'Leader',
+                signature: ''
+              });
+            }
+          }
+          
+          // Add team members (excluding leader to avoid duplication)
+          const teamMemberIds = teamMemberMap.get(team.id) || [];
+          teamMemberIds.forEach(memberId => {
+            if (memberId !== team.leader_id) { // Don't duplicate leader
+              const memberProfile = profileMap.get(memberId);
+              if (memberProfile) {
+                registrations.push({
+                  sno: registrations.length + 1,
+                  name: memberProfile.full_name || 'N/A',
+                  email: memberProfile.email || 'N/A',
+                  mobile: memberProfile.mobile_number || 'N/A',
+                  college: memberProfile.college_name || 'N/A',
+                  department: memberProfile.department || 'N/A',
+                  rollNumber: memberProfile.roll_number || 'N/A',
+                  teamName: team.team_name || `Team ${teamIndex + 1}`,
+                  role: 'Member',
+                  signature: ''
+                });
+              }
+            }
+          });
+        });
+      } else {
+        // For individual events, fetch individual registrations
+        const { data: individualRegs, error: regError } = await supabase
+          .from('event_registrations_config')
+          .select(`
+            *,
+            profiles(
+              full_name, email, mobile_number, college_name, department, roll_number
+            )
+          `)
+          .eq('event_id', selectedEvent.id)
+          .eq('payment_status', 'PAID');
+
+        if (regError) throw regError;
+
+        registrations = individualRegs?.map((reg, index) => ({
+          sno: index + 1,
+          name: reg.profiles?.full_name || reg.participant_name || 'N/A',
+          email: reg.profiles?.email || reg.participant_email || 'N/A',
+          mobile: reg.profiles?.mobile_number || 'N/A',
+          college: reg.profiles?.college_name || 'N/A',
+          department: reg.profiles?.department || 'N/A',
+          rollNumber: reg.profiles?.roll_number || 'N/A',
+          teamName: '',
+          role: 'Individual',
+          signature: ''
+        })) || [];
+      }
+
+      // Generate PDF using jsPDF
+      const doc = new jsPDF('landscape', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      
+      // Load logos as base64 with high quality
+      const loadImageAsBase64 = (url) => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'Anonymous';
+          img.onload = () => {
+            const scale = 4;
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+            ctx.scale(scale, scale);
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+            resolve({
+              data: canvas.toDataURL('image/png', 1.0),
+              width: img.width,
+              height: img.height
+            });
+          };
+          img.onerror = () => resolve(null);
+          img.src = url;
+        });
+      };
+
+      // Load logos
+      const dakshaaLogoData = await loadImageAsBase64(logo1);
+      const ksrctLogoData = await loadImageAsBase64(ksrctLogo);
+
+      // Header vertical center baseline
+      const headerY = 22;
+      
+      // KSRCT logo (left)
+      if (ksrctLogoData) {
+        const logoHeight = 30;
+        const aspectRatio = ksrctLogoData.width / ksrctLogoData.height;
+        const logoWidth = logoHeight * aspectRatio;
+        doc.addImage(ksrctLogoData.data, 'PNG', 32, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+      }
+      
+      // Dakshaa logo (right)
+      if (dakshaaLogoData) {
+        const logoHeight = 30;
+        const aspectRatio = dakshaaLogoData.width / dakshaaLogoData.height;
+        const logoWidth = logoHeight * aspectRatio;
+        doc.addImage(dakshaaLogoData.data, 'PNG', pageWidth - logoWidth - 10, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+      }
+      
+      // Header text block (centered)
+      doc.setFontSize(18);
+      doc.setTextColor(26, 54, 93);
+      doc.setFont('helvetica', 'bold');
+      doc.text('K.S.Rangasamy College of Technology', pageWidth / 2, headerY - 4, { align: 'center' });
+      doc.setFontSize(11);
+      doc.setTextColor(230, 126, 34);
+      doc.text('AUTONOMOUS | TIRUCHENGODE', pageWidth / 2, headerY + 2, { align: 'center' });
+      doc.setFontSize(14);
+      doc.setTextColor(197, 48, 48);
+      doc.text(selectedEvent.name, pageWidth / 2, headerY + 10, { align: 'center' });
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Registration Report - ${new Date().toLocaleDateString()}`, pageWidth / 2, headerY + 16, { align: 'center' });
+
+      // Prepare table columns based on event type
+      let columns, tableData;
+      
+      if (isTeamEvent) {
+        columns = ['S.No', 'Name', 'Roll Number', 'Department', 'College', 'Team', 'Role', 'Mobile', 'Signature'];
+        tableData = registrations.map(row => [
+          row.sno,
+          row.name,
+          row.rollNumber,
+          row.department,
+          row.college,
+          row.teamName,
+          row.role,
+          row.mobile,
+          ''
+        ]);
+      } else {
+        columns = ['S.No', 'Name', 'Roll Number', 'Department', 'College', 'Mobile', 'Signature'];
+        tableData = registrations.map(row => [
+          row.sno,
+          row.name,
+          row.rollNumber,
+          row.department,
+          row.college,
+          row.mobile,
+          ''
+        ]);
+      }
+
+      // Add table using autoTable
+      autoTable(doc, {
+        startY: headerY + 22,
+        head: [columns],
+        body: tableData,
+        theme: 'grid',
+        headStyles: {
+          fillColor: [240, 240, 240],
+          textColor: [0, 0, 0],
+          fontStyle: 'bold',
+          fontSize: 10,
+          halign: 'center',
+        },
+        bodyStyles: {
+          fontSize: 9,
+          textColor: [0, 0, 0],
+          valign: 'middle',
+        },
+        columnStyles: isTeamEvent ? {
+          0: { cellWidth: 16, halign: 'center' }, // S.No
+          1: { cellWidth: 40 }, // Name
+          2: { cellWidth: 32 }, // Roll Number
+          3: { cellWidth: 32 }, // Department
+          4: { cellWidth: 50 }, // College
+          5: { cellWidth: 32 }, // Team
+          6: { cellWidth: 20, halign: 'center' }, // Role
+          7: { cellWidth: 28 }, // Mobile
+          8: { cellWidth: 32 }, // Signature
+        } : {
+          0: { cellWidth: 16, halign: 'center' }, // S.No
+          1: { cellWidth: 44 }, // Name
+          2: { cellWidth: 38 }, // Roll Number
+          3: { cellWidth: 38 }, // Department
+          4: { cellWidth: 60 }, // College
+          5: { cellWidth: 32 }, // Mobile
+          6: { cellWidth: 32 }, // Signature
+        },
+        margin: { left: 14, right: 14 },
+        tableWidth: 'auto',
+        styles: {
+          overflow: 'linebreak',
+        },
+      });
+
+      // Download the PDF
+      const fileName = `${selectedEvent.name.replace(/[^a-zA-Z0-9]/g, '_')}_Registration_Report.pdf`;
+      doc.save(fileName);
+      
+    } catch (error) {
+      console.error('Error generating report:', error);
+      alert('Failed to generate report: ' + error.message);
+    } finally {
+      setDownloadingReport(false);
+    }
   };
 
   const executeTransfer = async () => {
@@ -987,9 +1271,25 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
               <span className="text-gray-400">Event Key: {selectedEvent.event_key || selectedEvent.event_id || '-'}</span>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-4xl font-bold text-secondary">{selectedEvent.totalRegistrations}</p>
-            <p className="text-gray-400">Total Registrations</p>
+          <div className="flex flex-col items-end gap-3">
+            <div className="text-right">
+              <p className="text-4xl font-bold text-secondary">{selectedEvent.totalRegistrations}</p>
+              <p className="text-gray-400">Total Registrations</p>
+            </div>
+            <button
+              onClick={generateRegistrationReport}
+              disabled={downloadingReport || selectedEvent.totalRegistrations === 0}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-secondary/20 to-primary/20 border border-secondary/30 rounded-xl hover:from-secondary/30 hover:to-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {downloadingReport ? (
+                <Loader2 className="animate-spin" size={16} />
+              ) : (
+                <Download size={16} />
+              )}
+              <span className="text-sm font-medium">
+                {downloadingReport ? 'Generating...' : 'Download Report'}
+              </span>
+            </button>
           </div>
         </div>
 
