@@ -47,7 +47,7 @@ export const hackathonEventDetails = {
         },
       ], */
       rules: [
-        "Each team shall consist of three (3) to four (4) members.",
+        "Each team shall consist of two (2) to three (3) members.",
         "NeuroHack 2.O is a continuous 36-hour hackathon with no breaks in development time.",
         "A total of two (2) evaluation rounds will be conducted during the hackathon period.",
         "Participants must bring their own laptops, peripherals, and required accessories.",

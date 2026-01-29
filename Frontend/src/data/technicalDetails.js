@@ -113,13 +113,13 @@ export const technicalDetails = [
           "Participants must analyze the system and justify their proposed solution within the allotted time as per the One-Minute Justification Rule",
         ],
       },
-      { title:" Round-3 - Additional Features",
+      { title:" Additional Features",
       description: [
         "Participants are encouraged to apply heuristic principles and system-thinking approaches to arrive at effective solutions.",
       ],
       },
       {
-        title:"Round-4 - Plagiarism and Fair Conduct",
+        title:"Plagiarism and Fair Conduct",
         description: [
           "All analyses and solutions must be original and developed during the event.",
 "Copying, sharing answers, or using unfair means in any form is strictly prohibited.",

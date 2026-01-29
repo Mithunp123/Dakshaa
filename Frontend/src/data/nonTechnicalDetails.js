@@ -1310,7 +1310,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "KSRCT Hostel Turf",
-    price: "₹150 per Member",
+    price: "₹ 700 per Member",
     description:
       "Powerhouse Champion Trophy is a fast-paced cricket tournament focused on skill, discipline, and team strength. With strict rules and limited overs, it promises intense competition and fair play",
     img: NonTech21,

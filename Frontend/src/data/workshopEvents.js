@@ -403,9 +403,9 @@ export const workshopDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "M. Saradha",
+          name: "S.Mithuna",
           department: "CSE",
-          phone: "+91 80565 75711",
+          phone: "+91 99526 65042",
           email: "",
         },
       ],
