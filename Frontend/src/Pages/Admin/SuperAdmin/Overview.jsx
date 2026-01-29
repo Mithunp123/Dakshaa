@@ -847,6 +847,7 @@ const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
         </div>
 
         {/* Quick Actions */}
+        {!hideFinancials && (
         <div className="space-y-6">
           <div className="bg-gradient-to-br from-secondary/20 to-primary/20 border border-white/10 rounded-3xl p-8">
             <h3 className="text-xl font-bold mb-4">Quick Actions</h3>
@@ -857,15 +858,12 @@ const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
               >
                 <FileSpreadsheet size={18} /> Generate Report
               </button>
-              {!hideFinancials && (
-                <button className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
-                  <Users size={18} /> Export User List
-                </button>
-              )}
+              <button className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                <Users size={18} /> Export User List
+              </button>
             </div>
           </div>
 
-          {!hideFinancials && (
           <div className="bg-white/5 border border-white/10 rounded-3xl p-8">
             <h3 className="text-xl font-bold mb-4">System Status</h3>
             <div className="space-y-4">
@@ -889,8 +887,8 @@ const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
               </div>
             </div>
           </div>
-          )}
         </div>
+        )}
       </div>
 
       {/* Report Generation Modal */}
