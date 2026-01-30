@@ -140,11 +140,24 @@ export const AuthProvider = ({ children }) => {
     };
   }, []); // Empty dependency array as we want this to run once
 
+  // Logout function
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+      // Clear cached data
+      sessionStorage.removeItem('userProfile');
+      // The auth state change listener will handle updating state
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
   const value = {
     user,
     role: role || 'student', // Fallback for UI if null/loading
     loading, // This loading is now "isResolvingInitialState" mostly
     isAuthenticated: !!user,
+    logout,
   };
 
   return (

@@ -109,13 +109,14 @@ const RegistrationAdminDashboard = () => {
   }, []);
 
   const fetchAdminData = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setAdminUser(user);
+    const { data: { session } } = await supabase.auth.getSession();
+    setAdminUser(session?.user);
   };
 
   const fetchStats = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       
       // Cash in hand (collected by this admin today)
       const { data: cashData } = await supabase
@@ -186,7 +187,8 @@ const RegistrationAdminDashboard = () => {
   const handleApproveCash = async (regId, amount) => {
     try {
       setSubmitting(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       
       // Update registration status
       const { error: regError } = await supabase
@@ -235,7 +237,8 @@ const RegistrationAdminDashboard = () => {
 
     setSubmitting(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       
       for (const regId of selectedRegs) {
         const reg = cashQueue.find(r => r.id === regId);
@@ -320,7 +323,8 @@ const RegistrationAdminDashboard = () => {
 
     setSubmitting(true);
     try {
-      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const adminUser = session?.user;
       
       // Create auth user
       const tempPassword = Math.random().toString(36).slice(-8);

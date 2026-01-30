@@ -3,7 +3,8 @@ import { supabase } from "../supabase";
 // ==================== ACTIVITY LOGGING ====================
 export const logAdminAction = async (actionType, targetUserId = null, targetRegistrationId = null, details = {}) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     const { error } = await supabase
       .from('admin_logs')
@@ -72,7 +73,7 @@ export const forceAddUser = async (userId, eventId) => {
         event_id: eventId,
         payment_status: 'completed',
         is_force_added: true,
-        marked_by: (await supabase.auth.getUser()).data.user.id
+        marked_by: (await supabase.auth.getSession()).data.session?.user?.id
       })
       .select()
       .single();
@@ -330,7 +331,7 @@ export const initiateRefund = async (paymentId, amount, reason) => {
         method: 'online',
         status: 'pending',
         notes: reason,
-        marked_by: (await supabase.auth.getUser()).data.user.id
+        marked_by: (await supabase.auth.getSession()).data.session?.user?.id
       })
       .select()
       .single();

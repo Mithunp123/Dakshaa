@@ -57,7 +57,8 @@ export const createAccommodationRequest = async (requestData) => {
  */
 export const getUserAccommodationRequests = async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
       throw new Error('User not authenticated');
@@ -162,7 +163,8 @@ export const updateAccommodationPayment = async (requestId, paymentStatus, payme
  */
 export const createLunchBooking = async (bookingData) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
       throw new Error('User not authenticated');
@@ -215,7 +217,8 @@ export const createLunchBooking = async (bookingData) => {
  */
 export const getUserLunchBookings = async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
       throw new Error('User not authenticated');

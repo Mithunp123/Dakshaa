@@ -36,9 +36,9 @@ export const getDashboardStats = async () => {
  */
 export const getUserRegistrations = async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
     
-    if (!user) {
+    if (!session?.user) {
       throw new Error('User not authenticated');
     }
 
@@ -48,7 +48,7 @@ export const getUserRegistrations = async () => {
         *,
         event:events_config(event_key, name, type, price)
       `)
-      .eq('user_id', user.id)
+      .eq('user_id', session.user.id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -74,11 +74,12 @@ export const getUserRegistrations = async () => {
  */
 export const getUserAttendance = async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
     
-    if (!user) {
+    if (!session?.user) {
       throw new Error('User not authenticated');
     }
+    const user = session.user;
 
     const { data, error } = await supabase
       .from('attendance_logs')
@@ -112,11 +113,12 @@ export const getUserAttendance = async () => {
  */
 export const getUserTeams = async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
     
-    if (!user) {
+    if (!session?.user) {
       throw new Error('User not authenticated');
     }
+    const user = session.user;
 
     const { data, error } = await supabase
       .from('team_members')
@@ -159,11 +161,12 @@ export const getUserTeams = async () => {
  */
 export const getUserNotifications = async (unreadOnly = false) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
     
-    if (!user) {
+    if (!session?.user) {
       throw new Error('User not authenticated');
     }
+    const user = session.user;
 
     let query = supabase
       .from('notifications')
@@ -228,11 +231,12 @@ export const markNotificationAsRead = async (notificationId) => {
  */
 export const markAllNotificationsAsRead = async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
     
-    if (!user) {
+    if (!session?.user) {
       throw new Error('User not authenticated');
     }
+    const user = session.user;
 
     const { error } = await supabase
       .from('notifications')
@@ -286,11 +290,12 @@ export const getUserQRCode = async () => {
  */
 export const getUserTransactions = async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
     
-    if (!user) {
+    if (!session?.user) {
       throw new Error('User not authenticated');
     }
+    const user = session.user;
 
     const { data, error } = await supabase
       .from('payment_transactions')

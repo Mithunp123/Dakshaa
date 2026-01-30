@@ -21,7 +21,7 @@ import { useAuth } from '../../../Components/AuthProvider';
 
 const DashboardLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { user, role } = useAuth();
+  const { user, role, logout } = useAuth();
   
   // Use auth context user for display
   const userProfile = {
@@ -50,8 +50,7 @@ const DashboardLayout = ({ children }) => {
   ], []);
 
   const handleLogout = async () => {
-    sessionStorage.removeItem('userProfile'); // Clear cache on logout
-    await supabase.auth.signOut();
+    await logout();
     navigate('/');
   };
 

@@ -119,7 +119,8 @@ const MyTeams = () => {
     if (location.state?.createTeam && location.state?.eventId) {
       // Check if user already has a team for this event
       const checkExistingTeam = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
         if (!user) return;
 
         const { data: existingTeams } = await supabase
@@ -173,14 +174,16 @@ const MyTeams = () => {
   }, [location.state, location.search]);
 
   const getCurrentUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     setCurrentUserId(user?.id);
   };
 
   const fetchTeams = async () => {
     try {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       if (!user) {
         setLoading(false);
         return;
