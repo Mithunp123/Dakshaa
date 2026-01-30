@@ -20,7 +20,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 const RoleManagement = () => {
   const MASTER_ADMIN_ID = '105f3289-bfc5-467f-8cd0-49ff9c8f7082'; // Only this user can assign super_admin
@@ -386,7 +386,6 @@ const RoleManagement = () => {
 
   return (
     <div className="space-y-8">
-      <Toaster position="top-right" />
       
       {/* Header */}
       <div className="flex justify-between items-start">
@@ -781,7 +780,20 @@ const RoleManagement = () => {
                 <p className="text-sm text-gray-400 mb-2">Select Coordinator</p>
                 <select
                   value={selectedCoordinator || ''}
-                  onChange={(e) => setSelectedCoordinator(e.target.value)}
+                  onChange={(e) => {
+                    const newCoordinatorId = e.target.value;
+                    setSelectedCoordinator(newCoordinatorId);
+                    
+                    // Auto-load existing assignments for this coordinator
+                    if (newCoordinatorId) {
+                      const existingAssignments = coordinatorAssignments
+                        .filter(a => a.user_id === newCoordinatorId)
+                        .map(a => a.event_id);
+                      setSelectedEvents(existingAssignments);
+                    } else {
+                      setSelectedEvents([]);
+                    }
+                  }}
                   className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:border-secondary transition-all"
                 >
                   <option value="" className="bg-slate-900">Choose Coordinator...</option>
