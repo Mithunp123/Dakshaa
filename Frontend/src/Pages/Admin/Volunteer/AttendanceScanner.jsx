@@ -82,7 +82,8 @@ const AttendanceScanner = () => {
   // Fetch coordinator's assigned events
   const fetchAssignedEvents = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       if (!user) return;
 
       // Get user's profile to check role
@@ -341,7 +342,8 @@ const AttendanceScanner = () => {
     setMarkingAttendance(true);
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       
       const { data, error } = await supabase.rpc("mark_event_attendance", {
         p_user_id: userId,

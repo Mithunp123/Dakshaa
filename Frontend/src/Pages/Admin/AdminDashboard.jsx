@@ -83,8 +83,9 @@ const AdminDashboard = () => {
   const fetchUserRole = async () => {
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user;
       if (user) {
         const { data: profile } = await supabase
           .from("profiles")

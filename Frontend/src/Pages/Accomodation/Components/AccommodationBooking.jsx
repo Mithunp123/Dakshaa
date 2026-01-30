@@ -65,7 +65,8 @@ const AccommodationBooking = () => {
 
   const fetchExistingBookings = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       if (user) {
         // Fetch ALL accommodation bookings (can have multiple now)
         const { data: accDataArray } = await supabase
@@ -138,7 +139,8 @@ const AccommodationBooking = () => {
 
   const fetchUserProfile = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -196,7 +198,8 @@ const AccommodationBooking = () => {
 
   const handleReferralIncrement = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       if (!user) return;
 
       const { data: userProfileForReferral } = await supabase
@@ -250,7 +253,8 @@ const AccommodationBooking = () => {
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       if (!user) {
         toast.error('Please login to continue', {
           duration: 3000,

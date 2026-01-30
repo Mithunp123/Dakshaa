@@ -41,11 +41,11 @@ const Events = () => {
   const navigate = useNavigate();
   const eventsRef = useRef(null);
 
-  // Check authentication status
+  // Check authentication status - use supabase.auth.getSession() instead of getUser() for faster response
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
     };
     getUser();
 

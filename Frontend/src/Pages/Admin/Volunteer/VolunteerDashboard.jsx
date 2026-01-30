@@ -226,7 +226,8 @@ const VolunteerDashboard = () => {
   const deliverKit = async (userId) => {
     try {
       setSubmitting(true);
-      const { data: { user: volunteer } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const volunteer = session?.user;
 
       // Check if user exists
       const { data: profile, error: profileError } = await supabase

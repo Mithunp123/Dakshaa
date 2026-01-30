@@ -15,7 +15,7 @@ const Navbar = () => {
   const [activeLink, setActiveLink] = useState("Home");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { user, role: userRole } = useAuth();
+  const { user, role: userRole, logout } = useAuth();
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const location = useLocation();
@@ -24,7 +24,7 @@ const Navbar = () => {
   const preloadedRef = useRef(new Set());
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await logout();
     navigate('/');
   };
 

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../supabase';
+import { useAuth } from '../../Components/AuthProvider';
 
 // Role display information
 const roleDisplayInfo = {
@@ -37,11 +38,14 @@ const roleDisplayInfo = {
 const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1024);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-  const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Use centralized auth to persist role across refreshes
+  const { user, role: authRole, logout } = useAuth();
+  const [userRole, setUserRole] = useState(authRole);
 
   useEffect(() => {
     const handleResize = () => {
@@ -55,8 +59,32 @@ const AdminLayout = () => {
   }, []);
 
   useEffect(() => {
-    checkUserRole();
-  }, []);
+    // Use authRole from context if available, otherwise check manually
+    if (authRole && authRole !== 'student') {
+      setUserRole(authRole);
+      setLoading(false);
+      // Still fetch name if not available
+      if (user && !userName) {
+        fetchUserName(user.id);
+      }
+    } else if (user && (!authRole || authRole === 'student')) {
+      // Double-check by fetching from DB (in case context hasn't updated yet on refresh)
+      checkUserRole();
+    } else if (!user) {
+      navigate('/login');
+    }
+  }, [user, authRole]);
+
+  const fetchUserName = async (userId) => {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', userId)
+      .single();
+    if (profile?.full_name) {
+      setUserName(profile.full_name);
+    }
+  };
 
   // Close sidebar on mobile when route changes
   useEffect(() => {
@@ -67,7 +95,7 @@ const AdminLayout = () => {
 
   const checkUserRole = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      // Use the user from context
       if (!user) {
         navigate('/login');
         return;
@@ -141,7 +169,7 @@ const AdminLayout = () => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await logout();
     navigate('/');
   };
 

@@ -648,7 +648,8 @@ export const getTeamDetails = async (teamId) => {
  */
 export const sendTeamInvitation = async (teamId, userId) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
       throw new Error('User not authenticated');
@@ -892,7 +893,8 @@ export const searchUsersForTeam = async (searchQuery) => {
  */
 export const searchTeamsToJoin = async (searchQuery) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     if (!user) throw new Error('User not authenticated');
 
     // First, search for leaders by name to get their IDs
@@ -1033,7 +1035,8 @@ export const searchTeamsToJoin = async (searchQuery) => {
  */
 export const sendJoinRequest = async (teamId, message = '') => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
@@ -1070,7 +1073,8 @@ export const sendJoinRequest = async (teamId, message = '') => {
  */
 export const getTeamJoinRequests = async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     if (!user) throw new Error('User not authenticated');
 
     // Fetch join requests with team and user data
@@ -1137,7 +1141,8 @@ export const getTeamJoinRequests = async () => {
  */
 export const getMyJoinRequests = async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     if (!user) throw new Error('User not authenticated');
 
     // Fetch join requests with team data
@@ -1237,7 +1242,8 @@ export const cancelJoinRequest = async (requestId) => {
  */
 export const acceptJoinRequest = async (requestId) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     if (!user) throw new Error('User not authenticated');
 
     // Get the join request details
@@ -1305,7 +1311,8 @@ export const acceptJoinRequest = async (requestId) => {
  */
 export const rejectJoinRequest = async (requestId) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     if (!user) throw new Error('User not authenticated');
 
     // Get the join request details

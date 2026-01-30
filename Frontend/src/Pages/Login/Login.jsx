@@ -89,7 +89,8 @@ const Login = () => {
       
       if (type === 'signup' || type === 'email') {
         // Get user data
-        const { data: userData } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
+        const userData = { user: session?.user };
         
         // Send welcome email after successful verification
         if (userData?.user?.email) {

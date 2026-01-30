@@ -38,8 +38,8 @@ const ManageTeamModal = ({ isOpen, onClose, team, onTeamUpdated }) => {
   }, [isOpen, team]);
 
   const getCurrentUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setCurrentUserId(user?.id);
+    const { data: { session } } = await supabase.auth.getSession();
+    setCurrentUserId(session?.user?.id);
   };
 
   const handleSearch = async () => {

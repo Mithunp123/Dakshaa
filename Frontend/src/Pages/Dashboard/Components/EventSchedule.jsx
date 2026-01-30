@@ -26,8 +26,8 @@ const EventSchedule = () => {
     try {
       setLoading(true);
       
-      const { data: { user } } = await supabase.auth.getUser();
-      const userId = user?.id;
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
 
       // Ensure backend runs on 3000 or configure via env
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';

@@ -193,7 +193,8 @@ const CoordinatorDashboard = () => {
   const fetchAssignedEvents = async () => {
     try {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
 
       // Get user's profile to check role
       const { data: profile } = await supabase
@@ -538,7 +539,8 @@ const CoordinatorDashboard = () => {
   const markAttendanceWithSessionAndEvent = async (userId, session, event) => {
     try {
       setSubmitting(true);
-      const { data: { user: coordinator } } = await supabase.auth.getUser();
+      const { data: { session: authSession } } = await supabase.auth.getSession();
+      const coordinator = authSession?.user;
 
       // Get the event UUID from passed event (from ref)
       const eventUuid = event?.id || event?.event_id;
@@ -610,7 +612,8 @@ const CoordinatorDashboard = () => {
   const submitWinners = async () => {
     try {
       setSubmitting(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
 
       const winners = [];
       if (selectedWinners.first) winners.push({ user_id: selectedWinners.first, position: 1 });
