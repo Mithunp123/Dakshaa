@@ -477,6 +477,20 @@ export const hackathonEventDetails = {
             "Initial screening. The selected teams are call for pitching. Intimation through mail before  11/02/2026 , 4 pm. The rejected teams are intimate through mail with commends.",
           ],
         },
+        {
+          title: "Round-3",
+          description:[
+            "Final Pitching on 13/02/2026 , the top 10 teams will be recommended for 3 lakhs seed fund in  EDII-TN, TN-IVP ",
+            "EDII-TN-IVP, knowledge partner Review @KSRCT",
+          ],
+        },
+        {
+          title: "Note:Topics to be align with",
+          description:[
+            "Innovation , Uniqueness, Scalability, Revenue Model, Impact on SGD , ESG, Rural development",
+            "Total number of slide : Maximum 10",
+          ],
+        }
         
       ],
       rules: [
