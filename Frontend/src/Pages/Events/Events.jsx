@@ -2064,6 +2064,29 @@ const Events = () => {
                 </div>
               </div>
 
+              {/* Slots Section */}
+              {selectedTechnical.slot && selectedTechnical.slot.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Available Slots
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {selectedTechnical.slot.map((s, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="flex items-start gap-2 text-gray-300 bg-gradient-to-r from-secondary/10 to-transparent p-3 rounded"
+                      >
+                        <span className="text-primary mt-1">▸</span>
+                        <span className="text-sm">{s.time}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Schedule Section */}
               {selectedTechnical.schedule && selectedTechnical.schedule.length > 0 && (
                 <div className="mb-8">
@@ -2113,6 +2136,30 @@ const Events = () => {
                   </div>
                 </div>
               )}
+
+              {/* Rules Section */}
+              {selectedTechnical.slot && selectedTechnical.slot.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Slot
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {selectedTechnical.slot.map((rule, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="flex items-start gap-2 text-gray-300"
+                      >
+                        <span className="text-primary mt-1">▸</span>
+                        <span className="text-sm">{rule}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
 
               {/* Topics Section */}
               {selectedTechnical.topics && selectedTechnical.topics.length > 0 && (

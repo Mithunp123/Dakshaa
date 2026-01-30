@@ -15,6 +15,7 @@ import workshop13 from "../assets/EventsImages/EventDetails/Workshop/mech_wk.png
 import workshop14 from "../assets/EventsImages/EventDetails/Workshop/txt_wk.png";
 import workshop15 from "../assets/EventsImages/EventDetails/Workshop/vlsi_wk.png";
 import workshop16 from "../assets/EventsImages/EventDetails/Workshop/mca_wk.png";
+import workshop17 from "../assets/EventsImages/EventDetails/Workshop/math.png";
 
 
 /* Workshop Events List
@@ -61,61 +62,67 @@ export const workshopEvents = [
   {
     image: workshop5,
     eventId: "workshop-csbs",
-    price: 350,
+    price: 300,
   },
   {
     image: workshop6,
     eventId: "workshop-cse",
-    price: 350,
+    price: 300,
   },
   {
     image: workshop7,
     eventId: "workshop-ece",
-    price: 350,
+    price: 300,
   },
   {
     image: workshop8,
     eventId: "workshop-eee",
-    price: 350,
+    price: 300,
   },
   {
     image: workshop9,
     eventId: "workshop-ft",
-    price: 350,
+    price: 300,
   },
   {
     image: workshop3,
     eventId: "workshop-bt",
-    price: 350,
+    price: 300,
   },
   {
     image: workshop11,
     eventId: "workshop-it",
-    price: 350,
+    price: 300,
   },
   {
     image: workshop12,
     eventId: "workshop-mct",
-    price: 350,
+    price: 300,
   },
   {
     image: workshop13,
     eventId: "workshop-mech",
-    price: 350,
+    price: 300,
   },
   {
     image: workshop14,
     eventId: "workshop-txt",
-    price: 350,
+    price: 300,
   },
   {
     image: workshop15,
     eventId: "workshop-vlsi",
-    price: 350,
+    price: 300,
   },
   {
     image: workshop16,
     eventId: "workshop-mca",
+    price: 300,
+  },
+  {
+    image: workshop17,
+    eventId: "workshop-math",
+    price: 300,
   },
   
 ];
@@ -866,4 +873,56 @@ export const workshopDetails = [
     },
     registrationLink: "",
   },
+  {
+    id: "workshop-math",
+    shortTitle: "Empowering the Next Generation on Emerging Trends through  MATLAB & Simulink",
+    title: "Empowering the Next Generation on Emerging Trends through MATLAB & Simulink",
+    description: "This workshop provides an introduction to Artificial Intelligence, Machine Learning, Deep Learning, and Image Processing using MATLAB in a practical and easy-to-understand manner. Participants will learn how intelligent models are built, how neural networks are trained, and how images are processed and analysed. The session includes hands-on experience with real-time applications such as classification, prediction, object detection, along with applications in Electric Vehicles (EVs) and Robotics. ",
+    img: workshop17,
+    date: "February 12, 2026",
+    venue: "UiPath Laboratory, IT PARK",
+    department: "Workshop",
+    price: "₹300",
+    schedule: [
+      {
+        
+        location: "UiPath Laboratory, IT PARK  ",
+        time: "1:00PM to 4:30PM ",
+        date: "February 12, 2026",
+      },
+    ],
+    contact: {
+      facultyCoordinator: [
+        {
+          name: "Ms Ramya R",
+          department: "Electronics Engineering",
+          phone: "+91 97879 03008",
+          email: "",
+        },
+      ],
+      studentCoordinator: [
+        {
+          name: " Kirankumar R",
+          year: "I Year",
+          department: "MCA",
+          phone: "+91 98489 526160",
+          email: "",
+        },
+        {
+          name: "Megavardhini L",
+          year: "I Year",
+          department: "MCA",
+          phone: "+91 639942 339351",
+          email: "",
+        },
+      ],
+    },
+    registrationLink: "",
+  },
+
+
+  
+
+
+
 ];

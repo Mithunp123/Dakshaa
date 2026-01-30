@@ -771,9 +771,9 @@ export const technicalDetails = [
           phone: "+91 99621 16570",
         },
         {
-          name: "Dr. S. Jeyaprakasam",
+          name: "Dr.M.Gnanasekaran",
           email: "",
-          phone: "+91 98946 94658",
+          phone: "+91 98944 04279",
         },
       ],
       studentCoordinator: [
@@ -1102,4 +1102,69 @@ export const technicalDetails = [
     },
     registrationLink: "",
   },
+   {
+    id: "tech-cody",
+    shortTitle: "Cody challenge  ",
+    title: "Cody challenge  ",
+    description: "It is an online, interactive game-based event designed to test MATLAB programming skills through puzzle-solving. It’s going to be conducted for 1 hour duration.",
+    img: Tech1,
+    date: "February 13, 2026",
+    venue: " UiPath Laboratory, IT PARK",
+    department: "Technical Events",
+    price: "₹250",
+    rules: [
+      "Individual participant only accepted.",
+      "System provided in Laboratory.",
+      "Mobile phones, books, or external references are strictly prohibited.",
+    ],
+
+    slot: [
+      "Slot 1 : 9:00 AM to 10.30 AM ",
+      "Slot 2 : 11:00 AM to 12.30 PM ",
+      "Slot 3 : 12:30 PM to 1:30 PM ",
+    ],
+
+    schedule: [
+      {
+        date: "February 13, 2026",
+        time: "9:00 AM - 4:00 PM",
+        location: " UiPath Laboratory, IT PARK",
+      },
+    ],
+    contact: {
+      facultyCoordinator: [
+        {
+          name: " Dr Nithya J",
+          phone: "+91 94438 46125",
+          email: "",
+        },
+        {
+          name: "Ms Ramya R",
+          phone: "+91 97879 03008",
+          email: "",
+        },
+      ],
+      studentCoordinator: [
+        {
+          name: "Dhanushri R ()",
+          phone: "+91 95858 67766",
+          email: "",
+        },
+        {
+          name: "Dharshini U ",
+          phone: "+91 63697 22563",
+          email: "",
+        },
+        {
+          name: "KiranKumar R",
+          phone: "+91 84895 26160",
+          email: "",
+        },
+      ],
+    },
+    registrationLink: "",
+  },
+
+
+
 ];

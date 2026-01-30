@@ -485,7 +485,7 @@ export const nonTechnicalDetails = [
     schedule: [
       {
         date: "February 14, 2026",
-        time: "2:30 PM to 4:30 PM",
+        time: "9.00 AM to 11:00 AM",
         location: "Quadrangle Triangle, Main Building",
       },
     ],
@@ -539,7 +539,7 @@ export const nonTechnicalDetails = [
     schedule: [
       {
         date: "February 14, 2026",
-        time: "2:30 PM to 4:30 PM",
+        time: "9.00 AM to 11.00 AM",
         location: "Smart Classroom, Main Block",
       },
     ],
@@ -825,26 +825,18 @@ export const nonTechnicalDetails = [
     venue: "KSRCT IT Park",
     price: "₹150 per Member",
     description:
-      "Treasure Hunt is an exciting team-based non-technical event that challenges participants to think creatively, solve clues, and work together under time pressure. Teams navigate through multiple checkpoints by cracking riddles, puzzles, physical tasks, and observation-based challenges spread across the campus. The first team to successfully complete all challenges and uncover the final treasure is declared the winner.",
+      "Get ready for an exciting Treasure Hunt that turns the campus into a thrilling challenge. Teams race against time to solve clues, crack puzzles, and complete fun tasks across checkpoints. Quick thinking, sharp observation, and teamwork are the keys to victory in this high-energy adventure.",
     img: NonTech14,
-    rounds: [
-      {
-        title: "Clue Trail Challenge",
-        description:
-          "Teams solve a series of clues and tasks to move from one checkpoint to another. Each solved clue leads to the next location, and teams must follow the correct sequence to reach the final treasure.",
-      },
-    ],
+    
     rules: [
-      "Each team must consist of exactly three members.",
-      "Team members cannot be changed once the event starts.",
-      "All team members must be present throughout the event.",
-      "Teams must solve clues in the correct order and must not skip any checkpoint.",
-      "Clues may include riddles, puzzles, physical tasks, and observation challenges.",
-      "The event will be conducted within a fixed time limit.",
-      "In case of a tie, fewer hints used, shorter completion time, and fair play behavior will be considered.",
-      "Participants must follow all instructions given by the coordinators.",
-      "Any form of misbehavior, cheating, or unfair means will result in disqualification.",
-      "The decision of the organizers shall be final and binding.",
+      "1.	Each team must consist of 3 members only.",
+    	"The event duration is 1 hour, and teams must complete the hunt within the given time.",
+    	"Teams must not damage property or disturb other participants during the game.",
+    	"Use of mobile phones or internet is strictly prohibited unless specified by the coordinators.",
+    	"Teams must follow the instructions of volunteers and coordinators at all times.",
+    	"Any form of misconduct, cheating, or rule violation will lead to immediate disqualification.",
+    	"The team that successfully finds the final treasure in the shortest time will be declared the winner.",
+    
     ],
     schedule: [
       {

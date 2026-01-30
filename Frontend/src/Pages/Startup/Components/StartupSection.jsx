@@ -112,18 +112,9 @@ function StartupSection() {
         <div className="md:col-span-8 flex flex-col items-center text-center md:text-left justify-center md:items-start mb-8">
           <div className="p-2 border border-sky-800 w-full">
             <p className="bg-sky-900/70 p-6 clip-bottom-right text-justify">
-              StartupTN, in collaboration with K.S. Rangasamy College of
-              Technology, proudly presents the DaKshaa T26 Idea Elevator
-              Pitching Contest as part of Tamil Nadu Global Startup Summit 2026.
-              This prestigious event serves as a dynamic platform for aspiring
-              students to showcase their groundbreaking ideas in a fast-paced
-              and impactful setting. As a parallel session of the Global Startup
-              Summit, the contest brings together visionary minds, industry
-              leaders, and investors, fostering an environment of innovation,
-              collaboration, and entrepreneurial excellence. Participants will
-              have the opportunity to pitch their ideas, receive valuable
-              insights from experts, and gain exposure to potential funding and
-              mentorship opportunities.
+              The StartUp Pitch Event, organized by the Entrepreneurship Development Cell (EDC), aims to encourage students to ideate, innovate, and present impactful startup solutions in emerging technology domains such as automation, robotics, artificial intelligence, smart manufacturing, and intelligent systems. The event provides a platform for participants to showcase how modern development principles integrated with AI-driven technologies can be applied to solve real-world industrial and societal challenges. Students are expected to focus on innovation, technical feasibility, scalability, and real-time impact, while demonstrating entrepreneurial thinking and problem-solving skills. 
+
+
             </p>
           </div>
         </div>
@@ -178,7 +169,7 @@ function StartupSection() {
                 🥈 2nd Prize
               </span>
               <span className="text-3xl font-semibold text-white mt-2">
-                ₹5,000
+                ₹7,500
               </span>
             </div>
 
@@ -188,144 +179,14 @@ function StartupSection() {
                 🥉 3rd Prize
               </span>
               <span className="text-3xl font-semibold text-white mt-2">
-                ₹2,000
+                ₹5,000
               </span>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Panel */}
-      <div className="border border-sky-800 p-2 mb-5" id="Panel Discussion">
-        <div className="border border-sky-800 shadow-lg p-4 md:p-10">
-          <h2 className="text-center font-semibold text-2xl md:text-3xl mb-5 text-sky-600 border border-sky-800 bg-sky-900/30 px-3 py-3">
-            Panel Members
-          </h2>
-
-          {/* Grid Layout - Always 2 cards per row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 px-4 sm:px-8">
-            <div
-              className="relative group cursor-pointer overflow-hidden duration-500 
-                     w-full max-w-xs mx-auto bg-sky-900 
-                     bg-opacity-30 border border-sky-900 text-gray-50 p-5 pb-10"
-            >
-              {/* Square Image */}
-              <div className="w-full aspect-square">
-                <img
-                  src={member1}
-                  alt="Icon"
-                  className="group-hover:scale-105 w-full h-full object-cover duration-500"
-                />
-              </div>
-
-              {/* Hover Text Effect */}
-              <div className="absolute w-full left-0 p-5 -bottom-[80px] duration-500 group-hover:-translate-y-16">
-                <div className="absolute -z-10 left-0 w-full h-24 sm:h-32 opacity-0 duration-500 group-hover:opacity-50 group-hover:bg-blue-900" />
-                <span className="text-md md:text-xl font-bold block">
-                  Mr. Gurushankar Selvam
-                </span>
-                <p className="group-hover:opacity-100 w-full duration-500 opacity-0 text-sm sm:text-base leading-5">
-                  Project Lead,
-                </p>
-                <p className="group-hover:opacity-100 w-full duration-500 opacity-0 text-sm sm:text-base leading-5">
-                  Erode & Salem Regional Hubs,
-                </p>
-                <p className="group-hover:opacity-100 w-full duration-500 opacity-0 text-sm sm:text-base leading-5">
-                  StartupTN, Govt. of Tamil Nadu.
-                </p>
-              </div>
-            </div>
-            <div
-              className="relative group cursor-pointer overflow-hidden duration-500 
-                     w-full max-w-xs mx-auto bg-sky-900 
-                     bg-opacity-30 border border-sky-900 text-gray-50 p-5 pb-10"
-            >
-              {/* Square Image */}
-              <div className="w-full aspect-square">
-                <img
-                  src={member4}
-                  alt="Icon"
-                  className="group-hover:scale-105 w-full h-full object-cover duration-500"
-                />
-              </div>
-
-              {/* Hover Text Effect */}
-              <div className="absolute w-full left-0 p-5 -bottom-16 duration-500 group-hover:-translate-y-14">
-                <div className="absolute -z-10 left-0 w-full h-24 sm:h-32 opacity-0 duration-500 group-hover:opacity-50 group-hover:bg-blue-900" />
-                <span className="text-lg sm:text-xl font-bold block">
-                  Mr. S. Arvinth
-                </span>
-                <p className="group-hover:opacity-100 w-full duration-500 opacity-0 text-sm sm:text-base leading-5">
-                  Founder & CEO, Incer Technovation Private Limited
-                </p>
-              </div>
-            </div>
-
-
-            <div
-              className="relative group cursor-pointer overflow-hidden duration-500 
-                     w-full max-w-xs mx-auto bg-sky-900 
-                     bg-opacity-30 border border-sky-900 text-gray-50 p-5 pb-10"
-            >
-              {/* Square Image */}
-              <div className="w-full aspect-square">
-                <img
-                  src={member2}
-                  alt="Icon"
-                  className="group-hover:scale-105 w-full h-full object-cover duration-500"
-                />
-              </div>
-
-              {/* Hover Text Effect */}
-              <div className="absolute w-full left-0 p-5 -bottom-[80px] duration-500 group-hover:-translate-y-16">
-                <div className="absolute -z-10 left-0 w-full h-24 sm:h-32 opacity-0 duration-500 group-hover:opacity-50 group-hover:bg-blue-900" />
-                <span className="text-lg sm:text-xl font-bold block">
-                  Dr. N. Thiruvenkadam,
-                </span>
-                <p className="group-hover:opacity-100 w-full duration-500 opacity-0 text-sm sm:text-base leading-5">
-                  Head of MSME BI,
-                </p>
-                <p className="group-hover:opacity-100 w-full duration-500 opacity-0 text-sm sm:text-base leading-5">
-                  K.S.Rangasamy College of Technology (Autonomous)
-                </p>
-              </div>
-            </div>
-            <div
-              className="relative group cursor-pointer overflow-hidden duration-500 
-                     w-full max-w-xs mx-auto bg-sky-900 
-                     bg-opacity-30 border border-sky-900 text-gray-50 p-5 pb-10"
-            >
-              {/* Square Image */}
-              <div className="w-full aspect-square">
-                <img
-                  src={member3}
-                  alt="Icon"
-                  className="group-hover:scale-105 w-full h-full object-cover duration-500"
-                />
-              </div>
-
-              {/* Hover Text Effect */}
-              <div className="absolute w-full left-0 p-5 pb-10 -bottom-36 duration-500 group-hover:-translate-y-28">
-                <div className="absolute -z-10 left-0 w-full h-24  sm:h-32 opacity-0 duration-500 group-hover:opacity-50 group-hover:bg-blue-900" />
-                <span className="text-sm md:text-xl font-bold block">
-                  Dr. B. Mythili Gnanamangai
-                </span>
-                <p className="group-hover:opacity-100 w-full duration-500 opacity-0 text-sm sm:text-base leading-5">
-                  CEO,
-                </p>
-                <p className="group-hover:opacity-100 w-full duration-500 opacity-0 text-sm sm:text-base leading-5">
-                  ACIC-KS Rangasasmy College of Technology Incubation Foundation,
-
-                </p>
-                <p className="group-hover:opacity-100 w-full duration-500 opacity-0 text-sm sm:text-base leading-5">
-                  (ACIC-KSRCTIF)
-                  K.S.Rangasamy College of Technology
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      
+      {/* Panel Members section commented out per request */}
 
       {/* Eligibility */}
       <div className="border border-sky-800 p-2 mb-5" id="Eligibility">

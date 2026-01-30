@@ -1,5 +1,8 @@
 import autoshow from "../assets/EventsImages/EventDetails/exposshows/autoshow.png";
 import droneshow from "../assets/EventsImages/EventDetails/exposshows/droneshow.png";
+import foodshow from "../assets/EventsImages/EventDetails/exposshows/food.png";
+import txt from "../assets/EventsImages/EventDetails/exposshows/texexpo.png";
+
 
 export const exposAndShowsDetails = [
   {
@@ -63,6 +66,68 @@ export const exposAndShowsDetails = [
           name: "Mr.S.I.Pon Subra Balan",
           department: "EEE",
           phone: "+91 99948 20486",
+          email: "",
+        },
+        
+      ],
+    },
+  },
+
+  {
+    id: "expo-foodshow",
+    img: foodshow,
+    shortTitle: "Expo Food Show",
+    title: "Expo Food Show 2026",
+    description: "A vibrant food expo showcasing cuisines, live cooking, food startups, and culinary innovations—all in one place.",
+    date: "12,13 and 14 February 2026",
+    venue: "Open Field",
+    price: "Free",
+    registrationLink: "",
+    schedule: [],
+    contact: {
+      facultyCoordinator: [
+        {
+          name: "",
+          designation: "",
+          phone: "+91 ",
+        },
+      ],
+      studentCoordinator: [
+        {
+          name: "",
+          department: "",
+          phone: "+91 ",
+          email: "",
+        },
+        
+      ],
+    },
+  },
+
+  {
+    id: "expo-textexpo",
+    img: txt,
+    shortTitle: "Textile Expo",
+    title: "Textile Expo 2026",
+    description: "An exhibition showcasing textiles, fabrics, fashion trends, weaving techniques, and innovations in the textile industry",
+    date: "",
+    venue: "Open Field",
+    price: "Free",
+    registrationLink: "",
+    schedule: [],
+    contact: {
+      facultyCoordinator: [
+        {
+          name: "",
+          designation: "",
+          phone: "+91 ",
+        },
+      ],
+      studentCoordinator: [
+        {
+          name: "",
+          department: "",
+          phone: "+91 ",
           email: "",
         },
         

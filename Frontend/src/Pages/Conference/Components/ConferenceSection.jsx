@@ -77,12 +77,13 @@ const conferences = [
   {
     id: 2,
     img: eeecon,
-    title: "National Conference on Advancements in Semiconductor Technologies, Intelligent Systems and Power Engineering",
-    shortTitle: "ASTIPE 2026",
+    title: "National Conference on Advances in Semiconductor Technologies, Intelligent Systems, and Power Engineering",
+    shortTitle: "National Conference on Advances in Semiconductor Technologies, Intelligent Systems, and Power Engineering",
     department: "School of Electrical Sciences",
     description:
-      "This conference brings together researchers, academicians, and industry professionals to discuss the latest advancements in semiconductor technologies, intelligent systems, and power engineering. Join us to explore cutting-edge research and innovations shaping the future of electrical engineering.",
+      "The latest advancements in signal processing and communication systems. It covers technologies that enable faster, more reliable, and efficient data transmission in modern networks. The focus is on developing smart and connected electronic systems that meet the demands of the digital era.",
     topics: [
+
       "Renewable Energy Systems and Sustainability",
       "Advanced Power Electronics and Drives",
       "Smart Grids and Energy Management",
@@ -94,14 +95,43 @@ const conferences = [
       "Low Power VLSI Design",
       "FPGA-Based VLSI Design",
     ],
+    theme: [
+      "Exploring the Next Dimension of Signal and Communication Technologies",
+    ],
+    rules: [
+     "Only registered participants can attend and present.",
+     "Plagiarism less than 15% only allowed.",
+     "Submit original papers; copying results in Disqualification.",
+     "Present on time according to your assigned slot.",
+     "E-Certificates will be given only to those who participate and present their Papers",
+    ],
+    
+    registrationdetails:[
+      "Rs300 (Per Paper + 1 Author) + Rs150 (Per Co-Author)",
+    ],
     date: "12 February 2026",
-    venue: "KSRCT Campus",
+    venue: "Gallery Hall (Main Building)",
     registrationFee: "₹300",
-    facultyCo: "Dr. R. Senthilkumar",
-    facultyCoNo: "+91 98765 43210",
-    studentCo1: "K. Priya",
-    studentCoNo1: "+91 87654 32109",
-    email: "ncistemm@ksrct.ac.in",
+    contact: {
+        facultyCoordinator: [
+          {
+            name: "Mr Balachandran A ",
+            phone: "+91 94430 72641",
+            email: "",
+          },
+        ],
+        studentCoordinator: [
+          {
+            name: " Muthaal S ",
+            phone: "+91 80565 88925",
+            email: "",
+          },
+          {
+            name : "Sabareesh S ", 
+            phone:"+91 63856 52095"
+          }
+        ],
+      },
     
   },
   {
@@ -124,6 +154,28 @@ const conferences = [
       "AI for Cybersecurity Policy and Governance",
       "Explainable AI (XAI) for Cybersecurity",
     ],
+    eligibility: [
+      "Undergraduate (UG) and Postgraduate (PG) Students",
+      "Research Scholars",
+      "Academicians",
+
+    ],
+    rules: [
+      "A paper may be authored by one or two members only.",
+      "Participants may submit either an Abstract or a Full Paper.",
+      "Full papers meeting the prescribed standards will be published in the Conference Proceedings.",
+      "Selected full papers will be recommended for Scopus-indexed journal publication, subject to journal review and compliance.",
+      "All submissions must be original, unpublished, and free from plagiarism as per UGC/AICTE norms.",
+      "Each paper will be allotted 10 minutes for presentation, followed by a questioning (Q&A) session with the judges/panel members.",
+      "Papers must strictly follow the conference formatting guidelines and undergo a peer-review process.",
+      "At least one author must register and present the paper.",
+      "The Organizing Committee’s decision shall be final in all matters related to acceptance and publication.",
+
+    ],
+    registrationdetails:[
+      " Including one author per paper : ₹300",
+      " Additional author per head : ₹150",
+    ],
     date: "12 February 2026",
     venue: "KSRCT Campus",
     registrationFee: "₹300",
@@ -142,63 +194,19 @@ const conferences = [
     department: "School of Life Sciences",
     description:
       "This multidisciplinary conference focuses on sustainable innovations across biotechnology, food technology, textile technology, and nanotechnology. Discover how life sciences are addressing global sustainability challenges.",
-    tracks: [
-      {
-        name: "Biotechnology",
-        topics: [
-          "Biofuels",
-          "Microbial Diagnostics",
-          "Industrial Biotechnology",
-          "Biomolecular Engineering",
-          "Computational Genomics",
-          "Biotechnology for Livestock, Pests and Aquaculture",
-          "Bioprocess and Biosystems",
-          "Microbial Energy Production",
-          "Environmental Biotechnology",
-          "Biosensors",
-        ],
-      },
-      {
-        name: "Food Technology",
-        topics: [
-          "Instant Foods",
-          "Food Analysis",
-          "Nutraceuticals",
-          "Pre/Probiotics",
-          "Edible Coatings",
-          "Food Adulteration",
-          "Biopharmaceuticals",
-          "Food Product Development",
-          "Controlled Atmosphere Packaging",
-        ],
-      },
-      {
-        name: "Textile Technology",
-        topics: [
-          "Green Textiles",
-          "Protective Fabrics",
-          "Textile Composites",
-          "Automobile Textiles",
-          "Aesthetics of Textiles",
-          "Smart Textile Applications",
-          "Textile Material Recycling",
-        ],
-      },
-      {
-        name: "Nanotechnology",
-        topics: [
-          "Nanoelectronics",
-          "Nanobiotechnology",
-          "Thin Film Technology",
-          "Nano-Communications",
-          "Nanodevice Fabrications",
-          "Advanced Nanomaterials",
-          "Electrochemical Corrosion",
-          "Multifunctional Materials",
-          "Sustainable Chemical Processing",
-          "Nanotechnology in Energy & Environment",
-        ],
-      },
+    topics: [
+      "Sustainable Biotechnology Practices",
+      "Innovations in Food Technology",
+    ],
+    eligibility: [
+      "Undergraduate (UG) and Postgraduate (PG) Students",
+      "Research Scholars",
+      "Academicians",
+
+    ],
+    registrationdetails:[
+      " Including one author per paper : ₹300",
+      " Additional author per head : ₹150",
     ],
     date: "12 February 2026",
     venue: "KSRCT Campus",
@@ -233,7 +241,7 @@ const ConferenceSection = () => {
         data-aos="fade-down"
       >
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3">
-          NCISTEMM
+          NATIONAL CONFERENCE
         </h2>
         <p className="text-gray-200 text-sm sm:text-lg font-semibold mb-4">
           NATIONAL CONFERENCE ON INNOVATIONS IN SCIENCE, TECHNOLOGY,
@@ -242,8 +250,10 @@ const ConferenceSection = () => {
         <div className="space-y-2">
           <p className="text-base sm:text-xl font-semibold">
             <Mail className="inline w-5 h-5 mr-2" />
-            <span className="text-gray-300">Mail your conference paper to:</span>{" "}
-            <span className="text-primary font-bold">ncistemm@ksrct.ac.in</span>
+            <span className="text-gray-300">Mail your abstract and conference paper to:</span>{" "}
+            <span className="text-primary font-bold">ncistemm@ksrct.ac.in</span><br></br><br></br>
+            <span className="text-gray-300">Note : </span>
+
           </p>
           <p className="text-base sm:text-xl font-semibold">
             <Phone className="inline w-5 h-5 mr-2" />

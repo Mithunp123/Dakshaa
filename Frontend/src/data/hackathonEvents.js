@@ -5,7 +5,7 @@ import hackathon4 from "../assets/EventsImages/EventDetails/HackathonImages/hack
 import hackathon5 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon5.png";
 import hackathon6 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon6.png";
 import { hackathonEventDetails } from "../Pages/Hackathon/Components/HackathonSection";
-
+import hackathon7 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon7.png";
 /*
 NeuroHack 2.O - hackathon1
 BioNexathon - hackathon2
@@ -47,6 +47,13 @@ export const hackathonEvents = [
     eventId: "hackathon6",
     title: "Designathon",
   },
+  {
+    image: hackathon7,
+    eventId: "hackathon7",
+    title: "RoboWars",
+  },
+
+
 ];
 
 // Detailed hackathon data for modal display - mapped from HackathonSection
@@ -108,4 +115,12 @@ export const hackathonDetails = [
     shortTitle: hackathonEventDetails["hackathon-6"]?.title || "Designathon",
     department: "Department of Mechanical Engineering",
   },
+  {
+    ...hackathonEventDetails["hackathon-7"],
+    id: 7,
+    img: hackathon7,
+    shortTitle: hackathonEventDetails["hackathon-7"]?.title || "RoboWars",
+    department: "Department of Mechanical Engineering",
+  },
+
 ];

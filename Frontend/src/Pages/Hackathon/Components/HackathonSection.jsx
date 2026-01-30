@@ -234,7 +234,7 @@ export const hackathonEventDetails = {
       title: "Neura Code 2.O - Relay Edition",
       date: "February 13 2026 ",
       venue: "computer Lab",
-      registrationFee:" ₹ 500 per head.",
+      registrationFee:" ₹ 300 per head.",
       registrationLink: " ",
       description: "Relay Edition is a team-based web design challenge where a reference website design is provided. Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
       rewards: [
@@ -320,13 +320,13 @@ export const hackathonEventDetails = {
         ],
         studentCoordinator: [
           {
-            name: "Mr.M.Aanoor Elavarasan",
-            phone: "+91 97904 87629",
-          },
-          {
             name: "Ms.G.Kari Vikashini",
             phone: "+91 93845 25869",
           },
+         {
+            name: "Mr.M.Osborn Jeremiah",
+            phone: "+91 96006 13985",
+         },
         ],
       },
     },
@@ -444,7 +444,7 @@ export const hackathonEventDetails = {
       title: "Startup Pitch 2026",
       date: "13.02.2026",
       venue: "Tech park, Conference hall",
-      registrationFee : " ₹ 500 per head.",
+      registrationFee : " ₹ 250 per head.(Without Food)",
       description: "The StartUp Pitch Event, organized by the Entrepreneurship Development Cell (EDC), aims to encourage students to ideate, innovate, and present impactful startup solutions in emerging technology domains such as automation, robotics, artificial intelligence, smart manufacturing, and intelligent systems. The event provides a platform for participants to showcase how modern development principles integrated with AI-driven technologies can be applied to solve real-world industrial and societal challenges. Students are expected to focus on innovation, technical feasibility, scalability, and real-time impact, while demonstrating entrepreneurial thinking and problem-solving skills. ",
       rewards: [
         {
@@ -474,7 +474,7 @@ export const hackathonEventDetails = {
         
       ],
       rules: [
-        "Teams must consist of 1-5 members.",
+        "Teams must consist of 1-3 members.",
         "10 - 15 slides are allowed for the presentation.",
         "4 min presentation + 3 min Q&A per team.",
         "Participants will present their startup idea through a structured pitch that explains the identified problem, proposed solution, target audience, and overall business approach. Teams should describe how their solution works at a high level, outline any relevant technologies involved, address ethical considerations, and discuss potential future growth and scalability.",
@@ -518,8 +518,8 @@ export const hackathonEventDetails = {
       title: "Designathon 2026",
       date: "February 13, 2026",
       registrationFee:" ₹ 500 per head.",
-      venue: "Idea lab [ Main Building ]",
-      description: "Designathon challenges individuals to solve an engineering problem within a limited time. Participants develop creative design solutions using logical and technical thinking. Originality, feasibility, and time management are key evaluation criteria.",
+      venue: "Bhaskara Block[Mechanical Dept]",
+      description: " This Designathon is centered on the innovative use of Computer-Aided Design (CAD) tools to create, redesign, and optimize mechanical components and systems for modern engineering applications. The event provides a creative and technical platform for Mechanical Engineering students to transform ideas into precise digital models using industry-standard CAD software.Participants will apply design thinking principles to develop concepts, create 3D models, perform assemblies, and generate engineering drawings while considering functionality, manufacturability, material selection, and sustainability. The Designathon encourages students to rethink conventional designs and propose efficient, lightweight, and cost-effective solutions through advanced CAD modeling techniques. ",
       rewards: [
         {
           position: "1st Prize",
@@ -537,25 +537,23 @@ export const hackathonEventDetails = {
           amount: "₹500",
         },
       ],
-      rounds: [
-        {
-          title: "Topics",
-          description: [
-            "Mechanical Design and Innovation",
-          ],
-        },
-        {
-          title: "Round: Design",
-          description: [
-          ],
-        },
-      ],
+     
       rules: [
-        "This is an individual (solo) participation event. Open to all participants of any displinary.",
-        "Participants must carry a valid ID card. The total duration of the designathon is 3 hours.",
-        "Participants must start and end within the given time frame.",
-        "Late submissions will not be considered. Any form of plagiarism will lead to immediate disqualification. Internet usage are restricted",
-        "Any misconduct may result in disqualification. The decision of the judges will be final and binding."
+        "All designs must be original and created during the Designathon period. ",
+      "	Participants must use CAD tools only for modeling, assembly, and detailing. ",
+      	"Pre-designed or previously submitted models will not be accepted. ",
+      "The problem statement / theme will be announced at the start of the event. ",
+      "Participants must adhere to the time limits specified for each phase of the Designathon.",
+      "Teams are allowed to seek guidance only from assigned mentors. ",
+      "Design solutions should consider",
+      "Functionality o Manufacturability o Material selection o Cost and sustainability ",
+      "Final submission must include: o 3D CAD models ",
+      "Assembly (if applicable) ",
+      "	Engineering drawings (minimum required views) o Design explanation / presentation ",
+      "	Any form of plagiarism or rule violation will lead to immediate disqualification." ,
+      "Judges’ decisions will be final and binding. ",
+      "	The organizing committee reserves the right to modify rules if necessary. ",
+
       ],
       schedule: [
         {
@@ -573,8 +571,8 @@ export const hackathonEventDetails = {
             email: "",
           },
            {
-            name: "Mr.S.Venkatesan",
-            phone: "+91 94430 15463",
+            name: "Mr.P.Prasanth",
+            phone: "+91 97882 06877",
             email: "",
           },
         ],
@@ -594,6 +592,101 @@ export const hackathonEventDetails = {
             phone: "+91 90254 65388",
             email: "",
           },
+        ],
+      },
+    },
+
+    "hackathon-7": {
+      id: "hackathon-7",
+      title: "PCBathon ",
+      date: "12th Feb (9.30AM to 8.00PM) & 13th Feb 2026(9:30AM to 2:30PM)",
+      venue: "AICTE IDEA Lab",
+      registrationFee:" ₹ 500 per head.",
+      registrationLink: "",
+      description: "  This technical event will focus on designing and creating an innovative approach to redesigning and reconfiguring printed circuit board (PCB) modules that power the electronics of tomorrow. This is a fantastic opportunity for everyone, especially students, to combine creativity with technical expertise. Participating in this hackathon will help you unlock the Embedded Hardware Developer within you, and you may also get a  chance to join our team! Dive into the world of Embedded Hardware Development and showcase your ability to create cutting-edge, efficient circuit designs.",
+      rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 5,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹2,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹1,000",
+        },
+      ],
+      
+      rounds: [
+        {
+          title: "Round 1",
+          description: [
+            "Based on the performance, Participants will be short listed for further rounds."
+          ],
+        }
+      ], 
+
+
+      challenge: [
+        {
+          title: "Round 1",
+          description: [
+            "Based on the performance, Participants will be short listed for further rounds."
+          ],
+        }
+      ],
+
+       eligibility: {
+        categories: [
+          "Students who want to pursue a career in Hardware Development, Electronics Engineers, and Tech enthusiasts.",
+        "Have a profound knowledge of Electronic components, PCB designing knowledge, path routing, and Antenna understating.  ",],
+      },
+
+      rules: [
+        "2 students per team. Team members may be from different departments or different institutions are allowed.",
+        "Teams are instructed to use any Open-source software or student licenced software can be used for Schematic and PCB design. Online tools and Crack version software are strictly prohibited.",
+        "Evaluation is done by the quality of the design and skills only. Not by the proficiency of tools  usage.", 
+        "Only SMD components are allowed for designing. Through-hole components maybe allowed for some components such as connectors where mechanical strength required. ",
+        "Clearly understand the problem before diving into solutions. ",
+        "This Challenge involves Schematic Designing, Library Creation, PCB Designing, Footprint assignment. Adhere to ethical practices.",
+        "Usage of AI in any form is strictly prohibited. If any teams identified the using of AI will be disqualified immediately at any stage of the hackathon.  ",
+        "Participants are required to give an interactive demonstration of their design",
+        "Ensure that your PCB marking and connection are well-commented and organized.",
+        "You cannot use hackathon work/development/code and any other material related to assessment or evaluation other than this event.",
+      ],
+      schedule: [
+        {
+          date: "12th Feb - 13th Feb, 2026",
+          time: "Day1 (9.30AM to 8.00PM) & Day2 (9:30AM to 2:30)",
+          location: "AICTE IDEA Lab",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Mr. Rajavenkatesan T ",
+            phone: "+91 94455 77142",
+          },
+          {
+            name:"Mr. Raguvaran K ",
+            phone: " +91 99946 66307"
+          }
+        ],
+        studentCoordinator: [
+          {
+            name: " Iniyavan S  ",
+            phone: "+91 963748 84010",
+          },
+          {
+            name: "Dinesh V ",
+            phone: "+91 63790 02495",
+          }
         ],
       },
     },

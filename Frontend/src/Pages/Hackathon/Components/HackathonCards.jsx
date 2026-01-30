@@ -275,6 +275,32 @@ const HackathonCards = () => {
                 </div>
               )}
 
+                          
+
+
+              {/* eligibilitypoints Section */}
+              {selectedHackathon.eligibilitypoints && selectedHackathon.eligibilitypoints.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Eligibility
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {selectedHackathon.eligibilitypoints.map((rule, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="flex items-start gap-2 text-gray-300"
+                      >
+                        <span className="text-primary mt-1">▸</span>
+                        <span className="text-sm">{rule}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Eligibility Section */}
               {selectedHackathon.eligibility && selectedHackathon.eligibility.length > 0 && (
                 <div className="mb-8">

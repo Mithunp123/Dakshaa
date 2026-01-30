@@ -21,6 +21,7 @@ import Tech20 from "../assets/EventsImages/EventDetails/TechnicalImages/txt_tech
 import Tech21 from "../assets/EventsImages/EventDetails/TechnicalImages/vlsi_tech.png";
 import Tech22 from "../assets/EventsImages/EventDetails/TechnicalImages/ft_tech1.png";
 import Tech23 from "../assets/EventsImages/EventDetails/TechnicalImages/ece_tech1.png";
+import Tech24 from "../assets/EventsImages/EventDetails/TechnicalImages/cody.png";
 
 
 
@@ -139,6 +140,11 @@ export const technicalEvents = [
   {
     image: Tech23,
     eventId: "tech-ece1",
+    price: 250,
+  },
+  {
+    image: Tech24,
+    eventId: "tech-cody",
     price: 250,
   },
   
