@@ -465,19 +465,39 @@ export const hackathonEventDetails = {
       ],
       rounds: [
         {
-          title: "Topics",
+          title: "Round-1",
           description: [
-            "General Startup Or Bussiness Innovation",
+            "Registration and idea submission should before 09/02/2026, 12:00 pm , and send the idea to this mail id : msme@ksrct.ac.in",
 
           ],
         },
+        {
+          title: "Round-2",
+          description: [
+            "Initial screening. The selected teams are call for pitching. Intimation through mail before  11/02/2026 , 4 pm. The rejected teams are intimate through mail with commends.",
+          ],
+        },
+        {
+          title: "Round-3",
+          description:[
+            "Final Pitching on 13/02/2026 , the top 10 teams will be recommended for 3 lakhs seed fund in  EDII-TN, TN-IVP ",
+            "EDII-TN-IVP, knowledge partner Review @KSRCT",
+          ],
+        },
+        {
+          title: "Note:Topics to be align with",
+          description:[
+            "Innovation , Uniqueness, Scalability, Revenue Model, Impact on SGD , ESG, Rural development",
+            "Total number of slide : Maximum 10",
+          ],
+        }
         
       ],
       rules: [
         "Teams must consist of 1-3 members.",
-        "10 - 15 slides are allowed for the presentation.",
+        "Max 10 slides are allowed for the presentation.",
         "4 min presentation + 3 min Q&A per team.",
-        "Participants will present their startup idea through a structured pitch that explains the identified problem, proposed solution, target audience, and overall business approach. Teams should describe how their solution works at a high level, outline any relevant technologies involved, address ethical considerations, and discuss potential future growth and scalability.",
+        
 
       ],
       schedule: [
@@ -492,14 +512,14 @@ export const hackathonEventDetails = {
         facultyCoordinator: [
           {
             name: "Dr. N. Tiruvenkadam ",
-            phone: "+91 99446 72671",
+            phone: "",
             email: "",
           },
         ],
         studentCoordinator: [
           {
             name: "Ms. H. Ainul Zuvairia",
-            phone: "+91 80562 30731",
+            phone: "",
             email: "",
           },
           {
@@ -510,6 +530,10 @@ export const hackathonEventDetails = {
             name:"Mr. M. Barath Kumar ",
             phone: "+91 80123 55633",
           },
+          {
+            name:"Mr. K. Vijayachandran ",
+            phone: "+91 73971 81421",
+          }
         ],
       },
     },

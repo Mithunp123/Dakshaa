@@ -1251,13 +1251,6 @@ export const nonTechnicalDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. S. Pradeep",
-          designation: "Assistant Professor",
-          department: "",
-          phone: " +91 81221 39862",
-          email: "pradeeps@ksrct.ac.in",
-        },
-        {
           name: "Dr. N. Lalithamani",
           designation: "Professor",
           department: "",
