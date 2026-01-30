@@ -1190,7 +1190,7 @@ export const nonTechnicalDetails = [
           name: "Dr. M. B. Sampath",
           designation: "Professor",
           department: "Textile Technology",
-          phone: "",
+          phone: "+91 90039 20300",
           email: " ",
         },
       ],

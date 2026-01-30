@@ -5,7 +5,12 @@ import hackathon4 from "../assets/EventsImages/EventDetails/HackathonImages/hack
 import hackathon5 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon5.webp";
 import hackathon6 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon6.webp";
 import { hackathonEventDetails } from "../Pages/Hackathon/Components/HackathonSection";
+<<<<<<< HEAD
 import hackathon7 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon7.webp";
+=======
+import hackathon7 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon7.png";
+import hackathon8 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon8.png";
+>>>>>>> 8b382ced048ed25a3b4d3a22680e593668368be3
 /*
 NeuroHack 2.O - hackathon1
 BioNexathon - hackathon2
@@ -52,6 +57,11 @@ export const hackathonEvents = [
     eventId: "hackathon7",
     title: "RoboWars",
   },
+  {
+    image: hackathon8,
+    eventId: "hackathon8",
+    title: "Cloud",
+  }
 
 
 ];
@@ -121,6 +131,13 @@ export const hackathonDetails = [
     img: hackathon7,
     shortTitle: hackathonEventDetails["hackathon-7"]?.title || "RoboWars",
     department: "Department of Mechanical Engineering",
+  },
+  {
+    ...hackathonEventDetails["hackathon-8"],
+    id: 8,
+    img: hackathon8,
+    shortTitle: hackathonEventDetails["hackathon-8"]?.title || "Cloud",
+    department: "Department of Computer Science and Engineering",
   },
 
 ];
