@@ -84,24 +84,7 @@ export const exposAndShowsDetails = [
     price: "Free",
     registrationLink: "",
     schedule: [],
-    contact: {
-      facultyCoordinator: [
-        {
-          name: "",
-          designation: "",
-          phone: "+91 ",
-        },
-      ],
-      studentCoordinator: [
-        {
-          name: "",
-          department: "",
-          phone: "+91 ",
-          email: "",
-        },
-        
-      ],
-    },
+    
   },
 
   {
@@ -115,23 +98,6 @@ export const exposAndShowsDetails = [
     price: "Free",
     registrationLink: "",
     schedule: [],
-    contact: {
-      facultyCoordinator: [
-        {
-          name: "",
-          designation: "",
-          phone: "+91 ",
-        },
-      ],
-      studentCoordinator: [
-        {
-          name: "",
-          department: "",
-          phone: "+91 ",
-          email: "",
-        },
-        
-      ],
-    },
+    
   },
 ];

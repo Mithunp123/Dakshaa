@@ -485,7 +485,7 @@ export const hackathonEventDetails = {
           ],
         },
         {
-          title: "Note:Topics to be align with",
+          title: "PPT should be align with",
           description:[
             "Innovation , Uniqueness, Scalability, Revenue Model, Impact on SGD , ESG, Rural development",
             "Total number of slide : Maximum 10",
@@ -524,7 +524,7 @@ export const hackathonEventDetails = {
           },
           {
             name:"Ms. A. Shrimathi ",
-            phone: "+91 63827 72489",
+            phone: "",
           },
           {
             name:"Mr. M. Barath Kumar ",
@@ -711,6 +711,121 @@ export const hackathonEventDetails = {
             name: "Dinesh V ",
             phone: "+91 63790 02495",
           }
+        ],
+      },
+    },
+
+    "hackathon-8": {
+      id: "hackathon-8",
+      title: "Cloudathon ",
+      date: "13 February 2026",
+      venue: "AB Lab 4",
+      registrationFee:" ₹ 500 per head.",
+      registrationLink: "",
+      description: "CLOUDATHON is a high-energy, hands-on cloud hackathon where ideas turn into scalable, real-world solutions. Build, deploy, and optimize cloud-powered applications while tackling today’s most exciting tech challenges. ",
+      rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 5,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹3,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹2,000",
+        },
+      ],
+
+      
+      rounds: [
+        {
+          title: "Round 1 : : Idea Submission",
+          description: [
+            "Each team must submit the idea clearly outlining:",
+            "Problem statement",
+            "Proposed solution",
+            "Cloud technologies to be used",
+            "Feasibility and real-world impact",
+            "Innovation and uniqueness",
+          ],
+        },
+        {
+          title: "Round 2 : Cloud Build & Demo Round",
+          description: [
+
+            "In this round, teams are expected to design, implement, and demonstrate their proposed solution using cloud technologies.",
+            "Build a cloud-based prototype or working model",
+            "Use cloud services such as compute, storage, databases, APIs, serverless, etc.",
+            "Integrate supporting technologies (if applicable)",  
+            "AI/ML, IoT, Data Analytics, Automation, Security, etc.",
+              "Demonstrate scalability or cloud advantages",
+              "Auto-scaling, pay-as-you-go, remote access, performance, or availability"
+          ]
+        }
+      ], 
+
+
+      eligibility: {
+        categories: [
+          "Each team must consist of maximum 2 members",
+          "All members should belong to the same college or institution",
+          "One member must be designated as the Team Leader",
+        ],
+      },
+
+      theme: {
+        details: [
+          "Artificial Intelligence & Machine Learning (AI/ML)",
+          "Internet of Things (IoT)",
+          "Data Analytics & Big Data",
+          "DevOps, Automation & Cloud Optimization"
+        ]
+      },
+
+      rules: [
+        "Participants must bring their own laptop and required software must be pre-installed ",
+        "Participants must have atleast free-tier account in AWS/GCP/Azure Cloud",
+        "All submissions must be original and team-created",
+        "Plagiarism, copied ideas, or pre-built projects will lead to immediate disqualification",
+        "Participants must maintain professionalism and ethical conduct"
+            ],
+      schedule: [
+        {
+          date: "12 February 2026",
+          time: "9:00 AM to 4:00 PM",
+          location: "AB Lab 4",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Dr. Tamilarasi M ",
+            phone: "+91 97500 37023",
+          },
+          {
+            name:"Dr. Sangeetha M ",
+            phone: " +91 99946 70017"
+          }
+        ],
+        studentCoordinator: [
+          {
+            name: " Rasikashree S  ",
+            phone: "+91 94422 90033",
+          },
+          {
+            name: "Ashmitha B  ",
+            phone: "+91 90437 14619",
+          },
+          {
+          name: "Sundara Raghav G  ",
+          phone: "+91 96002 07647",
+          },
         ],
       },
     },
