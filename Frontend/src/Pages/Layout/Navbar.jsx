@@ -8,53 +8,20 @@ import { Menu, X, ChevronDown, Download, LogIn, LogOut, User } from "lucide-reac
 import brochure from "../../assets/Brochure.pdf";
 import { supabase } from "../../supabase";
 import { preloadPages } from "../../App";
+import { useAuth } from "../../Components/AuthProvider";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("Home");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [user, setUser] = useState(null);
-  const [userRole, setUserRole] = useState('student');
+  const { user, role: userRole } = useAuth();
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const location = useLocation();
   
   // Preload cache to avoid duplicate preloads
   const preloadedRef = useRef(new Set());
-
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-        if (profile) setUserRole(profile.role);
-      }
-    };
-
-    checkUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-        if (profile) setUserRole(profile.role);
-      } else {
-        setUserRole('student');
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

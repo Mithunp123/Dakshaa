@@ -182,7 +182,7 @@ const RegistrationForm = () => {
       });
       
       // Show success toast
-      toast.success('Payment successful. Registration confirmed.', {
+      toast.success('Payment successful. Registration confirmed. Redirecting to home...', {
         duration: 4000,
         position: 'top-center',
         style: {
@@ -193,6 +193,11 @@ const RegistrationForm = () => {
       
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
+
+      // Redirect to home after a delay
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
     }
   }, [user]);
 

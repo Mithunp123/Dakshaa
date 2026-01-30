@@ -1,47 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '../supabase';
+import { useAuth } from './AuthProvider';
 
 const AuthRedirect = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isReady, setIsReady] = useState(false);
+  const { user, role, loading } = useAuth();
   
   // Get return URL from state (passed from event registration or other pages)
   const returnTo = location.state?.returnTo;
 
   useEffect(() => {
-    let mounted = true;
-    
-    const checkUser = async () => {
-      // Set ready immediately for non-login pages
-      if (location.pathname !== '/login') {
-        setIsReady(true);
-        return;
-      }
+    // Only apply redirect logic on login page
+    if (location.pathname !== '/login') return;
 
-      try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        
-        if (!mounted) return;
-        
-        if (error || !user) {
-          setIsReady(true);
-          return;
-        }
-
-        // Fetch role from profiles table
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-
-        if (!mounted) return;
-
-        const role = profile?.role || 'student';
-
-        // Redirect based on role
+    // If user is authenticated, redirect them based on role
+    if (!loading && user) {
         if (role === 'super_admin') {
           navigate('/admin', { replace: true });
         } else if (role === 'registration_admin') {
@@ -53,28 +27,17 @@ const AuthRedirect = ({ children }) => {
         } else {
           navigate(returnTo || '/', { replace: true });
         }
-      } catch (error) {
-        console.error('AuthRedirect error:', error);
-        if (mounted) {
-          setIsReady(true);
-        }
-      }
-    };
-
-    checkUser();
-
-    return () => {
-      mounted = false;
-    };
-  }, [navigate, returnTo, location.pathname]);
+    }
+  }, [user, role, loading, navigate, returnTo, location.pathname]);
 
   // For non-login pages, render immediately
   if (location.pathname !== '/login') {
     return <>{children}</>;
   }
 
-  // For login page, show children once ready
-  if (!isReady) {
+  // For login page, show children only if not authenticated
+  // (Loading is handled by AuthProvider mostly, but good to be safe)
+  if (loading || user) {
     return null;
   }
 

@@ -1,30 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { LayoutDashboard, ShieldCheck } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '../../supabase';
+import { useAuth } from '../../Components/AuthProvider';
 
 const FloatingDashboardButton = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [userRole, setUserRole] = useState('student');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const checkRole = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setIsAuthenticated(true);
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-        if (profile) setUserRole(profile.role);
-      }
-    };
-    checkRole();
-  }, []);
+  const { user, role: userRole } = useAuth();
+  const isAuthenticated = !!user;
 
   // Don't show the button if we're already on a dashboard
   if (

@@ -20,6 +20,7 @@ import FloatingCallButton from "./Pages/Layout/FloatingCallButton";
 import FloatingDashboardButton from "./Pages/Layout/FloatingDashboardButton";
 import BottomNavbar from "./Pages/Layout/BottomNavbar";
 import SupabaseHealthCheck from "./Components/SupabaseHealthCheck";
+import { AuthProvider } from "./Components/AuthProvider";
 
 // Lazy Load Pages with preload functions for faster navigation
 const Home = lazy(() => import("./Pages/Home/Home"));
@@ -488,9 +489,11 @@ function App() {
         }}
       />
       <SupabaseHealthCheck>
-        <Router>
-          <AppContent />
-        </Router>
+        <AuthProvider>
+          <Router>
+            <AppContent />
+          </Router>
+        </AuthProvider>
       </SupabaseHealthCheck>
     </>
   );

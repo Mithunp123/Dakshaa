@@ -1,55 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { supabase } from '../supabase';
+import { useAuth } from './AuthProvider';
 
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
-  const [userRole, setUserRole] = useState(null);
+  const { user, role, loading } = useAuth();
   const location = useLocation();
 
-  useEffect(() => {
-    let isMounted = true;
-    
-    const performAuthCheck = async () => {
-      if (isMounted) {
-        await checkAuth();
-      }
-    };
-    
-    performAuthCheck();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      setUser(user);
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-      if (profile) {
-        setUserRole(profile.role);
-      }
-    } catch (error) {
-      console.error('Auth check error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Note: AuthProvider usually handles the loading state before rendering children.
+  // But strictly speaking, if we use it elsewhere, we might want to check loading.
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -59,20 +17,21 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   }
 
   if (!user) {
+    // Redirect to login, saving the current location
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles.length > 0 && !allowedRoles.includes(userRole)) {
-    // If user is a student, send to dashboard, otherwise send to their respective home
-    if (userRole === 'student') {
+  if (allowedRoles.length > 0 && !allowedRoles.includes(role)) {
+    // If user is logged in but doesn't have permission, redirect to their dashboard
+    if (role === 'student') {
       return <Navigate to="/dashboard" replace />;
-    } else if (userRole === 'super_admin') {
+    } else if (role === 'super_admin') {
       return <Navigate to="/admin" replace />;
-    } else if (userRole === 'registration_admin') {
+    } else if (role === 'registration_admin') {
       return <Navigate to="/admin/desk" replace />;
-    } else if (userRole === 'event_coordinator') {
+    } else if (role === 'event_coordinator') {
       return <Navigate to="/coordinator" replace />;
-    } else if (userRole === 'volunteer') {
+    } else if (role === 'volunteer') {
       return <Navigate to="/volunteer" replace />;
     }
     return <Navigate to="/" replace />;

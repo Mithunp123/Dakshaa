@@ -17,90 +17,21 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../../supabase';
 import NotificationDropdown from './NotificationDropdown';
+import { useAuth } from '../../../Components/AuthProvider';
 
 const DashboardLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { user, role } = useAuth();
   
-  // Get user from localStorage synchronously for instant load
-  const getStoredUser = () => {
-    try {
-      const session = localStorage.getItem('sb-ltmyqtcirhsgfyortgfo-auth-token');
-      if (session) {
-        const sessionData = JSON.parse(session);
-        return sessionData?.user || null;
-      }
-    } catch (error) {
-      console.warn('Error reading stored session:', error);
-    }
-    return null;
+  // Use auth context user for display
+  const userProfile = {
+    full_name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User',
+    email: user?.email,
+    role: role || 'student'
   };
 
-  // Try to get initial profile from cache or build from stored user
-  const getInitialProfile = () => {
-    // First try sessionStorage cache
-    const cachedProfile = sessionStorage.getItem('userProfile');
-    if (cachedProfile) {
-      try {
-        return JSON.parse(cachedProfile);
-      } catch (e) {}
-    }
-    // Fallback: build basic profile from stored user for instant display
-    const storedUser = getStoredUser();
-    if (storedUser) {
-      return {
-        full_name: storedUser.user_metadata?.full_name || storedUser.email?.split('@')[0] || 'User',
-        email: storedUser.email,
-        role: 'student'
-      };
-    }
-    return null;
-  };
-
-  const [userProfile, setUserProfile] = useState(getInitialProfile);
-  const [loading, setLoading] = useState(false); // Start with false since we have initial profile
   const navigate = useNavigate();
   const location = useLocation();
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      // If we already have a complete cached profile (with role from DB), skip fetch
-      const cached = sessionStorage.getItem('userProfile');
-      if (cached) {
-        try {
-          const parsedProfile = JSON.parse(cached);
-          // Check if it's a complete profile (has role from DB, not default)
-          if (parsedProfile.role && parsedProfile.role !== 'student') {
-            setUserProfile(parsedProfile);
-            return; // Complete cache, no need to fetch
-          }
-        } catch (e) {
-          console.warn('Failed to parse cached profile');
-        }
-      }
-
-      // Background fetch to get complete profile from DB
-      try {
-        const storedUser = getStoredUser();
-        
-        if (storedUser) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('full_name, email, role')
-            .eq('id', storedUser.id)
-            .single();
-          
-          if (profile) {
-            setUserProfile(profile);
-            sessionStorage.setItem('userProfile', JSON.stringify(profile));
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-      }
-    };
-
-    fetchUserProfile();
-  }, []); // Run only once on mount
 
   // Close sidebar when route changes on mobile
   useEffect(() => {
