@@ -1080,7 +1080,7 @@ app.post("/payment/initiate", async (req, res) => {
 
     // Generate Direct Payment URL (Client Redirect)
     // We do NOT fetch from backend. We construct the URL and let the frontend redirect the user.
-    const baseUrl = 'https://5b0139739e3b.ngrok-free.app/HandlePaymentFromApp';
+    const baseUrl = 'https://fees.ksrctdigipro.in/HandlePaymentFromApp';
     
     // Ensure payload values are strings for URLSearchParams
     const queryParams = new URLSearchParams();
@@ -1389,7 +1389,7 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
          });
 
          // Construct Payment URL
-         const baseUrl = 'https://5b0139739e3b.ngrok-free.app/HandlePaymentFromApp';
+         const baseUrl = 'https://fees.ksrctdigipro.in/HandlePaymentFromApp';
          const queryParams = new URLSearchParams();
          // Ensure correct mapping
          Object.entries(newPayload).forEach(([key, value]) => {
@@ -2207,6 +2207,125 @@ app.get("/api/admin/finance", async (req, res) => {
   } catch (error) {
     console.error('Finance API Error:', error);
     res.status(500).json({ success: false, error: 'Failed to fetch finance data' });
+  }
+});
+
+/* 🟢 Team Events Combo Visibility API Endpoints */
+
+// Get combo visibility setting for team events
+app.get("/api/admin/team-events-combo-visibility", async (req, res) => {
+  try {
+    // Check if there's a global setting in a settings table, if not return default (false)
+    const { data: setting, error } = await supabase
+      .from('admin_settings')
+      .select('setting_value')
+      .eq('setting_key', 'team_events_in_combo_packages')
+      .single();
+
+    // If no setting exists, default to false (team events not visible in combo)
+    const visibility = setting?.setting_value === 'true' || false;
+    
+    res.json({
+      success: true,
+      team_events_in_combo_visible: visibility
+    });
+  } catch (error) {
+    console.error('Error fetching team events combo visibility:', error);
+    res.json({
+      success: true,
+      team_events_in_combo_visible: false // Default to hidden
+    });
+  }
+});
+
+// Toggle combo visibility for team events
+app.post("/api/admin/toggle-team-events-combo-visibility", async (req, res) => {
+  try {
+    const { visible } = req.body;
+    
+    // First check if setting exists
+    const { data: existingSetting } = await supabase
+      .from('admin_settings')
+      .select('id')
+      .eq('setting_key', 'team_events_in_combo_packages')
+      .single();
+
+    if (existingSetting) {
+      // Update existing setting
+      const { error: updateError } = await supabase
+        .from('admin_settings')
+        .update({ 
+          setting_value: visible ? 'true' : 'false',
+          updated_at: new Date().toISOString()
+        })
+        .eq('setting_key', 'team_events_in_combo_packages');
+        
+      if (updateError) throw updateError;
+    } else {
+      // Create new setting
+      const { error: insertError } = await supabase
+        .from('admin_settings')
+        .insert({
+          setting_key: 'team_events_in_combo_packages',
+          setting_value: visible ? 'true' : 'false',
+          setting_description: 'Controls whether team events are visible in combo packages'
+        });
+        
+      if (insertError) throw insertError;
+    }
+
+    res.json({
+      success: true,
+      message: `Team events in combo packages ${visible ? 'enabled' : 'disabled'}`,
+      team_events_in_combo_visible: visible
+    });
+  } catch (error) {
+    console.error('Error toggling team events combo visibility:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update team events combo visibility'
+    });
+  }
+});
+
+// Get events for combo creation with visibility filter
+app.get("/api/admin/events-for-combo", async (req, res) => {
+  try {
+    // Get team events visibility setting
+    const { data: setting } = await supabase
+      .from('admin_settings')
+      .select('setting_value')
+      .eq('setting_key', 'team_events_in_combo_packages')
+      .single();
+
+    const showTeamEvents = setting?.setting_value === 'true' || false;
+    
+    let query = supabase
+      .from('events')
+      .select('id, name, event_key, category, min_team_size, max_team_size, price')
+      .eq('is_active', true);
+    
+    // If team events are not allowed in combos, filter them out
+    if (!showTeamEvents) {
+      query = query.or('min_team_size.is.null,min_team_size.lte.1')
+                  .or('max_team_size.is.null,max_team_size.lte.1');
+    }
+
+    const { data: events, error } = await query.order('name');
+    
+    if (error) throw error;
+
+    res.json({
+      success: true,
+      data: events || [],
+      team_events_visible: showTeamEvents
+    });
+  } catch (error) {
+    console.error('Error fetching events for combo:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch events for combo'
+    });
   }
 });
 
