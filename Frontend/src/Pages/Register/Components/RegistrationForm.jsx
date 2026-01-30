@@ -9,6 +9,7 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Check,
   Sparkles,
   Star,
@@ -97,6 +98,9 @@ const RegistrationForm = () => {
   const [validationMessage, setValidationMessage] = useState("");
   const [loadingTimeout, setLoadingTimeout] = useState(false);
   const [showingCachedData, setShowingCachedData] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const categoryDropdownRef = useRef(null);
   
   // State for Mixed Registration (Team Details per Event)
   const [teamDetailsMap, setTeamDetailsMap] = useState({});
@@ -106,6 +110,7 @@ const RegistrationForm = () => {
 
   // Ref to track footer visibility
   const footerObserverRef = useRef(null);
+  const searchContainerRef = useRef(null);
 
   // Detect when footer becomes visible to hide navigation buttons
   useEffect(() => {
@@ -128,6 +133,38 @@ const RegistrationForm = () => {
       }
     };
   }, []);
+
+  // Close search suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    if (showSuggestions) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showSuggestions]);
+
+  // Close category dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target)) {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
+
+    if (isCategoryDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isCategoryDropdownOpen]);
 
   // Memoized steps configuration
   const steps = useMemo(
@@ -2154,7 +2191,7 @@ const RegistrationForm = () => {
                 {/* Search and Filter - Hide for team mode */}
                 {registrationMode !== "team" && (
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex-1 relative">
+                    <div className="flex-1 relative z-50" ref={searchContainerRef}>
                       <Search
                         className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"
                         size={24}
@@ -2163,51 +2200,136 @@ const RegistrationForm = () => {
                         type="text"
                         placeholder="Search events..."
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={(e) => {
+                          setSearchTerm(e.target.value);
+                          setShowSuggestions(true);
+                        }}
+                        onFocus={() => setShowSuggestions(true)}
                         className="w-full pl-14 pr-6 py-4 text-lg bg-gray-800 border-2 border-gray-700 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-lg transition-all"
                       />
+                      
+                      {/* Search Suggestions Dropdown */}
+                      <AnimatePresence>
+                        {showSuggestions && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10, scaleY: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scaleY: 1 }}
+                            exit={{ opacity: 0, y: 10, scaleY: 0.95 }}
+                            className="absolute top-full left-0 right-0 mt-2 bg-gray-900/95 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-2xl max-h-80 overflow-y-auto overflow-x-hidden z-[100]"
+                          >
+                            {events
+                              .filter(e => 
+                                (categoryFilter === "ALL" || e.category === categoryFilter) &&
+                                e.event_name.toLowerCase().includes(searchTerm.toLowerCase())
+                              )
+                              .length > 0 ? (
+                              events
+                                .filter(e => 
+                                  (categoryFilter === "ALL" || e.category === categoryFilter) &&
+                                  e.event_name.toLowerCase().includes(searchTerm.toLowerCase())
+                                )
+                                .map((event) => (
+                                  <div
+                                    key={event.id}
+                                    onClick={() => {
+                                      setSearchTerm(event.event_name);
+                                      setShowSuggestions(false);
+                                    }}
+                                    className="px-6 py-4 hover:bg-white/5 cursor-pointer border-b border-gray-800 last:border-0 flex justify-between items-center group transition-colors"
+                                  >
+                                    <span className="text-gray-300 group-hover:text-white font-semibold transition-colors">
+                                      {event.event_name}
+                                    </span>
+                                    <span className={`text-xs px-2 py-1 rounded-full border ${
+                                      event.category === 'Technical' ? 'bg-blue-500/10 border-blue-500/30 text-blue-400' :
+                                      event.category === 'Non-Technical' ? 'bg-purple-500/10 border-purple-500/30 text-purple-400' :
+                                      event.category === 'Workshop' ? 'bg-orange-500/10 border-orange-500/30 text-orange-400' :
+                                      'bg-gray-800 border-gray-700 text-gray-400'
+                                    }`}>
+                                      {event.category || 'Event'}
+                                    </span>
+                                  </div>
+                                ))
+                            ) : (
+                              <div className="px-6 py-8 text-center">
+                                <Search className="w-8 h-8 text-gray-600 mx-auto mb-2" />
+                                <p className="text-gray-500 text-sm">No matching events found</p>
+                              </div>
+                            )}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
-                    <div className="flex gap-2 overflow-x-auto pb-2">
+                    {/* Category Dropdown */}
+                    <div className="relative min-w-[200px] z-40" ref={categoryDropdownRef}>
                       <button
-                        onClick={() => setCategoryFilter("ALL")}
-                        className={`px-4 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
-                          categoryFilter === "ALL"
-                            ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
-                            : "bg-gray-800 text-gray-400 hover:text-white"
-                        }`}
+                        onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                        className="w-full px-4 py-4 bg-gray-800 border-2 border-gray-700 rounded-2xl text-white flex justify-between items-center hover:border-blue-500 transition-colors"
                       >
-                        All Events
+                        <span className="font-medium truncate">
+                          {categoryFilter === "ALL" ? "All Categories" : categoryFilter}
+                        </span>
+                        <ChevronDown size={20} className={`transform transition-transform ${isCategoryDropdownOpen ? "rotate-180" : ""}`} />
                       </button>
-                      {categories
-                        .filter((cat) => cat !== "ALL")
-                        .map((cat, index) => {
-                          // Display proper names for categories
-                          const displayName = cat === "Technical" ? "TECH" :
-                                            cat === "Non-Technical" ? "NON-TECH" :
-                                            cat === "Team Events" ? "TEAM EVENTS" :
-                                            cat === "Hackathon" ? "HACKATHON" :
-                                            cat === "Conference" ? "CONFERENCE" :
-                                            cat === "Workshop" ? "WORKSHOP" :
-                                            cat === "Sports" ? "SPORTS" :
-                                            cat === "Cultural" ? "CULTURAL" :
-                                            cat === "Conference" ? "CONFERENCE" :
-                                            cat.toUpperCase();
-                          
-                          return (
-                            <button
-                              key={`cat-${cat}-${index}`}
-                              onClick={() => setCategoryFilter(cat)}
-                              className={`px-5 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
-                              categoryFilter === cat
-                                ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg transform scale-105"
-                                : "bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700"
-                            }`}
-                            >
-                              {displayName}
-                            </button>
-                          );
-                        })}
-                  </div>
+                      
+                      <AnimatePresence>
+                        {isCategoryDropdownOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10, scaleY: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scaleY: 1 }}
+                            exit={{ opacity: 0, y: 10, scaleY: 0.95 }}
+                            className="absolute top-full right-0 mt-2 w-full sm:w-64 bg-gray-900/95 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-2xl overflow-hidden z-[100] max-h-64 overflow-y-auto"
+                          >
+                            <div className="p-2 space-y-1">
+                              <button
+                                onClick={() => {
+                                  setCategoryFilter("ALL");
+                                  setIsCategoryDropdownOpen(false);
+                                }}
+                                className={`w-full px-4 py-3 text-left rounded-xl transition-all ${
+                                  categoryFilter === "ALL"
+                                    ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 border border-blue-500/30"
+                                    : "text-gray-300 hover:bg-white/5"
+                                }`}
+                              >
+                                All Events
+                              </button>
+                              {categories
+                                .filter((cat) => cat !== "ALL")
+                                .map((cat, index) => {
+                                  // Display proper names for categories
+                                  const displayName = cat === "Technical" ? "TECH" :
+                                                    cat === "Non-Technical" ? "NON-TECH" :
+                                                    cat === "Team Events" ? "TEAM EVENTS" :
+                                                    cat === "Hackathon" ? "HACKATHON" :
+                                                    cat === "Conference" ? "CONFERENCE" :
+                                                    cat === "Workshop" ? "WORKSHOP" :
+                                                    cat === "Sports" ? "SPORTS" :
+                                                    cat === "Cultural" ? "CULTURAL" :
+                                                    cat.toUpperCase();
+                                  
+                                  return (
+                                    <button
+                                      key={`cat-dropdown-${cat}-${index}`}
+                                      onClick={() => {
+                                        setCategoryFilter(cat);
+                                        setIsCategoryDropdownOpen(false);
+                                      }}
+                                      className={`w-full px-4 py-3 text-left rounded-xl transition-all ${
+                                      categoryFilter === cat
+                                        ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 border border-blue-500/30"
+                                        : "text-gray-300 hover:bg-white/5"
+                                    }`}
+                                    >
+                                      {displayName}
+                                    </button>
+                                  );
+                                })}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
                 )}
 
@@ -2358,7 +2480,7 @@ const RegistrationForm = () => {
                       className="w-full pl-14 pr-6 py-4 text-lg bg-gray-800 border-2 border-gray-700 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-lg transition-all"
                     />
                   </div>
-                  <div className="flex gap-2 overflow-x-auto pb-2">
+                  <div className="flex gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     <button
                       onClick={() => setCategoryFilter("ALL")}
                       className={`px-5 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
