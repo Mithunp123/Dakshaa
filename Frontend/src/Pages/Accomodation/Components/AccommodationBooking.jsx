@@ -49,6 +49,10 @@ const AccommodationBooking = () => {
         });
       }
       
+      // 🎁 Referral Count Increment Logic
+      // After successful payment, check if user has a referred_by code and increment the referral count
+      handleReferralIncrement();
+      
       // Refresh bookings to show the new one
       setTimeout(() => {
         fetchExistingBookings();
@@ -184,9 +188,60 @@ const AccommodationBooking = () => {
 
   const calculateTotal = () => {
     if (bookingType === 'accommodation') {
-      return formData.accommodationDates.length * 300;
+      return formData.accommodationDates.length * 350;
     } else {
       return formData.lunchDates.length * 100;
+    }
+  };
+
+  const handleReferralIncrement = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: userProfileForReferral } = await supabase
+        .from('profiles')
+        .select('referred_by')
+        .eq('id', user.id)
+        .single();
+
+      if (userProfileForReferral && userProfileForReferral.referred_by) {
+        const referralCode = userProfileForReferral.referred_by.trim();
+        console.log(`🎁 User has referral code: ${referralCode}. Checking referral_code table...`);
+
+        // Check if this referral code exists in the referral_code table
+        const { data: existingReferral, error: referralFetchErr } = await supabase
+          .from('referral_code')
+          .select('referral_id, usage_count')
+          .eq('referral_id', referralCode)
+          .maybeSingle();
+
+        if (referralFetchErr) {
+          console.error("❌ Error fetching referral code:", referralFetchErr);
+        } else if (existingReferral) {
+          // Referral code exists - increment usage_count by 1
+          const newCount = (existingReferral.usage_count || 0) + 1;
+          
+          const { error: updateErr } = await supabase
+            .from('referral_code')
+            .update({ usage_count: newCount })
+            .eq('referral_id', referralCode);
+
+          if (updateErr) {
+            console.error("❌ Error updating referral count:", updateErr);
+          } else {
+            console.log(`✅ Referral count incremented for ${referralCode}: ${existingReferral.usage_count} → ${newCount}`);
+          }
+        } else {
+          // Referral code not found in table - skip (it might be an invalid code or not tracked)
+          console.log(`⚠️ Referral code ${referralCode} not found in referral_code table. Skipping increment.`);
+        }
+      } else {
+        console.log("ℹ️ User has no referral code. Skipping referral increment.");
+      }
+    } catch (referralErr) {
+      console.error("❌ Error processing referral increment:", referralErr);
+      // Don't fail the payment callback if referral tracking fails
     }
   };
 
@@ -420,29 +475,29 @@ const AccommodationBooking = () => {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-white font-orbitron">Accommodation</h2>
-              <p className="text-gray-400 text-sm">Rs. 300 per day</p>
+              <p className="text-gray-400 text-sm">Rs. 350 per day</p>
             </div>
           </div>
 
           <div className="space-y-4 mb-6">
             <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
               <p className="text-gray-300 text-sm leading-relaxed">
-                Accommodation is only provided for <strong>12th Night stay</strong> with Dinner, <strong>13th Breakfast</strong>, Night stay and <strong>14th Breakfast</strong>.
+                Accommodation will be provided along with <strong>dinner only</strong>. Breakfast is not included
               </p>
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <Calendar size={16} />
-                <span>February 12 Evening Stay</span>
+                <span>February 12 Evening Stay (Dinner only)</span>
               </div>
               <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <Calendar size={16} />
-                <span>February 13 Breakfast & Night Stay</span>
+                <span>February 13 Night Stay (Dinner only)</span>
               </div>
               <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <Calendar size={16} />
-                <span>February 14 Breakfast</span>
+                <span>February 14 Stay (Dinner only)</span>
               </div>
             </div>
           </div>
@@ -680,7 +735,7 @@ const AccommodationBooking = () => {
                             : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-blue-500/50'
                         }`}
                       >
-                        February 14 {existingBookings.bookedAccommodationDates.includes('February 14') ? '✓' : 'Breakfast'}
+                        February 14 {existingBookings.bookedAccommodationDates.includes('February 14') ? '✓' : 'Dinner only'}
                       </button>
                     </>
                   ) : (

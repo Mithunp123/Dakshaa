@@ -431,7 +431,7 @@ const AttendanceScanner = () => {
             <Scan className="text-white" size={28} />
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">
-            Event Scanner
+            Attendance Scanner
           </h1>
           <p className="text-gray-400 text-sm sm:text-base">Scan student QR to mark attendance</p>
         </motion.div>

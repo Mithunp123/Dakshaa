@@ -115,7 +115,7 @@ const AdminLayout = () => {
         { label: 'Overview', icon: LayoutDashboard, path: '/admin/coordinator/overview' },
         { label: 'Registration Management', icon: ClipboardList, path: '/admin/coordinator/registration' },
         { label: 'Global Scanner', icon: QrCode, path: '/admin/coordinator/global-scanner' },
-        { label: 'Event Scanner', icon: Shield, path: '/admin/coordinator' }
+        { label: 'Attendance Scanner', icon: Shield, path: '/admin/coordinator' }
       );
     }
 

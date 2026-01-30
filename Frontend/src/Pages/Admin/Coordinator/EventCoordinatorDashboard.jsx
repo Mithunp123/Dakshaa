@@ -892,6 +892,45 @@ const EventCoordinatorDashboard = () => {
         </div>
       </div>
 
+      {/* Tab Navigation */}
+      <div className="px-4 mb-4">
+        <div className="flex space-x-2 bg-white/5 border border-white/10 rounded-2xl p-2">
+          <button
+            onClick={() => setActiveTab('scanner')}
+            className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+              activeTab === 'scanner'
+                ? 'bg-secondary text-white shadow-lg shadow-secondary/20'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <QrCode size={18} />
+            Scanner
+          </button>
+          <button
+            onClick={() => setActiveTab('manual')}
+            className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+              activeTab === 'manual'
+                ? 'bg-secondary text-white shadow-lg shadow-secondary/20'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <UserCheck size={18} />
+            Manual
+          </button>
+          <button
+            onClick={() => setActiveTab('winners')}
+            className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+              activeTab === 'winners'
+                ? 'bg-secondary text-white shadow-lg shadow-secondary/20'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Trophy size={18} />
+            Winners
+          </button>
+        </div>
+      </div>
+
       {/* Tab Content */}
       <div className="p-4">
         <AnimatePresence mode="wait">

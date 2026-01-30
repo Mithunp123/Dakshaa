@@ -58,9 +58,9 @@ app.post("/add-accommodation", async (req, res) => {
     const february_13_accommodation = accommodation_dates.includes('February 13');
     const february_14_accommodation = accommodation_dates.includes('February 14');
     
-    // 🏷️ Calculate price: ₹300 per day
+    // 🏷️ Calculate price: ₹350 per day (dinner only)
     const number_of_days = accommodation_dates.length;
-    const accommodation_price = number_of_days * 300;
+    const accommodation_price = number_of_days * 350;
 
     // Check if booking already exists for this user
     const { data: existingBooking } = await supabase
@@ -1910,6 +1910,54 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
         }
       } catch (err) {
         console.error("❌ Failed to send payment email:", err);
+      }
+
+      // 🎁 Referral Count Increment Logic
+      // After successful payment, check if user has a referred_by code and increment the referral count
+      try {
+        const { data: userProfileForReferral } = await supabase
+          .from('profiles')
+          .select('referred_by')
+          .eq('id', paymentRecord.user_id)
+          .single();
+
+        if (userProfileForReferral && userProfileForReferral.referred_by) {
+          const referralCode = userProfileForReferral.referred_by.trim();
+          console.log(`🎁 User has referral code: ${referralCode}. Checking referral_code table...`);
+
+          // Check if this referral code exists in the referral_code table
+          const { data: existingReferral, error: referralFetchErr } = await supabase
+            .from('referral_code')
+            .select('referral_id, usage_count')
+            .eq('referral_id', referralCode)
+            .maybeSingle();
+
+          if (referralFetchErr) {
+            console.error("❌ Error fetching referral code:", referralFetchErr);
+          } else if (existingReferral) {
+            // Referral code exists - increment usage_count by 1
+            const newCount = (existingReferral.usage_count || 0) + 1;
+            
+            const { error: updateErr } = await supabase
+              .from('referral_code')
+              .update({ usage_count: newCount })
+              .eq('referral_id', referralCode);
+
+            if (updateErr) {
+              console.error("❌ Error updating referral count:", updateErr);
+            } else {
+              console.log(`✅ Referral count incremented for ${referralCode}: ${existingReferral.usage_count} → ${newCount}`);
+            }
+          } else {
+            // Referral code not found in table - skip (it might be an invalid code or not tracked)
+            console.log(`⚠️ Referral code ${referralCode} not found in referral_code table. Skipping increment.`);
+          }
+        } else {
+          console.log("ℹ️ User has no referral code. Skipping referral increment.");
+        }
+      } catch (referralErr) {
+        console.error("❌ Error processing referral increment:", referralErr);
+        // Don't fail the payment callback if referral tracking fails
       }
 
       // Localhost notification removed as per request
