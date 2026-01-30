@@ -53,6 +53,9 @@ const LiveStats = () => {
   const navigate = useNavigate();
   const eventLookupRef = useRef({});
 
+  const [milestone, setMilestone] = useState(null);
+  const prevStats = useRef(null);
+
   // Particle animation for background
   const particles = Array.from({ length: 50 }, (_, i) => ({
     id: i,
@@ -61,6 +64,43 @@ const LiveStats = () => {
     size: Math.random() * 4 + 1,
     duration: Math.random() * 20 + 10
   }));
+
+  // Detect Milestones
+  useEffect(() => {
+     // Only run if we have previous stats (skip initial load blast)
+     if (prevStats.current) {
+        // Check Students (Every 100)
+        const prevUsers = prevStats.current.users;
+        const currUsers = stats.users;
+        if (Math.floor(currUsers / 100) > Math.floor(prevUsers / 100)) {
+            setMilestone({
+                type: 'users',
+                value: Math.floor(currUsers / 100) * 100,
+                label: 'STUDENTS ONBOARDED!',
+                subLabel: 'New Batch Just Arrived 🚀',
+                color: 'text-secondary'
+            });
+            setTimeout(() => setMilestone(null), 5000);
+        }
+
+        // Check Registrations (Every 50)
+        const prevRegs = prevStats.current.registrations;
+        const currRegs = stats.registrations;
+        if (Math.floor(currRegs / 50) > Math.floor(prevRegs / 50)) {
+            setMilestone({
+                type: 'registrations',
+                value: Math.floor(currRegs / 50) * 50,
+                label: 'REGISTRATIONS!',
+                subLabel: 'Events Filling Up Fast 🔥',
+                color: 'text-primary'
+            });
+            setTimeout(() => setMilestone(null), 5000);
+        }
+     }
+     
+     // Update ref
+     prevStats.current = stats;
+  }, [stats]);
 
   useEffect(() => {
     preloadEventMetadata();
@@ -761,6 +801,75 @@ const LiveStats = () => {
       {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      {/* Milestone Celebration Overlay */}
+      <AnimatePresence>
+        {milestone && (
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.2, filter: "blur(20px)" }}
+                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md"
+            >
+                {/* Confetti / Particle Burst */}
+                <div className="absolute inset-0 overflow-hidden">
+                    {Array.from({ length: 50 }).map((_, i) => (
+                        <motion.div
+                            key={i}
+                            className={`absolute w-3 h-3 rounded-full ${Math.random() > 0.5 ? 'bg-primary' : 'bg-secondary'}`}
+                            initial={{ 
+                                x: "50vw", 
+                                y: "50vh", 
+                                opacity: 1, 
+                                scale: 0 
+                            }}
+                            animate={{ 
+                                x: `${Math.random() * 100}vw`, 
+                                y: `${Math.random() * 100}vh`, 
+                                opacity: 0, 
+                                scale: Math.random() * 2 
+                            }}
+                            transition={{ 
+                                duration: 2, 
+                                ease: "circOut",
+                                repeat: Infinity 
+                            }}
+                        />
+                    ))}
+                </div>
+
+                <div className="relative z-10 text-center p-12 border-y-4 border-white/20 bg-black/50 w-full transform rotate-[-2deg]">
+                    <motion.div
+                        initial={{ y: 50, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ type: "spring", bounce: 0.6 }}
+                    >
+                        <h2 className={`text-4xl md:text-5xl font-black uppercase tracking-widest mb-4 text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]`}>
+                            Milestone Reached!
+                        </h2>
+                        
+                        <div className="flex items-baseline justify-center gap-4 mb-4">
+                             <motion.span 
+                                className={`text-8xl md:text-9xl font-black ${milestone.color} drop-shadow-[0_0_30px_currentColor]`}
+                                animate={{ scale: [1, 1.2, 1] }}
+                                transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1 }}
+                             >
+                                {milestone.value}+
+                             </motion.span>
+                        </div>
+                        
+                        <h3 className={`text-3xl md:text-4xl font-bold text-white uppercase tracking-wider`}>
+                             {milestone.label}
+                        </h3>
+                        
+                        <p className="text-xl md:text-2xl text-gray-300 mt-4 font-mono">
+                             {milestone.subLabel}
+                        </p>
+                    </motion.div>
+                </div>
+            </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
