@@ -39,6 +39,7 @@ const RoleManagement = () => {
   const [selectedEvents, setSelectedEvents] = useState([]);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingRoleChange, setPendingRoleChange] = useState(null);
+  const [eventSearchTerm, setEventSearchTerm] = useState('');
 
   const roles = [
     { value: 'student', label: 'Student', icon: Users, color: 'gray' },
@@ -466,6 +467,7 @@ const RoleManagement = () => {
             onClick={() => {
               setSelectedCoordinator(null);
               setSelectedEvents([]);
+              setEventSearchTerm('');
               setIsAssignModalOpen(true);
             }}
             className="px-6 py-3 bg-purple-500/10 border border-purple-500/20 text-purple-500 rounded-xl font-bold hover:bg-purple-500 hover:text-white transition-all flex items-center gap-2"
@@ -583,6 +585,7 @@ const RoleManagement = () => {
                                   .filter(a => a.user_id === user.id)
                                   .map(a => a.event_id);
                                 setSelectedEvents(assignments);
+                                setEventSearchTerm('');
                                 setIsAssignModalOpen(true);
                               }}
                               className="p-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-500 rounded-lg transition-all"
@@ -792,8 +795,29 @@ const RoleManagement = () => {
 
               <div className="mb-8">
                 <p className="text-sm text-gray-400 mb-3">Select Events (Multiple)</p>
+                
+                {/* Event Search Input */}
+                <div className="mb-4 relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                  <input
+                    type="text"
+                    placeholder="Search events..."
+                    value={eventSearchTerm}
+                    onChange={(e) => setEventSearchTerm(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-purple-500/50 transition-all text-sm"
+                  />
+                </div>
+
                 <div className="grid grid-cols-1 gap-2 max-h-96 overflow-y-auto">
-                  {events.map(event => (
+                  {events
+                    .filter(event => {
+                      if (!eventSearchTerm) return true;
+                      const searchLower = eventSearchTerm.toLowerCase();
+                      const name = (event.name || event.title || event.event_id || '').toLowerCase();
+                      const category = (event.category || '').toLowerCase();
+                      return name.includes(searchLower) || category.includes(searchLower);
+                    })
+                    .map(event => (
                     <label
                       key={event.event_id}
                       className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex items-center gap-3 ${
