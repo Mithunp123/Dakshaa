@@ -258,22 +258,18 @@ export const nonTechnicalDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. M. Velumani",
-          phone: "+91 97879 78886",
+          name: "Mr. Sanjai kumar",
+          phone: "+91 70106 53423",
           email: " ",
         },
       ],
       studentCoordinator: [
         {
-          name: "Ms. J. Serlin Maria",
-          phone: "+91 72008 87993",
+          name: "Ms. Bhavana",
+          phone: "+91 72007 93399 ",
           email: " ",
         },
-        {
-          name: "Ms. A. Gopika",
-          phone: "+91 63698 19735",
-          email: " ",
-        },
+       
       ],
     },
     registrationLink: "",

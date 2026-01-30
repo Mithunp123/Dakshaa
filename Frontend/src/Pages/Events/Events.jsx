@@ -1174,10 +1174,11 @@ const Events = () => {
                         <span className="text-sm">{selectedHackathon.venue}</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-300">
-                        <Users className="w-5 h-5 text-primary" />
-                        <span className="text-sm">{selectedHackathon.department}</span>
-                      </div>
+                      <Users className="w-5 h-5 text-primary" />
+                      <span className="text-sm">{selectedHackathon.registrationFee}</span>
                     </div>
+                       {/* Event Details */}
+                  
 
                     {/* Register Button */}
                     <button
@@ -1198,12 +1199,14 @@ const Events = () => {
                     </button>
                   </div>
                 </div>
+            </div>
+
 
                 {/* Rewards Section */}
                 {selectedHackathon.rewards && selectedHackathon.rewards.length > 0 && (
                   <div className="mb-8">
                     <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
-                      Prizes & Rewards
+                      Prize Worth
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {selectedHackathon.rewards.map((reward, idx) => (
@@ -2461,7 +2464,7 @@ const Events = () => {
               {selectedNonTechnical.rewards && selectedNonTechnical.rewards.length > 0 && (
                 <div className="mb-8">
                   <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
-                    Prizes & Rewards
+                    Prize Worth
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {selectedNonTechnical.rewards.map((reward, idx) => (

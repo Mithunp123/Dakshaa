@@ -391,21 +391,21 @@ export const technicalDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. K. Vijaya Sundravel",
+          name: " Dr. S. Ramesh",
           email: "",
-          phone: "91 96886 76665",
+          phone: "+91 99768 72912",
         },
       ],
       studentCoordinator: [
         {
-          name: "Ms. P. Vaishnavi",
+          name: "Ms.S.Gopika",
           email: "",
-          phone: "9944108747",
+          phone: "+91 86374 99578",
         },
         {
-          name: "Ms. C. V. Swetha",
+          name: "Ms Serlin maria",
           email: "",
-          phone: "7538831885",
+          phone: "+91 72008 87993",
         },
       ],
     },
@@ -436,23 +436,23 @@ export const technicalDetails = [
       {
         
         date: "February 13, 2026",
-        time: "time need",
+        time: "10.00AM to 3.30PM",
         location: "IT PARK",
       },
     ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. K.PONNGODI",
-          email: "",
-          phone: "+91 97886 80616",
+          name: "Mrs. J.Mythili",
+          email: "mythili@ksrct.ac.in",
+          phone: "+91 99522 58113",
         },
       ],
       studentCoordinator: [
         {
           name: "JEEVANYA R",
           email: "",
-          phone: "+91 93857 81083",
+          phone: "+91 99443 12033",
         },
       ],
     },

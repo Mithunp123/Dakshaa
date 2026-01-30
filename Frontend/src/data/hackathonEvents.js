@@ -20,6 +20,7 @@ export const hackathonEvents = [
     image: hackathon1,
     eventId: "hackathon1",
     title: "NeuroHack 2.0",
+    price : "₹50",
   },
   {
     image: hackathon2,
@@ -84,6 +85,21 @@ export const hackathonDetails = [
     img: hackathon5,
     shortTitle: hackathonEventDetails["hackathon-5"]?.title || "Startup Pitch",
     department: "Department of Artificial Intelligence and Data Science",
+    // Inject missing fields here as a fallback so the modal shows them even if the imported source was partially initialized
+    whatParticipantsWillDo: [
+      "Present a structured pitch covering the problem statement, mechatronics-based solution, system architecture, target users, and business approach.",
+      "Explain integration of mechanical systems, electronics, sensors, control systems, and artificial intelligence.",
+      "Discuss ethical considerations and future scalability with a neat slide deck (10-15 slides).",
+    ],
+    judgingCriteria: {
+      title: "Evaluation Criteria",
+      criteria: [
+        "Problem Relevance – Industrial or societal relevance, clarity, and innovation",
+        "Technical Feasibility – Application of mechatronics concepts, AI integration, and system design",
+        "Business Model – Market potential, sustainability, and revenue strategy",
+        "Ethical & Social Impact – Responsible AI usage, safety, reliability, and societal benefit",
+      ],
+    },
   },
   {
     ...hackathonEventDetails["hackathon-6"],

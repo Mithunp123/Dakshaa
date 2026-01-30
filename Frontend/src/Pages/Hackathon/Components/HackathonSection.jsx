@@ -12,19 +12,21 @@ export const hackathonEventDetails = {
       title: "Neura-Hack 2.0 (36 Hours Hackathon)",
       date: "12th Feb - 13th Feb, 2026",
       venue: "IT PARK",
+      registrationFee:" ₹ 500 per head.",
       registrationLink: "",
       description: "NeuraHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, Defend, and Secure technology to shape the future of digital innovation.",
       rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹30,000",
+        },
         {
           position: "2nd Prize",
           emoji: "🥈",
           amount: "₹20,000",
         },
-        {
-          position: "1st Prize",
-          emoji: "🥇",
-          amount: "₹30,000",
-        },
+       
         {
           position: "3rd Prize",
           emoji: "🥉",
@@ -67,7 +69,7 @@ export const hackathonEventDetails = {
           {
             name: "Mr.S.VADIVEL",
             phone: "+91 97906 32171",
-            email: "senthilkumark@ksrct.ac.in",
+            email: "vadivels@ksrct.ac.in",
           },
         ],
         studentCoordinator: [
@@ -82,6 +84,7 @@ export const hackathonEventDetails = {
       id: "hackathon-2",
       title: "BioNexathon 2026 (24 Hours Hackathon)",
       date: "February 13 2026 to February 14, 2026",
+      registrationFee : " ₹ 500 per head.",
       venue: "Seminar Hall",
       description: "A platform for students, researchers, and professionals to present and discuss recent advancements in biotechnology. Includes keynote lectures, panel discussions, and interactive sessions. Focus on innovation, research impact, and interdisciplinary collaboration. Encourages networking and knowledge exchange among participants.",
       eligibility: {
@@ -103,16 +106,17 @@ export const hackathonEventDetails = {
         ]
       },
       rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹5,000",
+        },
         {
           position: "2nd Prize",
           emoji: "🥈",
           amount: "₹3,000",
         },
-        {
-          position: "1st Prize",
-          emoji: "🥇",
-          amount: "₹5,000",
-        },
+       
         {
           position: "3rd Prize",
           emoji: "🥉",
@@ -230,6 +234,7 @@ export const hackathonEventDetails = {
       title: "Neura Code 2.O - Relay Edition",
       date: "February 13 2026 ",
       venue: "computer Lab",
+      registrationFee:" ₹ 500 per head.",
       registrationLink: " ",
       description: "Relay Edition is a team-based web design challenge where a reference website design is provided. Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
       rewards: [
@@ -330,6 +335,7 @@ export const hackathonEventDetails = {
       title: "24-Hour Vibe Coding Hackathon",
       date: "February 13, 2026",
       venue: "AB lab 3",
+      registrationFee:" ₹ 500 per head.",
       description: "The 24-Hour Vibe Coding Hackathon is an intensive, creativity-driven coding event where participants design and prototype real-world software solutions using Lovable AI. The hackathon emphasizes problem-first thinking, rapid iteration, and meaningful impact rather than product pitching or hardware-based development.Participants will receive problem statements on the spot and are expected to ideate, build, and present a working solution within 24 hours using limited AI credits—encouraging smart, intentional, and efficient development",
       rewards: [
         {
@@ -436,69 +442,73 @@ export const hackathonEventDetails = {
     "hackathon-5": {
       id: "hackathon-5",
       title: "Startup Pitch 2026",
-      date: "To be Announced",
-      venue: "Innovation Hub, Building C",
-      description: "Startup Pitch is an entrepreneurial hackathon where teams develop business ideas and prototypes. Focus is on feasibility, market potential, and innovation.",
+      date: "13.02.2026",
+      venue: "Tech park, Conference hall",
+      registrationFee : " ₹ 500 per head.",
+      description: "The StartUp Pitch Event, organized by the Entrepreneurship Development Cell (EDC), aims to encourage students to ideate, innovate, and present impactful startup solutions in emerging technology domains such as automation, robotics, artificial intelligence, smart manufacturing, and intelligent systems. The event provides a platform for participants to showcase how modern development principles integrated with AI-driven technologies can be applied to solve real-world industrial and societal challenges. Students are expected to focus on innovation, technical feasibility, scalability, and real-time impact, while demonstrating entrepreneurial thinking and problem-solving skills. ",
       rewards: [
         {
           position: "1st Prize",
           emoji: "🥇",
-          amount: "₹10,000",
+          amount: "₹3,000",
         },
         {
           position: "2nd Prize",
           emoji: "🥈",
-          amount: "₹7,500",
+          amount: "₹2,000",
         },
         {
           position: "3rd Prize",
           emoji: "🥉",
-          amount: "₹5,000",
+          amount: "₹1,000",
         },
       ],
       rounds: [
         {
           title: "Topics",
           description: [
-            "Business Innovation and Entrepreneurship",
+            "General Startup Or Bussiness Innovation",
+
           ],
         },
-        {
-          title: "Round: Pitching",
-          description: [
-            "Startup idea submission",
-            "Business plan development",
-            "Prototype creation",
-            "Final pitch presentation",
-          ],
-        },
+        
       ],
       rules: [
-        "Teams must consist of 2-4 members.",
-        "Viable business model required.",
-        "Market analysis mandatory.",
+        "Teams must consist of 1-5 members.",
+        "10 - 15 slides are allowed for the presentation.",
+        "4 min presentation + 3 min Q&A per team.",
+        "Participants will present their startup idea through a structured pitch that explains the identified problem, proposed solution, target audience, and overall business approach. Teams should describe how their solution works at a high level, outline any relevant technologies involved, address ethical considerations, and discuss potential future growth and scalability.",
+
       ],
       schedule: [
         {
          
-          date: "To be Announced",
-          time: "02:00 PM",
-          location: "Innovation Hub, Building C",
+          date: "13.02.2026",
+          time: "9:00 AM to 4:00PM",
+          location: "Tech park, Conference hall",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
-            name: "Dr. Entrepreneur",
-            phone: "+91 95432 10987",
-            email: "entrepreneur@ksrct.ac.in",
+            name: "Dr. N. Tiruvenkadam ",
+            phone: "+91 99446 72671",
+            email: "",
           },
         ],
         studentCoordinator: [
           {
-            name: "Startup Lead",
-            phone: "+91 94567 01234",
-            email: "startupleader@gmail.com",
+            name: "Ms. H. Ainul Zuvairia",
+            phone: "+91 80562 30731",
+            email: "",
+          },
+          {
+            name:"Ms. A. Shrimathi ",
+            phone: "+91 63827 72489",
+          },
+          {
+            name:"Mr. M. Barath Kumar ",
+            phone: "+91 80123 55633",
           },
         ],
       },
@@ -507,6 +517,7 @@ export const hackathonEventDetails = {
       id: "hackathon-6",
       title: "Designathon 2026",
       date: "February 13, 2026",
+      registrationFee:" ₹ 500 per head.",
       venue: "Idea lab [ Main Building ]",
       description: "Designathon challenges individuals to solve an engineering problem within a limited time. Participants develop creative design solutions using logical and technical thinking. Originality, feasibility, and time management are key evaluation criteria.",
       rewards: [

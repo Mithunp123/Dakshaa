@@ -184,14 +184,14 @@ export const workshopDetails = [
     description: "Step into the AI Arcade and discover how AI tools can supercharge game development — build smarter, faster, and more creative games using cutting-edge AI tools.",
     img: workshop2,
     date: "February 12, 2026",
-    venue: "AB Lab 1",
+    venue: "AB Lab 3",
     department: "Workshop",
     price: "₹300",
     schedule: [
       {
        
         time: "1 Day",
-        venue: "AB Lab 1",
+        venue: "AB Lab 3",
         registrationFee: "₹300",
       },
     ],
@@ -396,7 +396,7 @@ export const workshopDetails = [
       {
        
         location: "CSE LAB 1",
-        time: "1 Day",
+        time: "9:30 AM to 4:00 PM",
         date: "February 12, 2026",
       },
     ],

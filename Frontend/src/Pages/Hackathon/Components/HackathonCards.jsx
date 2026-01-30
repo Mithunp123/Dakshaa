@@ -189,7 +189,7 @@ const HackathonCards = () => {
               {selectedHackathon.rewards && selectedHackathon.rewards.length > 0 && (
                 <div className="mb-8">
                   <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
-                    Prizes & Rewards
+                    Prizes Worths
                   </h3>
                   
                   {/* Podium Prize Layout */}
