@@ -146,9 +146,7 @@ const ComboCard = ({ combo, onSelect, isSelected, userPurchasedCombos = [] }) =>
               {combo.is_available !== false ? (
                 <>
                   <Unlock size={14} className="text-green-400" />
-                  <span className="text-xs text-green-400">
-                    <strong>{combo.max_purchases - (combo.current_purchases || 0)}</strong> spots left
-                  </span>
+                  <span className="text-xs text-green-400">Available</span>
                 </>
               ) : (
                 <>

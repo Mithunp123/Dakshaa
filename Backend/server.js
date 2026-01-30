@@ -1080,7 +1080,7 @@ app.post("/payment/initiate", async (req, res) => {
 
     // Generate Direct Payment URL (Client Redirect)
     // We do NOT fetch from backend. We construct the URL and let the frontend redirect the user.
-    const baseUrl = 'https://fees.ksrctdigipro.in/HandlePaymentFromApp';
+    const baseUrl = 'https://5b0139739e3b.ngrok-free.app/HandlePaymentFromApp';
     
     // Ensure payload values are strings for URLSearchParams
     const queryParams = new URLSearchParams();
@@ -1389,7 +1389,7 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
          });
 
          // Construct Payment URL
-         const baseUrl = 'https://fees.ksrctdigipro.in/HandlePaymentFromApp';
+         const baseUrl = 'https://5b0139739e3b.ngrok-free.app/HandlePaymentFromApp';
          const queryParams = new URLSearchParams();
          // Ensure correct mapping
          Object.entries(newPayload).forEach(([key, value]) => {

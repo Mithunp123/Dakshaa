@@ -504,8 +504,17 @@ const RegistrationForm = () => {
       const eventId = event.id || event.event_id;
       const eventCategory = (event.category || "").toLowerCase().trim();
 
-      // For combo mode, ONLY show events from allowed categories
+      // For combo mode, ONLY show events from allowed categories but exclude team events
       if (registrationMode === "combo" && allowedCategories.size > 0) {
+        // Check if this is a team event and exclude it from combo packages
+        const minTeamSize = event.min_team_size || 0;
+        const maxTeamSize = event.max_team_size || 0;
+        const isTeamEvent = minTeamSize > 1 || maxTeamSize > 1 || event.category === "Team Events";
+        
+        if (isTeamEvent) {
+          return false; // Don't show team events in combo packages
+        }
+        
         // If this category has a specific event configured, only show that specific event
         if (categoriesWithSpecificEvents.has(eventCategory)) {
           if (!specificEventIds.has(eventId)) {
@@ -752,6 +761,13 @@ const RegistrationForm = () => {
       return;
     }
     
+    // Find the event to get its category and details
+    const event = events.find(e => e.id === eventId || e.event_id === eventId);
+    if (!event) {
+      console.log('Event not found');
+      return;
+    }
+    
     // Check if this is a specific event from combo quota (auto-selected, can't be deselected)
     if (registrationMode === 'combo' && selectedCombo?.category_quotas) {
       const isSpecificEvent = Object.values(selectedCombo.category_quotas).some(quota => {
@@ -764,30 +780,55 @@ const RegistrationForm = () => {
         console.log('Cannot deselect - this event is required by the combo');
         return;
       }
+      
+      // Check quota limits before allowing selection
+      if (!selectedEvents.includes(eventId)) {
+        const eventCategory = (event.category || "").toLowerCase().trim();
+        const currentCount = selectedCountByCategory[eventCategory] || 0;
+        
+        // Find the quota for this category
+        const categoryQuotas = selectedCombo.category_quotas;
+        let quotaLimit = null;
+        
+        for (const [category, quota] of Object.entries(categoryQuotas)) {
+          const categoryKey = category.toLowerCase().trim();
+          if (categoryKey === eventCategory) {
+            // Check if quota is a number (category limit) or UUID (specific event)
+            const isEventId = typeof quota === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(quota);
+            if (!isEventId) {
+              quotaLimit = parseInt(quota);
+            }
+            break;
+          }
+        }
+        
+        // If quota limit exists and would be exceeded, prevent selection
+        if (quotaLimit !== null && currentCount >= quotaLimit) {
+          console.log(`Cannot select - quota exceeded for ${eventCategory} (${currentCount}/${quotaLimit})`);
+          return;
+        }
+      }
     }
     
-    // Find the event to check if it's full
-    const event = events.find(e => e.id === eventId || e.event_id === eventId);
-    if (event) {
-      const isFull = event.current_registrations >= event.capacity;
-      const isOpen = event.is_open !== false;
-      
-      // Don't allow selecting full or closed events
-      if (isFull || !isOpen) {
-        return;
-      }
+    // Check if event is full or closed
+    const isFull = event.current_registrations >= event.capacity;
+    const isOpen = event.is_open !== false;
+    
+    // Don't allow selecting full or closed events
+    if (isFull || !isOpen) {
+      return;
+    }
 
-      // Check for team event and redirect to Dashboard My Teams
-      if (event.is_team_event && registrationMode !== 'individual') {
-        navigate('/dashboard/teams', { 
-          state: { 
-            createTeam: true, 
-            eventId: event.event_id || eventId,
-            eventName: event.title || event.name 
-          } 
-        });
-        return;
-      }
+    // Check for team event and redirect to Dashboard My Teams
+    if (event.is_team_event && registrationMode !== 'individual') {
+      navigate('/dashboard/teams', { 
+        state: { 
+          createTeam: true, 
+          eventId: event.event_id || eventId,
+          eventName: event.title || event.name 
+        } 
+      });
+      return;
     }
     
     const newSelection = selectedEvents.includes(eventId)
@@ -821,6 +862,42 @@ const RegistrationForm = () => {
       }
     }
   }, [events, selectedEvents, selectedCombo, registrationMode, registeredEventIds]);
+
+  // Helper function to check if an event can be selected based on quota limits
+  const canSelectEvent = useCallback((eventId) => {
+    // If already selected, can always deselect
+    if (selectedEvents.includes(eventId)) {
+      return true;
+    }
+    
+    // If not in combo mode, no quota restrictions
+    if (registrationMode !== 'combo' || !selectedCombo?.category_quotas) {
+      return true;
+    }
+    
+    // Find the event to get its category
+    const event = events.find(e => e.id === eventId || e.event_id === eventId);
+    if (!event) return false;
+    
+    const eventCategory = (event.category || "").toLowerCase().trim();
+    const currentCount = selectedCountByCategory[eventCategory] || 0;
+    
+    // Find the quota for this category
+    const categoryQuotas = selectedCombo.category_quotas;
+    for (const [category, quota] of Object.entries(categoryQuotas)) {
+      const categoryKey = category.toLowerCase().trim();
+      if (categoryKey === eventCategory) {
+        // Check if quota is a number (category limit) or UUID (specific event)
+        const isEventId = typeof quota === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(quota);
+        if (!isEventId) {
+          const quotaLimit = parseInt(quota);
+          return currentCount < quotaLimit;
+        }
+      }
+    }
+    
+    return true; // No quota limit found for this category
+  }, [events, selectedEvents, registrationMode, selectedCombo, selectedCountByCategory]);
 
   const handleBack = useCallback(() => {
     if (currentStep === 3 && registrationMode === "combo") {
@@ -2029,10 +2106,6 @@ const RegistrationForm = () => {
                   <p className="text-gray-400">
                     Select a combo package that suits your interests
                   </p>
-                  {/* Debug info - remove after fixing */}
-                  <div className="text-xs text-gray-500 mt-2">
-                    Debug: combos.length = {combos.length} | user = {user?.id ? '✅' : '❌'}
-                  </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -2141,7 +2214,8 @@ const RegistrationForm = () => {
                     const isAlreadyRegistered = registeredEventIds.has(eventId);
                     const isPendingPayment = pendingPaymentEvents.has(eventId);
                     // Allow selecting pending payment events so user can retry payment
-                    const isEventDisabled = isFull || !isOpen || isAlreadyRegistered;
+                    const isQuotaBlocked = !canSelectEvent(eventId);
+                    const isEventDisabled = isFull || !isOpen || isAlreadyRegistered || isQuotaBlocked;
                     
                     return (
                       <EventCard
@@ -2335,7 +2409,8 @@ const RegistrationForm = () => {
                       return isEventId && quota === eventId;
                     });
                     
-                    const isEventDisabled = isFull || !isOpen || isAlreadyRegistered;
+                    const isQuotaBlocked = !canSelectEvent(eventId);
+                    const isEventDisabled = isFull || !isOpen || isAlreadyRegistered || isQuotaBlocked;
                     
                     return (
                       <div key={eventId || `combo-event-${index}`} className="relative">

@@ -150,7 +150,7 @@ const RoleManagement = () => {
       const eventIds = [...new Set(assignments.map(a => a.event_id))];
       const { data: eventsData } = await supabase
         .from('events')
-        .select('event_id, title, category')
+        .select('event_id, name, title, category')
         .in('event_id', eventIds);
       
       const eventMap = new Map(eventsData?.map(e => [e.event_id, e]) || []);
@@ -159,7 +159,7 @@ const RoleManagement = () => {
       const assignmentsWithData = assignments.map(a => ({
         ...a,
         profiles: profileMap.get(a.user_id) || { full_name: 'Unknown', email: '' },
-        events: eventMap.get(a.event_id) || { event_id: a.event_id, title: a.event_id, category: '' }
+        events: eventMap.get(a.event_id) || { event_id: a.event_id, name: a.event_id, title: a.event_id, category: '' }
       }));
 
       setCoordinatorAssignments(assignmentsWithData);
@@ -617,7 +617,7 @@ const RoleManagement = () => {
               >
                 <div>
                   <p className="font-bold">{assignment.profiles?.full_name}</p>
-                  <p className="text-sm text-gray-400">{assignment.events?.title || assignment.events?.event_id}</p>
+                  <p className="text-sm text-gray-400">{assignment.events?.name || assignment.events?.title || assignment.events?.event_id}</p>
                   <p className="text-xs text-gray-500 capitalize">{assignment.events?.category}</p>
                 </div>
                 <button
@@ -815,7 +815,7 @@ const RoleManagement = () => {
                         className="w-5 h-5 rounded border-white/10 bg-white/5 text-purple-500 focus:ring-purple-500"
                       />
                       <div className="flex-1">
-                        <p className="font-bold">{event.title || event.event_id}</p>
+                        <p className="font-bold">{event.name || event.title || event.event_id}</p>
                         <p className="text-xs text-gray-400 capitalize">{event.category} • ₹{event.price}</p>
                       </div>
                     </label>

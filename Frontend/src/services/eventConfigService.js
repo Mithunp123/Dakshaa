@@ -707,6 +707,10 @@ export const registerForEvent = async (eventId, registrationData) => {
 
     if (error) throw error;
 
+    // Invalidate caches
+    clearUserRegistrationsCache(user.id);
+    clearEventsCache(); 
+
     return {
       success: true,
       data: data,
@@ -819,6 +823,11 @@ export const updateRegistrationPayment = async (
 
     if (error) throw error;
 
+    if (data && data.user_id) {
+       clearUserRegistrationsCache(data.user_id);
+    }
+    clearEventsCache();
+
     return {
       success: true,
       data: data,
@@ -898,6 +907,22 @@ export const getUserRegisteredEventIds = async (userId, forceRefresh = false) =>
   }
 };
 
+/**
+ * Clear user registrations cache (Call this after new registration/payment)
+ * @param {string} userId - User ID to clear cache for
+ */
+export const clearUserRegistrationsCache = (userId) => {
+  try {
+    if (!userId) return;
+    sessionStorage.removeItem(`${REGISTERED_IDS_CACHE_KEY}_${userId}`);
+    console.log(`🧹 Cleared registration cache for user ${userId}`);
+    return true;
+  } catch (e) {
+    console.warn('Failed to clear user registration cache:', e);
+    return false;
+  }
+};
+
 export default {
   getEventsWithStats,
   getCachedEvents,
@@ -914,5 +939,6 @@ export default {
   getUserRegistrations,
   getEventRegistrations,
   updateRegistrationPayment,
-  getUserRegisteredEventIds
+  getUserRegisteredEventIds,
+  clearUserRegistrationsCache
 };

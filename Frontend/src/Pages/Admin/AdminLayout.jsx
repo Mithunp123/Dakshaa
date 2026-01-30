@@ -36,6 +36,7 @@ const roleDisplayInfo = {
 
 const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1024);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
@@ -43,15 +44,26 @@ const AdminLayout = () => {
   const location = useLocation();
 
   useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (mobile) setIsSidebarOpen(false);
+      else setIsSidebarOpen(true);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
     checkUserRole();
   }, []);
 
   // Close sidebar on mobile when route changes
   useEffect(() => {
-    if (window.innerWidth < 1024) {
+    if (isMobile) {
       setIsSidebarOpen(false);
     }
-  }, [location.pathname]);
+  }, [location.pathname, isMobile]);
 
   const checkUserRole = async () => {
     try {
@@ -142,120 +154,135 @@ const AdminLayout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex relative">
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setIsSidebarOpen(true)}
-        className="fixed top-4 left-4 z-50 p-3 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg hover:bg-slate-800 transition-all"
-      >
-        <Menu size={24} className="text-secondary" />
-      </button>
-
-      {/* Overlay for mobile */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsSidebarOpen(false)}
-            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Sidebar */}
-      <motion.aside 
-        initial={false}
-        animate={{
-          x: isSidebarOpen ? 0 : -280,
-        }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className={`${
-          isSidebarOpen ? 'w-64' : 'w-64'
-        } bg-slate-900/95 lg:bg-slate-900/50 border-r border-white/10 backdrop-blur-xl flex flex-col fixed h-full z-50 lg:translate-x-0 shadow-2xl lg:shadow-none`}
-      >
-        <div className="p-6 flex items-center justify-between">
-          <motion.h2 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-xl font-bold font-orbitron text-secondary"
-          >
-            DAKSHAA ADMIN
-          </motion.h2>
-          <button 
+    <div className="min-h-screen bg-slate-950 text-white flex flex-col relative">
+      {/* Top Header Bar */}
+      <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-slate-900/90 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-4 lg:px-6 shadow-lg">
+        <div className="flex items-center gap-4">
+          <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white"
+            aria-label="Toggle Menu"
           >
-            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            <Menu size={24} />
           </button>
-        </div>
-
-        {/* User Role Badge */}
-        {userRole && roleDisplayInfo[userRole] && (
-          <div className={`mx-4 mb-4 p-3 rounded-xl bg-${roleDisplayInfo[userRole].color}-500/10 border border-${roleDisplayInfo[userRole].color}-500/20`}>
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-lg bg-${roleDisplayInfo[userRole].color}-500/20 flex items-center justify-center`}>
-                {React.createElement(roleDisplayInfo[userRole].icon, { 
-                  size: 20, 
-                  className: `text-${roleDisplayInfo[userRole].color}-500` 
-                })}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-white truncate">{userName}</p>
-                <p className={`text-xs text-${roleDisplayInfo[userRole].color}-400`}>
-                  {roleDisplayInfo[userRole].label}
-                </p>
-              </div>
-            </div>
+          
+          <div className="flex items-center gap-3">
+             <span className="text-xl font-bold font-orbitron text-secondary">DAKSHAA</span>
+             <span className="hidden md:inline px-2 py-0.5 rounded-full bg-white/5 text-xs text-gray-400 border border-white/10">v2.0</span>
           </div>
-        )}
-
-        <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
-          {getMenuItems().map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => {
-                  if (window.innerWidth < 1024) {
-                    setIsSidebarOpen(false);
-                  }
-                }}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${
-                  isActive 
-                    ? 'bg-secondary text-white shadow-lg shadow-secondary/20' 
-                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                }`}
-              >
-                <item.icon size={20} className={isActive ? 'text-white' : 'group-hover:text-secondary'} />
-                <span className="font-medium whitespace-nowrap">{item.label}</span>
-                {isActive && (
-                  <ChevronRight size={16} className="ml-auto" />
-                )}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="p-4 border-t border-white/10 space-y-2">
-          <button 
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all"
-          >
-            <LogOut size={20} />
-            <span className="font-medium">Logout</span>
-          </button>
         </div>
-      </motion.aside>
 
-      {/* Main Content */}
-      <main className="flex-1 w-full lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8">
-        <div className="max-w-7xl mx-auto">
-          <Outlet />
+        {/* User Profile in Header */}
+        <div className="flex items-center gap-4">
+             {userRole && roleDisplayInfo[userRole] && (
+               <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+                  <div className={`p-1 rounded-full bg-${roleDisplayInfo[userRole].color}-500/20`}>
+                    {React.createElement(roleDisplayInfo[userRole].icon, { 
+                      size: 14, 
+                      className: `text-${roleDisplayInfo[userRole].color}-500` 
+                    })}
+                  </div>
+                  <span className="text-sm font-medium text-gray-300">{userName}</span>
+               </div>
+             )}
         </div>
-      </main>
+      </header>
+
+      <div className="flex flex-1 pt-16 h-screen overflow-hidden">
+        {/* Sidebar */}
+        <motion.aside 
+          initial={false}
+          animate={{
+            x: isSidebarOpen ? 0 : -280,
+          }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          className={`
+            fixed top-16 bottom-0 left-0 z-[100]
+            w-64 bg-slate-900/95 lg:bg-slate-900/80 
+            border-r border-white/10 backdrop-blur-xl 
+            flex flex-col
+            shadow-2xl lg:shadow-none
+          `}
+        >
+          {/* Mobile User Info (visible in sidebar on mobile since header might be small) */}
+          <div className="md:hidden p-4 border-b border-white/10">
+             {userRole && roleDisplayInfo[userRole] && (
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-lg bg-${roleDisplayInfo[userRole].color}-500/20 flex items-center justify-center`}>
+                    {React.createElement(roleDisplayInfo[userRole].icon, { 
+                      size: 16, 
+                      className: `text-${roleDisplayInfo[userRole].color}-500` 
+                    })}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-white truncate">{userName}</p>
+                    <p className={`text-xs text-${roleDisplayInfo[userRole].color}-400`}>{roleDisplayInfo[userRole].label}</p>
+                  </div>
+                </div>
+              )}
+          </div>
+
+          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            {getMenuItems().map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${
+                    isActive 
+                      ? 'bg-secondary text-white shadow-lg shadow-secondary/20 font-medium' 
+                      : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <item.icon size={18} className={isActive ? 'text-white' : 'group-hover:text-secondary'} />
+                  <span className="text-sm">{item.label}</span>
+                  {isActive && (
+                    <ChevronRight size={14} className="ml-auto opacity-70" />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="p-4 border-t border-white/10">
+            <button 
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-all text-sm font-medium"
+            >
+              <LogOut size={18} />
+              <span>Logout</span>
+            </button>
+          </div>
+        </motion.aside>
+
+        {/* Mobile Overlay */}
+        <AnimatePresence>
+          {isMobile && isSidebarOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsSidebarOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] lg:hidden"
+              style={{ top: '64px' }}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Main Content Area */}
+        <main 
+          className={`
+            flex-1 overflow-y-auto relative bg-slate-950
+            transition-all duration-300 ease-in-out
+            ${!isMobile && isSidebarOpen ? 'lg:ml-64' : ''}
+          `}
+        >
+          <div className="p-4 lg:p-8 max-w-7xl mx-auto min-h-full">
+            <Outlet />
+          </div>
+        </main>
+      </div>
     </div>
   );
 };
