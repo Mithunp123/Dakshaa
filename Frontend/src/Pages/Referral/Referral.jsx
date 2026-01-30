@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Gift, Users, AlertCircle, Loader2 } from 'lucide-react';
 import { supabase } from '../../supabase';
-import DakshaaCoin from '../../assets/DakshaaCoin.png';
+import DakshaaCoin from '../../assets/DakshaaCoin.webp';
 
 const Referral = () => {
   const [referralCode, setReferralCode] = useState('');

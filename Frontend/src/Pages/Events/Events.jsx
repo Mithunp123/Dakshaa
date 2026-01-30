@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { X, MapPin, Calendar, Users, AlertTriangle } from "lucide-react";
-import logo from "../../assets/logo1.png";
-import TechnicalImage from "../../assets/EventsImages/technical.png";
-import NonTechnicalImage from "../../assets/EventsImages/non-technical.png";
-import Cultural from "../../assets/EventsImages/culturals.jpg";
-import Workshop from "../../assets/EventsImages/workshop.jpg";
-import HackathonImage from "../../assets/Hackathon.png";
-import ConferenceImage from "../../assets/conference/conference.jpeg";
+import logo from "../../assets/logo1.webp";
+import TechnicalImage from "../../assets/EventsImages/technical.webp";
+import NonTechnicalImage from "../../assets/EventsImages/non-technical.webp";
+import Cultural from "../../assets/EventsImages/culturals.webp";
+import Workshop from "../../assets/EventsImages/workshop.webp";
+import HackathonImage from "../../assets/Hackathon.webp";
+import ConferenceImage from "../../assets/conference/conference.webp";
 
 // Import event data from separate files
 import { technicalEvents } from "../../data/technicalEvents";

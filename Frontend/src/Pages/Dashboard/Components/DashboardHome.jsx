@@ -15,7 +15,7 @@ import {
 import { supabase } from '../../../supabase';
 import { supabaseService } from '../../../services/supabaseService';
 import toast from 'react-hot-toast';
-import DakshaaCoin from '../../../assets/DakshaaCoin.png';
+import DakshaaCoin from '../../../assets/DakshaaCoin.webp';
 
 const DashboardHome = () => {
   // Get user from localStorage synchronously for instant load

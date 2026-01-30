@@ -1,7 +1,7 @@
 import React from "react";
-import college from "../../../assets/college.png";
-import logo from "../../../assets/logo1.png";
-import startupLogo from "../../../assets/startup/logo.png";
+import college from "../../../assets/college.webp";
+import logo from "../../../assets/logo1.webp";
+import startupLogo from "../../../assets/startup/logo.webp";
 
 function About() {
   return (

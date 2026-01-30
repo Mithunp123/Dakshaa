@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import logo from "../../assets/logo1.png";
+import logo from "../../assets/logo1.webp";
 
 // Cyber Loading Screen with multiple animation styles
 const LoadingScreen = ({ variant = 'cyber', text = 'Loading...' }) => {

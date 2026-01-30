@@ -1,4 +1,4 @@
-import conf1 from "../assets/conference/confermain.png";
+import conf1 from "../assets/conference/confermain.webp";
 
 /*
 Conference Events:

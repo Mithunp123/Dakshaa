@@ -1,6 +1,6 @@
 import React from "react";
-import tnStartUp from "../../assets/startup/logo.png";
-import hackathonLogo from "../../assets/Hackathon.png";
+import tnStartUp from "../../assets/startup/logo.webp";
+import hackathonLogo from "../../assets/Hackathon.webp";
 import { useNavigate } from "react-router-dom";
 
 function Tags() {

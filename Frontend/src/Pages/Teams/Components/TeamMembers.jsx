@@ -2,28 +2,28 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 //Association logo Images
-import aevaLogo from "../assest/aeva_aiml_logo.jpg";
-import aidsasso from "../assest/artificix_aids_logo.jpg";
-import ftasso from "../assest/ft_asso_logo.jpg";
-import btasso from "../assest/Neomutant_bt_logo.png";
-import mechasso from "../assest/sparks_mech_logo.png";
-import eeeasso from "../assest/spicee_eee_logo.png";
-import txtasso from "../assest/tafeta_txt_logo.png";
-import csbsasso from "../assest/Techragonz_csbs_logo.jpg";
-import vlsiasso from "../assest/vlsi-logo.jpg";
-import itasso from "../assest/zita_it_logo.png";
+import aevaLogo from "../assest/aeva_aiml_logo.webp";
+import aidsasso from "../assest/artificix_aids_logo.webp";
+import ftasso from "../assest/ft_asso_logo.webp";
+import btasso from "../assest/Neomutant_bt_logo.webp";
+import mechasso from "../assest/sparks_mech_logo.webp";
+import eeeasso from "../assest/spicee_eee_logo.webp";
+import txtasso from "../assest/tafeta_txt_logo.webp";
+import csbsasso from "../assest/Techragonz_csbs_logo.webp";
+import vlsiasso from "../assest/vlsi-logo.webp";
+import itasso from "../assest/zita_it_logo.webp";
 
 
 
-import kavinesh from "../../../assets/team_members/kavinesh.jpg";
-import narendhar from "../../../assets/team_members/Narendhar.png";
-import harish from "../../../assets/team_members/harish.png";
-import hariprakash from "../../../assets/team_members/Hariprakash.png";
-import deekshana from "../../../assets/team_members/Deekshana.jpg";
-import deepak from "../../../assets/team_members/Deepak.png";
-import vikas from "../../../assets/team_members/Vikas.png";
-import mithun from "../../../assets/team_members/mithun.jpeg";
-import giri from "../../../assets/team_members/giridharan.jpeg";
+import kavinesh from "../../../assets/team_members/kavinesh.webp";
+import narendhar from "../../../assets/team_members/Narendhar.webp";
+import harish from "../../../assets/team_members/harish.webp";
+import hariprakash from "../../../assets/team_members/Hariprakash.webp";
+import deekshana from "../../../assets/team_members/Deekshana.webp";
+import deepak from "../../../assets/team_members/Deepak.webp";
+import vikas from "../../../assets/team_members/Vikas.webp";
+import mithun from "../../../assets/team_members/mithun.webp";
+import giri from "../../../assets/team_members/giridharan.webp";
 
 
 const chiefCoordinator = [

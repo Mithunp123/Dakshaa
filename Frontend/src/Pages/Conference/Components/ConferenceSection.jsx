@@ -4,10 +4,10 @@ import { motion } from "framer-motion";
 import { X, MapPin, Calendar, Users, Mail, Phone } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import btcon from "../../../assets/conference/school_of_science.png";
-import eeecon from "../../../assets/conference/school_of_electrical.png";
-import cscon from "../../../assets/conference/school_of_compu.png";
-import mechcon from "../../../assets/conference/school_of_mech.png";
+import btcon from "../../../assets/conference/school_of_science.webp";
+import eeecon from "../../../assets/conference/school_of_electrical.webp";
+import cscon from "../../../assets/conference/school_of_compu.webp";
+import mechcon from "../../../assets/conference/school_of_mech.webp";
 
 // Conference data
 const conferences = [

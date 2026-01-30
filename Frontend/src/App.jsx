@@ -4,23 +4,23 @@ import {
   Route,
   useLocation,
 } from "react-router-dom";
-import { useEffect, useState, lazy, Suspense } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import AOS from "aos";
-import "aos/dist/aos.css";
+import { useEffect, lazy, Suspense, memo } from "react";
 import { Toaster } from 'react-hot-toast';
 import "./App.css";
-const ParticlesComponent = lazy(() => import("./Pages/Layout/ParticlesComponent"));
+
+// Layout components - kept as static imports since they're always needed
 import Navbar from "./Pages/Layout/Navbar";
 import Tags from "./Pages/Layout/Tags";
-import UltraFooter from "./Pages/Layout/UltraFooter";
 import LoadingScreen from "./Pages/Layout/LoadingScreen";
 import ScrollToTop from "./Pages/Layout/ScrollToTop";
-import FloatingCallButton from "./Pages/Layout/FloatingCallButton";
-import FloatingDashboardButton from "./Pages/Layout/FloatingDashboardButton";
 import BottomNavbar from "./Pages/Layout/BottomNavbar";
-import SupabaseHealthCheck from "./Components/SupabaseHealthCheck";
 import { AuthProvider } from "./Components/AuthProvider";
+
+// Lazy load non-critical layout components
+const UltraFooter = lazy(() => import("./Pages/Layout/UltraFooter"));
+const FloatingCallButton = lazy(() => import("./Pages/Layout/FloatingCallButton"));
+const FloatingDashboardButton = lazy(() => import("./Pages/Layout/FloatingDashboardButton"));
+const SupabaseHealthCheck = lazy(() => import("./Components/SupabaseHealthCheck"));
 
 // Lazy Load Pages with preload functions for faster navigation
 const Home = lazy(() => import("./Pages/Home/Home"));
@@ -139,22 +139,16 @@ function AppContent() {
 
   return (
     <div className="min-h-screen min-h-screen-safe" style={{ minHeight: '100vh', position: 'relative' }}>
-      {isHome && (
-        <Suspense fallback={null}>
-          <ParticlesComponent id="particlesBG" />
-        </Suspense>
-      )}
       {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && <Navbar />}
       {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && <Tags />}
-      <AnimatePresence>
-        <Suspense key={location.key} fallback={<LoadingScreen variant="pulse" text="Loading..." />}>
-          <Routes location={location} key={location.key}>
-            <Route
-              path="/"
-              element={
-                <AuthRedirect>
-                  <Home key={location.key} />
-                </AuthRedirect>
+      <Suspense key={location.key} fallback={<LoadingScreen variant="pulse" text="Loading..." />}>
+        <Routes location={location} key={location.key}>
+          <Route
+            path="/"
+            element={
+              <AuthRedirect>
+                <Home key={location.key} />
+              </AuthRedirect>
               }
             />
             <Route
@@ -454,12 +448,21 @@ function AppContent() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
-      </AnimatePresence>
 
-      {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && <UltraFooter />}
-      {!isAdmin && !isRegisterEvents && !isLiveStats && <FloatingDashboardButton />}
+      {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && (
+        <Suspense fallback={null}>
+          <UltraFooter />
+        </Suspense>
+      )}
+      {!isAdmin && !isRegisterEvents && !isLiveStats && (
+        <Suspense fallback={null}>
+          <FloatingDashboardButton />
+        </Suspense>
+      )}
       {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && !isRegisterEvents && !isLiveStats && (
-        <FloatingCallButton />
+        <Suspense fallback={null}>
+          <FloatingCallButton />
+        </Suspense>
       )}
       {showBottomNav && <BottomNavbar />}
       <ScrollToTop />
@@ -468,15 +471,6 @@ function AppContent() {
 }
 
 function App() {
-  useEffect(() => {
-    AOS.init({
-      duration: 800, // Smooth animation duration
-      once: true, // Whether animation should happen only once
-      easing: 'ease-in-out', // Smooth easing for better flow
-      offset: 50, // Trigger animations slightly earlier
-    });
-  }, []);
-
   return (
     <>
       <Toaster
@@ -488,13 +482,15 @@ function App() {
           },
         }}
       />
-      <SupabaseHealthCheck>
-        <AuthProvider>
-          <Router>
-            <AppContent />
-          </Router>
-        </AuthProvider>
-      </SupabaseHealthCheck>
+      <Suspense fallback={null}>
+        <SupabaseHealthCheck>
+          <AuthProvider>
+            <Router>
+              <AppContent />
+            </Router>
+          </AuthProvider>
+        </SupabaseHealthCheck>
+      </Suspense>
     </>
   );
 }

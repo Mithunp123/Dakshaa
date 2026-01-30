@@ -1,8 +1,8 @@
-import hr1 from "../assets/HORMONICS/hr1.png";
-import hr2 from "../assets/HORMONICS/hr2.png";
-import hr3 from "../assets/HORMONICS/hr3.png";
-import hr4 from "../assets/HORMONICS/hr4.png";
-import hr5 from "../assets/HORMONICS/hr5.png";
+import hr1 from "../assets/HORMONICS/hr1.webp";
+import hr2 from "../assets/HORMONICS/hr2.webp";
+import hr3 from "../assets/HORMONICS/hr3.webp";
+import hr4 from "../assets/HORMONICS/hr4.webp";
+import hr5 from "../assets/HORMONICS/hr5.webp";
 
 
 

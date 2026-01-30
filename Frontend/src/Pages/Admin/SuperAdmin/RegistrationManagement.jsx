@@ -28,8 +28,8 @@ import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import EventDetailsWithTeams from '../../../Components/Registration/EventDetailsWithTeams';
-import logo1 from '../../../assets/logo1.png';
-import ksrctLogo from '../../../assets/ksrct.png';
+import logo1 from '../../../assets/logo1.webp';
+import ksrctLogo from '../../../assets/ksrct.webp';
 
 const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) => {
   const [eventStats, setEventStats] = useState([]);

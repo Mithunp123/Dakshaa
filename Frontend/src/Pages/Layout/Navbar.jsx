@@ -1,5 +1,5 @@
-import logo from "../../assets/logo1.png";
-import collegeLogo from "../../assets/collegeLogoWhite.png";
+import logo from "../../assets/logo1.webp";
+import collegeLogo from "../../assets/collegeLogoWhite.webp";
 import round from "../../assets/round.svg";
 import { React, useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";

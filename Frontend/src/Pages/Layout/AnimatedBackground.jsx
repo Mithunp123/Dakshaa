@@ -1,113 +1,91 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { memo } from 'react';
 
-// Gradient Orbs Background Component
-export const GradientOrbs = () => {
+// Check if user prefers reduced motion or is on mobile
+const prefersReducedMotion = typeof window !== 'undefined' && 
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+// Gradient Orbs Background Component - CSS-only for better performance
+export const GradientOrbs = memo(() => {
+  // Skip on mobile or if reduced motion preferred
+  if (prefersReducedMotion || isMobile) {
+    return null;
+  }
+
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-      {/* Primary orb */}
-      <motion.div
-        className="absolute w-[600px] h-[600px] rounded-full"
+      {/* Primary orb - CSS animation instead of framer-motion */}
+      <div
+        className="absolute w-[400px] h-[400px] rounded-full animate-float-slow"
         style={{
-          background: 'radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%)',
           filter: 'blur(60px)',
-        }}
-        animate={{
-          x: ['-20%', '30%', '-10%', '20%', '-20%'],
-          y: ['10%', '40%', '20%', '-10%', '10%'],
-        }}
-        transition={{
-          duration: 25,
-          repeat: Infinity,
-          ease: 'easeInOut',
+          left: '10%',
+          top: '20%',
         }}
       />
       
       {/* Secondary orb */}
-      <motion.div
-        className="absolute right-0 w-[500px] h-[500px] rounded-full"
+      <div
+        className="absolute w-[300px] h-[300px] rounded-full animate-float-slower"
         style={{
-          background: 'radial-gradient(circle, rgba(147, 51, 234, 0.12) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(147, 51, 234, 0.08) 0%, transparent 70%)',
           filter: 'blur(50px)',
-        }}
-        animate={{
-          x: ['20%', '-30%', '10%', '-20%', '20%'],
-          y: ['50%', '10%', '60%', '30%', '50%'],
-        }}
-        transition={{
-          duration: 30,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-      />
-      
-      {/* Accent orb */}
-      <motion.div
-        className="absolute bottom-0 left-1/2 w-[400px] h-[400px] rounded-full"
-        style={{
-          background: 'radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%)',
-          filter: 'blur(40px)',
-        }}
-        animate={{
-          x: ['-50%', '-20%', '-60%', '-30%', '-50%'],
-          y: ['-30%', '-60%', '-20%', '-50%', '-30%'],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: 'easeInOut',
+          right: '10%',
+          top: '30%',
         }}
       />
     </div>
   );
-};
+});
 
-// Floating Particles Component
-export const FloatingParticles = ({ count = 20 }) => {
-  const particles = Array.from({ length: count }, (_, i) => ({
+GradientOrbs.displayName = 'GradientOrbs';
+
+// Floating Particles Component - Reduced count and CSS-only
+export const FloatingParticles = memo(({ count = 10 }) => {
+  // Skip on mobile or if reduced motion preferred
+  if (prefersReducedMotion || isMobile) {
+    return null;
+  }
+
+  // Reduce particle count significantly
+  const actualCount = Math.min(count, 10);
+  
+  const particles = Array.from({ length: actualCount }, (_, i) => ({
     id: i,
-    size: Math.random() * 4 + 2,
+    size: Math.random() * 3 + 1,
     x: Math.random() * 100,
     y: Math.random() * 100,
-    duration: Math.random() * 20 + 15,
-    delay: Math.random() * 5,
+    delay: i * 0.5,
   }));
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
       {particles.map((particle) => (
-        <motion.div
+        <div
           key={particle.id}
-          className="absolute rounded-full bg-sky-400/30"
+          className="absolute rounded-full bg-sky-400/20 animate-float-particle"
           style={{
             width: particle.size,
             height: particle.size,
             left: `${particle.x}%`,
             top: `${particle.y}%`,
-          }}
-          animate={{
-            y: [0, -100, 0],
-            x: [0, Math.random() * 50 - 25, 0],
-            opacity: [0.2, 0.6, 0.2],
-          }}
-          transition={{
-            duration: particle.duration,
-            repeat: Infinity,
-            delay: particle.delay,
-            ease: 'easeInOut',
+            animationDelay: `${particle.delay}s`,
           }}
         />
       ))}
     </div>
   );
-};
+});
 
-// Cyber Grid Background
-export const CyberGrid = () => {
+FloatingParticles.displayName = 'FloatingParticles';
+
+// Cyber Grid Background - Static, no animation
+export const CyberGrid = memo(() => {
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
       <div 
-        className="absolute inset-0 opacity-10"
+        className="absolute inset-0 opacity-5"
         style={{
           backgroundImage: `
             linear-gradient(rgba(14, 165, 233, 0.3) 1px, transparent 1px),
@@ -116,57 +94,52 @@ export const CyberGrid = () => {
           backgroundSize: '50px 50px',
         }}
       />
-      <motion.div
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(180deg, transparent 0%, rgba(11, 29, 39, 0.8) 100%)',
-        }}
-      />
     </div>
   );
-};
+});
 
-// Glowing Lines Animation
-export const GlowingLines = () => {
+CyberGrid.displayName = 'CyberGrid';
+
+// Glowing Lines Animation - Simplified
+export const GlowingLines = memo(() => {
+  if (prefersReducedMotion || isMobile) {
+    return null;
+  }
+
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-      {[...Array(5)].map((_, i) => (
-        <motion.div
+      {[...Array(3)].map((_, i) => (
+        <div
           key={i}
-          className="absolute h-[1px] w-full"
+          className="absolute h-[1px] w-full animate-glow-line"
           style={{
-            top: `${20 + i * 15}%`,
-            background: 'linear-gradient(90deg, transparent, rgba(14, 165, 233, 0.5), transparent)',
-          }}
-          animate={{
-            x: ['-100%', '100%'],
-            opacity: [0, 1, 0],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            delay: i * 1.5,
-            ease: 'easeInOut',
+            top: `${25 + i * 25}%`,
+            background: 'linear-gradient(90deg, transparent, rgba(14, 165, 233, 0.3), transparent)',
+            animationDelay: `${i * 2}s`,
           }}
         />
       ))}
     </div>
   );
-};
+});
+
+GlowingLines.displayName = 'GlowingLines';
 
 // Main Animated Background Component
-const AnimatedBackground = ({ variant = 'orbs' }) => {
+const AnimatedBackground = memo(({ variant = 'orbs' }) => {
   switch (variant) {
     case 'grid':
       return <CyberGrid />;
     case 'particles':
-      return <FloatingParticles count={30} />;
+      return <FloatingParticles count={10} />;
     case 'lines':
       return <GlowingLines />;
     case 'orbs':
     default:
       return <GradientOrbs />;
   }
-};
+});
+
+AnimatedBackground.displayName = 'AnimatedBackground';
 
 export default AnimatedBackground;

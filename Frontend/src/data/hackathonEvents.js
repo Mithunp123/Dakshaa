@@ -1,11 +1,11 @@
-import hackathon1 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon1.png";
-import hackathon2 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon2.png";
-import hackathon3 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon3.png";
-import hackathon4 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon4.png";
-import hackathon5 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon5.png";
-import hackathon6 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon6.png";
+import hackathon1 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon1.webp";
+import hackathon2 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon2.webp";
+import hackathon3 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon3.webp";
+import hackathon4 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon4.webp";
+import hackathon5 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon5.webp";
+import hackathon6 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon6.webp";
 import { hackathonEventDetails } from "../Pages/Hackathon/Components/HackathonSection";
-import hackathon7 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon7.png";
+import hackathon7 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon7.webp";
 /*
 NeuroHack 2.O - hackathon1
 BioNexathon - hackathon2
