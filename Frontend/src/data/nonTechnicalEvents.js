@@ -75,12 +75,12 @@ export const nonTechnicalEvents = [
     image: nontech6,
     eventId: "nontech-cse",
     price: 100,
-  },
+  },/*
   {
     image: nontech7,
     eventId: "nontech-cse1",
     price: 100,
-  },
+  },*/
   {
     image: nontech8,
     eventId: "nontech-ece",

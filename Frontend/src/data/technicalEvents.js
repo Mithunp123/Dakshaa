@@ -81,12 +81,12 @@ export const technicalEvents = [
     image: Tech11,
     eventId: "tech-ece",
     price: 250,
-  },
+  },/*
   {
     image: Tech12,
     eventId: "tech-eee",
     price: 250,
-  },
+  },*/
   {
     image: Tech13,
     eventId: "tech-eee-1",

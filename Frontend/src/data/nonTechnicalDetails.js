@@ -396,7 +396,7 @@ export const nonTechnicalDetails = [
       ],
     },
     registrationLink: " ",
-  },
+  },/*
   {
     id: "nontech-cse1",
     shortTitle: "Arangam Athira",
@@ -454,7 +454,7 @@ export const nonTechnicalDetails = [
         },
       ],
     },
-  },
+  },*/
   {
     id: "nontech-ece",
     shortTitle: "LineX",

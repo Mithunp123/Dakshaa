@@ -189,33 +189,73 @@ const conferences = [
   {
     id: 4,
     img: mechcon,
-    title: "Technological Innovations in Life Science towards Sustainability",
-    shortTitle: "Life Science Innovations 2026",
-    department: "School of Life Sciences",
+    title: "SCHOOL OF BUILDING & MECHANICAL SCIENCE",
+    shortTitle: "SCHOOL OF BUILDING & MECHANICAL SCIENCE",
+    department: "SCHOOL OF BUILDING & MECHANICAL SCIENCE",
     description:
-      "This multidisciplinary conference focuses on sustainable innovations across biotechnology, food technology, textile technology, and nanotechnology. Discover how life sciences are addressing global sustainability challenges.",
+      "The National Conference serves as a platform for students, researchers, academicians, and industry professionals to present and exchange ideas, research outcomes, and technological innovations in the field of Mechanical Engineering. The event aims to encourage technical discussions, promote knowledge sharing, and foster collaboration between academia and industry. It highlights recent advancements, practical engineering solutions, and emerging technologies that contribute to sustainable development and industrial progress, while helping participants gain insights into current trends and future challenges in the engineering domain.",
     topics: [
-      "Sustainable Biotechnology Practices",
-      "Innovations in Food Technology",
+      "Sustainable & Green Engineering ",
+      "Design Optimization and Finite Element Analysis",
+      "Sustainable & Green Engineering",
+      "Additive Manufacturing and Advanced Materials",
+      "Digital Manufacturing, Automation and Robotics",
+      "Advances in Automotive Engineering and Vehicle Dynamics",
+      "Smart Materials and Structures",
+      "Tribology, Wear and Surface Engineering",
+      "Innovations in Machine Design and Optimization",
+      "Computational Fluid Dynamics (CFD) in Engineering Applications",
+      "Production Planning, Industrial Safety and Reliability",
+      "Robotics, Mechatronics and Control Systems",
+      "Mechanical Engineering for Industry, Society and Sustainability"
     ],
-    eligibility: [
-      "Undergraduate (UG) and Postgraduate (PG) Students",
-      "Research Scholars",
-      "Academicians",
+
+    rules: [
+      "A paper may be authored by a maximum of two members only.", 
+      "Participants must submit their Full Paper.", 
+      "Full papers that meet the prescribed standards will be published in the Conference Proceedings.", 
+      "All submissions must be original, unpublished, and plagiarism-free as per UGC/AICTE norms (plagiarism must be below 15%).", 
+      "Each paper presentation will be allotted 10 minutes, followed by a Q&A session with the judges/panel members. ",
+      "Papers must strictly follow the conference formatting guidelines and will undergo a peer-review process. ", 
+      "At least one author must register and present the paper; only registered participants are allowed to attend and present.",
+      "Participants must present their papers on time as per the allotted schedule; failure to do so may lead to disqualification to do so may lead to disqualification. ",
+      " E-Certificates will be issued only to participants who register and present, and the Organizing Committee’s decision will be final in all matters. ",
+
 
     ],
+    
     registrationdetails:[
       " Including one author per paper : ₹300",
       " Additional author per head : ₹150",
     ],
     date: "12 February 2026",
-    venue: "KSRCT Campus",
+    venue: " Seminar Hall  [ Mechanical Block]  ",
     registrationFee: "₹300",
-    facultyCo: "Dr. P. Karthik",
-    facultyCoNo: "+91 94321 09876",
-    studentCo1: "N. Divya",
-    studentCoNo1: "+91 85432 10987",
-    email: "ncistemm@ksrct.ac.in",
+    contact: {
+        facultyCoordinator: [
+          {
+            name: "Dr. S. Jeyaprakasam",
+            phone: "91+ 98946 94658 ",
+            email: "",
+          },
+          {
+            name: "Dr. G. VENKATACHALAM",
+            phone: "91+ 94423 35001 ",
+            email: "",
+          }
+        ],
+        studentCoordinator: [
+          {
+            name: " Mr.K.Navin",
+            phone: "+91 78100 39736",
+            email: "",
+          },
+          {
+            name : "Mr. S. Narayanakumar ",
+            phone:"+91 93445 22384 "
+          }
+        ],
+      },
   },
 ];
 

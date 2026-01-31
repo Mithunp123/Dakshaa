@@ -167,7 +167,7 @@ export const technicalDetails = [
     description: "Reel-O-Science is a creative science communication challenge where participants create an engaging Instagram reel that explains scientific concepts in a simple, impactful, and visually appealing way. The event encourages students to blend scientific accuracy with creativity to raise awareness on topics related to Biotechnology, Life Sciences, Health, Environment, and Science for Society.",
     img: Tech4,
     date: "February 13, 2026",
-    venue: "Bioprocess Laboratory",
+    venue: "Smart class room (Biotechnology)",
     department: "Technical Events",
     price: "₹250",
     rules: [
@@ -203,7 +203,7 @@ export const technicalDetails = [
       {
         date: "February 13, 2026",
         time: "9.00 AM to 2.00 PM",
-        location: "Bioprocess Laboratory",
+        location: "Smart class room (Biotechnology)",
       },
     ],
     contact: {
@@ -241,7 +241,7 @@ export const technicalDetails = [
     description: "BioBlitz-Map is a biology-based campus treasure hunt that challenges participants to apply biotechnology concepts, scientific logic, and observation skills to solve clues. Teams navigate through multiple locations using mapped hints, biological riddles, and logical reasoning to reach the final destination. The event emphasizes teamwork, accuracy, and strategic thinking in a competitive and engaging environment.",
     img: Tech6,
     date: "February 13, 2026",
-    venue: "Protein and Enzyme Engineering Laboratory",
+    venue: "Protein and Enzyme Engineering Laboratory (Biotechnology Department)",
     department: "Technical Events",
     price: "₹250",
     rules: [
@@ -272,7 +272,7 @@ export const technicalDetails = [
       {
         date: "February 13, 2026",
         time: "3 Hours",
-        location: "Protein and Enzyme Engineering Laboratory",
+        location: "Protein and Enzyme Engineering Laboratory (Biotechnology Department)",
       },
     ],
     contact: {
@@ -418,7 +418,7 @@ export const technicalDetails = [
     description: "A showcase-based technical event where participants present pre-developed software or hardware bots demonstrating innovation, functionality, and real-world application. Teams must explain the concept, design, working principle, and technology stack of their bot and perform a live demonstration within the allotted time. Evaluation will be based on originality, technical complexity, problem-solving approach, performance, and presentation quality.",
     img: Tech10,
     date: "February 13, 2026",
-    venue: "IT PARK",
+    venue: "IT Park (Smart ClassRoom)",
     department: "Technical Events",
     price: "₹250",
     rules: [
@@ -437,7 +437,7 @@ export const technicalDetails = [
         
         date: "February 13, 2026",
         time: "10.00AM to 3.30PM",
-        location: "IT PARK",
+        location: "IT Park (Smart ClassRoom)",
       },
     ],
     contact: {
@@ -456,7 +456,7 @@ export const technicalDetails = [
         },
       ],
     },
-    registrationLink: "https://forms.gle/2wBfChfRVPiKVw599",
+    registrationLink: "",
   },
   {
     id: "tech-ece",
@@ -465,7 +465,7 @@ export const technicalDetails = [
     description: "An engaging electronics-based technical event where participants are given only component symbols without component names. Participants must identify the correct components and build the complete circuit within a limited time. The participant who successfully builds a correct and working circuit in the shortest time is declared the winner.",
     img: Tech11,
     date: "February 13, 2026",
-    venue: "Electronic Devices Laboratory",
+    venue: "EDC Lab (Main Building)",
     department: "Technical Events",
     price: "₹250",
     rules: [
@@ -480,7 +480,7 @@ export const technicalDetails = [
         
         date: "February 13, 2026",
         time: "9:00 AM to 1:00 PM",
-        location: "Electronic Devices Laboratory",
+        location: "EDC Lab (Main Building)",
       },
     ],
     contact: {
@@ -499,9 +499,9 @@ export const technicalDetails = [
         },
       ],
     },
-    registrationLink: "https://forms.gle/2wBfChfRVPiKVw599",
+    registrationLink: "",
   },
-  {
+  /*{
     id: "tech-eee",
     shortTitle: "Trailblazer",
     title: "Trailblazer",
@@ -547,7 +547,7 @@ export const technicalDetails = [
       ],
     },
     registrationLink: "https://forms.gle/2wBfChfRVPiKVw599",
-  },
+  },*/
   {
     id: "tech-eee-1",
     shortTitle: "Paper presentation",
@@ -555,7 +555,7 @@ export const technicalDetails = [
     description: "Paper Presentation is a technical event that provides a platform for students and researchers to present their innovative ideas, research findings, and technical knowledge in front of an expert panel. Participants are required to prepare and present a research or review paper related to engineering, science, technology, or management domains.",
     img: Tech13,
     date: "February 13, 2026",
-    venue: "EEE Department",
+    venue: "EE 304",
     department: "Technical Events",
     price: "₹250",
     topics: [
@@ -595,7 +595,7 @@ export const technicalDetails = [
         
         date: "February 13, 2026",
         time: "4 Hours",
-        location: "EEE Department",
+        location: "EE 304",
       },
     ],
     contact: {
@@ -625,7 +625,7 @@ export const technicalDetails = [
     description: "This poster presentation provides students a platform to showcase innovative ideas and research on emerging food processing technologies. Participants will visually present advanced techniques, applications, and benefits that enhance food quality, safety, and sustainability. The session encourages knowledge sharing, creativity, and scientific discussion among students and experts.",
     img: Tech14,
     date: "February 13, 2026",
-    venue: "Baking and Confectionery Laboratory",
+    venue: "Dairy Technology Laboratory",
     department: "Technical Events",
     price: "₹250",
     topics: [
@@ -647,7 +647,7 @@ export const technicalDetails = [
       
         date: "February 13, 2026",
         time: "time need",
-        location: "Baking and Confectionery Laboratory",
+        location: "Dairy Technology Laboratory",
       },
     ],
     contact: {
