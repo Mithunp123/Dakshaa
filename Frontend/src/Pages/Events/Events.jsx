@@ -23,6 +23,19 @@ import { exposAndShowsEvents } from "../../data/exposAndShowsEvents";
 import { exposAndShowsDetails } from "../../data/exposAndShowsDetails";
 import { supabase } from "../../supabase";
 
+// Category map constant - moved outside component to prevent recreation on every render
+const CATEGORY_MAP = {
+  'technical': 1,
+  'non-technical': 2, 
+  'harmonicks': 3,
+  'hackathon': 4,
+  'workshop': 5,
+  'conference': 6,
+  'expos-and-shows': 7
+};
+
+const CATEGORY_NAMES = ['technical', 'non-technical', 'harmonicks', 'hackathon', 'workshop', 'conference', 'expos-and-shows'];
+
 const Events = () => {
   const [selectedEvent, setSelectedEvent] = useState(1);
   const [rotation, setRotation] = useState(0);
@@ -41,26 +54,16 @@ const Events = () => {
   const navigate = useNavigate();
   const eventsRef = useRef(null);
 
-  // Check authentication status - use supabase.auth.getSession() instead of getUser() for faster response
+  // Check authentication status - fetch session once (AuthProvider handles global auth state)
   useEffect(() => {
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user || null);
+      // Also check admin role from localStorage
+      const userRole = localStorage.getItem('userRole');
+      setIsAdmin(userRole === 'admin' || userRole === 'super_admin');
     };
     getUser();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  // Check if user is admin
-  useEffect(() => {
-    const userRole = localStorage.getItem('userRole');
-    setIsAdmin(userRole === 'admin' || userRole === 'super_admin');
   }, []);
 
   // Countdown timer effect
@@ -128,17 +131,8 @@ const Events = () => {
   useEffect(() => {
     const categoryParam = searchParams.get('category');
     if (categoryParam) {
-      // Map category names to event IDs
-      const categoryMap = {
-        'technical': 1,
-        'non-technical': 2, 
-        'harmonicks': 3,
-        'hackathon': 4,
-        'workshop': 5,
-        'conference': 6,
-        'expos-and-shows': 7
-      };
-      const eventId = categoryMap[categoryParam] || 1;
+      // Use constant category map
+      const eventId = CATEGORY_MAP[categoryParam] || 1;
       setSelectedEvent(eventId);
       
       // Set rotation for the selected category
@@ -170,9 +164,8 @@ const Events = () => {
 
     setSelectedEvent(id);
     
-    // Update URL with selected category
-    const categoryNames = ['technical', 'non-technical', 'harmonicks', 'hackathon', 'workshop', 'conference', 'expos-and-shows'];
-    const categoryName = categoryNames[index];
+    // Update URL with selected category - use constant array
+    const categoryName = CATEGORY_NAMES[index];
     setSearchParams({ category: categoryName });
     
     setTimeout(() => setIsSpinning(false), 1200);

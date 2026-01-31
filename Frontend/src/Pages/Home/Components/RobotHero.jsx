@@ -130,15 +130,30 @@ function Model(props) {
 
 const RobotHero = () => {
   const [loadError, setLoadError] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const canvasRef = useRef(null);
 
   // Detect mobile device
   const isMobile = /iPhone|iPad|iPod|Android|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   useEffect(() => {
-    // Handle WebGL context loss
+    // Handle page visibility changes to pause/resume rendering
+    const handleVisibilityChange = () => {
+      setIsVisible(!document.hidden);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Handle WebGL context loss - don't auto-reload, just show fallback
     const handleContextLost = (event) => {
       event.preventDefault();
-      console.warn('WebGL context lost. Reloading...');
+      console.warn('WebGL context lost - showing fallback');
       setLoadError(true);
     };
 
@@ -147,16 +162,21 @@ const RobotHero = () => {
       setLoadError(false);
     };
 
-    const canvas = document.querySelector('canvas');
-    if (canvas) {
-      canvas.addEventListener('webglcontextlost', handleContextLost);
-      canvas.addEventListener('webglcontextrestored', handleContextRestored);
-    }
+    // Wait for canvas to be mounted
+    const timer = setTimeout(() => {
+      const canvas = document.querySelector('canvas');
+      if (canvas) {
+        canvasRef.current = canvas;
+        canvas.addEventListener('webglcontextlost', handleContextLost);
+        canvas.addEventListener('webglcontextrestored', handleContextRestored);
+      }
+    }, 100);
 
     return () => {
-      if (canvas) {
-        canvas.removeEventListener('webglcontextlost', handleContextLost);
-        canvas.removeEventListener('webglcontextrestored', handleContextRestored);
+      clearTimeout(timer);
+      if (canvasRef.current) {
+        canvasRef.current.removeEventListener('webglcontextlost', handleContextLost);
+        canvasRef.current.removeEventListener('webglcontextrestored', handleContextRestored);
       }
     };
   }, []);
@@ -167,13 +187,20 @@ const RobotHero = () => {
         <div className="text-center">
           <p className="text-gray-400 mb-4">3D view temporarily unavailable</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => setLoadError(false)}
             className="px-4 py-2 bg-secondary rounded-lg hover:bg-secondary/80 transition-colors"
           >
-            Reload Page
+            Try Again
           </button>
         </div>
       </div>
+    );
+  }
+
+  // Don't render 3D when tab is not visible to save resources
+  if (!isVisible) {
+    return (
+      <div className="w-full h-[280px] xs:h-[320px] sm:h-[400px] md:h-[500px] lg:h-[600px] relative z-20 bg-slate-900/50" />
     );
   }
 
@@ -189,6 +216,7 @@ const RobotHero = () => {
           failIfMajorPerformanceCaveat: false
         }}
         dpr={[1, Math.min(window.devicePixelRatio, 2)]}
+        frameloop={isVisible ? 'always' : 'never'} // Pause rendering when not visible
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0); // Transparent background
         }}

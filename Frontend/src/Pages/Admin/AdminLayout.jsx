@@ -60,6 +60,7 @@ const AdminLayout = () => {
 
   useEffect(() => {
     // Use authRole from context if available, otherwise check manually
+    // Wait for AuthProvider to finish loading to avoid race condition
     if (authRole && authRole !== 'student') {
       setUserRole(authRole);
       setLoading(false);
@@ -67,9 +68,19 @@ const AdminLayout = () => {
       if (user && !userName) {
         fetchUserName(user.id);
       }
-    } else if (user && (!authRole || authRole === 'student')) {
-      // Double-check by fetching from DB (in case context hasn't updated yet on refresh)
-      checkUserRole();
+    } else if (user) {
+      // Check localStorage for cached role first (instant check)
+      const cachedRole = localStorage.getItem('userRole');
+      if (cachedRole && cachedRole !== 'student') {
+        setUserRole(cachedRole);
+        setLoading(false);
+        if (!userName) {
+          fetchUserName(user.id);
+        }
+      } else {
+        // Fetch from DB (role might not be in cache yet or context hasn't updated)
+        checkUserRole();
+      }
     } else if (!user) {
       navigate('/login');
     }

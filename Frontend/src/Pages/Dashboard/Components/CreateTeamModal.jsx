@@ -80,8 +80,10 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated, preSelectedEventId, p
 
   const calculateTotal = () => {
     if (!selectedEventObj || !formData.memberCount) return 0;
-    const price = selectedEventObj.price || 0;
-    return price * parseInt(formData.memberCount);
+    // Ensure price is parsed as float to handle string values from database
+    const price = parseFloat(selectedEventObj.price) || 0;
+    const memberCount = parseInt(formData.memberCount, 10) || 0;
+    return price * memberCount;
   };
 
   const handleSubmit = async (e) => {
@@ -140,6 +142,14 @@ const CreateTeamModal = ({ isOpen, onClose, onTeamCreated, preSelectedEventId, p
       });
 
       if (result.success && result.payment_url) {
+        // Store pending team state before redirect (for recovery if redirect fails)
+        sessionStorage.setItem('pending_team_creation', JSON.stringify({
+          teamName: formData.teamName,
+          eventId: formData.eventId,
+          memberCount: count,
+          amount: amount,
+          timestamp: Date.now()
+        }));
         // Redirect to custom payment gateway
         window.location.href = result.payment_url;
       } else {

@@ -18,7 +18,8 @@ const ScrollToTop = () => {
     const toggleVisibility = () => {
       const scrolled = document.documentElement.scrollTop;
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = (scrolled / maxScroll) * 100;
+      // Prevent division by zero and NaN
+      const progress = maxScroll > 0 ? Math.min(100, Math.max(0, (scrolled / maxScroll) * 100)) : 0;
       
       setScrollProgress(progress);
       setIsVisible(scrolled > 300);

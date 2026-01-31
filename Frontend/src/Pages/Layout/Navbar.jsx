@@ -92,16 +92,27 @@ const Navbar = () => {
   }, []);
 
   const getDashboardPath = () => {
-    switch (userRole) {
+    // Also check localStorage for cached role (handles race conditions)
+    const cachedRole = localStorage.getItem('userRole');
+    const effectiveRole = (userRole === 'student' && cachedRole && cachedRole !== 'student') 
+      ? cachedRole 
+      : userRole;
+    
+    switch (effectiveRole) {
       case 'super_admin': return '/admin';
       case 'registration_admin': return '/admin/desk';
-      case 'event_coordinator': return '/coordinator';
+      case 'event_coordinator': return '/admin/coordinator';
       case 'volunteer': return '/volunteer';
       default: return '/dashboard';
     }
   };
 
-  const isAdminRole = ['super_admin', 'registration_admin', 'event_coordinator', 'volunteer'].includes(userRole);
+  // Check effective role for admin status
+  const cachedRole = localStorage.getItem('userRole');
+  const effectiveRole = (userRole === 'student' && cachedRole && cachedRole !== 'student') 
+    ? cachedRole 
+    : userRole;
+  const isAdminRole = ['super_admin', 'registration_admin', 'event_coordinator', 'volunteer'].includes(effectiveRole);
 
   return (
     <>

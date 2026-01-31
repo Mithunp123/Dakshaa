@@ -21,13 +21,18 @@ const DashboardHome = () => {
   // Get user from localStorage synchronously for instant load
   const getStoredUser = () => {
     try {
-      const session = localStorage.getItem('sb-ltmyqtcirhsgfyortgfo-auth-token');
+      // Use dynamic Supabase session key instead of hardcoded project ID
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const sessionKey = `sb-${supabaseUrl?.split('//')[1]?.split('.')[0] || 'ltmyqtcirhsgfyortgfo'}-auth-token`;
+      const session = localStorage.getItem(sessionKey);
       if (session) {
         const sessionData = JSON.parse(session);
         return sessionData?.user || null;
       }
     } catch (error) {
-      console.warn('Error reading stored session:', error);
+      if (import.meta.env.DEV) {
+        console.warn('Error reading stored session:', error);
+      }
     }
     return null;
   };

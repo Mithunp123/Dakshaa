@@ -44,17 +44,16 @@ const Referral = () => {
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
+  // Referral coin constants for clarity
+  const COINS_PER_MOBILE_REFERRAL = 2;  // Mobile number referrals earn 2 coins
+  const COINS_PER_CODE_REFERRAL = 4;    // Dakshaa ID referrals earn 4 coins
+  const MAX_REFERRAL_COINS = 100;        // Maximum coins per referral ID
 
   // Calculate coins: Mobile numbers (10 digits) get 2 coins per referral, others get 4
   const isMobileNumber = searchResult && /^\d{10}$/.test(searchResult.referral_id);
-  const coinsPerReferral = isMobileNumber ? 2 : 4;
+  const coinsPerReferral = isMobileNumber ? COINS_PER_MOBILE_REFERRAL : COINS_PER_CODE_REFERRAL;
   const coins = searchResult ? searchResult.usage_count * coinsPerReferral : 0;
-  const maxCoins = isMobileNumber ? 100 : 100;
+  const maxCoins = MAX_REFERRAL_COINS;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 pt-24 pb-32 px-4">
@@ -89,7 +88,7 @@ const Referral = () => {
                 type="text"
                 value={referralCode}
                 onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                onKeyPress={handleKeyPress}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 placeholder="Enter Referral ID (e.g., DAK26-XXXXXXXX)"
                 className="w-full bg-slate-700/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-secondary/50 focus:ring-2 focus:ring-secondary/20 font-mono uppercase"
               />

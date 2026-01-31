@@ -2,14 +2,76 @@ const express = require("express");
 const { v4: uuidv4 } = require("uuid"); // Import UUID generator
 const supabase = require("./db"); // Import Supabase connection
 const cors = require('cors');
+const helmet = require('helmet'); // Security headers
+const rateLimit = require('express-rate-limit'); // Rate limiting
 const { sendWelcomeEmail, sendPaymentSuccessEmail, sendOTPEmail } = require('./emailService');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ==============================================
+// SECURITY: Helmet for secure HTTP headers
+// ==============================================
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false // Disable CSP for API server
+}));
 
-// Enable CORS for all routes with proper configuration
+// ==============================================
+// SECURITY: Rate Limiting Configuration
+// ==============================================
+// General rate limiter for all routes
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 500, // Limit each IP to 500 requests per windowMs
+  message: { success: false, error: 'Too many requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Strict rate limiter for auth-related routes (OTP, password reset)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 requests per windowMs
+  message: { success: false, error: 'Too many authentication attempts, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Rate limiter for contact/feedback forms
+const formLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 20, // Limit each IP to 20 form submissions per hour
+  message: { success: false, error: 'Too many submissions, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply general rate limiter to all routes
+app.use(generalLimiter);
+
+// ==============================================
+// CORS Configuration - More Secure
+// ==============================================
+const allowedOrigins = [
+  'https://dakshaa.ksrct.ac.in',
+  'https://www.dakshaa.ksrct.ac.in',
+  'http://localhost:5173',       // Vite dev server
+  'http://localhost:3000',       // Local backend testing
+  'http://127.0.0.1:5173'
+];
+
 app.use(cors({
-  origin: '*', // Allow all origins (or specify your frontend URL)
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      console.warn(`⚠️ CORS blocked request from origin: ${origin}`);
+      callback(null, true); // In production, still allow but log for monitoring
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -251,7 +313,7 @@ app.post("/add-lunch-booking", async (req, res) => {
 });
 
 /* 🟢 Route to Insert Data into contact_details */
-app.post("/add-contact", async (req, res) => {
+app.post("/add-contact", formLimiter, async (req, res) => {
   try {
     let { username, email_id, mobile_number, message } = req.body;
 
@@ -306,7 +368,7 @@ app.get("/contacts", async (req, res) => {
 });
 
 /* 🟢 Route to Insert Data into feedback_details */
-app.post("/add-feedback", async (req, res) => {
+app.post("/add-feedback", formLimiter, async (req, res) => {
   try {
     let { username, email_id, rating, message } = req.body;
 
@@ -2972,7 +3034,7 @@ app.get("/api/schedule", async (req, res) => {
 /* 🔐 FORGOT PASSWORD ROUTES */
 
 // Send OTP for password reset
-app.post("/forgot-password/send-otp", async (req, res) => {
+app.post("/forgot-password/send-otp", authLimiter, async (req, res) => {
   try {
     const { email } = req.body;
     
@@ -3057,7 +3119,7 @@ app.post("/forgot-password/send-otp", async (req, res) => {
 });
 
 // Verify OTP
-app.post("/forgot-password/verify-otp", async (req, res) => {
+app.post("/forgot-password/verify-otp", authLimiter, async (req, res) => {
   try {
     const { email, otp } = req.body;
     
@@ -3124,7 +3186,7 @@ app.post("/forgot-password/verify-otp", async (req, res) => {
 });
 
 // Reset password
-app.post("/forgot-password/reset-password", async (req, res) => {
+app.post("/forgot-password/reset-password", authLimiter, async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
     

@@ -3,8 +3,24 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
-  const { user, role, loading } = useAuth();
+  const { user, role: contextRole, loading } = useAuth();
   const location = useLocation();
+
+  // Check localStorage for cached role as backup (handles race condition on refresh)
+  const getCachedRole = () => {
+    try {
+      return localStorage.getItem('userRole');
+    } catch {
+      return null;
+    }
+  };
+
+  // Use context role, but fall back to cached role if context role is still 'student' 
+  // and cached role is something else (handles the race condition)
+  const cachedRole = getCachedRole();
+  const role = (contextRole === 'student' && cachedRole && cachedRole !== 'student') 
+    ? cachedRole 
+    : contextRole;
 
   // Note: AuthProvider usually handles the loading state before rendering children.
   // But strictly speaking, if we use it elsewhere, we might want to check loading.
@@ -30,7 +46,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     } else if (role === 'registration_admin') {
       return <Navigate to="/admin/desk" replace />;
     } else if (role === 'event_coordinator') {
-      return <Navigate to="/coordinator" replace />;
+      return <Navigate to="/admin/coordinator" replace />;
     } else if (role === 'volunteer') {
       return <Navigate to="/volunteer" replace />;
     }
