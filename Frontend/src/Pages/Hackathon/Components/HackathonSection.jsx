@@ -637,20 +637,48 @@ export const hackathonEventDetails = {
       ], 
 
 
+      notable: [
+        {
+          title: "1st Prize",
+          description: [
+            "INR 5,000 Winning prize for the Team. Two month Internship with stipend (Rs.5000 per Month) at Mindnics Private Limited to develop the design as product. Product development cost will be borne by Mindnics Private Limited"
+          ],
+        },{
+          title: "2nd Prize",
+          description: [
+            " •	2nd Position – INR 2,000 Winning prize for the Team. Two month Internship without stipend at Mindnics Private Limited to develop the design as product. Product development cost will be borne by Mindnics Private Limited"
+          ],
+        },{
+          title: "3rd Prize",
+          description: [
+            "INR 1,000 Winning prize for the Team."
+          ],
+        }
+      ], 
+
+
       challenge: [
         {
           title: "Round 1",
           description: [
             "Based on the performance, Participants will be short listed for further rounds."
-          ],
-        }
+          ]
+        },
       ],
+
+
+
+      
 
        eligibility: {
         categories: [
           "Students who want to pursue a career in Hardware Development, Electronics Engineers, and Tech enthusiasts.",
         "Have a profound knowledge of Electronic components, PCB designing knowledge, path routing, and Antenna understating.  ",],
       },
+
+      problem:[
+        "4-20mA Communication Receiver  ",
+      ],
 
       rules: [
         "2 students per team. Team members may be from different departments or different institutions are allowed.",

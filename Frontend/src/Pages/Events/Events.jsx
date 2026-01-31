@@ -1219,14 +1219,16 @@ const Events = () => {
                   </div>
                 )}
 
+
+
                 {/* Rounds Section */}
-                {selectedHackathon.rounds && selectedHackathon.rounds.length > 0 && (
+                {selectedHackathon.challenge && selectedHackathon.challenge.length > 0 && (
                   <div className="mb-8">
                     <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
                       Hackathon Rounds
                     </h3>
                     <div className="space-y-4">
-                      {selectedHackathon.rounds.map((round, idx) => (
+                      {selectedHackathon.challenge.map((round, idx) => (
                         <motion.div
                           key={idx}
                           initial={{ opacity: 0, x: -20 }}
@@ -1250,6 +1252,7 @@ const Events = () => {
                     </div>
                   </div>
                 )}
+
 
                 {/* Schedule Section */}
                 {selectedHackathon.schedule && selectedHackathon.schedule.length > 0 && (
@@ -1277,6 +1280,31 @@ const Events = () => {
                     </div>
                   </div>
                 )}
+
+
+                {/* problem Section */}
+                {selectedHackathon.problem && selectedHackathon.problem.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                      Problem Statement
+                    </h3>
+                    <div className="grid grid-cols-1 gap-3">
+                      {selectedHackathon.problem.map((problem, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: idx * 0.05 }}
+                          className="flex items-start gap-2 text-gray-300"
+                        >
+                          <span className="text-primary mt-1">▸</span>
+                          <span className="text-sm">{problem}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
 
                 {/* Rules Section */}
                 {selectedHackathon.rules && selectedHackathon.rules.length > 0 && (
@@ -1329,6 +1357,7 @@ const Events = () => {
                           </div>
                         </div>
                       )}
+
                       {selectedHackathon.eligibility.teamSize && (
                         <div className="bg-gradient-to-r from-primary/10 to-transparent p-4 rounded-lg">
                           <h4 className="text-sm font-semibold text-white mb-2">Team Size:</h4>
@@ -1344,6 +1373,9 @@ const Events = () => {
                     </div>
                   </div>
                 )}
+
+
+                
 
                 {/* Theme Section */}
                 {selectedHackathon.theme && (
@@ -1365,6 +1397,38 @@ const Events = () => {
                           ))}
                         </div>
                       )}
+                    </div>
+                  </div>
+                )}
+
+                {/* notable Section */}
+                {selectedHackathon.notable && selectedHackathon.notable.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                      Opporunity for Winners : 
+                    </h3>
+                    <div className="space-y-4">
+                      {selectedHackathon.notable.map((notable, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: idx * 0.05 }}
+                          className="bg-gradient-to-r from-primary/10 to-transparent p-4 rounded-lg"
+                        >
+                          <h4 className="text-lg font-semibold text-white mb-2">{notable.title}</h4>
+                          {notable.description && Array.isArray(notable.description) && (
+                            <ul className="space-y-1">
+                              {notable.description.map((desc, descIdx) => (
+                                <li key={descIdx} className="text-sm text-gray-300 flex items-start gap-2">
+                                  <span className="text-primary mt-1">▸</span>
+                                  <span>{desc}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </motion.div>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -2370,14 +2434,14 @@ const Events = () => {
                     </div>
                   </div>
 
-                  {/* Important Note */}
+                  {/* Important Note */}{/*}
                   <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
                       <span className="text-yellow-400 font-semibold text-sm">Important Note:</span>
                     </div>
                     <p className="text-yellow-300 text-sm mt-1 ml-7">No Lunch will be provided for this event.</p>
-                  </div>
+                  </div>*/}
 
                   {/* Register Button */}
                   <button
