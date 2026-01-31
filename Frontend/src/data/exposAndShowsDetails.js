@@ -1,7 +1,7 @@
-import autoshow from "../assets/EventsImages/EventDetails/exposshows/autoshow.png";
-import droneshow from "../assets/EventsImages/EventDetails/exposshows/droneshow.png";
-import foodshow from "../assets/EventsImages/EventDetails/exposshows/food.png";
-import txt from "../assets/EventsImages/EventDetails/exposshows/texexpo.png";
+import autoshow from "../assets/EventsImages/EventDetails/exposshows/autoshow.webp";
+import droneshow from "../assets/EventsImages/EventDetails/exposshows/droneshow.webp";
+import foodshow from "../assets/EventsImages/EventDetails/exposshows/food.webp";
+import txt from "../assets/EventsImages/EventDetails/exposshows/texexpo.webp";
 
 
 export const exposAndShowsDetails = [

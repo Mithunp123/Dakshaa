@@ -181,12 +181,14 @@ const EventCoordinatorDashboard = () => {
         )
         .subscribe();
 
-      // Polling fallback: refresh both participants and stats every 5 seconds
+      // Polling fallback: refresh both participants and stats every 30 seconds (reduced from 5s)
       const pollingInterval = setInterval(() => {
-        console.log('⏱️ Polling update...');
+        if (import.meta.env.DEV) {
+          console.log('⏱️ Polling update...');
+        }
         fetchParticipants();
         fetchStats();
-      }, 5000);
+      }, 30000);
 
       // Cleanup subscriptions and interval on unmount or event change
       return () => {

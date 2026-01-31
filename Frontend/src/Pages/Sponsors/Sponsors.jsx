@@ -2,26 +2,26 @@ import React from "react";
 import { motion } from "framer-motion";
 
 
-import aidswk from "./assets/aidswk.png";
-import aimlwk from "./assets/aimlwk.png";
-import btwk from "./assets/btwk.jpg";
-import civilwk from "./assets/civilwk.png";
-import csbswk from "./assets/csbswk.png";
-import csewk from "./assets/csewk.png";
-import ecewk from "./assets/ecewk.png";
-import eeewk from "./assets/eeewk.jpeg";
-import ftwk from "./assets/ftwk.jpg";
-import iprwk from "./assets/iprwk.jpeg";
-import itwk from "./assets/itwk.jpeg";
-import mcawk from "./assets/mcawk.png";
-import mctwk from "./assets/mctwk.png";
-import mechwk from "./assets/mechwk.png";
-import txtwk from "./assets/txtwk.jpeg";
-import vlsiwk from "./assets/vlsiwk.jpeg";
-import comingsoon from "./assets/comingsoon.jpg";
-import startuptn from "./assets/startuptn.png";
-import lovable from "./assets/lovable.png";
-import titlesp from "./assets/atum.jpg";
+import aidswk from "./assets/aidswk.webp";
+import aimlwk from "./assets/aimlwk.webp";
+import btwk from "./assets/btwk.webp";
+import civilwk from "./assets/civilwk.webp";
+import csbswk from "./assets/csbswk.webp";
+import csewk from "./assets/csewk.webp";
+import ecewk from "./assets/ecewk.webp";
+import eeewk from "./assets/eeewk.webp";
+import ftwk from "./assets/ftwk.webp";
+import iprwk from "./assets/iprwk.webp";
+import itwk from "./assets/itwk.webp";
+import mcawk from "./assets/mcawk.webp";
+import mctwk from "./assets/mctwk.webp";
+import mechwk from "./assets/mechwk.webp";
+import txtwk from "./assets/txtwk.webp";
+import vlsiwk from "./assets/vlsiwk.webp";
+import comingsoon from "./assets/comingsoon.webp";
+import startuptn from "./assets/startuptn.webp";
+import lovable from "./assets/lovable.webp";
+import titlesp from "./assets/atum.webp";
 
 
 

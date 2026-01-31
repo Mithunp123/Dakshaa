@@ -1,21 +1,21 @@
 
-import workshop1 from "../assets/EventsImages/EventDetails/Workshop/aids_wk.png";
-import workshop2 from "../assets/EventsImages/EventDetails/Workshop/aiml_wk.png";
-import workshop3 from "../assets/EventsImages/EventDetails/Workshop/bt_wk.png";
-import workshop4 from "../assets/EventsImages/EventDetails/Workshop/civil_wk.png";
-import workshop5 from "../assets/EventsImages/EventDetails/Workshop/csbs_wk.png";
-import workshop6 from "../assets/EventsImages/EventDetails/Workshop/cse_wk.png";
-import workshop7 from "../assets/EventsImages/EventDetails/Workshop/ece_wk.png";
-import workshop8 from "../assets/EventsImages/EventDetails/Workshop/eee_wk.png";
-import workshop9 from "../assets/EventsImages/EventDetails/Workshop/ft_wk.png";
-import workshop10 from "../assets/EventsImages/EventDetails/Workshop/ipr_wk.png";
-import workshop11 from "../assets/EventsImages/EventDetails/Workshop/it_wk.png";
-import workshop12 from "../assets/EventsImages/EventDetails/Workshop/mct_wk.png";
-import workshop13 from "../assets/EventsImages/EventDetails/Workshop/mech_wk.png";
-import workshop14 from "../assets/EventsImages/EventDetails/Workshop/txt_wk.png";
-import workshop15 from "../assets/EventsImages/EventDetails/Workshop/vlsi_wk.png";
-import workshop16 from "../assets/EventsImages/EventDetails/Workshop/mca_wk.png";
-import workshop17 from "../assets/EventsImages/EventDetails/Workshop/math.png";
+import workshop1 from "../assets/EventsImages/EventDetails/Workshop/aids_wk.webp";
+import workshop2 from "../assets/EventsImages/EventDetails/Workshop/aiml_wk.webp";
+import workshop3 from "../assets/EventsImages/EventDetails/Workshop/bt_wk.webp";
+import workshop4 from "../assets/EventsImages/EventDetails/Workshop/civil_wk.webp";
+import workshop5 from "../assets/EventsImages/EventDetails/Workshop/csbs_wk.webp";
+import workshop6 from "../assets/EventsImages/EventDetails/Workshop/cse_wk.webp";
+import workshop7 from "../assets/EventsImages/EventDetails/Workshop/ece_wk.webp";
+import workshop8 from "../assets/EventsImages/EventDetails/Workshop/eee_wk.webp";
+import workshop9 from "../assets/EventsImages/EventDetails/Workshop/ft_wk.webp";
+import workshop10 from "../assets/EventsImages/EventDetails/Workshop/ipr_wk.webp";
+import workshop11 from "../assets/EventsImages/EventDetails/Workshop/it_wk.webp";
+import workshop12 from "../assets/EventsImages/EventDetails/Workshop/mct_wk.webp";
+import workshop13 from "../assets/EventsImages/EventDetails/Workshop/mech_wk.webp";
+import workshop14 from "../assets/EventsImages/EventDetails/Workshop/txt_wk.webp";
+import workshop15 from "../assets/EventsImages/EventDetails/Workshop/vlsi_wk.webp";
+import workshop16 from "../assets/EventsImages/EventDetails/Workshop/mca_wk.webp";
+import workshop17 from "../assets/EventsImages/EventDetails/Workshop/math.webp";
 
 
 /* Workshop Events List
@@ -150,12 +150,10 @@ export const workshopDetails = [
       facultyCoordinator: [
         {
           name: "Mr. S. Raja",
-          email: "",
           phone: "+91 75028 21440",
         },
         {
           name: "Mrs. A. Eswari",
-          email: "",
           phone: "+91 94431 81818",
         },
       ],
@@ -163,22 +161,18 @@ export const workshopDetails = [
         {
           name: "S. Balamurugan, IV Year",
           phone: "+91 94877 07552",
-          email: "",
         },
         {
           name: "D. Vedhaanthan, III Year",
           phone: "+91 8825722898",
-          email: "",
         },
         {
           name: "A. Kayalvizhi, III Year",
           phone: "+91 80982 14368",
-          email: "",
         },
         {
           name: "Nivethitha, II Year",
           phone: "+91 63804 46457",
-          email: "",
         },
       ],
     },
@@ -208,13 +202,11 @@ export const workshopDetails = [
           name: "Ms. M. Indumathi",
           designation: "Assistant Professor",
           phone: "+91 97152 47992",
-          email: "",
         },
         {
           name: "Mr. S. Vinothkumar",
           designation: "Assistant Professor",
           phone: "+91 75488 98727",
-          email: "",
         },
       ],
       studentCoordinator: [
@@ -223,28 +215,24 @@ export const workshopDetails = [
           year: "III Year",
           department: "CSE (AIML)",
           phone: "+91 80728 27232",
-          email: "",
         },
         {
           name: "Hanish J",
           year: "II Year",
           department: "CSE (AIML)",
           phone: "+91 80728 13642",
-          email: "",
         },
         {
           name: "Bharanidharan P",
           year: "I Year",
           department: "CSE (AIML)",
           phone: "+91 97892 82253",
-          email: "",
         },
         {
           name: "Lesanth N",
           year: "III Year",
           department: "CSE (AIML)",
           phone: "+91 63856 43934",
-          email: "",
         },
       ],
     },
@@ -274,7 +262,6 @@ export const workshopDetails = [
           name: "Dr. Rahul Chauhan",
           designation: "Assistant Professor",
           phone: "",
-          email: "",
         },
       ],
       studentCoordinator: [
@@ -283,21 +270,18 @@ export const workshopDetails = [
           year: "III Year",
           department: "Biotechnology",
           phone: "+91 88386 16292",
-          email: "",
         },
         {
           name: "E.K.A. Lakshitha",
           year: "III Year",
           department: "Biotechnology",
           phone: "+91 90956 22122",
-          email: "",
         },
         {
           name: "R. Hari",
           year: "III Year",
           department: "Biotechnology",
           phone: "+91 97512 39792",
-          email: "",
         },
       ],
     },
@@ -325,19 +309,16 @@ export const workshopDetails = [
         {
           name: "Dr. S. Gunasekar",
           phone: "+91 99768 76238",
-          email: "",
         },
       ],
       studentCoordinator: [
         {
           name: "S. Sandhiya",
           phone: "+91 96599 53151",
-          email: "",
         },
         {
           name: "M. Keerthi Varshini",
           phone: "+91 88700 16266",
-          email: "",
         },
       ],
     },
@@ -367,7 +348,6 @@ export const workshopDetails = [
           name: "Mrs. T. Udhaya",
           designation: "Assistant Professor",
           phone: "+91 86755 87180",
-          email: "",
         },
       ],
       studentCoordinator: [
@@ -376,14 +356,12 @@ export const workshopDetails = [
           year: "III Year",
           department: "CSBS",
           phone: "+91 97872 02300",
-          email: "",
         },
         {
           name: "B. Mahitha",
           year: "III Year",
           department: "CSBS",
           phone: "+91 93605 03971",
-          email: "",
         },
       ],
     },
@@ -396,13 +374,13 @@ export const workshopDetails = [
     description: "CyberStrike is a high-impact hands-on cybersecurity workshop designed to introduce participants to the fundamentals of cybersecurity and real-world web application security. The event covers career insights, essential security concepts, and practical exposure to OWASP Top 10 vulnerabilities through live demonstrations and guided activities. Participants will learn how attacks happen, how to defend systems, and how to build secure applications with industry-relevant knowledge and techniques.",
     img: workshop6,
     date: "February 12, 2026",
-    venue: "CSE LAB 1",
+    venue: "IT PARK (CSE LAB 1)",
     department: "Workshop",
     price: "₹300",
     schedule: [
       {
        
-        location: "CSE LAB 1",
+        location: "IT PARK(CSE LAB 1)",
         time: "9:30 AM to 4:00 PM",
         date: "February 12, 2026",
       },
@@ -413,14 +391,12 @@ export const workshopDetails = [
           name: "S.Mithuna",
           department: "CSE",
           phone: "+91 99526 65042",
-          email: "",
         },
       ],
       studentCoordinator: [
         {
           name: "K.L. Peranandha",
           phone: "+91 81485 37603",
-          email: "",
         },
       ],
     },
@@ -433,13 +409,13 @@ export const workshopDetails = [
     description: "The Future of IoT: LoRaWAN with Artificial Intelligence workshop by Enthu Technology Solutions India Pvt. Ltd. introduces participants to long-range, low-power IoT communication using LoRaWAN and its integration with AI. The session highlights real-world applications like smart cities, agriculture, and industrial automation through practical demonstrations and insights into intelligent IoT systems.",
     img: workshop7,
     date: "February 12, 2026",
-    venue: "Embedded System Laboratory",
+    venue: "Embedded Lab (Main Building)",
     department: "Workshop",
     price: "₹300",
     schedule: [
       {
         
-        location: "Embedded System Laboratory",
+        location: "Embedded Lab (Main Building)",
         duration: "9:00 AM to 4:00 PM",
         date: "February 12, 2026",
       },
@@ -449,14 +425,12 @@ export const workshopDetails = [
         {
           name: "Mr. Mohanraj AP",
           phone: "+91 80565 75711",
-          email: "",
         },
       ],
       studentCoordinator: [
         {
           name: "Srinivasan P",
           phone: "+91 63833 19663",
-          email: "",
         },
       ],
     },
@@ -485,19 +459,16 @@ export const workshopDetails = [
         {
           name: "Mr. E. Chandrakumar",
           phone: "",
-          email: "",
         },
       ],
       studentCoordinator: [
         {
           name: "Mr. Sujaysarvesh D",
           phone: "+91 77087 58486",
-          email: "",
         },
         {
           name: "Mr. Muhildharshan L",
           phone: "+91 95970 33919",
-          email: "",
         },
       ],
     },
@@ -526,19 +497,16 @@ export const workshopDetails = [
         {
           name: "Mr. T.G.N. Nagarjun",
           phone: "+91 87543 94242",
-          email: "",
         },
       ],
       studentCoordinator: [
         {
           name: "Ms. R. Pavithra",
           phone: "+91 93458 94830",
-          email: "",
         },
         {
           name: "Mr. V. Lithin Prasath",
           phone: "+91 97913 20244",
-          email: "",
         },
       ],
     },
@@ -551,7 +519,7 @@ export const workshopDetails = [
     description: "This one-day workshop on \"Monetizing Your Idea through Intellectual Property Rights (IPR)\" focuses on helping students, innovators, and early-stage entrepreneurs understand how ideas can be converted into protected intellectual assets and commercially leveraged. The session covers the practical use of patents, copyrights, trademarks, and designs, explaining what can be protected, when to file, and how IPR directly supports revenue generation through licensing, technology transfer, product commercialization, and startup valuation.",
     img: workshop10,
     date: "February 12, 2026",
-    venue: "To be announced",
+    venue: "PTC Conference Hal",
     department: "Workshop",
     price: "₹300",
     schedule: [
@@ -559,7 +527,7 @@ export const workshopDetails = [
        
         date: "12 February 2026",
         time: "9:00 AM to 4:00 PM",
-        location: "To be announced",
+        location: "PTC Conference Hal",
       },
     ],
     contact: {
@@ -574,7 +542,6 @@ export const workshopDetails = [
         {
           name: "Mr. A.Harish",
           phone: "+91 63642 32959",
-          email: "",
         },
       ],
     },
@@ -587,13 +554,13 @@ export const workshopDetails = [
     description: "This hands-on workshop introduces college students to Git and GitHub for efficient version control and team-based development, covering repositories, commits, branching, merging, and conflict resolution through live demos and practice, while engaging participants in real-world workflows like collaboration and code reviews, ultimately preparing them to confidently use Git and GitHub for academic, internship, hackathon, and industry-level projects.",
     img: workshop11,
     date: "February 12, 2026",
-    venue: "Computer Lab (high spec)",
+    venue: "IT LAB 1",
     department: "Workshop",
     price: "₹300",
     schedule: [
       {
         
-        location: "Computer Lab (high spec)",
+        location: "IT LAB 1",
         time: "1 Day",
         date: "February 12, 2026",
       },
@@ -604,19 +571,16 @@ export const workshopDetails = [
           name: "Mr. R.T. Dineshkumar",
           designation: "Assistant Professor",
           phone: "+91 99527 62214",
-          email: "",
         },
       ],
       studentCoordinator: [
         {
           name: "Mr. S. Deepan",
           phone: "8015441715",
-          email: "",
         },
         {
           name: "Ms. P.D. Malathi",
           phone: "+91 80728 44465",
-          email: "",
         },
       ],
     },
@@ -645,19 +609,16 @@ export const workshopDetails = [
         {
           name: "Mr. S. HariPrasadh",
           phone: "+91 70928 21630",
-          email: "",
         },
       ],
       studentCoordinator: [
         {
           name: "Mr. G. Harish",
           phone: "+91 63829 05603",
-          email: "",
         },
         {
           name: "Mr. V. Gowtham",
           phone: "+91 74484 28784",
-          email: "",
         },
       ],
     },
@@ -686,24 +647,20 @@ export const workshopDetails = [
         {
           name: "Dr. K. Raja",
           phone: "+91 98423 14481",
-          email: "",
         },
         {
           name: "Mr. C. Ramesh",
           phone: " +91 96297 67778",
-          email: "",
         },
       ],
       studentCoordinator: [
         {
           name: "Ms. A. Harini",
           phone: "+91 63794 14177",
-          email: "",
         },
         {
           name: "Mr. M. Marushini",
           phone: "+91 97869 04315",
-          email: "",
         },
       ],
     },
@@ -734,7 +691,6 @@ export const workshopDetails = [
           designation: "Assistant Professor",
           department: "Textile Technology",
           phone: "+91 99528 41869",
-          email: "",
         },
       ],
       studentCoordinator: [
@@ -743,14 +699,12 @@ export const workshopDetails = [
           year: "III Year",
           department: "Textile Technology",
           phone: "+91 70921 02427",
-          email: "",
         },
         {
           name: "Ms. Monika P T",
           year: "II Year",
           department: "Textile Technology",
           phone: "+91 93447 14198",
-          email: "",
         },
       ],
     },
@@ -786,28 +740,24 @@ export const workshopDetails = [
           name: "Dr. P. Suthanthira Kumar",
           designation: "Assistant Professor",
           phone: "+91 95008 25738",
-          email: "",
         },
       ],
       studentCoordinator: [
         {
           name: "Ms. S. Srikiruthika",
           phone: "+91 90422 31825",
-          email: "",
         },
         {
           name: "Mr. S. Gowtham",
           year: "II Year",
           department: "Electronics Engineering (VLSIDT)",
           phone: "+91 97878 31624",
-          email: "",
         },
         {
           name: "Ms. S. Kalaimagal",
           year: "II Year",
           department: "Electronics Engineering (VLSIDT)",
           phone: "+91 88706 71141",
-          email: "",
         },
       ],
     },
@@ -837,7 +787,6 @@ export const workshopDetails = [
           name: "Mr. MohanKumar R",
           department: "MCA",
           phone: "+91 97900 70708",
-          email: "",
         },
       ],
       studentCoordinator: [
@@ -846,28 +795,24 @@ export const workshopDetails = [
           year: "I Year",
           department: "MCA",
           phone: "+91 96064 22181",
-          email: "",
         },
         {
           name: "Vikas M S",
           year: "I Year",
           department: "MCA",
           phone: "+91 63800 88208",
-          email: "",
         },
         {
           name: "Madhumitha Devi Sri K",
           year: "I Year",
           department: "MCA",
           phone: "+91 78128 37347",
-          email: "",
         },
         {
           name: "Suvetha S",
           year: "I Year",
           department: "MCA",
           phone: "+91 88077 37000",
-          email: "",
         },
       ],
     },
@@ -897,7 +842,6 @@ export const workshopDetails = [
           name: "Ms Ramya R",
           department: "Electronics Engineering",
           phone: "+91 97879 03008",
-          email: "",
         },
       ],
       studentCoordinator: [
@@ -906,14 +850,12 @@ export const workshopDetails = [
           year: "I Year",
           department: "MCA",
           phone: "+91 98489 526160",
-          email: "",
         },
         {
           name: "Megavardhini L",
           year: "I Year",
           department: "MCA",
           phone: "+91 639942 339351",
-          email: "",
         },
       ],
     },

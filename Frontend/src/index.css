@@ -307,3 +307,76 @@
 .animate-blink {
   animation: blink 2s ease-in-out infinite;
 }
+
+/* Performance-optimized CSS animations */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(30px, -20px);
+  }
+}
+
+@keyframes float-slower {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-20px, 30px);
+  }
+}
+
+@keyframes float-particle {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(-50px);
+    opacity: 0.4;
+  }
+}
+
+@keyframes glow-line {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 25s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-float-slower {
+  animation: float-slower 30s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-float-particle {
+  animation: float-particle 15s ease-in-out infinite;
+}
+
+.animate-glow-line {
+  animation: glow-line 8s ease-in-out infinite;
+}
+
+/* Reduce animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-slow,
+  .animate-float-slower,
+  .animate-float-particle,
+  .animate-glow-line,
+  .animate-blink {
+    animation: none;
+  }
+}

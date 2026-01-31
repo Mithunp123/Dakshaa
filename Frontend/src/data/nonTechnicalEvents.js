@@ -1,25 +1,25 @@
-import NonTech12 from "../assets/EventsImages/EventDetails/Nontech/Department of InformationTechnology.jpg";
-import nontech1 from "../assets/EventsImages/EventDetails/Nontech/aids_nontech.png";
-import nontech2 from "../assets/EventsImages/EventDetails/Nontech/aids_nontech1.png";
-import nontech3 from "../assets/EventsImages/EventDetails/Nontech/bt_nontech.png";
-import nontech4 from "../assets/EventsImages/EventDetails/Nontech/civil_nontech.png";
-import nontech5 from "../assets/EventsImages/EventDetails/Nontech/csbs_nontech.png";
-import nontech6 from "../assets/EventsImages/EventDetails/Nontech/cse_nontech.png";
-import nontech7 from "../assets/EventsImages/EventDetails/Nontech/cse_nontech1.png";
-import nontech8 from "../assets/EventsImages/EventDetails/Nontech/ece_nontech.png";
-import nontech9 from "../assets/EventsImages/EventDetails/Nontech/ece_nontech1.png";
-import nontech10 from "../assets/EventsImages/EventDetails/Nontech/eee_nontech2.png";
-import nontech11 from "../assets/EventsImages/EventDetails/Nontech/eee_nontech1.png";
-import nontech12 from "../assets/EventsImages/EventDetails/Nontech/eee_nontech.png";
-import nontech13 from "../assets/EventsImages/EventDetails/Nontech/ft_nontech.png";
-import nontech14 from "../assets/EventsImages/EventDetails/Nontech/it_nontech.png";
-import nontech15 from "../assets/EventsImages/EventDetails/Nontech/mca_nontech.png";
-import nontech16 from "../assets/EventsImages/EventDetails/Nontech/mct_nontech.png";
-import nontech17 from "../assets/EventsImages/EventDetails/Nontech/mct_nontech1.png";
-import nontech18 from "../assets/EventsImages/EventDetails/Nontech/mech_nontech.png";
-import nontech19 from "../assets/EventsImages/EventDetails/Nontech/txt_nontech.png";
-import nontech20 from "../assets/EventsImages/EventDetails/Nontech/vlsi_nontech.png";
-import nontech21 from "../assets/EventsImages/EventDetails/Nontech/turf_csbs.png";
+import NonTech12 from "../assets/EventsImages/EventDetails/Nontech/Department of InformationTechnology.webp";
+import nontech1 from "../assets/EventsImages/EventDetails/Nontech/aids_nontech.webp";
+import nontech2 from "../assets/EventsImages/EventDetails/Nontech/aids_nontech1.webp";
+import nontech3 from "../assets/EventsImages/EventDetails/Nontech/bt_nontech.webp";
+import nontech4 from "../assets/EventsImages/EventDetails/Nontech/civil_nontech.webp";
+import nontech5 from "../assets/EventsImages/EventDetails/Nontech/csbs_nontech.webp";
+import nontech6 from "../assets/EventsImages/EventDetails/Nontech/cse_nontech.webp";
+import nontech7 from "../assets/EventsImages/EventDetails/Nontech/cse_nontech1.webp";
+import nontech8 from "../assets/EventsImages/EventDetails/Nontech/ece_nontech.webp";
+import nontech9 from "../assets/EventsImages/EventDetails/Nontech/ece_nontech1.webp";
+import nontech10 from "../assets/EventsImages/EventDetails/Nontech/eee_nontech2.webp";
+import nontech11 from "../assets/EventsImages/EventDetails/Nontech/eee_nontech1.webp";
+import nontech12 from "../assets/EventsImages/EventDetails/Nontech/eee_nontech.webp";
+import nontech13 from "../assets/EventsImages/EventDetails/Nontech/ft_nontech.webp";
+import nontech14 from "../assets/EventsImages/EventDetails/Nontech/it_nontech.webp";
+import nontech15 from "../assets/EventsImages/EventDetails/Nontech/mca_nontech.webp";
+import nontech16 from "../assets/EventsImages/EventDetails/Nontech/mct_nontech.webp";
+import nontech17 from "../assets/EventsImages/EventDetails/Nontech/mct_nontech1.webp";
+import nontech18 from "../assets/EventsImages/EventDetails/Nontech/mech_nontech.webp";
+import nontech19 from "../assets/EventsImages/EventDetails/Nontech/txt_nontech.webp";
+import nontech20 from "../assets/EventsImages/EventDetails/Nontech/vlsi_nontech.webp";
+import nontech21 from "../assets/EventsImages/EventDetails/Nontech/turf_csbs.webp";
 
 
 /*

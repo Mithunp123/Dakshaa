@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
-import college from "../../../assets/college.png";
-import logo from "../../../assets/logo1.png";
+import college from "../../../assets/college.webp";
+import logo from "../../../assets/logo1.webp";
 
 // Animated Card Component
 const AnimatedCard = ({ children, delay = 0 }) => {

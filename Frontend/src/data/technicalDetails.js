@@ -1,21 +1,22 @@
-import Tech1 from "../assets/EventsImages/EventDetails/TechnicalImages/aids_tech.png";
-import Tech2 from "../assets/EventsImages/EventDetails/TechnicalImages/csbs_tech.png";
-import Tech4 from "../assets/EventsImages/EventDetails/TechnicalImages/bt_tech.png";
-import Tech6 from "../assets/EventsImages/EventDetails/TechnicalImages/bt_tech2.png";
-import Tech7 from "../assets/EventsImages/EventDetails/TechnicalImages/civil_tech.png";
-import Tech8 from "../assets/EventsImages/EventDetails/TechnicalImages/civil_tech1.png";
-import Tech10 from "../assets/EventsImages/EventDetails/TechnicalImages/cse_tech1.png";
-import Tech11 from "../assets/EventsImages/EventDetails/TechnicalImages/ece_tech.png";
-import Tech12 from "../assets/EventsImages/EventDetails/TechnicalImages/eee_tech.png";
-import Tech13 from "../assets/EventsImages/EventDetails/TechnicalImages/eee_tech1.png";
-import Tech14 from "../assets/EventsImages/EventDetails/TechnicalImages/ft_tech.png";
-import Tech16 from "../assets/EventsImages/EventDetails/TechnicalImages/mct_tech.png";
-import Tech17 from "../assets/EventsImages/EventDetails/TechnicalImages/mech_tech.png";
-import Tech19 from "../assets/EventsImages/EventDetails/TechnicalImages/txt_tech.png";
-import Tech20 from "../assets/EventsImages/EventDetails/TechnicalImages/txt_tech1.png";
-import Tech21 from "../assets/EventsImages/EventDetails/TechnicalImages/vlsi_tech.png";
-import Tech22 from "../assets/EventsImages/EventDetails/TechnicalImages/ft_tech1.png";
-import Tech23 from "../assets/EventsImages/EventDetails/TechnicalImages/ece_tech1.png";
+import Tech1 from "../assets/EventsImages/EventDetails/TechnicalImages/aids_tech.webp";
+import Tech2 from "../assets/EventsImages/EventDetails/TechnicalImages/csbs_tech.webp";
+import Tech4 from "../assets/EventsImages/EventDetails/TechnicalImages/bt_tech.webp";
+import Tech6 from "../assets/EventsImages/EventDetails/TechnicalImages/bt_tech1.webp";
+import Tech7 from "../assets/EventsImages/EventDetails/TechnicalImages/civil_tech.webp";
+import Tech8 from "../assets/EventsImages/EventDetails/TechnicalImages/civil_tech1.webp";
+import Tech10 from "../assets/EventsImages/EventDetails/TechnicalImages/cse_tech1.webp";
+import Tech11 from "../assets/EventsImages/EventDetails/TechnicalImages/ece_tech.webp";
+import Tech12 from "../assets/EventsImages/EventDetails/TechnicalImages/eee_tech.webp";
+import Tech13 from "../assets/EventsImages/EventDetails/TechnicalImages/eee_tech1.webp";
+import Tech14 from "../assets/EventsImages/EventDetails/TechnicalImages/ft_tech.webp";
+import Tech16 from "../assets/EventsImages/EventDetails/TechnicalImages/mct_tech.webp";
+import Tech17 from "../assets/EventsImages/EventDetails/TechnicalImages/mech_tech.webp";
+import Tech19 from "../assets/EventsImages/EventDetails/TechnicalImages/txt_tech.webp";
+import Tech20 from "../assets/EventsImages/EventDetails/TechnicalImages/txt_tech1.webp";
+import Tech21 from "../assets/EventsImages/EventDetails/TechnicalImages/vlsi_tech.webp";
+import Tech22 from "../assets/EventsImages/EventDetails/TechnicalImages/ft_tech1.webp";
+import Tech23 from "../assets/EventsImages/EventDetails/TechnicalImages/ece_tech1.webp";
+import Tech24 from "../assets/EventsImages/EventDetails/TechnicalImages/cody.webp";
 
 export const technicalDetails = [
   {
@@ -48,34 +49,28 @@ export const technicalDetails = [
         {
           name: "Mr. J. Karthick",
           phone: "+91 80564 08054",
-          email: "",
         },
         {
           name: "Ms. J. K. Shalini",
           phone: "+91 98949 70113",
-          email: "",
         },
       ],
       studentCoordinator: [
         {
           name: "Mr. M.Harish",
           phone: "+91 63693 03123",
-          email: "",
         },
         {
           name: "Mr. T.Vikas",
           phone: "+91 63814 59911",
-          email: "",
         },
         {
           name: "Ms. S.Obulakshmi",
           phone: "+91 81242 25197",
-          email: "",
         },
         {
           name: "Ms. M.Raufama",
           phone: "+91 93450 64140",
-          email: "",
         },
       ],
     },
@@ -142,19 +137,16 @@ export const technicalDetails = [
         {
           name: "Dr. M.Tamilarasi",
           phone: "+91 97500 37023",
-          email: "",
         },
       ],
       studentCoordinator: [
         {
           name: "Miss. R. Mythra",
           phone: "+91 93459 68826",
-          email: "",
         },
         {
           name: "Miss. K. Saimohana",
           phone: "",
-          email: "",
         },
       ],
     },
@@ -210,24 +202,20 @@ export const technicalDetails = [
       facultyCoordinator: [
         {
           name: "Dr. S. Sidhra",
-          email: "",
           phone: "+91 89256 06990",
         },
       ],
       studentCoordinator: [
         {
           name: "Ms. P. Keerthana",
-          email: "",
           phone: "+91 98944 84834",
         },
         {
           name: "Mr. K. Sharen",
-          email: "",
           phone: "+91 99431 91499",
         },
         {
           name: "Ms. V. Dhanasree",
-          email: "",
           phone: "+91 63741 53457",
         },
       ],
@@ -279,24 +267,20 @@ export const technicalDetails = [
       facultyCoordinator: [
         {
           name: "Dr. S. Sidhra",
-          email: "",
           phone: "+91 89256 06990",
         },
       ],
       studentCoordinator: [
         {
           name: "Ms. D. Moumitha",
-          email: "",
           phone: "+91 99525 33198",
         },
         {
           name: "Mr. M. Ajairaj",
-          email: "",
           phone: "+91 93420 70737",
         },
         {
           name: "Ms. Nancy",
-          email: "",
           phone: "+91 76958 90609",
         },
       ],
@@ -332,19 +316,16 @@ export const technicalDetails = [
         {
           name: "Dr. K. Vijaya Sundravel",
           phone: "+91 96886 76665",
-          email: "",
         },
       ],
       studentCoordinator: [
         {
           name: "Ms. P. Vaishnavi",
           phone: "+91 99441 08747",
-          email: "",
         },
         {
           name: "Ms. C. V. Swetha",
           phone: "+91 75388 31885",
-          email: "",
         },
       ],
     },
@@ -392,19 +373,16 @@ export const technicalDetails = [
       facultyCoordinator: [
         {
           name: " Dr. S. Ramesh",
-          email: "",
           phone: "+91 99768 72912",
         },
       ],
       studentCoordinator: [
         {
           name: "Ms.S.Gopika",
-          email: "",
           phone: "+91 86374 99578",
         },
         {
           name: "Ms Serlin maria",
-          email: "",
           phone: "+91 72008 87993",
         },
       ],
@@ -451,7 +429,6 @@ export const technicalDetails = [
       studentCoordinator: [
         {
           name: "JEEVANYA R",
-          email: "",
           phone: "+91 99443 12033",
         },
       ],
@@ -487,14 +464,12 @@ export const technicalDetails = [
       facultyCoordinator: [
         {
           name: "Mrs V P Kalaiarasi",
-          email: "",
           phone: "+91 95002 41234",
         },
       ],
       studentCoordinator: [
         {
           name: "Harish K",
-          email: "",
           phone: "+91 93857 81083",
         },
       ],
@@ -529,19 +504,16 @@ export const technicalDetails = [
       facultyCoordinator: [
         {
           name: "Mr. N Rajasekaran",
-          email: "",
           phone: "",
         },
       ],
       studentCoordinator: [
         {
           name: "Mr. Vishwanathan K",
-          email: "",
           phone: "+91 90250 81987",
         },
         {
           name: "Mr. Gowri Shankar S",
-          email: "",
           phone: "+91 96292 39567",
         },
       ],
@@ -646,7 +618,7 @@ export const technicalDetails = [
       {
       
         date: "February 13, 2026",
-        time: "time need",
+        time: "9:00 AM to 4:00 PM",
         location: "Dairy Technology Laboratory",
       },
     ],
@@ -654,24 +626,24 @@ export const technicalDetails = [
       facultyCoordinator: [
         {
           name: "Mr.P.Kalai Rajan",
-          email: "",
+         
           phone: "+91 70108 41881",
         },
       ],
       studentCoordinator: [
         {
           name: "Ms.S.Trishna",
-          email: "",
+          
           phone: "+91 98438 67406",
         },
         {
           name: "Ms.V.Madhushree",
-          email: "",
+          
           phone: "+91 63797 04086",
         },
       ],
     },
-    registrationLink: "https://forms.gle/2wBfChfRVPiKVw599",
+    registrationLink: "",
   },
   {
     id: "tech-mct",
@@ -711,24 +683,24 @@ export const technicalDetails = [
       facultyCoordinator: [
         {
           name: "Mr. M. Sanjay",
-          email: "",
+      
           phone: "+91 70928 21630",
         },
       ],
       studentCoordinator: [
         {
           name: "Mr. B. Aakash",
-          email: "",
+         
           phone: "+91 70106 96233",
         },
         {
           name: "Mr. D. Nishanth",
-          email: "",
+          
           phone: "+91 96003 52820",
         },
       ],
     },
-    registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9",
+    registrationLink: "",
   },
   {
     id: "tech-mech",
@@ -767,34 +739,34 @@ export const technicalDetails = [
       facultyCoordinator: [
         {
           name: "Dr. P. Sampath",
-          email: "",
+         
           phone: "+91 99621 16570",
         },
         {
           name: "Dr.M.Gnanasekaran",
-          email: "",
+         
           phone: "+91 98944 04279",
         },
       ],
       studentCoordinator: [
         {
           name: "Mr.N. Surya",
-          email: "",
+        
           phone: "+91 90252 23203",
         },
         {
           name: "Mr. S.Harish",
-          email: "",
+        
           phone: "+91 70109 63539",
         },
         {
           name: "Ms.V.A.Santhanalakshimi",
-          email: "",
+        
           phone: "+91 80569 10993",
         },
       ],
     },
-    registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9",
+    registrationLink: "",
   },
   {
     id: "tech-txt",
@@ -803,7 +775,7 @@ export const technicalDetails = [
     description: "DrapeX: Fabric Draping in Action offers hands-on practice in both basic and advanced fabric draping techniques using dress forms. Participants will understand fabric behavior such as fall, flow, and structure through the use of different fabrics, while applying creativity and technical skills to create original draped designs. The event also focuses on translating draped forms into garment silhouettes and design concepts.",
     img: Tech19,
     date: "February 13, 2026",
-    venue: "Garment Lab -Textile Block",
+    venue: "Garment Construction Lab-TT",
     department: "Technical Events",
     price: "₹250",
     rules: [
@@ -821,31 +793,29 @@ export const technicalDetails = [
         
         date: "February 13, 2026",
         time: "3 hours",
-        location: "Garment Lab -Textile Block",
+        location: "Garment Construction Lab-TT",
       },
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr.C.Premalatha",
-          email: "",
+         
           phone: "+91 971 03201",
         },
       ],
       studentCoordinator: [
         {
           name: "Ms. Subhalakshmi B",
-          email: "",
           phone: "+91 95977 78936",
         },
         {
           name: "Ms. Abirama Selvi R J",
-          email: "",
           phone: "+91 96882 41151",
         },
       ],
     },
-    registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9",
+    registrationLink: "",
   },
   {
     id: "tech-txt-1",
@@ -888,29 +858,25 @@ export const technicalDetails = [
       facultyCoordinator: [
         {
           name: "Dr. K.R.Nandagopal",
-          email: "",
           phone: "+91 90034 36705",
         },
         {
           name: "Dr. C.Premalatha",
-          email: "",
           phone: "+91 97502 06161",
         },
       ],
       studentCoordinator: [
         {
           name: "Mr.Dinu",
-          email: "",
           phone: "+91 82206 76049",
         },
         {
           name: "Mr.Raaghul Khanna V",
-          email: "",
           phone: "+91 96008 88788",
         },
       ],
     },
-    registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9",
+    registrationLink: "",
   },
   {
     id: "tech-vlsi",
@@ -971,22 +937,19 @@ export const technicalDetails = [
       studentCoordinator: [
         {
           name: "Mr. M. Suriya Prasanth",
-          email: "",
           phone: "+91 94878 22144",
         },
         {
           name: "Ms. G.S. Harsha Prabha",
-          email: "",
           phone: "+91 94422 18288",
         },
         {
           name: "Mr. R. Shanmugavel",
-          email: "",
           phone: "+91 63695 31193",
         },
       ],
     },
-    registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9",
+    registrationLink: "",
   },
   {
     id: "tech-ft-1",
@@ -995,7 +958,7 @@ export const technicalDetails = [
     description: "Green Innovation in Food Processing Techniques is a platform that celebrates ideas and innovations shaping the future of food. The conference brings together students, researchers, academicians, and industry professionals to explore eco-friendly solutions, safe food practices, and sustainable technologies in food processing. This event encourages creative thinking, knowledge sharing, and meaningful discussions on building a greener, healthier, and more sustainable food system.",
     img: Tech22,
     date: "February 13, 2026",
-    venue: "Smart classroom",
+    venue: "Smart class room[Food Technology]",
     department: "Technical Events",
     price: "₹250",
     topics: [
@@ -1024,31 +987,28 @@ export const technicalDetails = [
         
         date: "February 13, 2026",
         time: "9.00 AM to 2.00 PM",
-        location: "Smart classroom",
+        location: "Smart class room[Food Technology]",
       },
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr. K.Balasubramani",
-          email: "",
           phone: "+91 97892 52952",
         },
       ],
       studentCoordinator: [
         {
           name: "Mr.Rajulapati Yatheeswar",
-          email: "",
           phone: "+91 94412 36991",
         },
         {
           name: "Mr S.Yogeshwaran",
-          email: "",
           phone: "+91 73052 13626",
         },
       ],
     },
-    registrationLink: "https://forms.gle/Co3kBQwR53cbBH1B9",
+    registrationLink: "",
   },
   {
     id: "tech-ece1",
@@ -1057,7 +1017,7 @@ export const technicalDetails = [
     description: "The field of Electronics and Communication Engineering is rapidly evolving with revolutionary trends such as 5G and upcoming 6G communication, Internet of Things (IoT), Artificial Intelligence in communication systems, and advanced embedded technologies. These innovations are transforming the way in high-speed connectivity, smart automation, and intelligent decision-making. Applications like smart cities, autonomous vehicles, healthcare monitoring, industrial automation, and next-generation wireless networks.",
     img: Tech23,
     date: "February 13, 2026",
-    venue: "Smart Class Room (Main Block)",
+    venue: "A112, A113 Smart Class Room (Main Building)",
     department: "Technical Events",
     price: "₹250",
     topics: [
@@ -1081,7 +1041,7 @@ export const technicalDetails = [
         
         date: "February 13, 2026",
         time: "9.00 AM to 2.00 PM",
-        location: "Smart Class Room (Main Block)",
+        location: "A112, A113 Smart Class Room (Main Building)",
       },
     ],
     contact: {
@@ -1095,7 +1055,6 @@ export const technicalDetails = [
       studentCoordinator: [
         {
           name: "Naveen J",
-          email: "",
           phone: "+91 90801 21928",
         },
       ],
@@ -1107,7 +1066,7 @@ export const technicalDetails = [
     shortTitle: "Cody challenge  ",
     title: "Cody challenge  ",
     description: "It is an online, interactive game-based event designed to test MATLAB programming skills through puzzle-solving. It’s going to be conducted for 1 hour duration.",
-    img: Tech1,
+    img: Tech24,
     date: "February 13, 2026",
     venue: " UiPath Laboratory, IT PARK",
     department: "Technical Events",
@@ -1117,6 +1076,9 @@ export const technicalDetails = [
       "System provided in Laboratory.",
       "Mobile phones, books, or external references are strictly prohibited.",
     ],
+
+
+
 
     slot: [
       "Slot 1 : 9:00 AM to 10.30 AM ",
@@ -1136,32 +1098,31 @@ export const technicalDetails = [
         {
           name: " Dr Nithya J",
           phone: "+91 94438 46125",
-          email: "",
         },
         {
           name: "Ms Ramya R",
           phone: "+91 97879 03008",
-          email: "",
         },
       ],
       studentCoordinator: [
         {
-          name: "Dhanushri R ()",
+          name: "Dhanushri R  ",
           phone: "+91 95858 67766",
-          email: "",
         },
         {
           name: "Dharshini U ",
           phone: "+91 63697 22563",
-          email: "",
         },
         {
           name: "KiranKumar R",
           phone: "+91 84895 26160",
-          email: "",
         },
       ],
     },
+    importantNote: " https://tinyurl.com/KSR-DAKHA26",
+    importantText: [
+      "Do Register here after the completion of the payment to gain the access for mathlab platform ",
+    ],
     registrationLink: "",
   },
 

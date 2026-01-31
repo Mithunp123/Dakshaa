@@ -136,6 +136,10 @@ const AttendanceQR = () => {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
+        // Release canvas memory
+        canvas.width = 0;
+        canvas.height = 0;
+        
         toast.success('Entry Pass downloaded successfully!', { id: 'download' });
       }, 'image/png', 1.0); // Maximum quality
       

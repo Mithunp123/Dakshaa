@@ -4,36 +4,36 @@ import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import Pravartak from '../../../assets/WorkshopImages/Pravartak.jpg'
-import virtuospark from '../../../assets/WorkshopImages/virtuospark.jpg'
-import TXT from '../../../assets/WorkshopImages/TXT.png'
-import dftt from '../../../assets/WorkshopImages/dftt.jpg'
-import garuda from '../../../assets/WorkshopImages/garuda.jpg'
-import macro from '../../../assets/WorkshopImages/macro.jpg'
-import millet from '../../../assets/WorkshopImages/millet.jpg'
-import it from '../../../assets/WorkshopImages/it.png'
-import Cokupa from '../../../assets/WorkshopImages/Cokupa.png'
-import EnthuTechnology from '../../../assets/WorkshopImages/EnthuTechnology.png'
-import uipath from '../../../assets/WorkshopImages/uipath.png'
-import Ictacademy from '../../../assets/WorkshopImages/Ictacademy.png'
-import mewLogo from "../../../assets/WorkshopImages/mew logo BLUE.png"
-import bt from "../../../assets/WorkshopImages/BT.png"
+import Pravartak from '../../../assets/WorkshopImages/Pravartak.webp'
+import virtuospark from '../../../assets/WorkshopImages/virtuospark.webp'
+import TXT from '../../../assets/WorkshopImages/TXT.webp'
+import dftt from '../../../assets/WorkshopImages/dftt.webp'
+import garuda from '../../../assets/WorkshopImages/garuda.webp'
+import macro from '../../../assets/WorkshopImages/macro.webp'
+import millet from '../../../assets/WorkshopImages/millet.webp'
+import it from '../../../assets/WorkshopImages/it.webp'
+import Cokupa from '../../../assets/WorkshopImages/Cokupa.webp'
+import EnthuTechnology from '../../../assets/WorkshopImages/EnthuTechnology.webp'
+import uipath from '../../../assets/WorkshopImages/uipath.webp'
+import Ictacademy from '../../../assets/WorkshopImages/Ictacademy.webp'
+import mewLogo from "../../../assets/WorkshopImages/mew logo BLUE.webp"
+import bt from "../../../assets/WorkshopImages/BT.webp"
 
 
-import Photo1 from "../../../assets/workshop_card/Ai.jpg";
-import Photo2 from "../../../assets/workshop_card/Aiml.jpg";
-import Photo3 from "../../../assets/workshop_card/bt.jpg";
-import Photo4 from "../../../assets/workshop_card/civil.jpg";
-import Photo5 from "../../../assets/workshop_card/csbs.jpg";
-import Photo6 from "../../../assets/workshop_card/cse.jpg";
-import Photo7 from "../../../assets/workshop_card/ece.jpg";
-import Photo8 from "../../../assets/workshop_card/eee.jpg";
-import Photo9 from "../../../assets/workshop_card/ft.jpg";
-import Photo10 from "../../../assets/workshop_card/it.jpg";
-import Photo11 from "../../../assets/workshop_card/mct.jpg";
-import Photo12 from "../../../assets/workshop_card/mech.jpg";
-import Photo13 from "../../../assets/workshop_card/tex.jpg";
-import Photo14 from "../../../assets/workshop_card/vlsi.jpg";
+import Photo1 from "../../../assets/workshop_card/Ai.webp";
+import Photo2 from "../../../assets/workshop_card/Aiml.webp";
+import Photo3 from "../../../assets/workshop_card/bt.webp";
+import Photo4 from "../../../assets/workshop_card/civil.webp";
+import Photo5 from "../../../assets/workshop_card/csbs.webp";
+import Photo6 from "../../../assets/workshop_card/cse.webp";
+import Photo7 from "../../../assets/workshop_card/ece.webp";
+import Photo8 from "../../../assets/workshop_card/eee.webp";
+import Photo9 from "../../../assets/workshop_card/ft.webp";
+import Photo10 from "../../../assets/workshop_card/it.webp";
+import Photo11 from "../../../assets/workshop_card/mct.webp";
+import Photo12 from "../../../assets/workshop_card/mech.webp";
+import Photo13 from "../../../assets/workshop_card/tex.webp";
+import Photo14 from "../../../assets/workshop_card/vlsi.webp";
 
 
 // Workshop data

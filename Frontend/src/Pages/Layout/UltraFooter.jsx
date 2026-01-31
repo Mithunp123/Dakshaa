@@ -2,8 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaInstagram, FaFacebook, FaLinkedin, FaYoutube } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
-import ksrct from '../../assets/collegeLogoWhite.png';
-import dakshaa from '../../assets/logo1.png';
+import ksrct from '../../assets/collegeLogoWhite.webp';
+import dakshaa from '../../assets/logo1.webp';
 
 // Animated Social Icon
 const SocialIcon = ({ href, icon: Icon, delay }) => {

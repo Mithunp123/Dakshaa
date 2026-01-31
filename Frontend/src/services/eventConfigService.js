@@ -11,6 +11,9 @@ const EVENTS_STATIC_KEY = 'dakshaa_events_static'; // For instant display
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes for full cache
 const STATIC_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours for static event data
 
+// Track when a fetch started to prevent race conditions
+let currentFetchTimestamp = 0;
+
 /**
  * Clear the events cache - useful when events are updated
  */
@@ -61,6 +64,10 @@ export const getCachedEvents = () => {
  * @returns {Promise<Array>} List of events with current_registrations count
  */
 export const getEventsWithStats = async (forceRefresh = false) => {
+  // Record when this fetch started to prevent race conditions
+  const fetchStartTime = Date.now();
+  currentFetchTimestamp = fetchStartTime;
+  
   try {
     console.log('🔄 Fetching events with stats...');
     
@@ -204,13 +211,18 @@ export const getEventsWithStats = async (forceRefresh = false) => {
       };
     });
     
-    // Step 6: Cache the result
+    // Step 6: Cache the result (only if this is still the latest fetch)
     try {
-      localStorage.setItem(EVENTS_CACHE_KEY, JSON.stringify({
-        data: eventsWithStats,
-        timestamp: Date.now()
-      }));
-      console.log('💾 Events cached successfully');
+      // Prevent race condition: only update cache if no newer fetch has started
+      if (currentFetchTimestamp === fetchStartTime) {
+        localStorage.setItem(EVENTS_CACHE_KEY, JSON.stringify({
+          data: eventsWithStats,
+          timestamp: Date.now()
+        }));
+        console.log('💾 Events cached successfully');
+      } else {
+        console.log('⏭️ Skipping cache update - newer fetch in progress');
+      }
     } catch (e) {
       console.warn('Failed to cache events:', e);
     }

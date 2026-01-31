@@ -3,11 +3,11 @@ import { motion } from "framer-motion";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
-import startuptn from "../../../assets/startup/logo.png";
-import member2 from "../../../assets/startup/panelMember1.jpg";
-import member3 from "../../../assets/startup/panelMember2.jpg";
-import member1 from "../../../assets/startup/gurushankar.jpg";
-import member4 from "../../../assets/startup/aravinth.jpg";
+import startuptn from "../../../assets/startup/logo.webp";
+import member2 from "../../../assets/startup/panelMember1.webp";
+import member3 from "../../../assets/startup/panelMember2.webp";
+import member1 from "../../../assets/startup/gurushankar.webp";
+import member4 from "../../../assets/startup/aravinth.webp";
 
 function StartupSection() {
   const title1 = "Idea's";

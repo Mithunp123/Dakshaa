@@ -1,35 +1,36 @@
 import Particles, { initParticlesEngine } from "@tsparticles/react";
-import { useEffect, useMemo, useState } from "react";
-// import { loadAll } from "@/tsparticles/all"; // if you are going to use `loadAll`, install the "@tsparticles/all" package too.
-// import { loadFull } from "tsparticles"; // if you are going to use `loadFull`, install the "tsparticles" package too.
-import { loadSlim } from "@tsparticles/slim"; // if you are going to use `loadSlim`, install the "@tsparticles/slim" package too.
-// import { loadBasic } from "@tsparticles/basic"; // if you are going to use `loadBasic`, install the "@tsparticles/basic" package too.
-import BackgroundAnimation from "./BackgroundAnimation";
+import { useEffect, useMemo, useState, memo } from "react";
+import { loadSlim } from "@tsparticles/slim";
 
+// Check if user prefers reduced motion or is on mobile
+const prefersReducedMotion = typeof window !== 'undefined' && 
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
-
-const ParticlesComponent = (props) => {
-
+const ParticlesComponent = memo((props) => {
   const [init, setInit] = useState(false);
-  // this should be run only once per application lifetime
+
+  // Don't render particles on mobile or if user prefers reduced motion
+  if (prefersReducedMotion || isMobile) {
+    return null;
+  }
+
   useEffect(() => {
-    initParticlesEngine(async (engine) => {
-      // you can initiate the tsParticles instance (engine) here, adding custom shapes or presets
-      // this loads the tsparticles package bundle, it's the easiest method for getting everything ready
-      // starting from v2 you can add only the features you need reducing the bundle size
-      //await loadAll(engine);
-      //await loadFull(engine);
-      await loadSlim(engine);
-      //await loadBasic(engine);
-    }).then(() => {
-      setInit(true);
-    });
+    // Delay initialization to not block initial render
+    const timer = setTimeout(() => {
+      initParticlesEngine(async (engine) => {
+        await loadSlim(engine);
+      }).then(() => {
+        setInit(true);
+      });
+    }, 1000); // Delay particles by 1 second
+
+    return () => clearTimeout(timer);
   }, []);
 
   const particlesLoaded = (container) => {
     // Particles loaded successfully
   };
-
 
   const options = useMemo(
     () => ({
@@ -38,7 +39,7 @@ const ParticlesComponent = (props) => {
           value: "transparent",
         },
       },
-      fpsLimit: 60, // Reduced from 120 for better performance
+      fpsLimit: 30, // Reduced from 60 for better performance
       interactivity: {
         events: {
           onClick: {
@@ -46,20 +47,8 @@ const ParticlesComponent = (props) => {
             mode: "none",
           },
           onHover: {
-            enable: true,
+            enable: false, // Disable hover interactions for performance
             mode: 'grab',
-          },
-        },
-        modes: {
-          push: {
-            distance: 200,
-            duration: 15,
-          },
-          grab: {
-            distance: 150,
-          },
-          repulse: {
-            distance: 100,
           },
         },
       },
@@ -69,49 +58,48 @@ const ParticlesComponent = (props) => {
         },
         links: {
           color: "#FFFFFF",
-          distance: 150,
+          distance: 200, // Increased distance = fewer links
           enable: true,
-          opacity: 0.1,
+          opacity: 0.08,
           width: 1,
         },
         move: {
           direction: "none",
           enable: true,
           outModes: {
-            default: "bounce",
+            default: "out", // Changed from bounce for less CPU
           },
-          random: true,
-          speed: 0.5, // Slower, smoother movement
+          random: false, // Disable random for smoother movement
+          speed: 0.3, // Even slower
           straight: false,
         },
         number: {
           density: {
             enable: true,
+            area: 1200, // Larger area = fewer particles
           },
-          value: 50, // Reduced from 80 for better performance
+          value: 25, // Reduced from 50
         },
         opacity: {
-          value: 0.3,
+          value: 0.2,
         },
         shape: {
           type: "circle",
         },
         size: {
-          value: { min: 1, max: 3 },
+          value: { min: 1, max: 2 },
         },
       },
-      detectRetina: true,
+      detectRetina: false, // Disable retina detection for performance
     }),
     [],
   );
 
+  if (!init) return null;
 
-  return (
-    <>
-      <BackgroundAnimation />
-      <Particles id={props.id} init={particlesLoaded} options={options} />
-    </>
-  );
-};
+  return <Particles id={props.id} init={particlesLoaded} options={options} />;
+});
+
+ParticlesComponent.displayName = 'ParticlesComponent';
 
 export default ParticlesComponent;

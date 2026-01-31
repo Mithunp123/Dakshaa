@@ -67,16 +67,13 @@ const AdminDashboard = () => {
       )
       .subscribe();
 
-    // Auto-refresh every 10 seconds
-    const refreshInterval = setInterval(() => {
-      fetchStats();
-    }, 10000);
+    // Note: Auto-refresh removed - real-time subscriptions above handle live updates
+    // This reduces unnecessary database queries and improves performance
 
     return () => {
       supabase.removeChannel(attendanceSubscription);
       supabase.removeChannel(registrationSubscription);
       supabase.removeChannel(profileSubscription);
-      clearInterval(refreshInterval);
     };
   }, []);
 

@@ -94,7 +94,12 @@ const AccommodationBooking = () => {
               const data = JSON.parse(booking.special_requests || '{}');
               if (data.dates) bookedAccDates.push(...data.dates);
               totalAccPrice += parseFloat(booking.total_price || 0);
-            } catch (e) {}
+            } catch (e) {
+              // Log JSON parsing errors in development mode only
+              if (import.meta.env.DEV) {
+                console.warn('Error parsing accommodation booking data:', e);
+              }
+            }
           });
         }
 
@@ -265,6 +270,34 @@ const AccommodationBooking = () => {
       }
 
       if (bookingType === 'accommodation') {
+        // Validate required fields
+        if (!formData.fullName?.trim()) {
+          toast.error('Please enter your full name', {
+            duration: 3000,
+            position: 'top-center',
+          });
+          setLoading(false);
+          return;
+        }
+
+        if (!formData.mobile || !/^\d{10}$/.test(formData.mobile)) {
+          toast.error('Please enter a valid 10-digit mobile number', {
+            duration: 3000,
+            position: 'top-center',
+          });
+          setLoading(false);
+          return;
+        }
+
+        if (!formData.gender) {
+          toast.error('Please select your gender', {
+            duration: 3000,
+            position: 'top-center',
+          });
+          setLoading(false);
+          return;
+        }
+
         if (formData.accommodationDates.length === 0) {
           toast.error('Please select at least one date', {
             duration: 3000,

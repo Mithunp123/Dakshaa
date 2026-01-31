@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -20,6 +20,16 @@ const MyRegistrations = () => {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Ref to track mounted state for async operations
+  const mountedRef = useRef(true);
+  
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   // Handle payment success - refresh registrations with delay to allow webhook processing
   useEffect(() => {
@@ -151,17 +161,20 @@ const MyRegistrations = () => {
         const validRegistrations = (data || []).filter(reg => reg && reg.id);
         
         // For team events, calculate cumulative totals
+        // Each registration is processed individually with error handling
         const registrationsWithTotals = await Promise.all(
           validRegistrations.map(async (reg) => {
-            if (reg.event_name) {
-              // This is a team registration
-              let cumulativeTotal = 0;
-              let totalMembers = 0;
-              const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-              
-              // 1. Try to find Team ID
-              let teamId = null;
-              try {
+            // Wrap each registration processing in try-catch to prevent one bad record from failing all
+            try {
+              if (reg.event_name) {
+                // This is a team registration
+                let cumulativeTotal = 0;
+                let totalMembers = 0;
+                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+                
+                // 1. Try to find Team ID
+                let teamId = null;
+                try {
                   // Strategy A: Direct Membership check
                   const { data: userTeams } = await supabase
                       .from('team_members')
@@ -243,8 +256,13 @@ const MyRegistrations = () => {
                 cumulative_total: cumulativeTotal,
                 team_member_count: totalMembers
               };
+              }
+              return reg;
+            } catch (regError) {
+              // If processing this registration fails, return it without totals
+              console.error(`Error processing registration ${reg.id}:`, regError);
+              return reg;
             }
-            return reg;
           })
         );
         

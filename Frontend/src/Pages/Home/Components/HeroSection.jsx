@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { Download } from "lucide-react";
-import HeroImg from "../../../assets/Heroimg.png";
+import HeroImg from "../../../assets/Heroimg.webp";
 import Daksha from "../../../assets/DaKshaa T26.png";
 import Countdown from "./Countdown";
 import RegisterAni from "../../../assets/registerani.gif";

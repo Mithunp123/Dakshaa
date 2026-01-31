@@ -11,7 +11,7 @@ export const hackathonEventDetails = {
       id: "hackathon-1",
       title: "Neura-Hack 2.0 (36 Hours Hackathon)",
       date: "12th Feb - 13th Feb, 2026",
-      venue: "IT PARK",
+      venue: "T&P LAB",
       registrationFee:" ₹ 500 per head.",
       registrationLink: "",
       description: "NeuraHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, Defend, and Secure technology to shape the future of digital innovation.",
@@ -61,7 +61,7 @@ export const hackathonEventDetails = {
         {
           date: "12th Feb - 13th Feb, 2026",
           time: "9:00 AM to 9:00 PM",
-          location: "IT PARK",
+          location: "T&P LAB",
         },
       ],
       contact: {
@@ -85,7 +85,7 @@ export const hackathonEventDetails = {
       title: "BioNexathon 2026 (24 Hours Hackathon)",
       date: "February 13 2026 to February 14, 2026",
       registrationFee : " ₹ 500 per head.",
-      venue: "Seminar Hall",
+      venue: "Dr. M.S. Swaminathan Biotech Seminar Hall",
       description: "A platform for students, researchers, and professionals to present and discuss recent advancements in biotechnology. Includes keynote lectures, panel discussions, and interactive sessions. Focus on innovation, research impact, and interdisciplinary collaboration. Encourages networking and knowledge exchange among participants.",
       eligibility: {
         categories: [
@@ -202,7 +202,7 @@ export const hackathonEventDetails = {
           round: "Venue",
           date: "February 13 2026 to February 14, 2026",
           time: "24 hours",
-          location: "Seminar Hall",
+          location: "Dr. M.S. Swaminathan Biotech Seminar Hall",
         },
       ],
       contact: {
@@ -210,7 +210,7 @@ export const hackathonEventDetails = {
           {
             name: "Dr. G. Ayyappadasan",
             phone: "+91 99445 28382",
-            email: "",
+            
           },
         ],
         studentCoordinator: [
@@ -233,7 +233,7 @@ export const hackathonEventDetails = {
       id: "hackathon-3",
       title: "Neura Code 2.O - Relay Edition",
       date: "February 13 2026 ",
-      venue: "computer Lab",
+      venue: "IT LAB 1",
       registrationFee:" ₹ 300 per head.",
       registrationLink: " ",
       description: "Relay Edition is a team-based web design challenge where a reference website design is provided. Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
@@ -307,15 +307,14 @@ export const hackathonEventDetails = {
         {
           date: "February 13, 2026",
           time: "09:00 AM",
-          location: "Computer Lab",
+          location: "IT LAB 1",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
             name: "Mr.P.Dineshkumar",
-            phone: "",
-            email: "",
+            
           },
         ],
         studentCoordinator: [
@@ -334,7 +333,7 @@ export const hackathonEventDetails = {
       id: "hackathon-4",
       title: "24-Hour Vibe Coding Hackathon",
       date: "February 13, 2026",
-      venue: "AB lab 3",
+      venue: "Bhumi Lab , Cyberdome, Tutorial class",
       registrationFee:" ₹ 500 per head.",
       description: "The 24-Hour Vibe Coding Hackathon is an intensive, creativity-driven coding event where participants design and prototype real-world software solutions using Lovable AI. The hackathon emphasizes problem-first thinking, rapid iteration, and meaningful impact rather than product pitching or hardware-based development.Participants will receive problem statements on the spot and are expected to ideate, build, and present a working solution within 24 hours using limited AI credits—encouraging smart, intentional, and efficient development",
       rewards: [
@@ -403,7 +402,7 @@ export const hackathonEventDetails = {
           
           date: "February 13, 2026",
           time: "09:00 AM",
-          location: "AB lab 3",
+          location: "Bhumi Lab , Cyberdome, Tutorial class",
         },
       ],
       contact: {
@@ -411,12 +410,12 @@ export const hackathonEventDetails = {
           {
             name: "Mr. S.Insol Rajasekar",
             phone: "+91 82205 12436",
-            email: "",
+            
           },
           {
             name: "Mr.K.Praveen",
             phone: "+91 95009 18101",
-            email: "",
+           
           },
         ],
         studentCoordinator: [
@@ -443,7 +442,7 @@ export const hackathonEventDetails = {
       id: "hackathon-5",
       title: "Startup Pitch 2026",
       date: "13.02.2026",
-      venue: "Tech park, Conference hall",
+      venue: "PTC Seminar Hall ",
       registrationFee : " ₹ 250 per head.(Without Food)",
       description: "The StartUp Pitch Event, organized by the Entrepreneurship Development Cell (EDC), aims to encourage students to ideate, innovate, and present impactful startup solutions in emerging technology domains such as automation, robotics, artificial intelligence, smart manufacturing, and intelligent systems. The event provides a platform for participants to showcase how modern development principles integrated with AI-driven technologies can be applied to solve real-world industrial and societal challenges. Students are expected to focus on innovation, technical feasibility, scalability, and real-time impact, while demonstrating entrepreneurial thinking and problem-solving skills. ",
       rewards: [
@@ -505,26 +504,24 @@ export const hackathonEventDetails = {
          
           date: "13.02.2026",
           time: "9:00 AM to 4:00PM",
-          location: "Tech park, Conference hall",
+          location: "PTC Seminar Hall ",
         },
       ],
       contact: {
         facultyCoordinator: [
           {
             name: "Dr. N. Tiruvenkadam ",
-            phone: "",
-            email: "",
+            
           },
         ],
         studentCoordinator: [
           {
             name: "Ms. H. Ainul Zuvairia",
-            phone: "",
-            email: "",
+            
           },
           {
             name:"Ms. A. Shrimathi ",
-            phone: "",
+            
           },
           {
             name:"Mr. M. Barath Kumar ",
@@ -542,7 +539,7 @@ export const hackathonEventDetails = {
       title: "Designathon 2026",
       date: "February 13, 2026",
       registrationFee:" ₹ 500 per head.",
-      venue: "Bhaskara Block[Mechanical Dept]",
+      venue: "BASKARA BLOCK [ MECHANICAL] DESIGN CENTER",
       description: " This Designathon is centered on the innovative use of Computer-Aided Design (CAD) tools to create, redesign, and optimize mechanical components and systems for modern engineering applications. The event provides a creative and technical platform for Mechanical Engineering students to transform ideas into precise digital models using industry-standard CAD software.Participants will apply design thinking principles to develop concepts, create 3D models, perform assemblies, and generate engineering drawings while considering functionality, manufacturability, material selection, and sustainability. The Designathon encourages students to rethink conventional designs and propose efficient, lightweight, and cost-effective solutions through advanced CAD modeling techniques. ",
       rewards: [
         {
@@ -584,7 +581,7 @@ export const hackathonEventDetails = {
          
           date: "February 13, 2026",
           time: "09:00 AM",
-          location: "Idea lab [ Main Building ]",
+          location: "BASKARA BLOCK [ MECHANICAL] DESIGN CENTER",
         },
       ],
       contact: {
@@ -592,29 +589,29 @@ export const hackathonEventDetails = {
           {
             name: "Dr.K.Santhanam",
             phone: " +91 98428 87155",
-            email: "",
+           
           },
            {
             name: "Mr.P.Prasanth",
             phone: "+91 97882 06877",
-            email: "",
+            
           },
         ],
         studentCoordinator: [
           {
             name: "Mr.G.S.Priyan",
             phone: "+91 86680 57985",
-            email: "",
+            
           },
             {
             name: "Mr. S.Vijayaragavan",
             phone: "+91 81245 47760",
-            email: "",
+            
           },
             {
             name: "Ms. M.Nabishka",
             phone: "+91 90254 65388",
-            email: "",
+            
           },
         ],
       },
@@ -624,7 +621,7 @@ export const hackathonEventDetails = {
       id: "hackathon-7",
       title: "PCBathon ",
       date: "12th Feb (9.30AM to 8.00PM) & 13th Feb 2026(9:30AM to 2:30PM)",
-      venue: "AICTE IDEA Lab",
+      venue: "IDEAL Lab (Main Building)",
       registrationFee:" ₹ 500 per head.",
       registrationLink: "",
       description: "  This technical event will focus on designing and creating an innovative approach to redesigning and reconfiguring printed circuit board (PCB) modules that power the electronics of tomorrow. This is a fantastic opportunity for everyone, especially students, to combine creativity with technical expertise. Participating in this hackathon will help you unlock the Embedded Hardware Developer within you, and you may also get a  chance to join our team! Dive into the world of Embedded Hardware Development and showcase your ability to create cutting-edge, efficient circuit designs.",
@@ -688,7 +685,7 @@ export const hackathonEventDetails = {
         {
           date: "12th Feb - 13th Feb, 2026",
           time: "Day1 (9.30AM to 8.00PM) & Day2 (9:30AM to 2:30)",
-          location: "AICTE IDEA Lab",
+          location: "IDEAL Lab (Main Building)",
         },
       ],
       contact: {
@@ -797,7 +794,7 @@ export const hackathonEventDetails = {
             ],
       schedule: [
         {
-          date: "12 February 2026",
+          date: "13 February 2026",
           time: "9:00 AM to 4:00 PM",
           location: "AB Lab 4",
         },
@@ -811,6 +808,7 @@ export const hackathonEventDetails = {
           {
             name:"Dr. Sangeetha M ",
             phone: " +91 99946 70017"
+            
           }
         ],
         studentCoordinator: [
@@ -823,8 +821,8 @@ export const hackathonEventDetails = {
             phone: "+91 90437 14619",
           },
           {
-          name: "Sundara Raghav G  ",
-          phone: "+91 96002 07647",
+          name: "Vishak S ",
+          phone: "+91 93441 75500",
           },
         ],
       },

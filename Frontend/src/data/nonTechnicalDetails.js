@@ -1,25 +1,25 @@
 // Non-Technical Events Images
-import NonTech1 from "../assets/EventsImages/EventDetails/Nontech/aids_nontech.png";
-import NonTech2 from "../assets/EventsImages/EventDetails/Nontech/aids_nontech1.png";
-import NonTech3 from "../assets/EventsImages/EventDetails/Nontech/bt_nontech.png";
-import NonTech4 from "../assets/EventsImages/EventDetails/Nontech/civil_nontech.png";
-import NonTech5 from "../assets/EventsImages/EventDetails/Nontech/csbs_nontech.png";
-import NonTech6 from "../assets/EventsImages/EventDetails/Nontech/cse_nontech.png";
-import NonTech7 from "../assets/EventsImages/EventDetails/Nontech/cse_nontech1.png";
-import NonTech8 from "../assets/EventsImages/EventDetails/Nontech/ece_nontech.png";
-import NonTech9 from "../assets/EventsImages/EventDetails/Nontech/ece_nontech1.png";
-import NonTech10 from "../assets/EventsImages/EventDetails/Nontech/eee_nontech2.png";
-import NonTech11 from "../assets/EventsImages/EventDetails/Nontech/eee_nontech1.png";
-import NonTech12 from "../assets/EventsImages/EventDetails/Nontech/eee_nontech.png";
-import NonTech13 from "../assets/EventsImages/EventDetails/Nontech/ft_nontech.png";
-import NonTech14 from "../assets/EventsImages/EventDetails/Nontech/it_nontech.png";
-import NonTech15 from "../assets/EventsImages/EventDetails/Nontech/mca_nontech.png";
-import NonTech16 from "../assets/EventsImages/EventDetails/Nontech/mct_nontech.png";
-import NonTech17 from "../assets/EventsImages/EventDetails/Nontech/mct_nontech1.png";
-import NonTech18 from "../assets/EventsImages/EventDetails/Nontech/mech_nontech.png";
-import NonTech19 from "../assets/EventsImages/EventDetails/Nontech/txt_nontech.png";
-import NonTech20 from "../assets/EventsImages/EventDetails/Nontech/vlsi_nontech.png";
-import NonTech21 from "../assets/EventsImages/EventDetails/Nontech/turf_csbs.png";
+import NonTech1 from "../assets/EventsImages/EventDetails/Nontech/aids_nontech.webp";
+import NonTech2 from "../assets/EventsImages/EventDetails/Nontech/aids_nontech1.webp";
+import NonTech3 from "../assets/EventsImages/EventDetails/Nontech/bt_nontech.webp";
+import NonTech4 from "../assets/EventsImages/EventDetails/Nontech/civil_nontech.webp";
+import NonTech5 from "../assets/EventsImages/EventDetails/Nontech/csbs_nontech.webp";
+import NonTech6 from "../assets/EventsImages/EventDetails/Nontech/cse_nontech.webp";
+import NonTech7 from "../assets/EventsImages/EventDetails/Nontech/cse_nontech1.webp";
+import NonTech8 from "../assets/EventsImages/EventDetails/Nontech/ece_nontech.webp";
+import NonTech9 from "../assets/EventsImages/EventDetails/Nontech/ece_nontech1.webp";
+import NonTech10 from "../assets/EventsImages/EventDetails/Nontech/eee_nontech2.webp";
+import NonTech11 from "../assets/EventsImages/EventDetails/Nontech/eee_nontech1.webp";
+import NonTech12 from "../assets/EventsImages/EventDetails/Nontech/eee_nontech.webp";
+import NonTech13 from "../assets/EventsImages/EventDetails/Nontech/ft_nontech.webp";
+import NonTech14 from "../assets/EventsImages/EventDetails/Nontech/it_nontech.webp";
+import NonTech15 from "../assets/EventsImages/EventDetails/Nontech/mca_nontech.webp";
+import NonTech16 from "../assets/EventsImages/EventDetails/Nontech/mct_nontech.webp";
+import NonTech17 from "../assets/EventsImages/EventDetails/Nontech/mct_nontech1.webp";
+import NonTech18 from "../assets/EventsImages/EventDetails/Nontech/mech_nontech.webp";
+import NonTech19 from "../assets/EventsImages/EventDetails/Nontech/txt_nontech.webp";
+import NonTech20 from "../assets/EventsImages/EventDetails/Nontech/vlsi_nontech.webp";
+import NonTech21 from "../assets/EventsImages/EventDetails/Nontech/turf_csbs.webp";
 
 export const nonTechnicalDetails = [
   {
@@ -28,7 +28,7 @@ export const nonTechnicalDetails = [
     title: "AI Meme Contest",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "AB 408",
+    venue: "AB 409",
     price: "₹150 per Member",
     description:
       "The AI Meme Contest is a fun-filled one-day non-technical event that combines creativity, humor, and artificial intelligence concepts through visually engaging memes. Participants will create original memes based on given AI-related themes using either AI-based tools or manual editing, with a strong focus on originality and ethical content creation. The event encourages innovative thinking and expressive digital creativity in a light-hearted competitive environment. It will be conducted at AB 408, with a registration fee of ₹150, and is open to both individuals and teams.",
@@ -56,7 +56,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "10:00 AM to 12:00 PM",
-        location: "AB 408",
+        location: "AB 409",
       },
     ],
     contact: {
@@ -64,34 +64,34 @@ export const nonTechnicalDetails = [
         {
           name: "Mr.S.Raja",
           phone: "+91 75028 21440",
-          email: " ",
+        
         },
         {
           name: "Mrs.A.Eswari",
           phone: "+91 94431 81818",
-          email: " ",
+         
         }
       ],
       studentCoordinator: [
         {
           name: "Mr.A.Akash",
           phone: "+91 63695 51324",
-          email: " ",
+         
         },
         {
           name: "Mr.D.Gobinath",
           phone: "+91 63829 32242",
-          email: " ",
+         
         },
         {
           name: "Mr.K.Selvabharathi",
           phone: "+91 84286 35597",
-          email: " ",
+          
         },
         {
           name: "Mr.Dhilip Shanmugam",
           phone: "+91 93633 36136",
-          email: " ",
+         
         },
       ],
     },
@@ -133,23 +133,23 @@ export const nonTechnicalDetails = [
       studentCoordinator: [
         {
           name: "Mr.A.Athityaa",
-          email: " ",
+          
           phone: "+91 93456 64042",
         },
         {
           name: "Mr.P.Mithun",
           phone: "+91 81227 62374",
-          email: " ",
+          
         },
         {
           name: "Mr.R.Kowshik",
           phone: "+91 93425 56848",
-          email: " ",
+          
         },
         {
           name: "Mr.K.Sanjay",
           phone: "+91 75503 21307",
-          email: " ",
+         
         },
       ],
     },
@@ -185,24 +185,24 @@ export const nonTechnicalDetails = [
       facultyCoordinator: [
         {
           name: "Ms.R.Krishnaveni",
-          email: "",
+       
           phone: "",
         },
       ],
       studentCoordinator: [
         {
           name: "Ms.A.Lydia Percy",
-          email: "",
+          
           phone: "+91 91504 36190",
         },
         {
           name: "Ms.V.Aagarshini",
-          email: " ",
+         
           phone: "+91 76039 59518",
         },
         {
           name: "Ms.D.Laavanya ",
-          email: " ",
+         
           phone: "+91 63806 96174",
         },
       ],
@@ -260,14 +260,14 @@ export const nonTechnicalDetails = [
         {
           name: "Mr. Sanjai kumar",
           phone: "+91 70106 53423",
-          email: " ",
+          
         },
       ],
       studentCoordinator: [
         {
           name: "Ms. Bhavana",
           phone: "+91 72007 93399 ",
-          email: " ",
+         
         },
        
       ],
@@ -280,7 +280,7 @@ export const nonTechnicalDetails = [
     title: "Emoji Pictionary",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "AB 110",
+    venue: "AB 211",
     price: "₹150 per Member",
     description:
       "Emoji Pictionary is a fast-paced and entertaining non-technical event where participants decode famous movie titles, book plots, or well-known phrases represented entirely through emoji sequences. This event adds a digital twist to the classic game of Pictionary by replacing drawings with emojis, challenging participants' creativity, interpretation skills, and quick thinking. Teams race against time to correctly guess the answers based on visual emoji clues, making the event both fun and intellectually stimulating.",
@@ -315,7 +315,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "2–3 Hours",
-        location: "AB 110",
+        location: "AB 211",
       },
     ],
     contact: {
@@ -324,7 +324,7 @@ export const nonTechnicalDetails = [
           name: "Mr. S. Vignesh",
           designation: "Assistant Professor",
           phone: "+91 99448 20102",
-          email: " ",
+         
         },
       ],
       studentCoordinator: [
@@ -333,14 +333,14 @@ export const nonTechnicalDetails = [
           department: "Computer Science and Business Systems",
           year: "III Year",
           phone: "+91 93632 83385",
-          email: " ",
+          
         },
         {
           name: "Guruchandhar D",
           department: "Computer Science and Business Systems",
           year: "III Year",
           phone: "+91 95004 46351",
-          email: " ",
+        
         },
       ],
     },
@@ -352,7 +352,7 @@ export const nonTechnicalDetails = [
     title: "Battle Arena",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "IT Park",
+    venue: "IT PARK (CLOUD LAB)",
     price: "₹150 per Member",
     description:
       "Battle Arena is a high-intensity eSports competition designed to bring together skilled gamers in a professional and competitive environment. Participants compete in popular gaming titles such as EA Sports FC and Free Fire, showcasing precision, strategy, reflexes, and real-time decision-making. The event follows a structured knockout tournament format to identify and crown the ultimate champions of the arena.",
@@ -372,8 +372,8 @@ export const nonTechnicalDetails = [
     schedule: [
       {
         date: "February 14, 2026",
-        time: "To be announced",
-        location: "IT Park",
+        time: "9.00 AM to 4.00 PM",
+        location: "IT PARK (CLOUD LAB)",
       },
     ],
     contact: {
@@ -382,7 +382,7 @@ export const nonTechnicalDetails = [
           name: "Dr. A. Gnanabaskaran",
           department: "Computer Science and Engineering",
           phone: "+91 98650 24343",
-          email: " ",
+          
         },
       ],
       studentCoordinator: [
@@ -391,7 +391,7 @@ export const nonTechnicalDetails = [
           department: "Computer Science and Engineering",
           year: "III Year",
           phone: "+91 94871 19381",
-          email: " ",
+          
         },
       ],
     },
@@ -461,7 +461,7 @@ export const nonTechnicalDetails = [
     title: "LineX",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "Quadrangle Triangle, Main Building",
+    venue: "Quadrangle , Main Building",
     price: "₹150 per Member",
     description:
       "LineX is a robotics-based non-technical event where participants compete head-to-head by controlling robots using a remote control. The robots must navigate through a predefined track filled with multiple obstacles. The participant who completes the track in the shortest time is declared the winner. This event focuses on testing speed, precision, control skills, and the ability to handle robots effectively under competitive conditions.",
@@ -486,7 +486,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "9.00 AM to 11:00 AM",
-        location: "Quadrangle Triangle, Main Building",
+        location: "Quadrangle , Main Building",
       },
     ],
     contact: {
@@ -495,7 +495,7 @@ export const nonTechnicalDetails = [
           name: "Mrs. U. Shayamaldevi",
           department: "Electronics and Communication Engineering",
           phone: "+91 95663 56428",
-          email: " ",
+          
         },
       ],
       studentCoordinator: [
@@ -504,7 +504,7 @@ export const nonTechnicalDetails = [
           department: "Electronics and Communication Engineering",
           year: "II Year",
           phone: "+91 63802 75179",
-          email: " ",
+         
         },
       ],
     },
@@ -516,7 +516,7 @@ export const nonTechnicalDetails = [
     title: "Kahoot! Quiz",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "Smart Classroom, Main Block",
+    venue: "A103 Smart Class room ( Main Building)",
     price: "₹150 per Member",
     description:
       "The Kahoot! Quiz Challenge is an exciting and interactive quiz event designed to test participants' knowledge, speed, and teamwork. Using the Kahoot platform, participants answer multiple-choice questions in real time through their smartphones. The quiz includes a mix of technical topics, general knowledge, and fun questions, making it both competitive and engaging. Accuracy and quick thinking are the key factors for success.",
@@ -540,7 +540,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "9.00 AM to 11.00 AM",
-        location: "Smart Classroom, Main Block",
+        location: "A103 Smart Class room ( Main Building)",
       },
     ],
     contact: {
@@ -549,7 +549,7 @@ export const nonTechnicalDetails = [
           name: "Mrs. Padmavathi D",
           department: "Electronics and Communication Engineering",
           phone: "+91 99428 68893",
-          email: " ",
+        
         },
       ],
       studentCoordinator: [
@@ -558,7 +558,7 @@ export const nonTechnicalDetails = [
           department: "Electronics and Communication Engineering",
           year: "III Year",
           phone: "+91 94891 78522",
-          email: " ",
+          
         },
       ],
     },
@@ -570,7 +570,7 @@ export const nonTechnicalDetails = [
     title: "Twisted Tiles",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "EE301",
+    venue: "EE 301",
     price: "₹150 per Member",
     description:
       "Twisted Tiles is a puzzle-based non-technical event designed to challenge participants' logical thinking and problem-solving abilities. Participants must analyze patterns, think critically, and solve puzzles within a limited time, making it an engaging test of focus, reasoning, and mental agility.",
@@ -593,7 +593,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "2 Hours",
-        location: "EE301",
+        location: "EE 301",
       },
     ],
     contact: {
@@ -603,7 +603,7 @@ export const nonTechnicalDetails = [
           designation: "Assistant Professor",
           department: "Electrical and Electronics Engineering",
           phone: "",
-          email: " ",
+        
         },
       ],
       studentCoordinator: [
@@ -612,14 +612,14 @@ export const nonTechnicalDetails = [
           department: "Electrical and Electronics Engineering",
           year: "III Year",
           phone: "+91 93600 02523",
-          email: " ",
+         
         },
         {
           name: "Mr. Sri Dharan B",
           department: "Electrical and Electronics Engineering",
           year: "II Year",
           phone: "+91 84389 86010",
-          email: " ",
+       
         },
       ],
     },
@@ -631,7 +631,7 @@ export const nonTechnicalDetails = [
     title: "Logo Quiz",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "EE302",
+    venue: "EE 302",
     price: "₹150 per Member",
     description:
       "Logo Quiz is a non-technical event that tests participants' ability to identify logos related to brands, technology companies, and general knowledge. The event challenges visual recognition, memory, and quick recall skills in a fun and engaging quiz-based format.",
@@ -654,7 +654,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "2 Hours",
-        location: "EE302",
+        location: "EE 302",
       },
     ],
     contact: {
@@ -664,7 +664,7 @@ export const nonTechnicalDetails = [
           designation: "Assistant Professor",
           department: "Electrical and Electronics Engineering",
           phone: "",
-          email: " ",
+      
         },
       ],
       studentCoordinator: [
@@ -673,14 +673,14 @@ export const nonTechnicalDetails = [
           department: "Electrical and Electronics Engineering",
           year: "III Year",
           phone: "+91 63843 63866",
-          email: " ",
+        
         },
         {
           name: "Ms. Nirmala D V",
           department: "Electrical and Electronics Engineering",
           year: "II Year",
           phone: "+91 82482 82714",
-          email: " ",
+          
         },
       ],
     },
@@ -692,7 +692,7 @@ export const nonTechnicalDetails = [
     title: "Unit Wars",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "EE303",
+    venue: "EE 303",
     price: "₹150 per Member",
     description:
       "Unit Wars is an educational quiz-based non-technical event focusing on fundamental and derived SI units used in science and engineering. The event challenges participants' conceptual understanding, memory, and speed, making it both informative and competitive.",
@@ -715,7 +715,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "2 Hours",
-        location: "EE303",
+        location: "EE 303",
       },
     ],
     contact: {
@@ -724,8 +724,8 @@ export const nonTechnicalDetails = [
           name: "Ms. N. Kayalvizhi",
           designation: "Assistant Professor",
           department: "Electrical and Electronics Engineering",
-          phone: "",
-          email: " ",
+          
+         
         },
       ],
       studentCoordinator: [
@@ -734,14 +734,14 @@ export const nonTechnicalDetails = [
           department: "Electrical and Electronics Engineering",
           year: "III Year",
           phone: "+91 79040 15088",
-          email: " ",
+         
         },
         {
           name: "Ms. Mahitha P",
           department: "Electrical and Electronics Engineering",
           year: "II Year",
           phone: "+91 81221 08363",
-          email: " ",
+       
         },
       ],
     },
@@ -753,7 +753,7 @@ export const nonTechnicalDetails = [
     title: "Unmasking Brands & Flavours",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "To be announced",
+    venue: "Smart class room[Food Technology]",
     price: "₹150 per Member",
     description:
       "Unmasking Brands & Flavours is an interactive non-technical event that challenges participants' knowledge of corporate branding and food recognition. Through a fun, three-level game format, the event tests awareness, teamwork, and quick thinking by combining logo identification, performance-based guessing, and culinary knowledge in an engaging and competitive environment.",
@@ -791,8 +791,8 @@ export const nonTechnicalDetails = [
     schedule: [
       {
         date: "February 14, 2026",
-        time: "To be announced",
-        location: "To be announced",
+        time: "9.00 AM to 4.00 PM",
+        location: "Smart class room[Food Technology]",
       },
     ],
     contact: {
@@ -801,7 +801,7 @@ export const nonTechnicalDetails = [
           name: "Ms .B.Srinithi Priya",
           department: "",
           phone: "+91 95976 21737",
-          email: " ",
+        
         },
       ],
       studentCoordinator: [
@@ -810,7 +810,7 @@ export const nonTechnicalDetails = [
           department: "Food Technology",
           year: "III Year",
           phone: "+91 90807 53031",
-          email: " ",
+        
         },
       ],
     },
@@ -850,19 +850,19 @@ export const nonTechnicalDetails = [
         {
           name: "Mr. M. Thilakraj",
           phone: "+91 98428 15665",
-          email: " ",
+        
         },
       ],
       studentCoordinator: [
         {
           name: "Mr. M. Pravin Kumar",
           phone: "+91 86674 74397",
-          email: " ",
+         
         },
         {
           name: "Ms. Linesha",
           phone: "+91 99446 23923",
-          email: " ",
+        
         },
       ],
     },
@@ -874,7 +874,7 @@ export const nonTechnicalDetails = [
     title: "Face Painting",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "KSRCT F Block",
+    venue: "KSRCT MCA Class,F Block",
     price: "₹150 per Member",
     description:
       "Face Painting is a fun, creative, and engaging non-technical event that brings out the artistic talents of participants. This event offers a platform for students to express their imagination through colors, designs, and meaningful themes painted on faces. Participants can showcase styles such as cartoons, abstract art, nature-inspired patterns, cultural motifs, and message-driven creativity.",
@@ -892,7 +892,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "1 Hour",
-        location: "KSRCT F Block",
+        location: "KSRCT MCA Class,F Block",
       },
     ],
     contact: {
@@ -901,7 +901,7 @@ export const nonTechnicalDetails = [
           name: "Mr. MohanKumar R",
           department: "Master of Computer Applications",
           phone: "+91 97900 70708",
-          email: " ",
+        
         },
       ],
       studentCoordinator: [
@@ -910,28 +910,28 @@ export const nonTechnicalDetails = [
           department: "Master of Computer Applications",
           year: "I Year",
           phone: "+91 96064 22181",
-          email: " ",
+         
         },
         {
           name: "Vikas M S",
           department: "Master of Computer Applications",
           year: "I Year",
           phone: "+91 63800 88208",
-          email: " ",
+          
         },
         {
           name: "Madhumitha Devi Sri K",
           department: "Master of Computer Applications",
           year: "I Year",
           phone: "+91 78128 37347",
-          email: " ",
+          
         },
         {
           name: "Suvetha S",
           department: "Master of Computer Applications",
           year: "I Year",
           phone: "+91 88077 37000",
-          email: " ",
+         
         },
       ],
     },
@@ -1017,7 +1017,7 @@ export const nonTechnicalDetails = [
     title: "Tech Without Tech",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "Robotics Laboratory",
+    venue: "Robotics Laboratory(MCT Block)",
     price: "₹150 per Member",
     description:
       "Tech Without Tech is a non-technical team event where participants are given a common technology or everyday system and must explain how it works without using any technical terms. Using simple language, real-life examples, gestures, or storytelling, participants make complex concepts understandable to a non-technical audience. The event tests creativity, communication skills, and the ability to simplify ideas effectively.",
@@ -1041,7 +1041,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "10:00 AM to 12.30PM",
-        location: "Robotics Laboratory",
+        location: "Robotics Laboratory(MCT Block)",
       },
     ],
     contact: {
@@ -1059,14 +1059,14 @@ export const nonTechnicalDetails = [
           department: "",
           year: "",
           phone: "+91 99434 52438",
-          email: " ",
+          
         },
         {
           name: "Mr. T. Bhuvanesh",
           department: "",
           year: "",
           phone: "+91 63694 36709",
-          email: " ",
+          
         },
       ],
     },
@@ -1078,7 +1078,7 @@ export const nonTechnicalDetails = [
     title: "Freezeframe",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "KSRCT Campus",
+    venue: "CLASS ROOM C107 [ MECHANICAL ]",
     price: "₹150 per Member",
     description:
       "Freezeframe is a creative photography contest focused on visual storytelling and awareness. Participants capture meaningful moments within the college campus without any editing or filters. The event promotes observational skills, creativity, and the ability to convey a message through a single photograph.",
@@ -1103,7 +1103,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "1 Hour",
-        location: "KSRCT Campus",
+        location: "CLASS ROOM C107 [ MECHANICAL ]",
       },
     ],
     contact: {
@@ -1113,14 +1113,14 @@ export const nonTechnicalDetails = [
           designation: "Assistant Professor",
           department: "",
           phone: "+91 80126 63913",
-          email: " ",
+          
         },
         {
           name: "Mr. S. Karthick",
           designation: "Assistant Professor",
           department: "",
           phone: "+91 97906 67321",
-          email: " ",
+          
         },
       ],
       studentCoordinator: [
@@ -1129,21 +1129,21 @@ export const nonTechnicalDetails = [
           department: "Mechanical Engineering",
           year: "III Year",
           phone: "+91 98947 45652",
-          email: " ",
+          
         },
         {
           name: "Ms. D. Vijayalakshimi",
           department: "Mechanical Engineering",
           year: "III Year",
           phone: "+91 99947 47296",
-          email: " ",
+        
         },
         {
           name: "Mr. S. Mohanraj",
           department: "Mechanical Engineering",
           year: "III Year",
           phone: "+91 93611 12795",
-          email: " ",
+       
         },
       ],
     },
@@ -1155,7 +1155,7 @@ export const nonTechnicalDetails = [
     title: "T2T – Trash 2 Textile",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "Wet Processing Lab – Textile Department",
+    venue: "Textile Chemical Processing Lab",
     price: "₹150 per Member",
     description:
       "T2T – Trash 2 Textile is a creative non-technical event that focuses on transforming textile waste into innovative and useful products. Participants explore techniques for recycling, upcycling, and repurposing discarded fabrics, old garments, and textile scraps. The event encourages sustainability, hands-on creativity, and understanding how to turn waste into value in an eco-friendly manner.",
@@ -1181,7 +1181,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "1 Hour",
-        location: "Wet Processing Lab – Textile Department",
+        location: "Textile Chemical Processing Lab",
       },
     ],
     contact: {
@@ -1191,7 +1191,7 @@ export const nonTechnicalDetails = [
           designation: "Professor",
           department: "Textile Technology",
           phone: "+91 90039 20300",
-          email: " ",
+         
         },
       ],
       studentCoordinator: [
@@ -1200,14 +1200,14 @@ export const nonTechnicalDetails = [
           department: "Textile Technology",
           year: "III Year",
           phone: "+91 76048 32897",
-          email: " ",
+         
         },
         {
           name: "Ms. Abirami S",
           department: "Textile Technology",
           year: "II Year",
           phone: "+91 86106 58433",
-          email: " ",
+          
         },
       ],
     },
@@ -1264,21 +1264,20 @@ export const nonTechnicalDetails = [
           department: "Electronics Engineering (VLSIDT)",
           year: "II Year",
           phone: "+91 99760 48999",
-          email: " ",
+        
         },
         {
           name: "Ms. P. Dhivyadharshini",
           department: "Electronics Engineering (VLSIDT)",
           year: "II Year",
           phone: "+91 84892 53710",
-          email: " ",
+        
         },
         {
           name: "Ms. G. Jeevaranjani",
           department: "Electronics Engineering (VLSIDT)",
           year: "I Year",
           phone: "+91 82702 02728",
-          email: " ",
         },
       ],
     },
@@ -1353,19 +1352,16 @@ export const nonTechnicalDetails = [
         {
           name: "Mr. K. Karthikeyan",
           phone: " +91 99524 75246",
-          email: "",
         },
       ],
       studentCoordinator: [
         {
           name: "S. Kishorekumar",
           phone: "+91 93442 76110",
-          email: " ",
         },
         {
           name: "C. Yogeshwaran",
           phone: "+91 86103 88095",
-          email: " ",
         },
       ],
     },

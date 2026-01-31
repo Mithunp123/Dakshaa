@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import toast from 'react-hot-toast';
@@ -56,40 +56,11 @@ const MyTeams = () => {
   const [isSearchingTeams, setIsSearchingTeams] = useState(false);
   const [myJoinRequests, setMyJoinRequests] = useState([]);
   const [incomingJoinRequests, setIncomingJoinRequests] = useState([]);
+  
+  // Ref to track mounted state for async operations
+  const mountedRef = useRef(true);
 
-  // DEPRECATED: Old team registration flow - Teams are now created with immediate payment
-  // const handleTeamRegistration = (team) => {
-  //   // Verify minimum team size
-  //   const minSize = team.events?.min_team_size || 2;
-  //   const currentSize = team.members?.length || 0;
-  //   
-  //   if (currentSize < minSize) {
-  //     toast.error(`Team must have at least ${minSize} members to register`, {
-  //       duration: 4000,
-  //       position: 'top-center',
-  //     });
-  //     return;
-  //   }
-  //
-  //   // Check if team is already partially registered
-  //   const registeredCount = team.registered_count || 0;
-  //   const isPartiallyRegistered = registeredCount > 0 && registeredCount < currentSize;
-  //
-  //   // Navigate to event registration with team data
-  //   navigate('/register-events', {
-  //     state: {
-  //       teamRegistration: true,
-  //       teamId: team.id,
-  //       teamName: team.name,
-  //       eventId: team.event_id,
-  //       eventName: team.events?.title,
-  //       teamMembers: team.members,
-  //       memberCount: currentSize,
-  //       isPartialPayment: isPartiallyRegistered,
-  //       registeredCount: registeredCount
-  //     }
-  //   });
-  // };
+  // Note: Team registration now happens with immediate payment via CreateTeamModal
 
   useEffect(() => {
     let isMounted = true;
@@ -170,6 +141,7 @@ const MyTeams = () => {
     
     return () => {
       isMounted = false;
+      mountedRef.current = false;
     };
   }, [location.state, location.search]);
 
@@ -327,8 +299,12 @@ const MyTeams = () => {
   }, [searchQuery, expandedTeamId]);
 
   const handleSearch = async (teamId) => {
+    if (!mountedRef.current) return;
     setIsSearching(true);
     const result = await searchUsersForTeam(searchQuery);
+    
+    // Check if component is still mounted before updating state
+    if (!mountedRef.current) return;
     
     if (result.success) {
       const team = teams.find(t => t.id === teamId);

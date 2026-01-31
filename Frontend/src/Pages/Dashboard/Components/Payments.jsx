@@ -204,6 +204,12 @@ const Payments = () => {
                   <td className="p-6">
                     <button 
                       disabled={txn.status?.toUpperCase() !== 'SUCCESS'}
+                      onClick={() => {
+                        toast.success(`Receipt for ₹${parseFloat(txn.amount).toFixed(2)} - Transaction: ${txn.transaction_id || txn.order_id}`, {
+                          duration: 5000,
+                          icon: '🧾'
+                        });
+                      }}
                       className="p-2 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-secondary disabled:opacity-30"
                       title="Download Receipt"
                     >
@@ -251,6 +257,12 @@ const Payments = () => {
                  
                  <button 
                     disabled={txn.status?.toUpperCase() !== 'SUCCESS'}
+                    onClick={() => {
+                      toast.success(`Receipt for ₹${parseFloat(txn.amount).toFixed(2)} - Transaction: ${txn.transaction_id || txn.order_id}`, {
+                        duration: 5000,
+                        icon: '🧾'
+                      });
+                    }}
                     className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-xs font-medium text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     <Download size={14} />

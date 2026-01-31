@@ -1,34 +1,28 @@
-import React from 'react'
-import UltraHeroSection from './Components/UltraHeroSection'
-import UltraAbout from './Components/UltraAbout'
-import { GradientOrbs, FloatingParticles } from '../Layout/AnimatedBackground'
-import { motion } from 'framer-motion'
+import React, { lazy, Suspense, memo } from 'react'
 
-const Home = () => {
+// Use the original components with 3D robot
+const UltraHeroSection = lazy(() => import('./Components/UltraHeroSection'))
+const UltraAbout = lazy(() => import('./Components/UltraAbout'))
+
+// Simple loading placeholder
+const LoadingPlaceholder = () => (
+  <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+    <div className="w-8 h-8 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+  </div>
+)
+
+const Home = memo(() => {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="relative w-full min-h-screen"
-    >
-      {/* Global animated background - Absolute positioning within container */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
-        <GradientOrbs />
-        <FloatingParticles count={30} />
-      </div>
-      
-      {/* Content wrapper with proper z-index */}
-      <div className="relative" style={{ zIndex: 1 }}>
-        {/* Hero Section with integrated countdown */}
+    <div className="relative w-full min-h-screen bg-slate-950">
+      {/* Content wrapper */}
+      <Suspense fallback={<LoadingPlaceholder />}>
         <UltraHeroSection />
-        
-        {/* About Section */}
         <UltraAbout />
-      </div>
-    </motion.div>
+      </Suspense>
+    </div>
   )
-}
+})
+
+Home.displayName = 'Home'
 
 export default Home

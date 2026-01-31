@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { X, MapPin, Calendar, Users, AlertTriangle } from "lucide-react";
-import logo from "../../assets/logo1.png";
-import TechnicalImage from "../../assets/EventsImages/technical.png";
-import NonTechnicalImage from "../../assets/EventsImages/non-technical.png";
-import Cultural from "../../assets/EventsImages/culturals.jpg";
-import Workshop from "../../assets/EventsImages/workshop.jpg";
-import HackathonImage from "../../assets/Hackathon.png";
-import ConferenceImage from "../../assets/conference/conference.jpeg";
+import logo from "../../assets/logo1.webp";
+import TechnicalImage from "../../assets/EventsImages/technical.webp";
+import NonTechnicalImage from "../../assets/EventsImages/non-technical.webp";
+import Cultural from "../../assets/EventsImages/culturals.webp";
+import Workshop from "../../assets/EventsImages/workshop.webp";
+import HackathonImage from "../../assets/Hackathon.webp";
+import ConferenceImage from "../../assets/conference/conference.webp";
 
 // Import event data from separate files
 import { technicalEvents } from "../../data/technicalEvents";
@@ -22,6 +22,19 @@ import { conferenceEvents } from "../../data/conferenceEvents";
 import { exposAndShowsEvents } from "../../data/exposAndShowsEvents";
 import { exposAndShowsDetails } from "../../data/exposAndShowsDetails";
 import { supabase } from "../../supabase";
+
+// Category map constant - moved outside component to prevent recreation on every render
+const CATEGORY_MAP = {
+  'technical': 1,
+  'non-technical': 2, 
+  'harmonicks': 3,
+  'hackathon': 4,
+  'workshop': 5,
+  'conference': 6,
+  'expos-and-shows': 7
+};
+
+const CATEGORY_NAMES = ['technical', 'non-technical', 'harmonicks', 'hackathon', 'workshop', 'conference', 'expos-and-shows'];
 
 const Events = () => {
   const [selectedEvent, setSelectedEvent] = useState(1);
@@ -41,26 +54,16 @@ const Events = () => {
   const navigate = useNavigate();
   const eventsRef = useRef(null);
 
-  // Check authentication status - use supabase.auth.getSession() instead of getUser() for faster response
+  // Check authentication status - fetch session once (AuthProvider handles global auth state)
   useEffect(() => {
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user || null);
+      // Also check admin role from localStorage
+      const userRole = localStorage.getItem('userRole');
+      setIsAdmin(userRole === 'admin' || userRole === 'super_admin');
     };
     getUser();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  // Check if user is admin
-  useEffect(() => {
-    const userRole = localStorage.getItem('userRole');
-    setIsAdmin(userRole === 'admin' || userRole === 'super_admin');
   }, []);
 
   // Countdown timer effect
@@ -128,17 +131,8 @@ const Events = () => {
   useEffect(() => {
     const categoryParam = searchParams.get('category');
     if (categoryParam) {
-      // Map category names to event IDs
-      const categoryMap = {
-        'technical': 1,
-        'non-technical': 2, 
-        'harmonicks': 3,
-        'hackathon': 4,
-        'workshop': 5,
-        'conference': 6,
-        'expos-and-shows': 7
-      };
-      const eventId = categoryMap[categoryParam] || 1;
+      // Use constant category map
+      const eventId = CATEGORY_MAP[categoryParam] || 1;
       setSelectedEvent(eventId);
       
       // Set rotation for the selected category
@@ -170,9 +164,8 @@ const Events = () => {
 
     setSelectedEvent(id);
     
-    // Update URL with selected category
-    const categoryNames = ['technical', 'non-technical', 'harmonicks', 'hackathon', 'workshop', 'conference', 'expos-and-shows'];
-    const categoryName = categoryNames[index];
+    // Update URL with selected category - use constant array
+    const categoryName = CATEGORY_NAMES[index];
     setSearchParams({ category: categoryName });
     
     setTimeout(() => setIsSpinning(false), 1200);
@@ -1718,13 +1711,13 @@ const Events = () => {
                   </div>
 
                   {/* Important Note */}
-                  <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
+                  {/*<div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
                       <span className="text-yellow-400 font-semibold text-sm">Important Note:</span>
                     </div>
                     <p className="text-yellow-300 text-sm mt-1 ml-7">No Lunch will be provided for this event.</p>
-                  </div>
+                  </div>*/}
 
                   {/* Register Button */}
                   <button
@@ -2040,13 +2033,31 @@ const Events = () => {
                   </div>
 
                   {/* Important Note */}
-                  <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
-                      <span className="text-yellow-400 font-semibold text-sm">Important Note:</span>
+                  {(selectedTechnical.importantNote || selectedTechnical.importantText) && (
+                    <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
+                        <span className="text-yellow-400 font-semibold text-sm">Important Note:</span>
+                      </div>
+                      <div className="mt-1 ml-7 space-y-1">
+                        {selectedTechnical.importantText && (
+                          <p className="text-yellow-300 text-sm break-words">{selectedTechnical.importantText}</p>
+                        )}
+                        {selectedTechnical.importantNote && (
+                          <p className="text-yellow-300 text-sm break-words">
+                            <a
+                              href={selectedTechnical.importantNote}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline text-yellow-200 hover:text-yellow-100"
+                            >
+                              {selectedTechnical.importantNote}
+                            </a>
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-yellow-300 text-sm mt-1 ml-7">No Lunch will be provided for this event.</p>
-                  </div>
+                  )}
 
                   {/* Register Button */}
                   <button

@@ -14,6 +14,7 @@ import {
   Loader2
 } from "lucide-react";
 import { supabase } from "../../../supabase";
+import toast from 'react-hot-toast';
 
 const ProfileSettings = () => {
   const [loading, setLoading] = useState(true);
@@ -84,10 +85,10 @@ const ProfileSettings = () => {
         .eq("id", user.id);
 
       if (error) throw error;
-      alert("Profile updated successfully!");
+      toast.success('Profile updated successfully!', { position: 'top-center' });
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Failed to update profile.");
+      toast.error('Failed to update profile. Please try again.', { position: 'top-center' });
     } finally {
       setSaving(false);
     }
