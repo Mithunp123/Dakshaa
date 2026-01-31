@@ -161,7 +161,7 @@ const ConferenceCard = ({ name, title, image, description }) => {
             <motion.button
               className="px-8 py-4 bg-primary hover:bg-primary/90 text-white font-bold text-xl border-2 border-primary transition-all duration-300 shadow-lg"
               onClick={() =>
-                window.open("", "_blank")
+                window.location.href = "/register-events"
               }
               whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(14, 165, 233, 0.5)" }}
               whileTap={{ scale: 0.95 }}

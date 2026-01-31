@@ -102,6 +102,36 @@ const RegistrationForm = () => {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const categoryDropdownRef = useRef(null);
   
+  // Department Filter State
+  const [deptFilter, setDeptFilter] = useState("ALL");
+  const [isDeptDropdownOpen, setIsDeptDropdownOpen] = useState(false);
+  const deptDropdownRef = useRef(null);
+
+  const departments = [
+    "ALL",
+    "AI-DS",
+    "AIML",
+    "BT",
+    "CIVIL",
+    "CSBS",
+    "CSE",
+    "CULTURALS",
+    "ECE",
+    "EDC",
+    "EEE",
+    "FT",
+    "IPR",
+    "IT",
+    "MCA",
+    "MCT",
+    "MECH",
+    "SOES",
+    "SOLS",
+    "TEXTILE",
+    "TXT",
+    "VLSI"
+  ];
+  
   // State for Mixed Registration (Team Details per Event)
   const [teamDetailsMap, setTeamDetailsMap] = useState({});
   
@@ -165,6 +195,22 @@ const RegistrationForm = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isCategoryDropdownOpen]);
+
+  // Close department dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (deptDropdownRef.current && !deptDropdownRef.current.contains(event.target)) {
+        setIsDeptDropdownOpen(false);
+      }
+    };
+
+    if (isDeptDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDeptDropdownOpen]);
 
   // Memoized steps configuration
   const steps = useMemo(
@@ -606,9 +652,25 @@ const RegistrationForm = () => {
         matchesCategory = eventCategory === categoryFilter.toLowerCase();
       }
 
-      return matchesSearch && matchesCategory;
+      // Department Filter Logic
+      let matchesDept = true;
+      if (deptFilter !== "ALL") {
+        const deptLower = deptFilter.toLowerCase();
+        // Use event_id string specifically for department matching as it contains the readable dept code
+        // and ignore numeric suffixes if present (though includes check handles it)
+        const lookupId = event.event_id;
+        
+        if (lookupId) {
+           const idLower = lookupId.toLowerCase();
+           matchesDept = idLower.includes(deptLower);
+        } else {
+           matchesDept = false;
+        }
+      }
+
+      return matchesSearch && matchesCategory && matchesDept;
     });
-  }, [events, searchTerm, categoryFilter, registrationMode, selectedCombo]);
+  }, [events, searchTerm, categoryFilter, deptFilter, registrationMode, selectedCombo]);
 
   // Memoized selected event details
   const selectedEventDetails = useMemo(
@@ -2325,6 +2387,48 @@ const RegistrationForm = () => {
                                     </button>
                                   );
                                 })}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                    {/* Department Dropdown */}
+                    <div className="relative min-w-[200px] z-40" ref={deptDropdownRef}>
+                      <button
+                        onClick={() => setIsDeptDropdownOpen(!isDeptDropdownOpen)}
+                        className="w-full px-4 py-4 bg-gray-800 border-2 border-gray-700 rounded-2xl text-white flex justify-between items-center hover:border-blue-500 transition-colors"
+                      >
+                        <span className="font-medium truncate">
+                          {deptFilter === "ALL" ? "All Depts" : deptFilter}
+                        </span>
+                        <ChevronDown size={20} className={`transform transition-transform ${isDeptDropdownOpen ? "rotate-180" : ""}`} />
+                      </button>
+                      
+                      <AnimatePresence>
+                        {isDeptDropdownOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10, scaleY: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scaleY: 1 }}
+                            exit={{ opacity: 0, y: 10, scaleY: 0.95 }}
+                            className="absolute top-full right-0 mt-2 w-full sm:w-64 bg-gray-900/95 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-2xl overflow-hidden z-[100] max-h-64 overflow-y-auto"
+                          >
+                            <div className="p-2 space-y-1">
+                              {departments.map((dept, index) => (
+                                <button
+                                  key={`dept-dropdown-${dept}-${index}`}
+                                  onClick={() => {
+                                    setDeptFilter(dept);
+                                    setIsDeptDropdownOpen(false);
+                                  }}
+                                  className={`w-full px-4 py-3 text-left rounded-xl transition-all ${
+                                    deptFilter === dept
+                                      ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 border border-blue-500/30"
+                                      : "text-gray-300 hover:bg-white/5"
+                                  }`}
+                                >
+                                  {dept === "ALL" ? "All Departments" : dept}
+                                </button>
+                              ))}
                             </div>
                           </motion.div>
                         )}

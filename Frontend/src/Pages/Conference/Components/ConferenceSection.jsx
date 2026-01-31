@@ -609,7 +609,7 @@ const ConferenceSection = () => {
               <button
                 className="w-full md:w-auto px-8 py-4 bg-primary hover:bg-primary/90 text-white font-bold text-xl tracking-widest transition-all shadow-lg shadow-primary/20 border-2 border-primary"
                 onClick={() =>
-                  window.open(selectedConference.registrationLink, "_blank")
+                 window.location.href = "/register-events"
                 }
               >
                 REGISTER NOW
