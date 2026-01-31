@@ -28,7 +28,7 @@ const glowAnimation = {
 };
 
 // Animated Grid Background
-const CyberGrid = () => {
+const CyberGrid = ({ isMobile }) => {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
       <div
@@ -41,20 +41,24 @@ const CyberGrid = () => {
           backgroundSize: '50px 50px',
         }}
       />
-      <motion.div
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(180deg, transparent 0%, rgba(14, 165, 233, 0.05) 50%, transparent 100%)',
-        }}
-        animate={{ y: ['-100%', '100%'] }}
-        transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-      />
+      {!isMobile && (
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, transparent 0%, rgba(14, 165, 233, 0.05) 50%, transparent 100%)',
+          }}
+          animate={{ y: ['-100%', '100%'] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+        />
+      )}
     </div>
   );
 };
 
 // Enhanced Floating particles with trails
-const HeroParticles = () => {
+const HeroParticles = ({ isMobile }) => {
+  if (isMobile) return null;
+
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {[...Array(30)].map((_, i) => (
@@ -179,7 +183,7 @@ const CyberButton = ({ children, onClick, variant = "primary", className = "" })
 };
 
 // Animated Stats Card with glassmorphism
-const StatsCard = ({ detail, onClick, delay }) => {
+const StatsCard = ({ detail, onClick, delay, isMobile }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30, scale: 0.9 }}
@@ -195,11 +199,13 @@ const StatsCard = ({ detail, onClick, delay }) => {
       onClick={onClick}
     >
       {/* Glow effect */}
-      <motion.div
-        className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-sky-500 to-orange-500 rounded-lg blur-lg opacity-0 group-hover:opacity-75"
-        animate={{ rotate: [0, 360] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-      />
+      {!isMobile && (
+        <motion.div
+          className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-sky-500 to-orange-500 rounded-lg blur-lg opacity-0 group-hover:opacity-75"
+          animate={{ rotate: [0, 360] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+        />
+      )}
 
       {/* Card content */}
       <div className="relative bg-gradient-to-br from-sky-900/90 to-sky-950/90 backdrop-blur-xl border border-sky-500/30 rounded-lg px-6 py-4 overflow-hidden">
@@ -210,11 +216,13 @@ const StatsCard = ({ detail, onClick, delay }) => {
         <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-cyan-400" />
 
         {/* Animated background line */}
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent"
-          animate={{ x: ['-100%', '100%'] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-        />
+        {!isMobile && (
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent"
+            animate={{ x: ['-100%', '100%'] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          />
+        )}
 
         <motion.span
           className="relative z-10 text-white text-sm sm:text-base md:text-lg font-orbitron tracking-wider font-bold"
@@ -319,8 +327,8 @@ const UltraHeroSection = () => {
     >
       {/* Background Elements */}
       <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-        <CyberGrid />
-        <HeroParticles />
+        <CyberGrid isMobile={isMobile} />
+        <HeroParticles isMobile={isMobile} />
         <HexPattern />
       </div>
 
@@ -506,6 +514,7 @@ const UltraHeroSection = () => {
               key={i}
               detail={detail}
               delay={0.8 + i * 0.15}
+              isMobile={isMobile}
               onClick={() => {
                 if (detail === "20+ WORKSHOPS") handleNavigation("/events");
                 else if (detail === "25+ EVENTS") handleNavigation("/events");
@@ -553,15 +562,15 @@ const UltraHeroSection = () => {
           style={{
             background: 'radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, rgba(249, 115, 22, 0.15) 50%, transparent 70%)',
           }}
-          animate={{
+          animate={isMobile ? {} : {
             scale: [1, 1.3, 1],
             opacity: [0.4, 0.7, 0.4],
           }}
           transition={{ duration: 5, repeat: Infinity }}
         />
 
-        {/* Animated rings */}
-        {[1, 2, 3].map((ring) => (
+        {/* Animated rings - Disable on mobile */}
+        {!isMobile && [1, 2, 3].map((ring) => (
           <motion.div
             key={ring}
             className="absolute rounded-full border border-sky-500/20 pointer-events-none"
@@ -580,38 +589,40 @@ const UltraHeroSection = () => {
           />
         ))}
 
-        {/* Orbiting elements with trails */}
-        <motion.div
-          className="absolute w-full h-full pointer-events-none"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-        >
-          {[...Array(4)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute"
-              style={{
-                top: "50%",
-                left: "50%",
-                transform: `rotate(${i * 90}deg) translateX(160px)`,
-              }}
-            >
+        {/* Orbiting elements with trails - Disable on mobile */}
+        {!isMobile && (
+          <motion.div
+            className="absolute w-full h-full pointer-events-none"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          >
+            {[...Array(4)].map((_, i) => (
               <motion.div
-                className="w-3 h-3 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"
-                animate={{
-                  scale: [1, 1.8, 1],
-                  opacity: [0.6, 1, 0.6],
-                  boxShadow: [
-                    "0 0 10px rgba(249, 115, 22, 0.5)",
-                    "0 0 30px rgba(249, 115, 22, 0.8)",
-                    "0 0 10px rgba(249, 115, 22, 0.5)",
-                  ],
+                key={i}
+                className="absolute"
+                style={{
+                  top: "50%",
+                  left: "50%",
+                  transform: `rotate(${i * 90}deg) translateX(160px)`,
                 }}
-                transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }}
-              />
-            </motion.div>
-          ))}
-        </motion.div>
+              >
+                <motion.div
+                  className="w-3 h-3 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"
+                  animate={{
+                    scale: [1, 1.8, 1],
+                    opacity: [0.6, 1, 0.6],
+                    boxShadow: [
+                      "0 0 10px rgba(249, 115, 22, 0.5)",
+                      "0 0 30px rgba(249, 115, 22, 0.8)",
+                      "0 0 10px rgba(249, 115, 22, 0.5)",
+                    ],
+                  }}
+                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }}
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
 
         {/* Hero Image with 3D effect */}
         <motion.div
@@ -650,52 +661,54 @@ const UltraHeroSection = () => {
           <div className="mt-3 w-32 h-[1px] bg-gradient-to-r from-transparent via-orange-500/60 to-transparent mx-auto" style={{ transform: 'none' }}></div>
         </motion.div>
 
-        {/* Tech circle overlay */}
-        <motion.div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.4 }}
-        >
-          <svg className="w-[95%] h-[95%]" viewBox="0 0 200 200">
-            <motion.g
-              animate={{ rotate: 360 }}
-              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-              style={{ transformOrigin: "100px 100px" }}
-            >
-              <circle
-                cx="100"
-                cy="100"
-                r="95"
-                fill="none"
-                stroke="url(#heroGradient)"
-                strokeWidth="0.3"
-                strokeDasharray="5 10"
-              />
-            </motion.g>
-            <motion.g
-              animate={{ rotate: -360 }}
-              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-              style={{ transformOrigin: "100px 100px" }}
-            >
-              <circle
-                cx="100"
-                cy="100"
-                r="80"
-                fill="none"
-                stroke="url(#heroGradient)"
-                strokeWidth="0.5"
-                strokeDasharray="15 8"
-              />
-            </motion.g>
-            <defs>
-              <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#0ea5e9" />
-                <stop offset="50%" stopColor="#f97316" />
-                <stop offset="100%" stopColor="#06b6d4" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </motion.div>
+        {/* Tech circle overlay - Disable on mobile */}
+        {!isMobile && (
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.4 }}
+          >
+            <svg className="w-[95%] h-[95%]" viewBox="0 0 200 200">
+              <motion.g
+                animate={{ rotate: 360 }}
+                transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                style={{ transformOrigin: "100px 100px" }}
+              >
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="95"
+                  fill="none"
+                  stroke="url(#heroGradient)"
+                  strokeWidth="0.3"
+                  strokeDasharray="5 10"
+                />
+              </motion.g>
+              <motion.g
+                animate={{ rotate: -360 }}
+                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                style={{ transformOrigin: "100px 100px" }}
+              >
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="80"
+                  fill="none"
+                  stroke="url(#heroGradient)"
+                  strokeWidth="0.5"
+                  strokeDasharray="15 8"
+                />
+              </motion.g>
+              <defs>
+                <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#0ea5e9" />
+                  <stop offset="50%" stopColor="#f97316" />
+                  <stop offset="100%" stopColor="#06b6d4" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </motion.div>
+        )}
       </motion.div>
 
       {/* Enhanced Scroll indicator */}
