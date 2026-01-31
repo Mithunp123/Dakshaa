@@ -10,7 +10,7 @@ import csbswk from "./assets/csbswk.webp";
 import csewk from "./assets/csewk.webp";
 import ecewk from "./assets/ecewk.webp";
 import eeewk from "./assets/eeewk.webp";
-import ftwk from "./assets/ftwk.webp";
+import ftwk from "./assets/ftwknew.jpeg";
 import iprwk from "./assets/iprwk.webp";
 import itwk from "./assets/itwk.webp";
 import mcawk from "./assets/mcawk.webp";
@@ -29,7 +29,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 
 function Sponsors() {
-  const titlesponser =[titlesp];
+  const titlesponser =[{ image: titlesp, name: "ATUM Beveragers Pvt.Ltd" }];
   const cosponser=[comingsoon];
   const ecosystem=[startuptn];
 
@@ -80,15 +80,16 @@ function Sponsors() {
       <div className="text-center w-full">
         <h2 className="text-3xl font-bold mb-10">Title Sponser</h2>
         <div className="flex justify-center flex-wrap gap-6">
-          {titlesponser.map((image, index) => (
+          {titlesponser.map((sponsor, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.8, rotateY: 180 }}
               animate={cardEntryAnimation(index)}
               whileHover={{ scale: 1.15, rotateY: 5 }}
-              className="shadow-lg flex justify-center items-center bg-white w-48 h-48 rounded-lg border-2 border-secondary shadow-secondary"
+              className="shadow-lg flex flex-col justify-center items-center bg-white w-48 rounded-lg border-2 border-secondary shadow-secondary p-4"
             >
-              <img className="w-40 h-40 object-contain rounded-lg" src={image} alt={`Event Partner ${index + 1}`} />
+              <img className="w-40 h-40 object-contain rounded-lg" src={sponsor.image} alt={sponsor.name} />
+              <p className="mt-4 text-sm font-semibold text-gray-800 text-center">{sponsor.name}</p>
             </motion.div>
           ))}
         </div>

@@ -77,8 +77,8 @@ const conferences = [
   {
     id: 2,
     img: eeecon,
-    title: "National Conference on Advances in Semiconductor Technologies, Intelligent Systems, and Power Engineering",
-    shortTitle: "National Conference on Advances in Semiconductor Technologies, Intelligent Systems, and Power Engineering",
+    title: "Exploring the Next Dimension of Signal and Communication Technologies",
+    shortTitle: "National Conference on Exploring the Next Dimension of Signal and Communication Technologies",
     department: "School of Electrical Sciences",
     description:
       "The latest advancements in signal processing and communication systems. It covers technologies that enable faster, more reliable, and efficient data transmission in modern networks. The focus is on developing smart and connected electronic systems that meet the demands of the digital era.",
@@ -179,13 +179,20 @@ const conferences = [
     date: "12 February 2026",
     venue: "KSRCT Campus",
     registrationFee: "₹300",
-    facultyCo: "Dr. M. Anitha",
-    facultyCoNo: "+91 95432 10987",
-    studentCo1: "S. Rahul",
-    studentCoNo1: "+91 86543 21098",
-    email: "ncistemm@ksrct.ac.in",
-    
+    contact: {
+        facultyCoordinator: [ 
+          {
+            name: "Dr.C.Nallusamy",
+            phone: "+91 87542 54805",
+            email: "",
+          },
+        ],
+        studentCoordinator: [
+      
+        ],
+      },
   },
+
   {
     id: 4,
     img: mechcon,
@@ -292,7 +299,7 @@ const ConferenceSection = () => {
             <Mail className="inline w-5 h-5 mr-2" />
             <span className="text-gray-300">Mail your abstract and conference paper to:</span>{" "}
             <span className="text-primary font-bold">ncistemm@ksrct.ac.in</span><br></br><br></br>
-            <span className="text-gray-300">Note : </span>
+            {/*<span className="text-gray-300">Note : </span>*/}
 
           </p>
           <p className="text-base sm:text-xl font-semibold">

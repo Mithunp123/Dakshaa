@@ -791,13 +791,19 @@ export const technicalDetails = [
         },
       ],
     rules: [
-      "Participants must register before the event",
-      "Posters should be original and student-created",
-      "Each team/student must be present during the presentation",
-      "Time limits for presenting must be strictly followed",
-      "Proper citation of references is mandatory",
-      "Posters should be neat, clear, and visually appealing",
-      "Judges' decisions will be final and binding",
+      "Participation is team-based (maximum 2 members).",
+       "Prior registration is mandatory.",
+       "Teams must submit one A2-size original poster created by students.",
+        "The poster should include product name, concept, ingredients, nutritional benefits, and uniqueness.",
+
+      "Posters must be neat, clear, and include visuals/infographics.",
+
+"Proper citation of references is compulsory.",
+
+"All participants must be present during presentation and follow the time limit.",
+ 
+   "Evaluation will be based on clarity, innovation, and feasibility.",
+   "Judges’ decision will be final."
     ],
     schedule: [
       {

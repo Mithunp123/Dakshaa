@@ -258,16 +258,21 @@ export const nonTechnicalDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Mr. Sanjai kumar",
-          phone: "+91 70106 53423",
-          
-        },
+          name: "Dr.M.Velumani",
+          phone: "+91 97879 78886",
+        }
+        
       ],
       studentCoordinator: [
         {
           name: "Ms. Bhavana",
           phone: "+91 72007 93399 ",
          
+        },
+        {
+          name: "Mr. Sanjai kumar",
+          phone: "+91 70106 53423",
+          
         },
        
       ],

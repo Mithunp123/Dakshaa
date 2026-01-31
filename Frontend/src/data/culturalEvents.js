@@ -60,6 +60,24 @@ export const culturalDetails = [
       "Winners will be judged by jury based on Choreography, Costumes, Stage Presence, Overall Impact",
   
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 2,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],
     schedule: [
       {
         date: "February 14, 2026",
@@ -117,6 +135,24 @@ export const culturalDetails = [
       "Props: Allowed but should be pre-approved",
       "Winners will be judged by jury based on Coordination, Choreography, Costumes, Stage Presence, Overall Impact",
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 5,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹3,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹2,000",
+        },
+      ],
     schedule: [
       {
         date: "February 14, 2026",
@@ -176,6 +212,24 @@ export const culturalDetails = [
       "Winners will be judged based on creativity, storytelling, and overall impact",
       "No 18+, bad words and adult content",
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 2,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],
     schedule: [
       {
         date: "February 14, 2026",
@@ -233,6 +287,24 @@ export const culturalDetails = [
       "Prohibited: No auto-tune or vocal effects allowed",
       "Judging Criteria: Voice Quality, Pitch, Rhythm, Expression, Song Selection",
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 2,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],
     schedule: [
       {
         date: "February 14, 2026",
@@ -288,6 +360,24 @@ export const culturalDetails = [
       "Participants are responsible for bringing their own instruments, props, or materials required for the performance",
       "Background music (if any) must be submitted to the coordinators before the event in the specified format",
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 2,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],
     schedule: [
       {
       

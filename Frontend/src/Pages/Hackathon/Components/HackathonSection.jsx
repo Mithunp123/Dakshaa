@@ -625,24 +625,7 @@ export const hackathonEventDetails = {
       registrationFee:" ₹ 500 per head.",
       registrationLink: "",
       description: "  This technical event will focus on designing and creating an innovative approach to redesigning and reconfiguring printed circuit board (PCB) modules that power the electronics of tomorrow. This is a fantastic opportunity for everyone, especially students, to combine creativity with technical expertise. Participating in this hackathon will help you unlock the Embedded Hardware Developer within you, and you may also get a  chance to join our team! Dive into the world of Embedded Hardware Development and showcase your ability to create cutting-edge, efficient circuit designs.",
-      rewards: [
-         {
-          position: "1st Prize",
-          emoji: "🥇",
-          amount: "₹ 5,000",
-        },
-        {
-          position: "2nd Prize",
-          emoji: "🥈",
-          amount: "₹2,000",
-        },
-       
-        {
-          position: "3rd Prize",
-          emoji: "🥉",
-          amount: "₹1,000",
-        },
-      ],
+      
       
       rounds: [
         {
@@ -720,24 +703,7 @@ export const hackathonEventDetails = {
       registrationFee:" ₹ 500 per head.",
       registrationLink: "",
       description: "CLOUDATHON is a high-energy, hands-on cloud hackathon where ideas turn into scalable, real-world solutions. Build, deploy, and optimize cloud-powered applications while tackling today’s most exciting tech challenges. ",
-      rewards: [
-         {
-          position: "1st Prize",
-          emoji: "🥇",
-          amount: "₹ 5,000",
-        },
-        {
-          position: "2nd Prize",
-          emoji: "🥈",
-          amount: "₹3,000",
-        },
-       
-        {
-          position: "3rd Prize",
-          emoji: "🥉",
-          amount: "₹2,000",
-        },
-      ],
+      
 
       
       rounds: [
