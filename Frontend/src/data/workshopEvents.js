@@ -836,6 +836,12 @@ export const workshopDetails = [
         date: "February 12, 2026",
       },
     ],
+
+    importantNote: "https://tinyurl.com/KSRCT-DAKSHAEvent",
+    importantText: [
+      "Do Register here after the completion of the payment to gain the access for mathlab platform ",
+    ],
+
     contact: {
       facultyCoordinator: [
         {

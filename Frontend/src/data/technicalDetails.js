@@ -1382,7 +1382,7 @@ export const technicalDetails = [
     id: "tech-cody",
     shortTitle: "Cody challenge  ",
     title: "Cody challenge  ",
-    description: "It is an online, interactive game-based event designed to test MATLAB programming skills through puzzle-solving. It’s going to be conducted for 1 hour duration.",
+    description: "It is an online, interactive game-based event designed to test MATLAB programming skills through puzzle-solving. It’s going to be conducted for 1 hour duration. Top 10 participants will be certified by MathWorks.",
     img: Tech24,
     date: "February 13, 2026",
     venue: " UiPath Laboratory, IT PARK",
@@ -1411,6 +1411,7 @@ export const technicalDetails = [
           amount: "₹2,000",
         },
       ],
+      
 
 
 
@@ -1456,7 +1457,7 @@ export const technicalDetails = [
     },
     importantNote: " https://tinyurl.com/KSR-DAKHA26",
     importantText: [
-      "Do Register here after the completion of the payment to gain the access for mathlab platform ",
+      "Do Register here after the completion of the payment to gain the access for MATLAB platform ",
     ],
     registrationLink: "",
   },

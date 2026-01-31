@@ -676,8 +676,15 @@ export const hackathonEventDetails = {
         "Have a profound knowledge of Electronic components, PCB designing knowledge, path routing, and Antenna understating.  ",],
       },
 
-      problem:[
-        "4-20mA Communication Receiver  ",
+      problemstatement:[
+        "4-20mA Communication Receiver",
+        "4-20mA Communication Transmitter",  
+        "0-10V Communication Receiver",  
+        "0-10V Communication Transmitter",  
+        "RS485 Transceiver",
+        "GSM interface (only interface lines)",
+        "GPS interface (only interface lines)",
+        "Wi-Fi communication",
       ],
 
       rules: [

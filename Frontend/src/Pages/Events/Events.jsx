@@ -1283,13 +1283,13 @@ const Events = () => {
 
 
                 {/* problem Section */}
-                {selectedHackathon.problem && selectedHackathon.problem.length > 0 && (
+                {selectedHackathon.problemstatement && selectedHackathon.problemstatement.length > 0 && (
                   <div className="mb-8">
                     <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
-                      Problem Statement
+                      Problem Statement : Design an Industrial control node with following features:
                     </h3>
                     <div className="grid grid-cols-1 gap-3">
-                      {selectedHackathon.problem.map((problem, idx) => (
+                      {selectedHackathon.problemstatement.map((problem, idx) => (
                         <motion.div
                           key={idx}
                           initial={{ opacity: 0, x: -20 }}
@@ -1782,6 +1782,34 @@ const Events = () => {
                     </div>
                     <p className="text-yellow-300 text-sm mt-1 ml-7">No Lunch will be provided for this event.</p>
                   </div>*/}
+
+
+                  {/* Important Note */}
+                  {(selectedWorkshop.importantNote || selectedWorkshop.importantText) && (
+                    <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
+                        <span className="text-yellow-400 font-semibold text-sm">Important Note:</span>
+                      </div>
+                      <div className="mt-1 ml-7 space-y-1">
+                        {selectedWorkshop.importantText && (
+                          <p className="text-yellow-300 text-sm break-words">{selectedWorkshop.importantText}</p>
+                        )}
+                        {selectedWorkshop.importantNote && (
+                          <p className="text-yellow-300 text-sm break-words">
+                            <a
+                              href={selectedWorkshop.importantNote}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline text-yellow-200 hover:text-yellow-100"
+                            >
+                              {selectedWorkshop.importantNote}
+                            </a>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Register Button */}
                   <button
