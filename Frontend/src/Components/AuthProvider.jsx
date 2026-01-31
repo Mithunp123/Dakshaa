@@ -71,6 +71,11 @@ export const AuthProvider = ({ children }) => {
   
   // Track visibility check debounce
   const lastVisibilityCheckRef = useRef(0);
+  const isLoggingOut = useRef(false);
+  const [roleVerified, setRoleVerified] = useState(() => {
+    const session = getStoredSession();
+    return !session?.user; 
+  });
 
   // Safety timeout - never show loading spinner for more than 5 seconds
   useEffect(() => {
@@ -183,11 +188,13 @@ export const AuthProvider = ({ children }) => {
           const userRole = await fetchUserRole(session.user.id);
           if (mounted) {
              setRole(userRole);
+             setRoleVerified(true);
           }
         } else {
           // No session - user is not logged in (this is OK for public pages)
           setUser(null);
           setRole('student');
+          setRoleVerified(true);
           // Clear all cached data on logout detection
           localStorage.removeItem('userRole');
           sessionStorage.removeItem('userProfile');
@@ -197,6 +204,7 @@ export const AuthProvider = ({ children }) => {
         // On error, still allow the app to load
         setUser(null);
         setRole('student');
+        setRoleVerified(true);
       } finally {
         // ALWAYS set loading to false so the app can render
         if (mounted) setLoading(false);
@@ -216,16 +224,20 @@ export const AuthProvider = ({ children }) => {
         
         // Fetch role on SIGNED_IN, INITIAL_SESSION, and TOKEN_REFRESHED
         if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
+             isLoggingOut.current = false;
+             if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') setRoleVerified(false);
+             
              const userRole = await fetchUserRole(session.user.id);
              if (mounted) {
                  setRole(userRole);
+                 setRoleVerified(true);
              }
         }
       } else if (event === 'SIGNED_OUT') {
         // IMPORTANT: Double-check there's really no valid session before clearing
-        // This prevents race conditions on browser reopen
+        // (Unless we are explicitly logging out)
         const storedSession = getStoredSession();
-        if (storedSession?.user) {
+        if (storedSession?.user && !isLoggingOut.current) {
           console.log('SIGNED_OUT received but valid session exists in storage - ignoring');
           // Use stored session instead
           setUser(storedSession.user);
@@ -259,6 +271,8 @@ export const AuthProvider = ({ children }) => {
   // Logout function - thoroughly clears all cached data
   const logout = async () => {
     try {
+      isLoggingOut.current = true;
+      
       // Clear all cached data BEFORE signing out to prevent race conditions
       localStorage.removeItem('userRole');
       sessionStorage.removeItem('userProfile');
@@ -297,6 +311,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    roleVerified,
     role: role || 'student', // Fallback for UI if null/loading
     loading, // This loading is now "isResolvingInitialState" mostly
     isAuthenticated: !!user,

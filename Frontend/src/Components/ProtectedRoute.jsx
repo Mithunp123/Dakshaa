@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
-  const { user, role: contextRole, loading } = useAuth();
+  const { user, role: contextRole, loading, roleVerified } = useAuth();
   const location = useLocation();
 
   // Check localStorage for cached role as backup (handles race condition on refresh)
@@ -38,6 +38,15 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   }
 
   if (allowedRoles.length > 0 && !allowedRoles.includes(role)) {
+    // Prevent premature redirect if role is not strictly verified yet
+    if (!roleVerified) {
+       return (
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary"></div>
+        </div>
+      );
+    }
+
     // If user is logged in but doesn't have permission, redirect to their dashboard
     if (role === 'student') {
       return <Navigate to="/dashboard" replace />;
