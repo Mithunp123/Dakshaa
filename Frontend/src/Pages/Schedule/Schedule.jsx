@@ -282,7 +282,7 @@ const Schedule = () => {
                 {[
                   { cat: "Workshops", d1: "16", d2: "-", d3: "-", total: "16" },
                   { cat: "Tech Events", d1: "-", d2: "24", d3: "-", total: "24" },
-                  { cat: "Non-Tech (Free)", d1: "-", d2: "-", d3: "20", total: "20" },
+                  { cat: "Non-Tech ", d1: "-", d2: "-", d3: "20", total: "20" },
                   { cat: "Hackathon", d1: "Start", d2: "Continue", d3: "End", total: "1" },
                   { cat: "Codeathon", d1: "-", d2: "✔", d3: "-", total: "1" },
                   { cat: "Cultural", d1: "Light", d2: "Major", d3: "Closing", total: "3" },
