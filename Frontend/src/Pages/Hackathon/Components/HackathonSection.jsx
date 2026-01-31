@@ -49,7 +49,7 @@ export const hackathonEventDetails = {
         },
       ], */
       rules: [
-        "Each team shall consist of two (2) to three (3) members.",
+        "Each team shall consist of maximum of 4 members",
         "NeuraHack 2.O is a continuous 36-hour hackathon with no breaks in development time.",
         "A total of two (2) evaluation rounds will be conducted during the hackathon period.",
         "Participants must bring their own laptops, peripherals, and required accessories.",
@@ -236,7 +236,7 @@ export const hackathonEventDetails = {
       venue: "IT LAB 1",
       registrationFee:" ₹ 300 per head.",
       registrationLink: " ",
-      description: "Relay Edition is a team-based web design challenge where a reference website design is provided. Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
+      description: "Relay Edition is a solo-based web design challenge where a reference website design is provided. Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
       rewards: [
         {
           position: "1st Prize",
@@ -276,9 +276,7 @@ export const hackathonEventDetails = {
         {
           title: "Round-3",
           description: [
-            "Each team has 3 members",
             "Total time: 45 minutes",
-            "Each member codes for exactly 15 minutes",
             "Coding happens one after another",
            
 
@@ -296,7 +294,6 @@ export const hackathonEventDetails = {
         "Mandatory CSS Grid",
         "Semantic tags required (header, main, section, footer)",
         "No frameworks (Bootstrap, Tailwind )",
-        "Each team must consist of exactly 3 members",
         "All members must be present during all rounds",
         "Participants must bring their own laptop",
         "Required software must be pre-installed (VS Code / browser)",
@@ -386,6 +383,7 @@ export const hackathonEventDetails = {
 ],
 
       rules: [
+        "Teams must consist of 2-4 members.",
   "Each participant is allotted 100 Lovable AI credits.",
   "Credits are non-transferable.",
   "Teams must manage credits responsibly.",

@@ -435,7 +435,7 @@ export const technicalDetails = [
     date: "February 13, 2026",
     venue: "Civil Building, C110 classroom",
     department: "Technical Events",
-    price: "₹250",
+    price: "₹ 150 per participant",
     topics: [
       {
         description: "Topics",
@@ -678,7 +678,7 @@ export const technicalDetails = [
     date: "February 13, 2026",
     venue: "EE 304",
     department: "Technical Events",
-    price: "₹250",
+    price: "₹ 150 per participant",
     topics: [
       {
         title: "TOPICS:",
@@ -845,7 +845,7 @@ export const technicalDetails = [
     date: "February 13, 2026",
     venue: "Homi J Baba Hall (Conference Hall) (MCT Block)",
     department: "Technical Events",
-    price: "₹250",
+    price: "₹ 150 per participant",
     topics: [
       {
         title: "TOPICS:",
@@ -920,7 +920,7 @@ export const technicalDetails = [
     date: "February 13, 2026",
     venue: "Smart Class Room [Mechanical]",
     department: "Technical Events",
-    price: "₹250",
+    price: "₹ 150 per participant",
     topics: [
       {
         title: "TOPICS:",
@@ -1071,7 +1071,7 @@ export const technicalDetails = [
     date: "February 13, 2026",
     venue: "MBA Seminar Hall",
     department: "Technical Events",
-    price: "₹250",
+    price: "₹ 150 per participant",
     topics: [
       {
         title: "TOPICS:",
@@ -1241,7 +1241,7 @@ export const technicalDetails = [
     date: "February 13, 2026",
     venue: "Smart class room[Food Technology]",
     department: "Technical Events",
-    price: "₹250",
+    price: "₹ 150 per participant",
     topics: [
       {
         title: "TOPICS:",
@@ -1318,7 +1318,7 @@ export const technicalDetails = [
     date: "February 13, 2026",
     venue: "A112, A113 Smart Class Room (Main Building)",
     department: "Technical Events",
-    price: "₹250",
+    price: "₹ 150 per participant",
     topics: [
       {
         title: "TOPICS:",
