@@ -38,51 +38,57 @@ const ReferralManager = () => {
   const fetchReferralData = async () => {
     setLoading(true);
     try {
-      // Fetch all users who have a referred_by value (meaning they were referred)
-      const { data: referredUsers, error } = await supabase
-        .from("profiles")
-        .select("id, full_name, email, mobile_number, roll_number, college_name, department, year_of_study, referred_by, created_at")
-        .not("referred_by", "is", null)
-        .neq("referred_by", "")
-        .order("created_at", { ascending: false });
+      // Fetch stats and top referrers from referral_code table
+      const { data: topCodes, error: topCodesError } = await supabase
+        .from('referral_code')
+        .select('*')
+        .order('usage_count', { ascending: false })
+        .limit(3);
 
-      if (error) throw error;
+      if (topCodesError) throw topCodesError;
 
-      setReferrals(referredUsers || []);
+      // Calculate total stats
+      const { data: allStats, error: statsError } = await supabase
+        .from('referral_code')
+        .select('usage_count')
+        .gt('usage_count', 0);
 
-      // Calculate referral counts per referrer
-      const referrerCounts = {};
-      referredUsers?.forEach(user => {
-        const referrer = user.referred_by;
-        if (referrer) {
-          if (!referrerCounts[referrer]) {
-            referrerCounts[referrer] = {
-              referrer_roll: referrer,
-              count: 0,
-              referredUsers: []
-            };
-          }
-          referrerCounts[referrer].count++;
-          referrerCounts[referrer].referredUsers.push(user.full_name);
-        }
-      });
+      if (statsError) throw statsError;
 
-      // Get top 3 referrers
-      const sortedReferrers = Object.values(referrerCounts)
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 3);
+      const totalReferralsCount = allStats?.reduce((sum, item) => sum + (item.usage_count || 0), 0) || 0;
+      const uniqueReferrersCount = allStats?.length || 0;
 
       // Fetch referrer details for top 3
       const topReferrerDetails = await Promise.all(
-        sortedReferrers.map(async (referrer) => {
-          const { data: profile } = await supabase
+        (topCodes || []).map(async (code) => {
+          let profileQuery = supabase
             .from("profiles")
-            .select("full_name, email, college_name, department")
-            .or(`roll_number.eq.${referrer.referrer_roll},roll_no.eq.${referrer.referrer_roll}`)
-            .single();
+            .select("full_name, email, college_name, department");
+
+          if (code.referral_id.startsWith('DAK26-')) {
+            // Handle DAK26 ID format (DAK26-XXXXXXXX -> first 8 chars of UUID)
+            const uuidPrefix = code.referral_id.replace('DAK26-', '').toLowerCase();
+            
+            // Check if prefix is valid hex (8 chars) to avoid Postgres errors
+            if (/^[0-9a-f]{8}$/.test(uuidPrefix)) {
+              // Use range query for UUID prefix match since we can't easily ILIKE a UUID column
+              const minUuid = `${uuidPrefix}-0000-0000-0000-000000000000`;
+              const maxUuid = `${uuidPrefix}-ffff-ffff-ffff-ffffffffffff`;
+              profileQuery = profileQuery.gte('id', minUuid).lte('id', maxUuid);
+            } else {
+              // Invalid format, force no result
+              profileQuery = profileQuery.eq('id', '00000000-0000-0000-0000-000000000000'); 
+            }
+          } else {
+            // Handle Mobile / Roll Number
+            profileQuery = profileQuery.or(`mobile_number.eq.${code.referral_id},roll_number.eq.${code.referral_id}`);
+          }
+
+          const { data: profile } = await profileQuery.maybeSingle();
 
           return {
-            ...referrer,
+            referrer_roll: code.referral_id,
+            count: code.usage_count,
             full_name: profile?.full_name || "Unknown",
             email: profile?.email || "",
             college_name: profile?.college_name || "",
@@ -93,11 +99,23 @@ const ReferralManager = () => {
 
       setTopReferrers(topReferrerDetails);
 
-      // Calculate stats
+      // Set stats
       setStats({
-        totalReferrals: referredUsers?.length || 0,
-        uniqueReferrers: Object.keys(referrerCounts).length
+        totalReferrals: totalReferralsCount,
+        uniqueReferrers: uniqueReferrersCount
       });
+
+      // Fetch all users who have a referred_by value for the table list
+      const { data: referredUsers, error: listError } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, mobile_number, roll_number, college_name, department, year_of_study, referred_by, created_at")
+        .not("referred_by", "is", null)
+        .neq("referred_by", "")
+        .order("created_at", { ascending: false });
+
+      if (listError) throw listError;
+
+      setReferrals(referredUsers || []);
 
     } catch (error) {
       console.error("Error fetching referral data:", error);
