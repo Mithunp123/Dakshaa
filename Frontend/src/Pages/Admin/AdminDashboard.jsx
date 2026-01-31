@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Users,
   CreditCard,
@@ -20,6 +20,7 @@ import { supabase } from "../../supabase";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [stats, setStats] = useState({
     totalRegistrations: 0,
     totalRevenue: 0,
@@ -76,6 +77,23 @@ const AdminDashboard = () => {
       supabase.removeChannel(profileSubscription);
     };
   }, []);
+
+  // Auto-refresh on navigation or visibility
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchStats();
+      }
+    };
+    
+    // Refresh when navigating back
+    fetchStats();
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname]);
 
   const fetchUserRole = async () => {
     try {

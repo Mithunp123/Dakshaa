@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import { 
   Search, 
   CheckCircle2, 
@@ -31,6 +32,7 @@ import { supabase } from '../../../supabase';
 import { QRCodeCanvas } from 'qrcode.react';
 
 const RegistrationAdminDashboard = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('queue');
   const [cashQueue, setCashQueue] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -107,6 +109,24 @@ const RegistrationAdminDashboard = () => {
       supabase.removeChannel(transactionChannel);
     };
   }, []);
+
+  // Auto-refresh on navigation or visibility
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchPendingCashApprovals();
+        fetchStats();
+      }
+    };
+
+    fetchPendingCashApprovals();
+    fetchStats();
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname]);
 
   const fetchAdminData = async () => {
     const { data: { session } } = await supabase.auth.getSession();

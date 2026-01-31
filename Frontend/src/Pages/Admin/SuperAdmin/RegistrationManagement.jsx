@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import {
   Users,
   Filter,
@@ -32,6 +33,7 @@ import logo1 from '../../../assets/logo1.webp';
 import ksrctLogo from '../../../assets/ksrct.webp';
 
 const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) => {
+  const location = useLocation();
   const [eventStats, setEventStats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -60,6 +62,31 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
   const [transferLoading, setTransferLoading] = useState(false);
   const [transferError, setTransferError] = useState('');
   const [transferSuccess, setTransferSuccess] = useState('');
+
+  const refreshData = () => {
+    console.log('🔄 Refreshing Registration Data...');
+    loadEventStats();
+    loadRegistrationCounts();
+    if (selectedEvent) {
+      loadEventRegistrations(selectedEvent.id);
+    }
+  };
+
+  // Auto-refresh on navigation or visibility
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refreshData();
+      }
+    };
+
+    refreshData();
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname, coordinatorEvents]);
 
   useEffect(() => {
     loadEventStats();
@@ -676,15 +703,15 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           if (teamsData) allowedTeamIds = teamsData.map(t => t.id);
       }
 
-      // 3. Count team leaders (role='leader' in team_members)
+      // 3. Count team leaders (teams with leader_id are active teams)
       let leaderQuery = supabase
-        .from('team_members')
+        .from('teams')
         .select('*', { count: 'exact', head: true })
-        .eq('role', 'leader')
-        .in('status', ['joined', 'active']);
+        .not('leader_id', 'is', null)
+        .eq('is_active', true);
 
-      if (allowedTeamIds) {
-          leaderQuery = leaderQuery.in('team_id', allowedTeamIds);
+      if (hasCoordinatorFilter && allowedEventIds) {
+          leaderQuery = leaderQuery.in('event_id', allowedEventIds);
       }
         
       const { count: teamLeaderCount, error: leaderError } = await leaderQuery;

@@ -403,7 +403,7 @@ function AppContent() {
                   <ProtectedRoute
                     allowedRoles={["event_coordinator", "super_admin"]}
                   >
-                    <CoordinatorGlobalScanner />
+                    <VolunteerDashboard />
                   </ProtectedRoute>
                 }
               />

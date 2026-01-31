@@ -57,7 +57,7 @@ const VolunteerDashboard = () => {
     try {
       const { data, error } = await supabase
         .from('event_venues')
-        .select('*, events(event_id)');
+        .select('*');
 
       if (error) throw error;
       setVenues(data || []);
@@ -336,7 +336,8 @@ const VolunteerDashboard = () => {
   };
 
   const filteredVenues = venues.filter(v =>
-    v.events?.event_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    v.event_key?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    v.venue_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     v.building?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     v.room_number?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -614,10 +615,11 @@ const VolunteerDashboard = () => {
                           <MapPin className="text-blue-500" size={28} />
                         </div>
                         <div className="flex-1">
-                          <h4 className="font-bold text-lg mb-1">{venue.events?.event_id}</h4>
+                          <h4 className="font-bold text-lg mb-1">{venue.venue_name}</h4>
                           <div className="space-y-1 text-sm text-gray-400">
+                            <p className="text-secondary font-bold">{venue.event_key}</p>
                             <p className="flex items-center gap-2">
-                              <span className="text-secondary font-bold">{venue.building}</span>
+                              <span>Building: {venue.building}</span>
                               {venue.floor && <span>• Floor {venue.floor}</span>}
                             </p>
                             <p className="font-bold text-white">Room {venue.room_number}</p>

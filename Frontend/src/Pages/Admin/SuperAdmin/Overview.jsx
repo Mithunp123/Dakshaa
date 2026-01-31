@@ -41,6 +41,8 @@ const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
   const [openSuccess, setOpenSuccess] = useState(false);
   const [allEventsOpen, setAllEventsOpen] = useState(false);
   const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
+  
+  const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
 
   // Function to open all events
   const openAllEvents = async () => {
@@ -676,13 +678,15 @@ const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold">System Overview</h2>
+          <h2 className="text-3xl font-bold">{hasCoordinatorFilter ? "Event Coordinator Dashboard" : "System Overview"}</h2>
           <div className="flex items-center gap-3 mt-1">
-            <p className="text-gray-400">Real-time analytics and system status</p>
-            <span className="flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/30 rounded-full text-xs text-green-400">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              Live Updates Active
-            </span>
+            <p className="text-gray-400">{hasCoordinatorFilter ? "Real-time updates for assigned events" : "Real-time analytics and system status"}</p>
+            {!hasCoordinatorFilter && (
+              <span className="flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/30 rounded-full text-xs text-green-400">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                Live Updates Active
+              </span>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -776,14 +780,16 @@ const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
             )}
           </AnimatePresence>
           
-          <button
-            onClick={() => fetchStats()}
-            disabled={refreshing}
-            className="flex items-center gap-2 px-4 py-2 bg-secondary/20 hover:bg-secondary/30 border border-secondary/50 rounded-lg text-secondary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-            <span className="text-sm font-medium">Refresh</span>
-          </button>
+          {!hasCoordinatorFilter && (
+            <button
+              onClick={() => fetchStats()}
+              disabled={refreshing}
+              className="flex items-center gap-2 px-4 py-2 bg-secondary/20 hover:bg-secondary/30 border border-secondary/50 rounded-lg text-secondary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              <span className="text-sm font-medium">Refresh</span>
+            </button>
+          )}
           {refreshing && <Loader2 className="w-4 h-4 animate-spin text-secondary" />}
         </div>
       </div>

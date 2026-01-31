@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   QrCode, 
   Camera, 
@@ -48,6 +48,8 @@ const formatDakshaaId = (uuid) => {
 };
 
 const EventCoordinatorDashboard = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [assignedEvents, setAssignedEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [participants, setParticipants] = useState([]);
@@ -59,6 +61,7 @@ const EventCoordinatorDashboard = () => {
   const [cameraId, setCameraId] = useState(null);
   const [cameras, setCameras] = useState([]);
   const [cameraError, setCameraError] = useState(null);
+  const [expandedTeams, setExpandedTeams] = useState(new Set());
   
   // Session type for attendance
   const [selectedSession, setSelectedSession] = useState('morning');
@@ -72,9 +75,22 @@ const EventCoordinatorDashboard = () => {
   }, [selectedSession]);
   
   useEffect(() => {
-    selectedEventRef.current = selectedEvent;
-    console.log('Event updated to:', selectedEvent?.name || selectedEvent?.id);
+    if (selectedEvent) {
+      selectedEventRef.current = selectedEvent;
+      console.log('Event updated to:', selectedEvent.name || selectedEvent.id);
+    }
   }, [selectedEvent]);
+
+  const refreshData = async () => {
+    if (!selectedEvent) return;
+    // Silent refresh unless error
+    try {
+      if (import.meta.env.DEV) console.log('🔄 Auto-refreshing data...');
+      await Promise.all([fetchParticipants(), fetchStats()]);
+    } catch (e) {
+      console.error('Auto-refresh failed', e);
+    }
+  };
   
   // Stats - now with session breakdown
   const [stats, setStats] = useState({
@@ -103,6 +119,28 @@ const EventCoordinatorDashboard = () => {
       stopScanning();
     };
   }, []);
+
+  // Auto-refresh on location change or visibility change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && selectedEvent) {
+        console.log('🔄 Tab visible, refreshing data...');
+        refreshData();
+      }
+    };
+    
+    // Refresh when navigating back to this page
+    if (selectedEvent) {
+      console.log('🔄 Page navigation detected, refreshing data...');
+      refreshData();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname, selectedEvent]);
+
 
   const getCameras = async () => {
     const support = checkCameraSupport();
@@ -206,12 +244,16 @@ const EventCoordinatorDashboard = () => {
       const { data: { user } } = await supabase.auth.getUser();
 
       // Get user's profile to check role
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single();
       
+      if (profileError) {
+        console.warn('Profile fetch error or no profile:', profileError);
+      }
+
       let events = [];
       
       // Super admins can see all events
@@ -331,8 +373,42 @@ const EventCoordinatorDashboard = () => {
 
       if (regError) throw regError;
 
-      // Get unique user IDs from registrations
-      const userIds = [...new Set((registrations || []).map(r => r.user_id))];
+      // Start with registered users
+      let allUserIds = new Set((registrations || []).map(r => r.user_id));
+      let teamMap = {};
+
+      // Check for teams for this event
+      const { data: teamsData } = await supabase
+        .from('teams')
+        .select('*')
+        .eq('event_id', eventId);
+      
+      if (teamsData && teamsData.length > 0) {
+        const teamIds = teamsData.map(t => t.id);
+        const { data: membersData } = await supabase
+          .from('team_members')
+          .select('*')
+          .in('team_id', teamIds);
+          
+        teamsData.forEach(team => {
+          if (team.leader_id) {
+            teamMap[team.leader_id] = { ...team, members: [] };
+          }
+        });
+
+        if (membersData) {
+          membersData.forEach(member => {
+            const team = teamsData.find(t => t.id === member.team_id);
+            if (team && team.leader_id && member.user_id !== team.leader_id) {
+              teamMap[team.leader_id].members.push(member.user_id);
+              allUserIds.add(member.user_id);
+            }
+          });
+        }
+      }
+
+      // Get unique user IDs from registrations AND team members
+      const userIds = [...allUserIds];
       
       // Fetch profiles separately for these users
       let profilesMap = {};
@@ -363,16 +439,36 @@ const EventCoordinatorDashboard = () => {
         const profile = profilesMap[reg.user_id] || {};
         // With column-based approach, there's only one attendance row per user/event
         const userAttendance = (attendanceData || []).find(att => att.user_id === reg.user_id);
+        
+        // Prepare team members if this user is a leader
+        let teamMembersList = [];
+        if (teamMap[reg.user_id]) {
+          teamMembersList = teamMap[reg.user_id].members.map(mId => {
+            const mProfile = profilesMap[mId] || {};
+            const mAttendance = (attendanceData || []).find(att => att.user_id === mId);
+            return {
+              user_id: mId,
+              profiles: mProfile,
+              attendance: mAttendance ? [mAttendance] : [],
+              morningAttended: mAttendance?.morning_attended || false,
+              eveningAttended: mAttendance?.evening_attended || false,
+              team_name: teamMap[reg.user_id].team_name // Add team name to member logic
+            };
+          }).sort((a, b) => (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || ''));
+        }
+
         return {
           ...reg,
+          team_name: teamMap[reg.user_id]?.team_name || reg.team_name,
           profiles: profile,
           attendance: userAttendance ? [userAttendance] : [],
           morningAttended: userAttendance?.morning_attended || false,
           eveningAttended: userAttendance?.evening_attended || false,
           morningTime: userAttendance?.morning_time,
-          eveningTime: userAttendance?.evening_time
+          eveningTime: userAttendance?.evening_time,
+          teamMembers: teamMembersList
         };
-      });
+      }).sort((a, b) => (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || ''));
 
       setParticipants(participantsWithAttendance);
     } catch (error) {
@@ -703,6 +799,18 @@ const EventCoordinatorDashboard = () => {
     });
   };
 
+  const toggleTeam = (leaderId) => {
+    setExpandedTeams(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(leaderId)) {
+        newSet.delete(leaderId);
+      } else {
+        newSet.add(leaderId);
+      }
+      return newSet;
+    });
+  };
+
   const submitWinners = async () => {
     try {
       setSubmitting(true);
@@ -781,8 +889,13 @@ const EventCoordinatorDashboard = () => {
     p.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.profiles?.roll_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.profiles?.roll_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    formatDakshaaId(p.user_id).toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    formatDakshaaId(p.user_id).toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (p.team_name && p.team_name.toLowerCase().includes(searchTerm.toLowerCase()))
+  ).sort((a, b) => {
+    const nameA = (a.team_name || a.profiles?.full_name || '').toLowerCase();
+    const nameB = (b.team_name || b.profiles?.full_name || '').toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
 
   const attendedParticipants = participants.filter(p => p.attendance && p.attendance.length > 0);
 
@@ -818,6 +931,7 @@ const EventCoordinatorDashboard = () => {
             <h1 className="text-2xl font-bold font-orbitron text-secondary">COORDINATOR</h1>
             <p className="text-xs text-gray-400">Mobile Action Panel</p>
           </div>
+          {/* Hidden Refresh Trigger - Auto-refreshes on mount/visibility */}
           <div className="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center border border-secondary/20">
             <QrCode className="text-secondary" size={24} />
           </div>
@@ -1101,10 +1215,16 @@ const EventCoordinatorDashboard = () => {
                 {filteredParticipants.map(p => {
                   const hasCurrentSessionAttendance = selectedSession === 'morning' ? p.morningAttended : p.eveningAttended;
                   const hasAnyAttendance = p.morningAttended || p.eveningAttended;
+                  const isTeamLeader = p.teamMembers && p.teamMembers.length > 0;
+                  const isExpanded = expandedTeams.has(p.user_id);
+                  const teamMembersCount = p.teamMembers?.length || 0;
+                  const registeredMemberCount = p.teamMembers?.filter(m => selectedSession === 'morning' ? m.morningAttended : m.eveningAttended).length || 0;
+                  const allMembersMarked = teamMembersCount > 0 && registeredMemberCount === teamMembersCount;
+
                   return (
+                    <div key={p.id} className="space-y-2">
                     <div
-                      key={p.id}
-                      className={`p-4 rounded-2xl border ${
+                      className={`p-4 rounded-2xl border transition-all ${
                         hasCurrentSessionAttendance
                           ? 'bg-green-500/10 border-green-500/20'
                           : hasAnyAttendance
@@ -1112,8 +1232,8 @@ const EventCoordinatorDashboard = () => {
                           : 'bg-white/5 border-white/10'
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 cursor-pointer flex-1" onClick={() => isTeamLeader && toggleTeam(p.user_id)}>
                           <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                             hasCurrentSessionAttendance ? 'bg-green-500/20' : 'bg-white/10'
                           }`}>
@@ -1124,18 +1244,38 @@ const EventCoordinatorDashboard = () => {
                             )}
                           </div>
                           <div>
-                            <p className="font-bold">{p.profiles?.full_name}</p>
-                            <p className="text-xs text-secondary font-mono">{formatDakshaaId(p.user_id)}</p>
-                            {/* Session badges */}
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold">{p.profiles?.full_name}</p>
+                              {isTeamLeader && (
+                                <span className={`text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-1 border ${
+                                  allMembersMarked 
+                                    ? 'bg-green-500/20 text-green-500 border-green-500/30' 
+                                    : 'bg-blue-500/20 text-blue-500 border-blue-500/30'
+                                }`}>
+                                  <Users size={10} />
+                                  {registeredMemberCount}/{teamMembersCount}
+                                </span>
+                              )}
+                            </div>
+                            {p.team_name ? (
+                              <p className="text-xs text-gray-400">{p.team_name}</p>
+                            ) : (
+                              <p className="text-xs text-secondary font-mono">{formatDakshaaId(p.user_id)}</p>
+                            )}
                             <div className="flex gap-1 mt-1">
                               {p.morningAttended && <span className="text-xs px-2 py-0.5 bg-yellow-500/20 text-yellow-500 rounded">AM ✓</span>}
                               {p.eveningAttended && <span className="text-xs px-2 py-0.5 bg-indigo-500/20 text-indigo-500 rounded">PM ✓</span>}
                             </div>
                           </div>
                         </div>
+                        
+                        <div className="flex items-center gap-2">
                         {!hasCurrentSessionAttendance && (
                           <button
-                            onClick={() => handleManualAttendance(p.user_id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleManualAttendance(p.user_id);
+                            }}
                             disabled={submitting}
                             className={`px-4 py-2 rounded-xl font-bold text-sm transition-all disabled:opacity-50 ${
                               selectedSession === 'morning'
@@ -1143,10 +1283,94 @@ const EventCoordinatorDashboard = () => {
                                 : 'bg-indigo-500 text-white hover:bg-indigo-600'
                             }`}
                           >
-                            {selectedSession === 'morning' ? 'Mark AM' : 'Mark PM'}
+                            Mark
                           </button>
                         )}
+                        {isTeamLeader && (
+                           <button 
+                             onClick={(e) => {
+                               e.stopPropagation();
+                               toggleTeam(p.user_id);
+                             }}
+                             className={`p-2 rounded-lg transition-colors ${isExpanded ? 'bg-white/10' : 'hover:bg-white/5'}`}
+                           >
+                             <ChevronRight size={20} className={`text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
+                           </button>
+                        )}
+                        </div>
                       </div>
+                    </div>
+
+                    {/* Team Members List - Collapsible */}
+                    <AnimatePresence>
+                    {isTeamLeader && isExpanded && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                      <div className="ml-6 pl-4 border-l-2 border-white/10 space-y-2 pb-2">
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                           <Users size={12} /> Team Members
+                        </p>
+                        {p.teamMembers.map((member) => {
+                          const memberHasCurrentSession = selectedSession === 'morning' ? member.morningAttended : member.eveningAttended;
+                          return (
+                            <div
+                              key={member.user_id}
+                              className={`p-3 rounded-xl border ${
+                                memberHasCurrentSession
+                                  ? 'bg-green-500/10 border-green-500/20'
+                                  : 'bg-white/5 border-white/10'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                                    memberHasCurrentSession ? 'bg-green-500/20' : 'bg-white/10'
+                                  }`}>
+                                    {memberHasCurrentSession ? (
+                                      <CheckCircle2 className="text-green-500" size={18} />
+                                    ) : (
+                                      <UserCheck className="text-gray-400" size={18} />
+                                    )}
+                                  </div>
+                                  <div>
+                                    <p className="font-bold text-sm">{member.profiles?.full_name}</p>
+                                    {member.team_name ? (
+                                      <p className="text-[10px] text-gray-400">{member.team_name}</p>
+                                    ) : (
+                                      <p className="text-[10px] text-secondary font-mono">{formatDakshaaId(member.user_id)}</p>
+                                    )}
+                                    <div className="flex gap-1 mt-1">
+                                      {member.morningAttended && <span className="text-[10px] px-1.5 py-0.5 bg-yellow-500/20 text-yellow-500 rounded">AM ✓</span>}
+                                      {member.eveningAttended && <span className="text-[10px] px-1.5 py-0.5 bg-indigo-500/20 text-indigo-500 rounded">PM ✓</span>}
+                                    </div>
+                                  </div>
+                                </div>
+                                {!memberHasCurrentSession && (
+                                  <button
+                                    onClick={() => handleManualAttendance(member.user_id)}
+                                    disabled={submitting}
+                                    className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all disabled:opacity-50 ${
+                                      selectedSession === 'morning'
+                                        ? 'bg-yellow-500 text-white hover:bg-yellow-600'
+                                        : 'bg-indigo-500 text-white hover:bg-indigo-600'
+                                    }`}
+                                  >
+                                    Mark
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      </motion.div>
+                    )}
+                    </AnimatePresence>
                     </div>
                   );
                 })}
