@@ -37,6 +37,27 @@ export const technicalDetails = [
       "Internet access is permitted",
       "The final solution must include a working machine learning model integrated with a functional web interface",
     ],
+
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 1,500",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],
+    
+
     schedule: [
       {
         date: "February 13, 2026",
@@ -93,6 +114,26 @@ export const technicalDetails = [
       "Solutions should emphasize system understanding, logical reasoning, and practical improvements, rather than coding",
       "Each participant or team must justify their proposed solution within the specified time limit as announced by the organizers",
     ],
+
+
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 1,500",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],
     rounds: [
       {
         title: "Round-1 – System Analysis Round",
@@ -178,6 +219,24 @@ export const technicalDetails = [
       "Mandatory hashtags: #Dakshaa #ksrct1994 #Biotechnology",
       "The Instagram reel link must be submitted during the event",
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 1,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹750",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],
     rounds: [
       {
         title: "Reel Creation & Submission",
@@ -244,6 +303,24 @@ export const technicalDetails = [
       "Participants must strictly follow the instructions given by the event coordinators",
       "The decisions of the coordinators and judges are final and binding",
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 1,500",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],
     rounds: [
       {
         title: "Round 1: Clue Decoding & Navigation",
@@ -304,6 +381,24 @@ export const technicalDetails = [
       "Solo Entry: Only registered participants allowed; no team support or helpers",
       "Judging: Based on accuracy, creativity, and submission time",
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 1,500",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],
     schedule: [
       {
         date: "February 13, 2026",
@@ -355,6 +450,24 @@ export const technicalDetails = [
         title: "3) Future Trends in Construction and Structural Engineering",
       },
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 2,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,500",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹1,000",
+        },
+      ],
     rules: [
       "Each team must consist of 2 to 3 members only",
       "Participants must Present their Paper under any one of the three given Themes",
@@ -410,6 +523,24 @@ export const technicalDetails = [
       "Any damage to equipment, venue property, or safety violations may result in disqualification",
       "The decision of the jury shall be final and binding",
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 1,500",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],
     schedule: [
       {
         
@@ -452,6 +583,24 @@ export const technicalDetails = [
       "The circuit must be fully functional to earn full points",
       "Damaging components or equipment may result in disqualification",
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 1,500",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],
     schedule: [
       {
         
@@ -562,6 +711,24 @@ export const technicalDetails = [
       "Each team will be given 8–10 minutes for presentation followed by a short Q&A session",
       "Judges' decision will be final, and any form of malpractice will lead to disqualification",
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 2,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,500",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹1,000",
+        },
+      ],
     schedule: [
       {
         
@@ -605,6 +772,24 @@ export const technicalDetails = [
         title: "Emerging Food Processing Technologies",
       },
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 1,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹750",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],
     rules: [
       "Participants must register before the event",
       "Posters should be original and student-created",
@@ -665,6 +850,24 @@ export const technicalDetails = [
         ],
       },
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 2,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,500",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹1,000",
+        },
+      ],
     rules: [
       "Compete individually or in teams of 2-3 members",
       "No External help allowed",
@@ -721,6 +924,24 @@ export const technicalDetails = [
         ],
       },
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 2,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,500",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹1,000",
+        },
+      ],
     rules: [
       "Team of maximum two members is allowed",
       "Format: PPT / PDF format",
@@ -788,6 +1009,24 @@ export const technicalDetails = [
       "Judging will be based on creativity, fabric utilization, draping technique, and overall presentation",
       "The decision of the judges and organizing committee will be final",
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 1,500",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹500",
+        },
+      ],
     schedule: [
       {
         
@@ -840,6 +1079,24 @@ export const technicalDetails = [
         ],
       },
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 2,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,500",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹1,000",
+        },
+      ],
     rules: [
       "Team of maximum two members is allowed",
       "Format: PPT / PDF format",
@@ -899,6 +1156,24 @@ export const technicalDetails = [
       "The attendance is mandatory for all session to getting certificate",
       "Winner team will be awarded with prize amount",
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 3,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹2,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹1,000",
+        },
+      ],
 
     topics: [
       {
@@ -973,6 +1248,24 @@ export const technicalDetails = [
         ],
       },
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 2,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,500",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹1,000",
+        },
+      ],
     rules: [
       "Individual or team (up to 3 members) participation allowed",
       "Paper must be original and plagiarism-free",
@@ -1028,6 +1321,24 @@ export const technicalDetails = [
         ],
       },
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 2,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹1,500",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹1,000",
+        },
+      ],
     rules: [
       "Individual or team participation (maximum 2 members)",
       "Strict adherence to the allotted time",
@@ -1076,6 +1387,24 @@ export const technicalDetails = [
       "System provided in Laboratory.",
       "Mobile phones, books, or external references are strictly prohibited.",
     ],
+    rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 5,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹3,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹2,000",
+        },
+      ],
 
 
 

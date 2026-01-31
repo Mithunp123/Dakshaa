@@ -2077,6 +2077,31 @@ const Events = () => {
                 </div>
               </div>
 
+
+              {/* Rewards Section */}
+                {selectedTechnical.rewards && selectedTechnical.rewards.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                      Prize Worth
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {selectedTechnical.rewards.map((reward, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: idx * 0.1 }}
+                          className="bg-gradient-to-br from-primary/20 to-secondary/20 p-4 rounded-lg text-center"
+                        >
+                          <div className="text-3xl mb-2">{reward.emoji}</div>
+                          <div className="text-lg font-bold text-white mb-1">{reward.position}</div>
+                          <div className="text-2xl font-bold text-primary">{reward.amount}</div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
               {/* Schedule Section */}
               {selectedTechnical.schedule && selectedTechnical.schedule.length > 0 && (
                 <div className="mb-8">
@@ -2103,6 +2128,8 @@ const Events = () => {
                   </div>
                 </div>
               )}
+
+              
 
               {/* Rules Section */}
               {selectedTechnical.rules && selectedTechnical.rules.length > 0 && (

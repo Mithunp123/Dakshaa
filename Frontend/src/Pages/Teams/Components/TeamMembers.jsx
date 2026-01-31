@@ -12,6 +12,7 @@ import txtasso from "../assest/tafeta_txt_logo.webp";
 import csbsasso from "../assest/Techragonz_csbs_logo.webp";
 import vlsiasso from "../assest/vlsi-logo.webp";
 import itasso from "../assest/zita_it_logo.webp";
+import cseasso from "../assest/vlsi-logo.webp";
 
 
 
@@ -24,6 +25,10 @@ import deepak from "../../../assets/team_members/Deepak.webp";
 import vikas from "../../../assets/team_members/Vikas.webp";
 import mithun from "../../../assets/team_members/mithun.webp";
 import giri from "../../../assets/team_members/giridharan.webp";
+import posterjoint from "../../../assets/team_members/joint_cor.webp";
+import des1 from "../../../assets/team_members/des1.webp";
+import des2 from "../../../assets/team_members/des2.webp";
+import des3 from "../../../assets/team_members/des3.webp";
 
 
 const chiefCoordinator = [
@@ -41,7 +46,7 @@ const jointCoordinators = [
   {id :20, name:"Hari Prakash G ", department:"VLSI ENGINEERS AND DEVELOPERS ASSOCIATION ", img:hariprakash, role:"Workshops, Expos, Stalls & Resource Persons ", phone:"+91 89257 92409", associationLogo:vlsiasso},
   {id :21, name:"Harish A ", department:"Artificix", img:harish, role:"Hackathon, Codeathon & Flagship Challenges", phone:"+91 63642 32959 ", associationLogo:aidsasso},
   {id :22, name:"Deekshana C S ", department:"AEVA", img:deekshana, role:"National Conference ", phone:"+91 90878 42931", associationLogo:aevaLogo},
-  //{id :23, name:"Aarush VS ", department:"CSE", img:cseco, role:"Design, Social Media & Promotions", phone:"+91 88918 50995", associationLogo:cseasso},
+  {id :23, name:"Aarush VS ", department:"CSE", img:posterjoint, role:"Design, Social Media & Promotions", phone:"+91 88918 50995", associationLogo:cseasso},
   //{id :24, name:"Tharun Kumar R ", department:"AIML", img:aimlco, role:"Accommodation & Lunch ", phone:"+91 77084 13624", associationLogo:aimlasso},
 ];
 
@@ -60,7 +65,9 @@ const developers = [
 ]
 
 const designers = [
-  //{ id: 7, name: "Balasaastha", department: "Department of IT", img: bala, role: "Web Designer", associationLogo: aevaLogo },
+  { id: 7, name: "  Kumaran R Y", department: " ASCII", img: des1, role: "", associationLogo: aevaLogo },
+  { id: 8, name: " Sarath T S ", department: " ASCII", img: des2, role: "", associationLogo: csbsasso },
+  { id: 9, name: "  Mohitha shree D", department: " ASCII", img: des3, role: "", associationLogo: eeeasso },
 
   ];
 

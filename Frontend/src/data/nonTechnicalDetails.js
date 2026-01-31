@@ -1311,19 +1311,20 @@ export const nonTechnicalDetails = [
     ],
     rewards: [
       {
-        position: "2nd Prize",
-        emoji: "🥈",
-        amount: "₹3,000",
-      },
-      {
         position: "1st Prize",
         emoji: "🥇",
         amount: "₹5,000",
       },
       {
+        position: "2nd Prize",
+        emoji: "🥈",
+        amount: "₹3,000",
+      },
+      
+      {
         position: "3rd Prize",
         emoji: "🥉",
-        amount: "₹1,500",
+        amount: "₹1,000",
       },
     ],
     rules: [
