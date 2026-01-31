@@ -1,5 +1,9 @@
 {
   "dependencies": {
     "razorpay": "^2.9.6"
+  },
+  "devDependencies": {
+    "lighthouse": "^13.0.1",
+    "source-map-explorer": "^2.5.3"
   }
 }

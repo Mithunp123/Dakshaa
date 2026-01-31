@@ -584,7 +584,7 @@ const RegistrationForm = () => {
           return matchesSearch;
         }
         // Otherwise filter by selected category (must still be in allowed categories)
-        return matchesSearch && event.category === categoryFilter;
+        return matchesSearch && eventCategory === categoryFilter.toLowerCase().trim();
       }
       
       // For non-combo modes (individual/team), use normal category filtering
