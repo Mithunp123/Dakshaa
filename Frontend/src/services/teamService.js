@@ -1039,6 +1039,27 @@ export const sendJoinRequest = async (teamId, message = '') => {
     const user = session?.user;
     if (!user) throw new Error('User not authenticated');
 
+    // Check if user already sent a request for this team
+    const { data: existingRequest } = await supabase
+      .from('team_join_requests')
+      .select('id, status')
+      .eq('team_id', teamId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (existingRequest) {
+      if (existingRequest.status === 'pending') {
+        throw new Error('You already have a pending request for this team');
+      } else if (existingRequest.status === 'approved') {
+        throw new Error('Your request was already approved');
+      }
+      // If rejected, allow sending a new request by deleting the old one
+      await supabase
+        .from('team_join_requests')
+        .delete()
+        .eq('id', existingRequest.id);
+    }
+
     const { data, error } = await supabase
       .from('team_join_requests')
       .insert({
@@ -1278,15 +1299,15 @@ export const acceptJoinRequest = async (requestId) => {
         team_id: request.team_id,
         user_id: request.user_id,
         role: 'member',
-        status: 'active'
+        status: 'joined'
       });
 
     if (memberError) throw memberError;
 
-    // Update request status to accepted
+    // Update request status to approved
     const { error: updateError } = await supabase
       .from('team_join_requests')
-      .update({ status: 'accepted' })
+      .update({ status: 'approved' })
       .eq('id', requestId);
 
     if (updateError) throw updateError;
