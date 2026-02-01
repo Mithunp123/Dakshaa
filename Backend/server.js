@@ -802,11 +802,23 @@ app.post("/payment/initiate", async (req, res) => {
         if (!event) continue;
 
         const price = Number(event.price) || 0;
+        const isConference = (event.category || '').toLowerCase() === 'conference';
 
         if (item.type === 'team') {
            // Team Logic
            const count = Number(item.member_count);
-           const itemTotal = price * count;
+           let itemTotal;
+           
+           // Apply 50% discount for additional conference attendees
+           if (isConference && count > 1) {
+             // First person pays full price, additional people pay 50%
+             const firstPersonPrice = price;
+             const additionalPeoplePrice = price * 0.5 * (count - 1);
+             itemTotal = firstPersonPrice + additionalPeoplePrice;
+           } else {
+             itemTotal = price * count;
+           }
+           
            totalCalculatedAmount += itemTotal;
 
            // Create Inactive Team NOW (with Retry)
