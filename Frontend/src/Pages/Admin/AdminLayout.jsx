@@ -150,6 +150,8 @@ const AdminLayout = () => {
         { label: 'Waitlist', icon: Clock, path: '/admin/waitlist' },
         { label: 'Accommodation', icon: Bed, path: '/admin/accommodation' },
         { label: 'Referrals', icon: Trophy, path: '/admin/referrals' },
+        { label: 'Pending Registrations', icon: ClipboardList, path: '/admin/pending-registrations' },
+        { label: 'Attendance Management', icon: Users, path: '/admin/attendance' },
         { label: 'Event Controller', icon: Radio, path: '/admin/event-controller' }
       );
     }
