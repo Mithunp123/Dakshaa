@@ -91,6 +91,8 @@ const AccommodationManager = lazy(() => import("./Pages/Admin/SuperAdmin/Accommo
 const EventController = lazy(() => import("./Pages/Admin/SuperAdmin/EventController"));
 const RoleManagement = lazy(() => import("./Pages/Admin/SuperAdmin/RoleManagement"));
 const ReferralManager = lazy(() => import("./Pages/Admin/SuperAdmin/ReferralManager"));
+const PendingRegistrations = lazy(() => import("./Pages/Admin/SuperAdmin/PendingRegistrations"));
+const AttendanceManagement = lazy(() => import("./Pages/Admin/SuperAdmin/AttendanceManagement"));
 const RegistrationAdminDashboard = lazy(() => import("./Pages/Admin/RegAdmin/RegistrationAdminDashboard"));
 const EventCoordinatorDashboard = lazy(() => import("./Pages/Admin/Coordinator/EventCoordinatorDashboard"));
 const CoordinatorOverviewPage = lazy(() => import("./Pages/Admin/Coordinator/OverviewPage"));
@@ -338,6 +340,22 @@ function AppContent() {
                 element={
                   <ProtectedRoute allowedRoles={["super_admin"]}>
                     <ReferralManager />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="pending-registrations"
+                element={
+                  <ProtectedRoute allowedRoles={["super_admin"]}>
+                    <PendingRegistrations />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="attendance"
+                element={
+                  <ProtectedRoute allowedRoles={["super_admin"]}>
+                    <AttendanceManagement />
                   </ProtectedRoute>
                 }
               />
