@@ -3299,4 +3299,4 @@ const validatePasswordStrength = (password) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-});//on 24-01-2026
+});//on 01-02-2026
