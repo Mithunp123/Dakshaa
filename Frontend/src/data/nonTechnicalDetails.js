@@ -20,6 +20,7 @@ import NonTech18 from "../assets/EventsImages/EventDetails/Nontech/mech_nontech.
 import NonTech19 from "../assets/EventsImages/EventDetails/Nontech/txt_nontech.webp";
 import NonTech20 from "../assets/EventsImages/EventDetails/Nontech/vlsi_nontech.webp";
 import NonTech21 from "../assets/EventsImages/EventDetails/Nontech/turf_csbs.webp";
+import techtalk from "../assets/EventsImages/EventDetails/Nontech/talkshow.webp";
 
 export const nonTechnicalDetails = [
   {
@@ -33,16 +34,7 @@ export const nonTechnicalDetails = [
     description:
       "The AI Meme Contest is a fun-filled one-day non-technical event that combines creativity, humor, and artificial intelligence concepts through visually engaging memes. Participants will create original memes based on given AI-related themes using either AI-based tools or manual editing, with a strong focus on originality and ethical content creation. The event encourages innovative thinking and expressive digital creativity in a light-hearted competitive environment. It will be conducted at AB 408, with a registration fee of ₹150, and is open to both individuals and teams.",
     img: NonTech1,
-    rounds: [
-      {
-        title: "",
-        description: "",
-      },
-      {
-        title: "",
-        description: "",
-      },
-    ],
+    
     rules: [
       "The meme must be related to the content that are given to you.The meme must be related to the content that are given to you.",
       "Participants may use AI tools or manual design, but the concept must be original.",
@@ -562,7 +554,7 @@ export const nonTechnicalDetails = [
           name: "Saran G D",
           department: "Electronics and Communication Engineering",
           year: "III Year",
-          phone: "+91 94891 78522",
+          phone: "+91 88385 66093",
           
         },
       ],
@@ -1368,6 +1360,81 @@ export const nonTechnicalDetails = [
         {
           name: "C. Yogeshwaran",
           phone: "+91 86103 88095",
+        },
+      ],
+    },
+    registrationLink: "",
+  },
+
+  {
+    id: "nontech-techtalk",
+    shortTitle: "TECH TALK",
+    title: "TECH TALK",
+    department: "Non-Technical Events",
+    date: "February 14, 2026",
+    venue: "",
+    price: "₹ 150 per Member",
+    description:
+      "Tech Talk is an event where students can showcase their knowledge and skills in various technical domains. It includes presentations, discussions, and interactive sessions with industry experts.",
+    img: techtalk,
+    /*rounds: [
+      {
+        title: "Round 1",
+        description:
+          "Teams will be divided into three groups and ranked based on points and net run rate.",
+      },
+      {
+        title: "Round 2",
+        description:"The top three teams and one committee team will qualify for the Semi-Finals.",
+      },
+      {
+        title: "Round 3",
+        description:"Winners of the Semi-Finals will compete in the Final match.",
+      },
+    ],
+    rewards: [
+      {
+        position: "1st Prize",
+        emoji: "🥇",
+        amount: "₹5,000",
+      },
+      {
+        position: "2nd Prize",
+        emoji: "🥈",
+        amount: "₹3,000",
+      },
+      
+      {
+        position: "3rd Prize",
+        emoji: "🥉",
+        amount: "₹1,000",
+      },
+    ],*/
+    rules: [
+      "Each participant must prepare a presentation on a technical topic of their choice.",        
+    ],
+    schedule: [
+      {
+        date: "February 14, 2026",
+        time: "9.00 AM to 01.00 PM",
+        location: "",
+      },
+    ],
+    contact: {
+      facultyCoordinator: [
+        {
+          name: "",
+          phone: " ",
+        },
+      ],
+      studentCoordinator: [
+        {
+          name: "",
+          phone: "",
+        },
+        {
+          name: "",
+          phone: "",
         },
       ],
     },

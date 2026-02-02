@@ -514,22 +514,24 @@ export const technicalDetails = [
     id: "tech-cse-1",
     shortTitle: "BotXhibit",
     title: "BOTXHIBIT",
-    description: "A showcase-based technical event where participants present pre-developed software or hardware bots demonstrating innovation, functionality, and real-world application. Teams must explain the concept, design, working principle, and technology stack of their bot and perform a live demonstration within the allotted time. Evaluation will be based on originality, technical complexity, problem-solving approach, performance, and presentation quality.",
+    description: "A technical paper presentation event focused on innovative concepts and research in software and hardware bot technologies. Participants must present the problem statement, proposed solution, system architecture, working methodology, and applications. Prototype is not mandatory. Evaluation will be based on originality, technical content, feasibility, and presentation quality.",
     img: Tech10,
     date: "February 13, 2026",
     venue: "IT Park (Smart ClassRoom)",
     department: "Technical Events",
     price: "₹250",
     rules: [
-      "A team may consist of a maximum of two (2) participants",
-      "Only pre-developed bots (software or hardware) are permitted for demonstration",
-      "On-site coding, modification, or fabrication of bots is strictly prohibited",
-      "Mobile phones and external references are not allowed during evaluation, except when required for bot operation",
-      "Each team must demonstrate a fully functional bot to be eligible for full evaluation",
-      "Teams must bring all required components, equipment, and accessories for their bot",
-      "Bots must comply with basic safety standards; unsafe hardware may lead to disqualification",
-      "Any damage to equipment, venue property, or safety violations may result in disqualification",
-      "The decision of the jury shall be final and binding",
+      " A team may consist of a maximum of two (2) participants.",
+      "Papers must be related to bot technologies (software bots, hardware bots, AI bots, IoT bots, automation, robotics, etc.).",
+      "Prototype or working model is NOT compulsory. Conceptual designs and simulations are permitted.",
+      "Papers must be pre-prepared; on-spot editing or changes are not allowed.",
+      "Plagiarism beyond the permissible limit will lead to immediate disqualification.",
+      "Each team will be given 5-10 minutes for presentation followed by 2–3 minutes of Q&A.",
+      "Use of slides (PPT/PDF) is mandatory for presentation.",
+      "Mobile phones and external references are not allowed during evaluation, except for presentation purposes.",
+      "Participants must adhere strictly to the time limit.",
+      "Evaluation will be based on originality, technical depth, clarity, feasibility, innovation, and presentation skills.",
+      "The decision of the jury shall be final and binding."
     ],
     rewards: [
          {
@@ -549,6 +551,14 @@ export const technicalDetails = [
           amount: "₹500",
         },
       ],
+
+      papersubmission: [
+      {
+        description: [
+          "Paper Should be mailed to : botxhibit@gmail.com",
+        ],
+      },
+    ],
     schedule: [
       {
         

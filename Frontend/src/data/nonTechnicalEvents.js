@@ -1,4 +1,3 @@
-import NonTech12 from "../assets/EventsImages/EventDetails/Nontech/Department of InformationTechnology.webp";
 import nontech1 from "../assets/EventsImages/EventDetails/Nontech/aids_nontech.webp";
 import nontech2 from "../assets/EventsImages/EventDetails/Nontech/aids_nontech1.webp";
 import nontech3 from "../assets/EventsImages/EventDetails/Nontech/bt_nontech.webp";
@@ -20,6 +19,7 @@ import nontech18 from "../assets/EventsImages/EventDetails/Nontech/mech_nontech.
 import nontech19 from "../assets/EventsImages/EventDetails/Nontech/txt_nontech.webp";
 import nontech20 from "../assets/EventsImages/EventDetails/Nontech/vlsi_nontech.webp";
 import nontech21 from "../assets/EventsImages/EventDetails/Nontech/turf_csbs.webp";
+import techtalk from "../assets/EventsImages/EventDetails/Nontech/talkshow.webp";
 
 
 /*
@@ -150,5 +150,10 @@ export const nonTechnicalEvents = [
     image: nontech21,
     eventId: "nontech-csbs1",
     price: 100,
-}
+},
+{
+    image: techtalk,
+    eventId: "nontech-techtalk",
+    price: 100,
+},
 ];

@@ -159,7 +159,7 @@ function StartupSection() {
                 🥇 1st Prize
               </span>
               <span className="text-3xl font-semibold text-white mt-2">
-                ₹10,000
+                ₹ 3,000
               </span>
             </div>
 
@@ -169,7 +169,7 @@ function StartupSection() {
                 🥈 2nd Prize
               </span>
               <span className="text-3xl font-semibold text-white mt-2">
-                ₹7,500
+                ₹ 2,000
               </span>
             </div>
 
@@ -179,7 +179,7 @@ function StartupSection() {
                 🥉 3rd Prize
               </span>
               <span className="text-3xl font-semibold text-white mt-2">
-                ₹5,000
+                ₹ 1,000
               </span>
             </div>
           </div>
