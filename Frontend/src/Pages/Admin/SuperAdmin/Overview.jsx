@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users,
@@ -21,6 +22,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
+  const location = useLocation();
   const [stats, setStats] = useState({
     totalRegistrations: 0,
     totalRevenue: 0,
@@ -171,6 +173,25 @@ const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
       supabase.removeChannel(eventChannel);
     };
   }, [coordinatorEvents]);
+
+  // Auto-refresh on location change or visibility change (silent refresh)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Tab visible, refreshing super admin stats...');
+        fetchStats();
+      }
+    };
+    
+    // Refresh when navigating back to this page
+    console.log('🔄 Page navigation detected, refreshing super admin stats...');
+    fetchStats();
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname]);
 
   const fetchStats = async () => {
     try {

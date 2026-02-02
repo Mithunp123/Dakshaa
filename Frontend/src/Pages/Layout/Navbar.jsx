@@ -202,7 +202,9 @@ const Navbar = () => {
             <div className="md:hidden flex items-center gap-4">
               <button
                 onClick={toggleMenu}
-                className="text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
+                className="text-white p-3 hover:bg-white/10 rounded-lg transition-colors touch-manipulation active:scale-95"
+                style={{ minWidth: '48px', minHeight: '48px' }}
+                aria-label="Toggle menu"
               >
                 {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
               </button>
