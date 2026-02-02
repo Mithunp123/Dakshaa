@@ -53,24 +53,7 @@ export const exposAndShowsDetails = [
     price: "Free",
     registrationLink: "",
     schedule: [],
-    contact: {
-      facultyCoordinator: [
-        {
-          name: "Mr.R.Vivek",
-          designation: "Associate Professor, Dept. of EEE",
-          phone: "+91 72004 58826",
-        },
-      ],
-      studentCoordinator: [
-        {
-          name: "Mr.S.I.Pon Subra Balan",
-          department: "EEE",
-          phone: "+91 99948 20486",
-          email: "",
-        },
-        
-      ],
-    },
+    
   },
 
   {

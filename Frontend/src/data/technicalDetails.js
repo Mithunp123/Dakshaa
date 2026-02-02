@@ -450,6 +450,14 @@ export const technicalDetails = [
         title: "3) Future Trends in Construction and Structural Engineering",
       },
     ],
+
+    papersubmission: [
+      {
+        description: [
+          "Paper Should be mailed to : rameshs@ksrct.ac.in"
+        ],
+      },
+    ],
     rewards: [
          {
           position: "1st Prize",
@@ -705,6 +713,13 @@ export const technicalDetails = [
         title: "Power systems",
       },
     ],
+    papersubmission: [
+      {
+        description: [
+          "Paper Should be mailed to : civil@ksrct.ac.in"
+        ],
+      },
+    ],
     rules: [
       "The paper must be original, plagiarism-free, and relevant to the chosen technical domain",
       "A maximum of 2–3 participants per team is allowed; individual participation is also permitted",
@@ -880,6 +895,13 @@ export const technicalDetails = [
       "Clarity of Presentation",
       "Innovation / Contribution",
     ],
+    papersubmission: [
+      {
+        description: [
+          "Paper Should be mailed to : civil@ksrct.ac.in"
+        ],
+      },
+    ],
     schedule: [
       {
         
@@ -927,6 +949,13 @@ export const technicalDetails = [
         description: [
           "Any Topics Related to Mechanical Domain",
           "Upcoming revolutionary technologies in Manufacturing industries",
+        ],
+      },
+    ],
+    papersubmission: [
+      {
+        description: [
+          "Paper Should be mailed to :  sparkassociationksrct@gmail.com"
         ],
       },
     ],
@@ -1082,6 +1111,13 @@ export const technicalDetails = [
           "Smart Textiles: Concepts and Everyday Applications",
           "Eco-Friendly Practices in Textile Manufacturing",
           "Future Scope of Textile Engineering in a Sustainable World",
+        ],
+      },
+    ],
+    papersubmission: [
+      {
+        description: [
+          "Paper Should be mailed to : civil@ksrct.ac.in"
         ],
       },
     ],
@@ -1254,6 +1290,13 @@ export const technicalDetails = [
         ],
       },
     ],
+    papersubmission: [
+      {
+        description: [
+          "Paper Should be mailed to : foodvistaft@gmail.com"
+        ],
+      },
+    ],
     rewards: [
          {
           position: "1st Prize",
@@ -1324,6 +1367,13 @@ export const technicalDetails = [
         title: "TOPICS:",
         description: [
           "Revolutionary Trends in Electronics and Communication Engineering",
+        ],
+      },
+    ],
+    papersubmission: [
+      {
+        description: [
+          "Paper Should be mailed to : cafaceassociation@gmail.com"
         ],
       },
     ],

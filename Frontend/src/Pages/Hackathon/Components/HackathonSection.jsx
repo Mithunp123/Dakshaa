@@ -254,7 +254,7 @@ export const hackathonEventDetails = {
           amount: "₹2,000",
         },
       ],
-      rounds: [
+      challenge: [
         {
           title: "Round-1",
           description: [
@@ -297,7 +297,6 @@ export const hackathonEventDetails = {
         "All members must be present during all rounds",
         "Participants must bring their own laptop",
         "Required software must be pre-installed (VS Code / browser)",
-        "Internet access is restricted unless explicitly allowed by judges",
         "Plagiarism or copying from other teams will result in immediate disqualification"
       ],
       schedule: [
@@ -625,14 +624,7 @@ export const hackathonEventDetails = {
       description: "  This technical event will focus on designing and creating an innovative approach to redesigning and reconfiguring printed circuit board (PCB) modules that power the electronics of tomorrow. This is a fantastic opportunity for everyone, especially students, to combine creativity with technical expertise. Participating in this hackathon will help you unlock the Embedded Hardware Developer within you, and you may also get a  chance to join our team! Dive into the world of Embedded Hardware Development and showcase your ability to create cutting-edge, efficient circuit designs.",
       
       
-      rounds: [
-        {
-          title: "Round 1",
-          description: [
-            "Based on the performance, Participants will be short listed for further rounds."
-          ],
-        }
-      ], 
+       
 
 
       notable: [

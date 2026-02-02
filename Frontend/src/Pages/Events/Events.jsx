@@ -2125,7 +2125,7 @@ const Events = () => {
                   </div>
 
                   {/* Important Note */}
-                  {(selectedTechnical.importantNote || selectedTechnical.importantText) && (
+                  {(selectedTechnical.importantNote || selectedTechnical.importantText || (selectedTechnical.papersubmission && selectedTechnical.papersubmission.length > 0)) && (
                     <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
                       <div className="flex items-center gap-2">
                         <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
@@ -2146,6 +2146,19 @@ const Events = () => {
                               {selectedTechnical.importantNote}
                             </a>
                           </p>
+                        )}
+                        {selectedTechnical.papersubmission?.length > 0 && (
+                          <div className="text-yellow-300 text-sm break-words space-y-1">
+                            {selectedTechnical.papersubmission.map((item, idx) => (
+                              <div key={`paper-submission-${idx}`} className="space-y-1">
+                                {Array.isArray(item.description)
+                                  ? item.description.map((line, lineIdx) => (
+                                      <p key={`paper-submission-${idx}-${lineIdx}`}>{line}</p>
+                                    ))
+                                  : item.description && <p>{item.description}</p>}
+                              </div>
+                            ))}
+                          </div>
                         )}
                       </div>
                     </div>
