@@ -119,17 +119,22 @@ const conferences = [
             phone: "+91 94430 72641",
             email: "",
           },
+          {
+            name: "Dr. S. Pradeep",
+            phone: "+91 81221 39862",
+          }
         ],
         studentCoordinator: [
           {
-            name: " Muthaal S ",
+            name: "Ms.S. Muthaal ",
             phone: "+91 80565 88925",
             email: "",
           },
           {
-            name : "Sabareesh S ", 
-            phone:"+91 63856 52095"
-          }
+            name : "Ms.M. Deepasri " ,
+            phone:"+91 76959 45259"
+          },
+          
         ],
       },
     
@@ -203,18 +208,29 @@ const conferences = [
       "The National Conference serves as a platform for students, researchers, academicians, and industry professionals to present and exchange ideas, research outcomes, and technological innovations in the field of Mechanical Engineering. The event aims to encourage technical discussions, promote knowledge sharing, and foster collaboration between academia and industry. It highlights recent advancements, practical engineering solutions, and emerging technologies that contribute to sustainable development and industrial progress, while helping participants gain insights into current trends and future challenges in the engineering domain.",
     topics: [
       "Sustainable & Green Engineering ",
-      "Design Optimization and Finite Element Analysis",
-      "Sustainable & Green Engineering",
-      "Additive Manufacturing and Advanced Materials",
-      "Digital Manufacturing, Automation and Robotics",
-      "Advances in Automotive Engineering and Vehicle Dynamics",
-      "Smart Materials and Structures",
-      "Tribology, Wear and Surface Engineering",
-      "Innovations in Machine Design and Optimization",
-      "Computational Fluid Dynamics (CFD) in Engineering Applications",
-      "Production Planning, Industrial Safety and Reliability",
-      "Robotics, Mechatronics and Control Systems",
-      "Mechanical Engineering for Industry, Society and Sustainability"
+        "Additive Manufacturing and Advanced Materials",
+        "Digital Manufacturing, Automation and Robotics ",
+        "Advances in Automotive Engineering and Vehicle Dynamics",
+        "Tribology, Wear and Surface Engineering",
+        "Innovations in Machine Design and Optimization",
+        "Computational Fluid Dynamics (CFD) in Engineering Applications",
+        "Production Planning, Industrial Safety and Reliability",
+        "Mechanical Engineering for Industry, Society and Sustainability",
+        "Sensors and Transducers in Mechatronics Systems",
+        "Actuators and Drives in Automation",
+        "Robotics: Basic Structure, Types, and Applications",
+        "Human–Machine Interface (HMI) in Industrial Systems",
+        "IoT in Mechatronics Engineering",
+        "Mechatronics in Smart and Intelligent Systems",
+        "Mechatronics in Industry 4.0",
+        "Flight Control Systems in Drones",
+        "Smart Water Resources and Water Management ",
+        "Environmental Protection and Waste Management Technologies",
+        "Green and Sustainable Transportation Systems",
+        "Earthquake-Resistant and Safe Structures",
+        "Smart Cities and Urban Infrastructure Development",
+        "Use of GIS and Remote Sensing in Civil Engineering",
+        "Advanced Construction Materials and Management Practices"
     ],
 
     rules: [

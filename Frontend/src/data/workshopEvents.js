@@ -159,19 +159,19 @@ export const workshopDetails = [
       ],
       studentCoordinator: [
         {
-          name: "S. Balamurugan, IV Year",
+          name: "S. Balamurugan",
           phone: "+91 94877 07552",
         },
         {
-          name: "D. Vedhaanthan, III Year",
+          name: "D. Vedhaanthan",
           phone: "+91 8825722898",
         },
         {
-          name: "A. Kayalvizhi, III Year",
+          name: "A. Kayalvizhi",
           phone: "+91 80982 14368",
         },
         {
-          name: "Nivethitha, II Year",
+          name: "Nivethitha",
           phone: "+91 63804 46457",
         },
       ],
