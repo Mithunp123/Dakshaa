@@ -2275,7 +2275,7 @@ const RegistrationForm = () => {
                       
                       {/* Search Suggestions Dropdown */}
                       <AnimatePresence>
-                        {showSuggestions && (
+                        {showSuggestions && searchTerm && (
                           <motion.div
                             initial={{ opacity: 0, y: 10, scaleY: 0.95 }}
                             animate={{ opacity: 1, y: 0, scaleY: 1 }}
@@ -2283,27 +2283,29 @@ const RegistrationForm = () => {
                             className="absolute top-full left-0 right-0 mt-2 bg-gray-900/95 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-2xl max-h-80 overflow-y-auto overflow-x-hidden z-[100]"
                           >
                             {events
-                              .filter(e => 
-                                (categoryFilter === "ALL" || e.category === categoryFilter) &&
-                                e.event_name.toLowerCase().includes(searchTerm.toLowerCase())
-                              )
+                              .filter(e => {
+                                const eventName = (e.name || e.event_name || "").toLowerCase();
+                                return (categoryFilter === "ALL" || e.category === categoryFilter) &&
+                                  eventName.includes(searchTerm.toLowerCase());
+                              })
                               .length > 0 ? (
                               events
-                                .filter(e => 
-                                  (categoryFilter === "ALL" || e.category === categoryFilter) &&
-                                  e.event_name.toLowerCase().includes(searchTerm.toLowerCase())
-                                )
+                                .filter(e => {
+                                  const eventName = (e.name || e.event_name || "").toLowerCase();
+                                  return (categoryFilter === "ALL" || e.category === categoryFilter) &&
+                                    eventName.includes(searchTerm.toLowerCase());
+                                })
                                 .map((event) => (
                                   <div
                                     key={event.id}
                                     onClick={() => {
-                                      setSearchTerm(event.event_name);
+                                      setSearchTerm(event.name || event.event_name);
                                       setShowSuggestions(false);
                                     }}
                                     className="px-6 py-4 hover:bg-white/5 cursor-pointer border-b border-gray-800 last:border-0 flex justify-between items-center group transition-colors"
                                   >
                                     <span className="text-gray-300 group-hover:text-white font-semibold transition-colors">
-                                      {event.event_name}
+                                      {event.name || event.event_name}
                                     </span>
                                     <span className={`text-xs px-2 py-1 rounded-full border ${
                                       event.category === 'Technical' ? 'bg-blue-500/10 border-blue-500/30 text-blue-400' :
