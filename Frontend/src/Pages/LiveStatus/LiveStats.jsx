@@ -30,7 +30,7 @@ const getDeptFromId = (rawId) => {
     if (/-ft($|-)/.test(eid) || eid.includes("food")) return "FT";
     if (eid.includes("txt") || eid.includes("textile")) return "TXT";
     
-    if (eid.includes("vlsi")) return "VLSI";
+    if (eid.includes("vlsi")) return "EE(VLSI D&T)";
     if (eid.includes("mca")) return "MCA";
     if (eid.includes("edc")) return "EDC";
     if (eid.includes("ipr")) return "IPR";
@@ -269,6 +269,9 @@ const LiveStats = () => {
              // Normalize variants
              if (deptName === 'CSE-AIML' || deptName === 'Aiml') {
                  deptName = 'AIML';
+             }
+             if (deptName === 'VLSI') {
+                 deptName = 'EE(VLSI D&T)';
              }
              
              mergedMap[deptName] = (mergedMap[deptName] || 0) + item.count;
@@ -1018,4 +1021,3 @@ const LiveStats = () => {
 };
 
 export default LiveStats;
-
