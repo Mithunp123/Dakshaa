@@ -1183,9 +1183,9 @@ const Events = () => {
                           navigate('/login', { state: { returnTo: '/register-events' } });
                           return;
                         }
-                        // Logged in - redirect to registration page with event pre-selected
+                        // Logged in - redirect to registration page, skip to event selection
                         setSelectedHackathon(null);
-                        navigate('/register-events');
+                        navigate('/register-events', { state: { skipToEventSelection: true } });
                       }}
                     >
                       REGISTER NOW
@@ -1590,9 +1590,9 @@ const Events = () => {
                         navigate('/login', { state: { returnTo: '/register-events' } });
                         return;
                       }
-                      // Logged in - redirect to registration page with event pre-selected
+                      // Logged in - redirect to registration page, skip to event selection
                       setSelectedCultural(null);
-                      navigate('/register-events');
+                      navigate('/register-events', { state: { skipToEventSelection: true } });
                     }}
                   >
                     REGISTER NOW
@@ -1821,9 +1821,9 @@ const Events = () => {
                         navigate('/login', { state: { returnTo: '/register-events' } });
                         return;
                       }
-                      // Logged in - redirect to registration page with event pre-selected
+                      // Logged in - redirect to registration page, skip to event selection
                       setSelectedWorkshop(null);
-                      navigate('/register-events');
+                      navigate('/register-events', { state: { skipToEventSelection: true } });
                     }}
                   >
                     REGISTER NOW
@@ -2173,7 +2173,7 @@ const Events = () => {
                         navigate('/login', { state: { returnTo: '/register-events' } });
                       } else {
                         setSelectedTechnical(null);
-                        navigate('/register-events');
+                        navigate('/register-events', { state: { skipToEventSelection: true } });
                       }
                     }}
                   >
@@ -2493,7 +2493,7 @@ const Events = () => {
                         navigate('/login', { state: { returnTo: '/register-events' } });
                       } else {
                         setSelectedNonTechnical(null);
-                        navigate('/register-events');
+                        navigate('/register-events', { state: { skipToEventSelection: true } });
                       }
                     }}
                   >

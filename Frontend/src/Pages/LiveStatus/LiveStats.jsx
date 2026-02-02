@@ -30,7 +30,7 @@ const getDeptFromId = (rawId) => {
     if (/-ft($|-)/.test(eid) || eid.includes("food")) return "FT";
     if (eid.includes("txt") || eid.includes("textile")) return "TXT";
     
-    if (eid.includes("vlsi")) return "VLSI";
+    if (eid.includes("vlsi")) return "EE(VLSI D&T)";
     if (eid.includes("mca")) return "MCA";
     if (eid.includes("edc")) return "EDC";
     if (eid.includes("ipr")) return "IPR";
@@ -40,104 +40,8 @@ const getDeptFromId = (rawId) => {
     return null; 
 };
 
-// Flip Card Component with dynamic colors and flip animation
-const FlipUnit = ({ value, label, size = "md", colorScheme = "default" }) => {
-    const [prevValue, setPrevValue] = useState(value);
-    const [isFlipping, setIsFlipping] = useState(false);
-    
-    useEffect(() => {
-        if (prevValue !== value) {
-            setIsFlipping(true);
-            setTimeout(() => {
-                setPrevValue(value);
-                setIsFlipping(false);
-            }, 300);
-        }
-    }, [value]);
-    
-    // Pad single digits
-    const formattedValue = value < 10 ? `0${value}` : value;
-    const formattedPrev = prevValue < 10 ? `0${prevValue}` : prevValue;
-    
-    // Size classes
-    const sizeClasses = {
-        sm: {
-            container: "w-12 h-14 md:w-16 md:h-20 p-1.5",
-            text: "text-2xl md:text-4xl",
-            label: "text-[9px] md:text-xs"
-        },
-        md: {
-            container: "w-16 h-20 md:w-20 md:h-24 p-2",
-            text: "text-3xl md:text-5xl",
-            label: "text-[10px] md:text-xs"
-        }
-    };
-
-    // Color schemes based on urgency
-    const colorSchemes = {
-        safe: {
-            bg: "bg-gradient-to-br from-emerald-900/80 to-green-900/80",
-            border: "border-emerald-500/30",
-            text: "text-emerald-100",
-            glow: "shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-        },
-        warning: {
-            bg: "bg-gradient-to-br from-amber-900/80 to-orange-900/80",
-            border: "border-amber-500/30",
-            text: "text-amber-100",
-            glow: "shadow-[0_0_20px_rgba(245,158,11,0.3)]"
-        },
-        danger: {
-            bg: "bg-gradient-to-br from-red-900/80 to-rose-900/80",
-            border: "border-red-500/40",
-            text: "text-red-100",
-            glow: "shadow-[0_0_25px_rgba(239,68,68,0.4)] animate-pulse"
-        },
-        default: {
-            bg: "bg-gray-900/80",
-            border: "border-white/10",
-            text: "text-white",
-            glow: ""
-        }
-    };
-
-    const currentSize = sizeClasses[size] || sizeClasses.md;
-    const currentColor = colorSchemes[colorScheme] || colorSchemes.default;
-
-    return (
-        <div className="flex flex-col items-center gap-1" style={{ perspective: "1000px" }}>
-            <AnimatePresence mode="popLayout">
-                <motion.div
-                    key={formattedValue}
-                    initial={{ rotateX: -90, opacity: 0 }}
-                    animate={{ rotateX: 0, opacity: 1 }}
-                    exit={{ rotateX: 90, opacity: 0 }}
-                    transition={{ 
-                        duration: 0.5,
-                        ease: "easeInOut"
-                    }}
-                    style={{ transformStyle: "preserve-3d", backfaceVisibility: "hidden" }}
-                    className={`relative ${currentColor.bg} rounded-lg md:rounded-xl ${currentSize.container} flex items-center justify-center ${currentColor.border} border overflow-visible shadow-xl backdrop-blur-md group transition-colors duration-500 ${currentColor.glow}`}
-                >
-                    {/* Center Line for flip effect */}
-                    <div className="absolute inset-x-0 top-1/2 h-px bg-black/80 z-20 shadow-[0_1px_0_rgba(255,255,255,0.1)]"></div>
-                    
-                    {/* Number */}
-                    <span className={`${currentSize.text} font-black font-mono ${currentColor.text} z-30 tabular-nums tracking-tighter drop-shadow-[0_2px_5px_rgba(0,0,0,0.5)]`}>
-                        {formattedValue}
-                    </span>
-
-                    {/* Glossy Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-black/20 pointer-events-none z-10"></div>
-                    
-                    {/* Top highlight */}
-                    <div className="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-white/5 to-transparent pointer-events-none z-10"></div>
-                </motion.div>
-            </AnimatePresence>
-            <span className={`${currentSize.label} text-gray-500 font-bold uppercase tracking-wider`}>{label}</span>
-        </div>
-    );
-};
+// Flip Card Component removed
+// const FlipUnit = ...
 
 const LiveStats = () => {
   const [stats, setStats] = useState({
@@ -153,7 +57,6 @@ const LiveStats = () => {
   const eventLookupRef = useRef({});
 
   const [milestone, setMilestone] = useState(null);
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, label: "" });
   const prevStats = useRef(null);
 
   // Particle animation for background
@@ -164,30 +67,6 @@ const LiveStats = () => {
     size: Math.random() * 4 + 1,
     duration: Math.random() * 20 + 10
   }));
-
-  useEffect(() => {
-    const calculateTimeLeft = () => {
-      const targetDate = new Date("2026-02-09T00:00:00");
-      const now = new Date();
-      const difference = targetDate - now;
-      
-      if (difference <= 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, label: "Registration Closed" });
-        return;
-      }
-
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((difference / 1000 / 60) % 60);
-      const seconds = Math.floor((difference / 1000) % 60);
-
-      setTimeLeft({ days, hours, minutes, seconds, label: "" });
-    };
-
-    calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   // Detect Milestones
   useEffect(() => {
@@ -269,6 +148,9 @@ const LiveStats = () => {
              // Normalize variants
              if (deptName === 'CSE-AIML' || deptName === 'Aiml') {
                  deptName = 'AIML';
+             }
+             if (deptName === 'VLSI') {
+                 deptName = 'EE(VLSI D&T)';
              }
              
              mergedMap[deptName] = (mergedMap[deptName] || 0) + item.count;
@@ -648,23 +530,6 @@ const LiveStats = () => {
         >
           <ArrowLeft size={24} className="md:w-8 md:h-8" />
         </button>
-
-        {/* Countdown Timer - Right of Back Button */}
-        {timeLeft.label ? (
-             <div className="hidden md:block text-sm md:text-base font-bold text-red-500 uppercase tracking-widest animate-pulse">
-                {timeLeft.label}
-             </div>
-        ) : (
-             <div className="hidden md:flex items-center gap-2 md:gap-3">
-                <FlipUnit value={timeLeft.days} label="Days" size="sm" colorScheme={timeLeft.days <= 3 ? 'danger' : timeLeft.days <= 7 ? 'warning' : 'safe'} />
-                <div className="text-2xl md:text-3xl font-black text-white/30 -mt-4 md:-mt-5">:</div>
-                <FlipUnit value={timeLeft.hours} label="Hrs" size="sm" colorScheme={timeLeft.days <= 1 ? 'danger' : timeLeft.days <= 3 ? 'warning' : 'safe'} />
-                <div className="text-2xl md:text-3xl font-black text-white/30 -mt-4 md:-mt-5">:</div>
-                <FlipUnit value={timeLeft.minutes} label="Mins" size="sm" colorScheme={timeLeft.days === 0 && timeLeft.hours <= 2 ? 'danger' : timeLeft.days <= 1 ? 'warning' : 'safe'} />
-                <div className="text-2xl md:text-3xl font-black text-white/30 -mt-4 md:-mt-5">:</div>
-                <FlipUnit value={timeLeft.seconds} label="Secs" size="sm" colorScheme={timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes <= 30 ? 'danger' : timeLeft.days === 0 ? 'warning' : 'safe'} />
-             </div>
-        )}
       </div>
 
       {/* Animated Background Particles */}
@@ -1018,4 +883,3 @@ const LiveStats = () => {
 };
 
 export default LiveStats;
-

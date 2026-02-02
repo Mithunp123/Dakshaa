@@ -881,8 +881,8 @@ const HackathonSection = () => {
       navigate(`/login?register=true&eventId=${encodeURIComponent(rawEventId)}`);
       return;
     }
-    // Logged in - redirect to registration page with event pre-selected
-    navigate('/register-events', { state: { selectedEventId: rawEventId } });
+    // Logged in - redirect to registration page, skip to event selection
+    navigate('/register-events', { state: { selectedEventId: rawEventId, skipToEventSelection: true } });
   };
 
   // Infinite Pulsing Animation for Button
@@ -1358,12 +1358,3 @@ const HackathonSection = () => {
 };
 
 export default HackathonSection;
-
-
-
-
-
-
-
-
-

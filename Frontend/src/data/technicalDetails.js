@@ -716,7 +716,7 @@ export const technicalDetails = [
     papersubmission: [
       {
         description: [
-          "Paper Should be mailed to : civil@ksrct.ac.in"
+          "Paper Should be mailed to : spiceeeee01@gmail.com"
         ],
       },
     ],
@@ -898,7 +898,7 @@ export const technicalDetails = [
     papersubmission: [
       {
         description: [
-          "Paper Should be mailed to : civil@ksrct.ac.in"
+          "Paper Should be mailed to : "
         ],
       },
     ],
@@ -1117,7 +1117,7 @@ export const technicalDetails = [
     papersubmission: [
       {
         description: [
-          "Paper Should be mailed to : civil@ksrct.ac.in"
+          "Paper Should be mailed to  : tafetatt@gmail.com "
         ],
       },
     ],

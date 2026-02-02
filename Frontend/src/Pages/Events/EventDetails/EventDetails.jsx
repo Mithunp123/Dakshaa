@@ -335,8 +335,13 @@ const EventDetails = () => {
       navigate(`/login?register=true&eventId=${encodeURIComponent(databaseEventId)}`);
       return;
     }
-    // Logged in - redirect to registration page with event pre-selected
-    navigate('/register-events', { state: { selectedEventId: databaseEventId } });
+    // Logged in - redirect to registration page with event pre-selected and skip to step 2
+    navigate('/register-events', { 
+      state: { 
+        selectedEventId: databaseEventId,
+        skipToEventSelection: true 
+      } 
+    });
   };
 
   const eventDetails = {

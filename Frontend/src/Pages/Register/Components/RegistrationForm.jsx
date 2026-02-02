@@ -55,6 +55,11 @@ const RegistrationForm = () => {
   const navigate = useNavigate();
   const preSelectedEventId = location.state?.selectedEventId;
   
+  // Check URL parameter for skip flag
+  const urlParams = new URLSearchParams(location.search);
+  const skipFromUrl = urlParams.get('skip') === 'true';
+  const skipToEventSelection = location.state?.skipToEventSelection || skipFromUrl; // Flag to skip step 1
+  
   // Check if returning from successful payment
   const registrationSuccess = location.state?.registrationSuccess;
   
@@ -501,36 +506,34 @@ const RegistrationForm = () => {
       }
     }
     
-    // Handle individual event pre-selection
-    if (preSelectedEventId && events.length > 0 && !preSelectApplied) {
-      // Find the event by event_key OR by id
-      const matchedEvent = events.find(
-        (e) => e.event_key === preSelectedEventId || e.id === preSelectedEventId
-      );
+    // Handle individual event pre-selection or skip to event selection
+    if ((preSelectedEventId || skipToEventSelection) && events.length > 0 && !preSelectApplied) {
+      // Always set individual mode and go to step 2
+      setRegistrationMode("individual");
+      setCurrentStep(2);
       
-      if (matchedEvent) {
-        const eventUUID = matchedEvent.id;
-        // Check if event is full
-        const isFull = matchedEvent.current_registrations >= matchedEvent.capacity;
-        const isOpen = matchedEvent.is_open !== false;
+      // If a specific event was passed, try to pre-select it
+      if (preSelectedEventId) {
+        // Find the event by event_key OR by id
+        const matchedEvent = events.find(
+          (e) => e.event_key === preSelectedEventId || e.id === preSelectedEventId
+        );
         
-        if (!isFull && isOpen) {
-          setSelectedEvents([eventUUID]);
-          setRegistrationMode("individual");
-          setCurrentStep(2);
-        } else {
-          // Event is full or closed, just go to selection page
-          setRegistrationMode("individual");
-          setCurrentStep(2);
+        if (matchedEvent) {
+          const eventUUID = matchedEvent.id;
+          // Check if event is full
+          const isFull = matchedEvent.current_registrations >= matchedEvent.capacity;
+          const isOpen = matchedEvent.is_open !== false;
+          
+          if (!isFull && isOpen) {
+            setSelectedEvents([eventUUID]);
+          }
         }
-      } else {
-        // Event not found, just go to selection page
-        setRegistrationMode("individual");
-        setCurrentStep(2);
       }
+      
       setPreSelectApplied(true);
     }
-  }, [preSelectedEventId, teamRegistrationData, events, preSelectApplied]);
+  }, [preSelectedEventId, skipToEventSelection, teamRegistrationData, events, preSelectApplied]);
 
   // Memoized categories - prevents recalculation on every render
   const categories = useMemo(() => {
