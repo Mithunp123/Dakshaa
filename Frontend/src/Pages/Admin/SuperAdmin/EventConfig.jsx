@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Edit2, 
@@ -27,6 +27,7 @@ import eventConfigService from '../../../services/eventConfigService';
 
 const EventConfig = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingEvent, setEditingEvent] = useState(null);
@@ -47,6 +48,21 @@ const EventConfig = () => {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  // Auto-refresh on visibility change and location change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Tab visible, refreshing events...');
+        fetchEvents();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname]);
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -80,11 +96,18 @@ const EventConfig = () => {
   };
 
   const handleToggleStatus = async (eventId) => {
+    // Optimistic update
+    setEvents(prevEvents => 
+      prevEvents.map(e => 
+        e.id === eventId ? { ...e, is_open: !e.is_open } : e
+      )
+    );
+    
     const result = await eventConfigService.toggleEventStatus(eventId);
-    if (result.success) {
-      fetchEvents();
-    } else {
+    if (!result.success) {
       alert('Toggle failed: ' + result.error);
+      // Revert on failure
+      fetchEvents();
     }
   };
 

@@ -323,7 +323,15 @@ const RegistrationForm = () => {
         
         if (hasCachedData && isEffectValid()) {
           console.log('⚡ Showing cached events instantly:', cachedEvents.length);
-          setEvents(cachedEvents);
+          // Auto-close full events even in cached data
+          const cachedWithAutoClose = cachedEvents.map(event => {
+            const isFull = event.current_registrations >= event.capacity;
+            if (isFull && event.is_open) {
+              return { ...event, is_open: false };
+            }
+            return event;
+          });
+          setEvents(cachedWithAutoClose);
           setShowingCachedData(true);
           setLoading(false); // Hide loading spinner immediately
         } else {
@@ -411,8 +419,18 @@ const RegistrationForm = () => {
           console.log(`✅ [RegistrationForm] Loaded ${combosData.length} combos`);
           console.log(`✅ [RegistrationForm] Loaded ${registeredIds.size} registered event IDs`);
           
+          // Auto-close full events (frontend restriction)
+          const eventsWithAutoClose = eventsData.map(event => {
+            const isFull = event.current_registrations >= event.capacity;
+            if (isFull && event.is_open) {
+              console.log(`🔒 Auto-closing full event: ${event.name} (${event.current_registrations}/${event.capacity})`);
+              return { ...event, is_open: false };
+            }
+            return event;
+          });
+          
           // ALWAYS update events state with fresh data
-          setEvents(eventsData);
+          setEvents(eventsWithAutoClose);
           setShowingCachedData(false);
           setCombos(combosData);
           setRegisteredEventIds(registeredIds);
@@ -1049,6 +1067,39 @@ const RegistrationForm = () => {
         return;
       }
 
+      // Check if any selected events are now full (real-time capacity check)
+      const fullEvents = [];
+      for (const eventId of selectedEvents) {
+        const eventInfo = selectedEventDetails.find(e => (e.id || e.event_id) === eventId);
+        if (eventInfo) {
+          const isFull = eventInfo.current_registrations >= eventInfo.capacity;
+          if (isFull) {
+            fullEvents.push(eventInfo.name || eventInfo.event_name || 'Unknown Event');
+          }
+        }
+      }
+      
+      if (fullEvents.length > 0) {
+        toast.error(`Cannot register. The following event(s) are now full: ${fullEvents.join(', ')}`, {
+          duration: 5000,
+          position: 'top-center',
+        });
+        setIsSubmitting(false);
+        // Reload events to update UI
+        const result = await eventConfigService.getEventsWithStats();
+        if (result.success) {
+          const eventsWithAutoClose = result.data.map(event => {
+            const isFull = event.current_registrations >= event.capacity;
+            if (isFull && event.is_open) {
+              return { ...event, is_open: false };
+            }
+            return event;
+          });
+          setEvents(eventsWithAutoClose);
+        }
+        return;
+      }
+
       // Clear any existing PENDING registrations for the selected events
       // This allows the user to retry payment without duplicate key errors
       if (selectedEvents.length > 0) {
@@ -1260,6 +1311,39 @@ const RegistrationForm = () => {
           duration: 3000,
           position: 'top-center',
         });
+        return;
+      }
+
+      // Check if any selected events are now full (real-time capacity check)
+      const fullEvents = [];
+      for (const eventId of selectedEvents) {
+        const eventInfo = selectedEventDetails.find(e => (e.id || e.event_id) === eventId);
+        if (eventInfo) {
+          const isFull = eventInfo.current_registrations >= eventInfo.capacity;
+          if (isFull) {
+            fullEvents.push(eventInfo.name || eventInfo.event_name || 'Unknown Event');
+          }
+        }
+      }
+      
+      if (fullEvents.length > 0) {
+        toast.error(`Cannot register. The following event(s) are now full: ${fullEvents.join(', ')}`, {
+          duration: 5000,
+          position: 'top-center',
+        });
+        setIsSubmitting(false);
+        // Reload events to update UI
+        const result = await eventConfigService.getEventsWithStats();
+        if (result.success) {
+          const eventsWithAutoClose = result.data.map(event => {
+            const isFull = event.current_registrations >= event.capacity;
+            if (isFull && event.is_open) {
+              return { ...event, is_open: false };
+            }
+            return event;
+          });
+          setEvents(eventsWithAutoClose);
+        }
         return;
       }
 
@@ -1481,6 +1565,35 @@ const RegistrationForm = () => {
           position: 'top-center',
         });
         return;
+      }
+
+      // Check if the event is now full (real-time capacity check)
+      if (selectedEvents.length > 0) {
+        const eventId = selectedEvents[0];
+        const eventInfo = selectedEventDetails.find(e => (e.id || e.event_id) === eventId);
+        if (eventInfo) {
+          const isFull = eventInfo.current_registrations >= eventInfo.capacity;
+          if (isFull) {
+            toast.error(`Cannot register. Event "${eventInfo.name || eventInfo.event_name}" is now full.`, {
+              duration: 5000,
+              position: 'top-center',
+            });
+            setIsSubmitting(false);
+            // Reload events to update UI
+            const result = await eventConfigService.getEventsWithStats();
+            if (result.success) {
+              const eventsWithAutoClose = result.data.map(event => {
+                const isFull = event.current_registrations >= event.capacity;
+                if (isFull && event.is_open) {
+                  return { ...event, is_open: false };
+                }
+                return event;
+              });
+              setEvents(eventsWithAutoClose);
+            }
+            return;
+          }
+        }
       }
 
       // Get team leader (first member or user)

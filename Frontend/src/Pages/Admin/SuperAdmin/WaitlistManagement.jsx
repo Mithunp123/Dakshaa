@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Clock,
@@ -16,6 +17,7 @@ import {
 } from "../../../services/adminService";
 
 const WaitlistManagement = () => {
+  const location = useLocation();
   const [waitlist, setWaitlist] = useState([]);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,6 +31,21 @@ const WaitlistManagement = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Auto-refresh on visibility change and location change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Tab visible, refreshing waitlist...');
+        loadData();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname]);
 
   useEffect(() => {
     loadWaitlist();

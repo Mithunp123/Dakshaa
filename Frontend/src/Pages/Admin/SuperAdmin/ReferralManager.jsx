@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Users,
@@ -17,6 +18,7 @@ import {
 import { supabase } from "../../../supabase";
 
 const ReferralManager = () => {
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [referrals, setReferrals] = useState([]);
   const [filteredReferrals, setFilteredReferrals] = useState([]);
@@ -30,6 +32,21 @@ const ReferralManager = () => {
   useEffect(() => {
     fetchReferralData();
   }, []);
+
+  // Auto-refresh on visibility change and location change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Tab visible, refreshing referral data...');
+        fetchReferralData();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname]);
 
   useEffect(() => {
     filterReferrals();

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Users,
@@ -38,6 +38,7 @@ import {
 const EventRegistrationManager = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [participants, setParticipants] = useState([]);
@@ -53,6 +54,21 @@ const EventRegistrationManager = () => {
   useEffect(() => {
     fetchData();
   }, [eventId]);
+
+  // Auto-refresh on visibility change and location change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Tab visible, refreshing event registrations...');
+        fetchData();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname, eventId]);
 
   useEffect(() => {
     filterParticipants();

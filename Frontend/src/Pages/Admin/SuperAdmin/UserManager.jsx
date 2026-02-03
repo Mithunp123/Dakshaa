@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Search, 
@@ -25,6 +26,7 @@ import { supabase } from '../../../supabase';
 import { AnimatePresence } from 'framer-motion';
 
 const UserManager = () => {
+  const location = useLocation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -43,6 +45,21 @@ const UserManager = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // Auto-refresh on visibility change and location change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Tab visible, refreshing users...');
+        fetchUsers();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname]);
 
   const fetchUsers = async () => {
     try {
@@ -195,6 +212,10 @@ const UserManager = () => {
 
   const handleUpdateProfile = async (userId, updates) => {
     try {
+      // Optimistic update - update UI immediately
+      setUsers(users.map(u => u.id === userId ? { ...u, ...updates } : u));
+      if (selectedUser?.id === userId) setSelectedUser({ ...selectedUser, ...updates });
+      
       const { error } = await supabase
         .from('profiles')
         .update(updates)
@@ -202,8 +223,6 @@ const UserManager = () => {
 
       if (error) throw error;
       
-      setUsers(users.map(u => u.id === userId ? { ...u, ...updates } : u));
-      if (selectedUser?.id === userId) setSelectedUser({ ...selectedUser, ...updates });
       alert('Profile updated successfully');
     } catch (error) {
       alert('Update failed: ' + error.message);
@@ -218,6 +237,9 @@ const UserManager = () => {
   const handleRoleChange = async (userId, newRole) => {
     setUpdatingId(userId);
     try {
+      // Optimistic update - update UI immediately
+      setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
+      
       const { error } = await supabase
         .from('profiles')
         .update({ role: newRole })
@@ -225,7 +247,6 @@ const UserManager = () => {
 
       if (error) throw error;
       
-      setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
       alert(`Role updated to ${newRole}`);
     } catch (error) {
       alert('Update failed: ' + error.message);

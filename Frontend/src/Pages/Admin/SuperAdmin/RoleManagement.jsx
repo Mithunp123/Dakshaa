@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, 
@@ -23,6 +24,7 @@ import { supabase } from '../../../supabase';
 import toast from 'react-hot-toast';
 
 const RoleManagement = () => {
+  const location = useLocation();
   const MASTER_ADMIN_ID = '105f3289-bfc5-467f-8cd0-49ff9c8f7082'; // Only this user can assign super_admin
   const [currentUserId, setCurrentUserId] = useState(null);
   const [users, setUsers] = useState([]);
@@ -79,6 +81,23 @@ const RoleManagement = () => {
       supabase.removeChannel(profileSubscription);
     };
   }, []);
+
+  // Auto-refresh on visibility change and location change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Tab visible, refreshing role data...');
+        fetchUsers();
+        fetchEvents();
+        fetchCoordinatorAssignments();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname]);
 
   const getCurrentUser = async () => {
     try {
@@ -325,7 +344,11 @@ const RoleManagement = () => {
         duration: 3000
       });
       
-      fetchCoordinatorAssignments();
+      // Refresh both assignments and users list immediately
+      await Promise.all([
+        fetchCoordinatorAssignments(),
+        fetchUsers()
+      ]);
       setIsAssignModalOpen(false);
       setSelectedEvents([]);
     } catch (error) {
@@ -346,7 +369,11 @@ const RoleManagement = () => {
       if (error) throw error;
 
       toast.success('Assignment removed!', { icon: '🗑️' });
-      fetchCoordinatorAssignments();
+      // Refresh both assignments and users list immediately
+      await Promise.all([
+        fetchCoordinatorAssignments(),
+        fetchUsers()
+      ]);
     } catch (error) {
       console.error('Error removing assignment:', error);
       toast.error('Failed to remove assignment');

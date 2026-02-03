@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
@@ -20,6 +21,7 @@ import comboService from '../../../services/comboService';
 import { supabase } from '../../../supabase';
 
 const ComboManagement = () => {
+  const location = useLocation();
   const [combos, setCombos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -28,6 +30,21 @@ const ComboManagement = () => {
   useEffect(() => {
     fetchCombos();
   }, []);
+
+  // Auto-refresh on visibility change and location change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Tab visible, refreshing combos...');
+        fetchCombos();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname]);
 
   const fetchCombos = async () => {
     setLoading(true);
@@ -39,12 +56,20 @@ const ComboManagement = () => {
   };
 
   const handleToggleStatus = async (comboId) => {
+    // Optimistic update
+    setCombos(prevCombos => 
+      prevCombos.map(c => 
+        c.id === comboId ? { ...c, is_active: !c.is_active } : c
+      )
+    );
+    
     const result = await comboService.toggleComboStatus(comboId);
     if (result.success) {
       alert(result.message || 'Status updated successfully');
-      fetchCombos();
     } else {
       alert('Failed to toggle status: ' + (result.message || result.error));
+      // Revert on failure
+      fetchCombos();
     }
   };
 

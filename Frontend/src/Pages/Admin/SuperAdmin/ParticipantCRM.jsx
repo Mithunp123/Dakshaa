@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Users,
@@ -24,6 +25,7 @@ import {
 } from "../../../services/adminService";
 
 const ParticipantCRM = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('edit'); // 'edit', 'bulk-email', 'activity-log'
   const [loading, setLoading] = useState(false);
   
@@ -53,6 +55,22 @@ const ParticipantCRM = () => {
     loadEvents();
     loadActivityLogs();
   }, []);
+
+  // Auto-refresh on visibility change and location change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Tab visible, refreshing participant data...');
+        loadEvents();
+        loadActivityLogs();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname]);
 
   useEffect(() => {
     if (searchTerm.length >= 2) {

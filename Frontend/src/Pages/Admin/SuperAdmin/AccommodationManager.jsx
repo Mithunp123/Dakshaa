@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Bed,
@@ -18,6 +19,7 @@ import {
 import { supabase } from "../../../supabase";
 
 const AccommodationManager = () => {
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalBeds: 500,
@@ -34,6 +36,21 @@ const AccommodationManager = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Auto-refresh on visibility change and location change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Tab visible, refreshing accommodation data...');
+        fetchData();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname]);
 
   useEffect(() => {
     filterBookings();

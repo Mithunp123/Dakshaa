@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Users,
@@ -35,6 +36,7 @@ const formatDate = (date, formatStr) => {
 };
 
 const AttendanceManagement = () => {
+  const location = useLocation();
   const [attendance, setAttendance] = useState([]);
   const [events, setEvents] = useState([]);
   const [eventStats, setEventStats] = useState([]);
@@ -76,6 +78,26 @@ const AttendanceManagement = () => {
       supabase.removeChannel(channel);
     };
   }, [selectedEvent]);
+
+  // Auto-refresh on visibility change and location change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Tab visible, refreshing attendance...');
+        loadEvents();
+        if (selectedEvent) {
+          loadAttendance();
+        } else {
+          loadEventStats();
+        }
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname, selectedEvent]);
 
   const loadEvents = async () => {
     try {

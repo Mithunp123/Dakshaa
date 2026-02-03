@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   CreditCard, 
@@ -34,6 +35,7 @@ import {
 import { supabase } from '../../../supabase';
 
 const FinanceManager = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [transactions, setTransactions] = useState([]);
@@ -43,6 +45,22 @@ const FinanceManager = () => {
     fetchFinanceData();
     fetchCashierSessions();
   }, []);
+
+  // Auto-refresh on visibility change and location change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Tab visible, refreshing finance data...');
+        fetchFinanceData();
+        fetchCashierSessions();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname]);
 
   const fetchCashierSessions = async () => {
     const { data } = await supabase

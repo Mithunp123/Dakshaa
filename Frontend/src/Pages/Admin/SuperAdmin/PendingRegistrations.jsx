@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Clock,
@@ -39,6 +40,7 @@ const formatDate = (date, formatStr) => {
 };
 
 const PendingRegistrations = () => {
+  const location = useLocation();
   const [pendingRegistrations, setPendingRegistrations] = useState([]);
   const [comboPurchases, setComboPurchases] = useState([]);
   const [events, setEvents] = useState([]);
@@ -62,6 +64,21 @@ const PendingRegistrations = () => {
   useEffect(() => {
     loadEvents();
   }, []);
+
+  // Auto-refresh on visibility change and location change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Tab visible, refreshing pending registrations...');
+        loadAllData();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [location.pathname]);
 
   useEffect(() => {
     loadAllData();
