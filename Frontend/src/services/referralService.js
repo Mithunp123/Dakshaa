@@ -51,10 +51,8 @@ export const trackReferralCode = async (referralId) => {
       console.error('Error inserting referral code:', insertError);
       return { success: false, error: insertError.message };
     }
-
-    console.log('New referral code tracked with usage_count = 0:', newCode);
+    
     return { success: true, data: newCode, alreadyExists: false };
-
   } catch (error) {
     console.error('Unexpected error in trackReferralCode:', error);
     return { success: false, error: error.message };
@@ -98,10 +96,8 @@ export const incrementReferralUsage = async (referralId) => {
       console.error('Error updating referral usage:', updateError);
       return { success: false, error: updateError.message };
     }
-
-    console.log('Referral usage incremented:', updatedCode);
+    
     return { success: true, data: updatedCode };
-
   } catch (error) {
     console.error('Unexpected error in incrementReferralUsage:', error);
     return { success: false, error: error.message };

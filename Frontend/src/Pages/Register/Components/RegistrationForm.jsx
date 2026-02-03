@@ -40,7 +40,6 @@ const getStoredUser = () => {
     if (storedSession) {
       const parsed = JSON.parse(storedSession);
       if (parsed.expires_at && parsed.expires_at * 1000 > Date.now()) {
-        console.log('📦 Found valid session in localStorage on init');
         return parsed.user;
       }
     }
@@ -247,7 +246,6 @@ const RegistrationForm = () => {
     const paymentStatus = urlParams.get('payment');
     
     if (paymentStatus === 'success' && user?.id) {
-      console.log('✅ Payment success detected, clearing pending payments');
       
       // Clear expired pending payments
       pendingPaymentService.clearExpiredPayments();
@@ -301,13 +299,10 @@ const RegistrationForm = () => {
     
     // Prevent double execution in React StrictMode if data already loaded
     if (dataLoadedRef.current) {
-      console.log('⏭️ Skipping duplicate load call (data already loaded)');
       setLoading(false);
       return;
     }
     
-    console.log(`🚀 Starting data loading... (effect #${currentEffectId})`);
-    console.log('👤 Initial user:', user ? `✅ ${user.id}` : '❌ None');
     loadingRef.current = true;
     
     // Helper to check if this effect is still valid
@@ -315,14 +310,12 @@ const RegistrationForm = () => {
     
     const loadData = async () => {
       try {
-        console.log('=== LOADING DATA ===');
         
         // Check if we have cached events for instant display
         const cachedEvents = eventConfigService.getCachedEvents();
         const hasCachedData = cachedEvents && cachedEvents.length > 0;
         
         if (hasCachedData && isEffectValid()) {
-          console.log('⚡ Showing cached events instantly:', cachedEvents.length);
           // Auto-close full events even in cached data
           const cachedWithAutoClose = cachedEvents.map(event => {
             const isFull = event.current_registrations >= event.capacity;
@@ -349,7 +342,6 @@ const RegistrationForm = () => {
         let registeredIdsPromise;
         
         if (user?.id) {
-          console.log('🔄 Loading combos for user:', user.id);
           combosPromise = comboService.getActiveCombosForStudents(user.id).catch(err => {
             console.error('Failed to load combos:', err);
             return { success: false, data: [] };
@@ -358,7 +350,6 @@ const RegistrationForm = () => {
           // Fetch user's PAID combo purchases (SINGLE CALL - removed duplicate)
           const paidCombosPromise = comboService.getUserPaidCombos(user.id).then(result => {
             if (isEffectValid() && result.success) {
-              console.log('💳 User paid combos:', result.data.length);
               setUserPurchasedCombos(result.data);
             }
           }).catch(err => {
@@ -380,7 +371,6 @@ const RegistrationForm = () => {
                 .map(p => p.eventId)
             );
             if (isEffectValid()) {
-              console.log('💳 Pending payment events:', pendingEventIds.size, 'events');
               setPendingPaymentEvents(pendingEventIds);
             }
           }).catch(err => {
@@ -399,7 +389,6 @@ const RegistrationForm = () => {
               console.warn('Failed to load profile Please log in again.', err);
             });
         } else {
-          console.log('⚠️ No user - skipping combos');
           combosPromise = Promise.resolve({ success: false, data: [] });
           registeredIdsPromise = Promise.resolve(new Set());
         }
@@ -415,15 +404,10 @@ const RegistrationForm = () => {
           const eventsData = eventsResult?.data || [];
           const combosData = combosResult?.success ? (combosResult.data || []) : [];
           
-          console.log(`✅ [RegistrationForm] Effect #${currentEffectId} - Loaded ${eventsData.length} events`);
-          console.log(`✅ [RegistrationForm] Loaded ${combosData.length} combos`);
-          console.log(`✅ [RegistrationForm] Loaded ${registeredIds.size} registered event IDs`);
-          
           // Auto-close full events (frontend restriction)
           const eventsWithAutoClose = eventsData.map(event => {
             const isFull = event.current_registrations >= event.capacity;
             if (isFull && event.is_open) {
-              console.log(`🔒 Auto-closing full event: ${event.name} (${event.current_registrations}/${event.capacity})`);
               return { ...event, is_open: false };
             }
             return event;
@@ -435,8 +419,6 @@ const RegistrationForm = () => {
           setCombos(combosData);
           setRegisteredEventIds(registeredIds);
           setLoading(false);
-          
-          console.log('✅ [RegistrationForm] State updated successfully');
           
           dataLoadedRef.current = true;
         } else {
@@ -461,7 +443,6 @@ const RegistrationForm = () => {
     
     // Auth state listener for future changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('🔐 Auth changed:', event);
       if (!isEffectValid()) return;
       
       if (session?.user) {
@@ -501,13 +482,9 @@ const RegistrationForm = () => {
   useEffect(() => {
     // Handle team registration pre-selection
     if (teamRegistrationData && events.length > 0 && !preSelectApplied) {
-      console.log('Team registration data:', teamRegistrationData);
-      console.log('Looking for event:', teamRegistrationData.eventId);
       const matchedEvent = events.find(e => {
-        console.log('Checking event:', e.event_id, e.id);
         return e.id === teamRegistrationData.eventId || e.event_id === teamRegistrationData.eventId;
       });
-      console.log('Matched event:', matchedEvent);
       if (matchedEvent) {
         setRegistrationMode("team");
         setSelectedEvents([matchedEvent.id || matchedEvent.event_id]);
@@ -714,8 +691,6 @@ const RegistrationForm = () => {
           event_id: selectedEvents[0]
         };
 
-        console.log('💰 Fetching team amount preview:', body);
-
         const response = await fetch(`${apiUrl}/payment/calculate-team-amount`, {
           method: 'POST',
           headers: {
@@ -727,7 +702,6 @@ const RegistrationForm = () => {
         const result = await response.json();
         if (response.ok && result.success && typeof result.calculated_amount === 'number') {
           setCalculatedTeamAmount(result.calculated_amount);
-          console.log('✅ Team amount preview loaded:', result);
         } else {
           console.warn('⚠️ Failed to calculate team amount preview:', result);
         }
@@ -866,7 +840,6 @@ const RegistrationForm = () => {
       
       if (autoSelectEventIds.length > 0) {
         setSelectedEvents(autoSelectEventIds);
-        console.log('🎯 Auto-selected events from combo:', autoSelectEventIds);
       } else {
         setSelectedEvents([]); // Clear any previous selections
       }
@@ -882,14 +855,12 @@ const RegistrationForm = () => {
   const handleEventToggle = useCallback(async (eventId) => {
     // Check if event is already registered
     if (registeredEventIds.has(eventId)) {
-      console.log('Cannot select - event already registered');
       return;
     }
     
     // Find the event to get its category and details
     const event = events.find(e => e.id === eventId || e.event_id === eventId);
     if (!event) {
-      console.log('Event not found');
       return;
     }
     
@@ -902,7 +873,6 @@ const RegistrationForm = () => {
       
       // If trying to deselect a specific event, prevent it
       if (isSpecificEvent && selectedEvents.includes(eventId)) {
-        console.log('Cannot deselect - this event is required by the combo');
         return;
       }
       
@@ -929,7 +899,6 @@ const RegistrationForm = () => {
         
         // If quota limit exists and would be exceeded, prevent selection
         if (quotaLimit !== null && currentCount >= quotaLimit) {
-          console.log(`Cannot select - quota exceeded for ${eventCategory} (${currentCount}/${quotaLimit})`);
           return;
         }
       }
@@ -1117,7 +1086,6 @@ const RegistrationForm = () => {
           if (deleteError) {
             console.warn('Warning: Could not clear pending registrations:', deleteError);
           } else {
-             console.log('Cleared pending registrations for retry');
           }
         } catch (e) {
           console.warn('Error clearing pending payments:', e);
@@ -1149,15 +1117,11 @@ const RegistrationForm = () => {
         });
       }
 
-      console.log('Creating pending registrations with batch ID:', batchId, registrations);
-
       // Insert registrations with PENDING status
       const { data: insertedRegs, error: regError } = await supabase
         .from('event_registrations_config')
         .insert(registrations)
         .select();
-      
-      console.log('Insert result:', { insertedRegs, regError });
       
       if (regError) {
         console.error('Registration error:', regError);
@@ -1177,8 +1141,6 @@ const RegistrationForm = () => {
         
         throw new Error(regError.message || 'Failed to create registrations');
       }
-
-      console.log('✅ Pending registrations created successfully:', insertedRegs);
 
       // Step 2: Initiate payment via backend
       const bookingId = insertedRegs && insertedRegs.length > 0 ? insertedRegs[0].id : `REG_${Date.now()}`;
@@ -1350,8 +1312,6 @@ const RegistrationForm = () => {
       // Validate team events have team names
       const hasTeamEvents = selectedEventDetails.some(e => (e.min_team_size > 1 || e.max_team_size > 1));
       if (hasTeamEvents) {
-        console.log('🔍 Validating team events...');
-        console.log('teamDetailsMap:', teamDetailsMap);
         
         const invalidTeams = selectedEventDetails.filter(e => {
           const isTeam = (e.min_team_size > 1 || e.max_team_size > 1);
@@ -1359,11 +1319,8 @@ const RegistrationForm = () => {
           
           const eventId = e.id || e.event_id;
           const teamName = teamDetailsMap[eventId]?.teamName;
-          console.log(`Event ${e.name || e.event_name} (${eventId}): teamName = "${teamName}"`);
           return !teamName?.trim();
         });
-        
-        console.log('Invalid teams:', invalidTeams.map(e => e.name || e.event_name));
         
         if (invalidTeams.length > 0) {
           toast.error('Please enter team names for all team events', { duration: 4000, position: 'top-center' });
@@ -1415,8 +1372,6 @@ const RegistrationForm = () => {
         throw new Error('Invalid combo price');
       }
 
-      console.log('Combo purchase created:', { bookingId, totalAmount });
-
       toast.loading('Preparing payment...', {
         duration: 2000,
         position: 'top-center',
@@ -1424,25 +1379,18 @@ const RegistrationForm = () => {
 
       // Prepare team data for combo registrations
       const teamDataForCombo = {};
-      console.log('🔍 Preparing team data for combo...');
-      console.log('📋 teamDetailsMap:', teamDetailsMap);
-      console.log('📋 selectedEventDetails:', selectedEventDetails.map(e => ({ id: e.id, name: e.name, min_team_size: e.min_team_size, max_team_size: e.max_team_size })));
       
       selectedEventDetails.forEach(event => {
         const eventId = event.id || event.event_id;
         const isTeam = (event.min_team_size > 1 || event.max_team_size > 1);
-        console.log(`Event ${event.name}: eventId=${eventId}, isTeam=${isTeam}, hasDetails=${!!teamDetailsMap[eventId]}`);
         if (isTeam) {
           // Always add team event data, even if teamName is empty (for debugging)
           teamDataForCombo[eventId] = {
             teamName: teamDetailsMap[eventId]?.teamName || '',
             memberCount: parseInt(teamDetailsMap[eventId]?.memberCount || event.min_team_size || 2)
           };
-          console.log(`✅ Added team data for ${event.name}:`, teamDataForCombo[eventId]);
         }
       });
-      
-      console.log('📦 Final teamDataForCombo:', teamDataForCombo);
 
       // Step 3: Initiate payment via backend
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -1715,7 +1663,7 @@ const RegistrationForm = () => {
           registration_type: "team",
         },
         is_read: false,
-      }).then(() => console.log('Admin notification sent')).catch(e => console.warn('Notification failed:', e));
+      }).catch(e => console.warn('Notification failed:', e));
 
       toast.success(`Team Registration Successful! ${teamData.teamName} - ${teamData.memberCount} Members`, {
         duration: 5000,
@@ -1746,7 +1694,6 @@ const RegistrationForm = () => {
 
   // Handle Team Details Inputs
   const handleTeamDetailsChange = (eventId, field, value) => {
-    console.log(`📝 Team details changed: eventId=${eventId}, field=${field}, value=${value}`);
     setTeamDetailsMap(prev => {
       const newMap = {
         ...prev,
@@ -1755,7 +1702,6 @@ const RegistrationForm = () => {
           [field]: value
         }
       };
-      console.log('📋 Updated teamDetailsMap:', newMap);
       return newMap;
     });
   };

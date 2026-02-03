@@ -68,7 +68,7 @@ export const pendingPaymentService = {
       const pendingPayments = this.getPendingPayments();
       const filtered = pendingPayments.filter(p => p.bookingId !== bookingId);
       localStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(filtered));
-      console.log('✅ Removed pending payment for booking:', bookingId);
+
     } catch (error) {
       console.error('Error removing pending payment:', error);
     }
@@ -83,7 +83,7 @@ export const pendingPaymentService = {
       const pendingPayments = this.getPendingPayments();
       const filtered = pendingPayments.filter(p => p.userId !== userId);
       localStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(filtered));
-      console.log('🗑️ Cleared pending payments for user:', userId);
+
     } catch (error) {
       console.error('Error clearing pending payments:', error);
     }
@@ -104,7 +104,7 @@ export const pendingPaymentService = {
       });
       
       localStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(filtered));
-      console.log('🧹 Cleared expired pending payments');
+
     } catch (error) {
       console.error('Error clearing expired payments:', error);
     }

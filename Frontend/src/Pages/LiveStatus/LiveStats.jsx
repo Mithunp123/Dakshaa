@@ -384,7 +384,7 @@ const LiveStats = () => {
   };
 
   const fetchStatsFallback = async () => {
-    console.log("Using fallback stats fetch...");
+
     try {
         // Fallback method using head count
         // Using event_registrations_config as it seems to be the main table now

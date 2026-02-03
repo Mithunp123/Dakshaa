@@ -197,11 +197,7 @@ const SignUpForm = () => {
         if (formData.referredBy && formData.referredBy.trim() !== '') {
           const referralResult = await trackReferralCode(formData.referredBy);
           if (referralResult.success) {
-            if (referralResult.alreadyExists) {
-              console.log('✓ Referral code already tracked:', referralResult.data);
-            } else {
-              console.log('✓ New referral code tracked with count=0:', referralResult.data);
-            }
+            // Referral code tracked successfully
           } else {
             console.warn('⚠️ Failed to track referral code:', referralResult.error);
             // Don't block signup if referral tracking fails

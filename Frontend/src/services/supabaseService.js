@@ -125,8 +125,6 @@ export const supabaseService = {
         transaction_id: paymentId || null, // Set transaction ID when payment is processed
       }));
 
-      console.log("Attempting to insert registrations:", registrations);
-
       const { data, error } = await supabase
         .from("event_registrations_config")
         .insert(registrations)
@@ -141,7 +139,6 @@ export const supabaseService = {
         throw error;
       }
 
-      console.log("Registration successful:", data);
       return data;
     } catch (err) {
       console.error("Registration service error:", err);
@@ -245,7 +242,6 @@ export const supabaseService = {
       const allTeamIds = [...new Set([...ownedTeamIds, ...memberTeamIds])];
 
       if (allTeamIds.length === 0) {
-        console.log("No teams found for user:", userId);
         return [];
       }
 
@@ -266,19 +262,13 @@ export const supabaseService = {
         }
       }
       
-      console.log("Teams before filter:", teams.map(t => ({ id: t.id, name: t.team_name, is_active: t.is_active })));
-
       // Filter teams: Only show active teams in dashboard
       // This prevents teams created during payment (but payment not completed) from showing
       teams = teams.filter(team => team.is_active === true);
       
-      console.log("Teams after is_active filter:", teams.map(t => ({ id: t.id, name: t.team_name, is_active: t.is_active })));
-
       if (!teams || teams.length === 0) {
         return [];
       }
-
-      console.log("Found teams:", teams.length);
 
       // Get event IDs for fetching event details
       const eventIds = [...new Set(teams.map(t => t.event_id).filter(Boolean))];

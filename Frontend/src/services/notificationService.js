@@ -486,7 +486,6 @@ const notificationService = {
    */
   syncTeamMemberRegistrations: async (team) => {
     try {
-      console.log('🔄 syncTeamMemberRegistrations called for team:', team?.name, team);
       
       if (!team) {
         console.log('❌ No team provided');
@@ -497,7 +496,6 @@ const notificationService = {
       console.log('👥 Team members:', memberUserIds.length, memberUserIds);
       
       if (memberUserIds.length === 0) {
-        console.log('❌ No members in team');
         return;
       }
 

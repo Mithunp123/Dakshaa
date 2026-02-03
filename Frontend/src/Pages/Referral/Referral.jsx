@@ -26,7 +26,6 @@ const Referral = () => {
         .eq('referral_id', referralCode.trim().toUpperCase())
         .maybeSingle();
 
-      console.log('Supabase response:', { data, error });
 
       if (error) {
         console.error('Error fetching referral:', error);

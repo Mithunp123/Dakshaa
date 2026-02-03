@@ -78,11 +78,6 @@ const Login = () => {
   const wantsToRegister = registerFromUrl || location.state?.wantsToRegister;
   const eventId = eventIdFromUrl || location.state?.eventId;
   
-  // Debug logging only in development
-  if (import.meta.env.DEV) {
-    console.log('🔐 Login page loaded - wantsToRegister:', wantsToRegister, 'eventId:', eventId);
-  }
-
   // Check for email verification success from URL
   useEffect(() => {
     const checkEmailVerification = async () => {
@@ -109,9 +104,6 @@ const Login = () => {
                 fullName: userData.user.user_metadata?.full_name || 'User'
               })
             });
-            if (import.meta.env.DEV) {
-              console.log('✅ Welcome email sent after verification');
-            }
           } catch (emailError) {
             if (import.meta.env.DEV) {
               console.error('Failed to send welcome email:', emailError);
@@ -156,16 +148,6 @@ const Login = () => {
     }
 
     if (data?.user) {
-      // Debug logging only in development
-      if (import.meta.env.DEV) {
-        console.log('🔐 User login data:', {
-          email: data.user.email,
-          email_confirmed_at: data.user.email_confirmed_at,
-          confirmed: !!data.user.email_confirmed_at,
-          created_at: data.user.created_at
-        });
-      }
-      
       // Check if email is verified
       if (!data.user.email_confirmed_at) {
         console.error('❌ Email not verified! Blocking login.');
@@ -175,10 +157,6 @@ const Login = () => {
         return;
       }
       
-      if (import.meta.env.DEV) {
-        console.log('✅ Email verified, proceeding with login');
-      }
-
       // Clear all cached data to ensure fresh load after login
       try {
         // Clear event cache
@@ -189,9 +167,6 @@ const Login = () => {
         sessionStorage.removeItem('userProfile');
         // Clear combos cache
         localStorage.removeItem('dakshaa_combos_cache');
-        if (import.meta.env.DEV) {
-          console.log('🧹 Cleared all cached data for fresh login');
-        }
       } catch (e) {
         if (import.meta.env.DEV) {
           console.warn('Failed to clear cache:', e);
@@ -225,9 +200,6 @@ const Login = () => {
       // Wait briefly to show success state, then redirect
       setTimeout(() => {
         // Use the values from URL params or state that were captured at component level
-        if (import.meta.env.DEV) {
-          console.log('🔄 Redirect check - wantsToRegister:', wantsToRegister, 'eventId:', eventId, 'returnTo:', returnTo, 'role:', role);
-        }
         
         // Redirect based on role
         if (role === 'super_admin') {
@@ -242,9 +214,6 @@ const Login = () => {
           // For students, ALWAYS check registration intent first
           if (wantsToRegister) {
             // User wanted to register for events, redirect to register-events page
-            if (import.meta.env.DEV) {
-              console.log('✅ Redirecting to register-events with eventId:', eventId);
-            }
             navigate('/register-events', { 
               state: eventId ? { selectedEventId: eventId } : undefined 
             });
