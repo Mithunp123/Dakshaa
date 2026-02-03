@@ -317,6 +317,7 @@ const conferences = [
           "Production Planning, Industrial Safety and Reliability",
           "Robotics, Mechatronics and Control Systems",
           "Mechanical Engineering for Industry, Society and Sustainability",
+          "Sustainability and Renewable energy",
         ]
       },
       {
@@ -379,7 +380,7 @@ const conferences = [
             email: "",
           },
           {
-            name: "Dr J .Abdul Bari",
+            name: "Dr J .Abdul Bari -(Civil)",
             phone: "+91 99650 10625",
             email: "",
           },
@@ -408,6 +409,12 @@ const conferences = [
           },{
             name:"Mr.R.C.Sathyanarayanan",
             phone:"+91 73730 46996",
+          },{
+            name : "Mr.R.Vinothkumar - Civil",
+            phone:"+91 63826 50977",
+          },{
+            name : "Ms.B.Dhiyasri - Civil",
+            phone:"+91 90256 34058",
           }
         ],
       },

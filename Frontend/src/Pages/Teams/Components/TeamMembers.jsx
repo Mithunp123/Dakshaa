@@ -30,6 +30,24 @@ import des2 from "../../../assets/team_members/des2.webp";
 import des3 from "../../../assets/team_members/des3.webp";
 import kavi from "../../../assets/team_members/kavi.webp";
 
+
+//event coordinators
+/*
+import ec1 from "../../../assets/team_members/ec1.png";
+import ec2 from "../../../assets/team_members/ec2.jpg";
+import ec3 from "../../../assets/team_members/ec3.jpeg"
+import ec4 from "../../../assets/team_members/ec4.jpg"
+import ec5 from "../../../assets/team_members/ec5.png"
+import ec6 from "../../../assets/team_members/ec6.jpeg"
+import ec7 from "../../../assets/team_members/ec7.jpg"
+import ec8 from "../../../assets/team_members/ec8.png"
+import ec9 from "../../../assets/team_members/ec9.jpeg"
+import ec10 from "../../../assets/team_members/ec10.jpg"
+import ec11 from "../../../assets/team_members/ec11.heic"
+import ec12 from "../../../assets/team_members/ec12.jpg"
+import ec13 from "../../../assets/team_members/ec13.jpg"
+import ec14 from "../../../assets/team_members/ec14.jpg";*/
+
 const chiefCoordinator = [
    { id: 14, name: "Kavinesh", department: "", img: kavinesh, role: "AEVA", phone: "+91 94892 43775", associationLogo: aevaLogo },
 ];
@@ -51,8 +69,22 @@ const jointCoordinators = [
 
 
 const eventCoordinators = [
-  //{ id: 11, name: "Vignesh", department: "Department of IT", img: vignesh, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
-  //{ id: 16, name: "Ajay", department: "Department of CSE", img: ajay, role: "Event Coordinator", phone: "+91 93446 36553", associationLogo: aevaLogo },
+  /*{ id: 101, name: "Vignesh", department: "Department of IT", img: ec1, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+    { id: 102, name: "Vignesh", department: "Department of IT", img: ec2, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+  { id: 103, name: "Vignesh", department: "Department of IT", img: ec3, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+  { id: 104, name: "Vignesh", department: "Department of IT", img: ec4, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+  { id: 105, name: "Vignesh", department: "Department of IT", img: ec5, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+  { id: 106, name: "Vignesh", department: "Department of IT", img: ec6, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+  { id: 107, name: "Vignesh", department: "Department of IT", img: ec7, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+  { id: 108, name: "Vignesh", department: "Department of IT", img: ec8, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+  { id: 109, name: "Vignesh", department: "Department of IT", img: ec9, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+  { id: 110, name: "Vignesh", department: "Department of IT", img: ec10, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+  { id: 111, name: "Vignesh", department: "Department of IT", img: ec11, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+  { id: 112, name: "Vignesh", department: "Department of IT", img: ec12, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+
+  { id: 113, name: "Vignesh", department: "Department of IT", img: ec13, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+    { id: 114, name: "Vignesh", department: "Department of IT", img: ec14, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },*/
+
 ];
 
 const developers = [
