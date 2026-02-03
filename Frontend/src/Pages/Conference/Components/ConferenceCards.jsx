@@ -140,6 +140,9 @@ const ConferenceCard = ({ name, title, image, description }) => {
                     </div>
                   )}
 
+
+                  
+
                   {/* Description if available */}
                   {description && (
                     <div className="mt-4">

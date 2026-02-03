@@ -30,13 +30,13 @@ export const exposAndShowsDetails = [
           name: "Mr.J.N.Ravindra",
           department: "Mechanical",
           phone: "+91 95975  94597",
-          email: "",
+        
         },
         {
           name: "Mr.P.Sree Prahajeeth",
           department: "Mechanical",
           phone: "+91 86108 81422",
-          email: "",
+          
         },
         
       ],
@@ -53,6 +53,32 @@ export const exposAndShowsDetails = [
     price: "Free",
     registrationLink: "",
     schedule: [],
+     contact: {
+      facultyCoordinator: [
+        {
+          name: "Dr.P.Mohanram",
+          phone: "+91 98425 58121 ",
+        },
+        {
+          name:"Mr.R.Vivek",
+          phone:"+91 72004 58826",
+
+        },
+      ],
+      studentCoordinator: [
+        {
+          name: "Mr.S.I.Pon subra Balan",
+          phone: "+91 99948 20486 ",
+         
+        },
+        {
+          name: "Mr.B.Kishore",
+          phone: "+91 63799 76344 ",
+         
+        },
+        
+      ],
+    },
     
   },
 

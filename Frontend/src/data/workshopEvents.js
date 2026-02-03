@@ -137,7 +137,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "AB Lab 2",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
         
@@ -187,7 +187,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "AB Lab 3",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
        
@@ -247,7 +247,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "Dr. M S Swaminathan Biotech Seminar Hall",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
        
@@ -296,7 +296,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "Civil CADD Laboratory",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
         location: "Civil CADD Laboratory",
@@ -333,7 +333,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "AB LAB-4",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
         
@@ -376,7 +376,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "IT PARK (CSE LAB 1)",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
        
@@ -411,7 +411,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "Embedded Lab (Main Building)",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
         
@@ -445,7 +445,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "EEE Project Lab",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
         
@@ -483,7 +483,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "Baking and Confectionery Laboratory",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
        
@@ -521,7 +521,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "PTC Conference Hal",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
        
@@ -556,7 +556,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "IT LAB 1",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
         
@@ -595,7 +595,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "PLC Laboratory",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
       
@@ -633,7 +633,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "Bhaskara Block [Mechanical]",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
         
@@ -675,7 +675,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "MBA Seminar Hall",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
         
@@ -719,7 +719,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "VLSI Lab, J Block 1st Floor",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
        
@@ -772,7 +772,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "MCA Laboratory",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
         
@@ -827,7 +827,7 @@ export const workshopDetails = [
     date: "February 12, 2026",
     venue: "UiPath Laboratory, IT PARK",
     department: "Workshop",
-    price: "₹300",
+    price: "₹300 per member",
     schedule: [
       {
         

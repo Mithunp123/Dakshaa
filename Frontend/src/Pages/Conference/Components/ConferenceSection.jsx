@@ -19,10 +19,48 @@ const conferences = [
     department: "School of Life Sciences",
     description:
       "National Conference on Transforming Life Sciences through AI and Smart Technologies aims to provide a scholarly platform for students, researchers, and academicians to present innovative research and interdisciplinary advancements that integrate life sciences with emerging smart technologies such as Artificial Intelligence, Machine Learning, IoT, Data Analytics, Automation, and Digital Health. The conference promotes knowledge exchange, research collaboration, and dissemination of high-quality scientific work.",
-    topics: [
-      "Transforming Life Sciences through AI and Smart Technologies",
+    tracks: [
+      {
+        name: "Biotechnology",
+        topics: [
+          "AI-Driven Drug Discovery and Precision Therapeutics",
+          "Smart Diagnostics and Digital Health",
+          "Computational Biology and Bioinformatics",
+          "Automation, Robotics, and Smart Laboratories",
+          "AI in Genomics and Personalized Medicine",
+          "Smart Bioprocessing and Industrial Biotechnology",
+          "AI for Environmental and Agricultural Life Sciences"
+        ]
+      },
+      {
+        name: "Food Technology",
+        topics: [
+          "Innovative Food Processing Techniques",
+          "Sustainable & Green Food Technologies",
+          "Future Foods and Alternative Protein Sources",
+          "Food Safety and Fermentation Technologies",
+          "Eco-friendly & Smart Food Packaging"
+        ]
+      },
+      {
+        name: "Textile Technology",
+        topics: [
+          "Sustainability in the Textile Industry: An Overview",
+          "Recent Trends and Innovations in Textile Technology",
+          "Textile Waste: Problems, Solutions, and Opportunities",
+          "Smart Textiles: Concepts and Everyday Applications",
+          "Eco-Friendly Practices in Textile Manufacturing",
+          "Future Scope of Textile Engineering in a Sustainable World"
+        ]
+      }
     ],
-    rules: [
+    note:[  
+      "All submitted papers must have plagiarism below 5% as per standard guidelines.",
+      "Please attach the payment confirmation email received during conference registration while submitting your paper.",
+      "Paper should be mailed to :  dakshaaslsnc@ksrct.ac.in",
+
+    ],
+     rules: [
       "A paper may be authored by one or two members only.",
       "Participants may submit either an Abstract or a Full Paper.",
       "Full papers meeting the prescribed standards will be published in the Conference Proceedings.",
@@ -40,6 +78,13 @@ const conferences = [
       "Academicians",
 
     ],
+
+    templete_link:[
+      "Paper Template Download Link : https://drive.google.com/drive/folders/1rxX4vEv9-B2QKS1cZhu_uewq8lCy7Jnf ",
+
+    ],
+
+    
     registrationdetails:[
       " Including one author per paper : ₹300",
       " Additional author per head : ₹150",
@@ -105,10 +150,23 @@ const conferences = [
      "Present on time according to your assigned slot.",
      "E-Certificates will be given only to those who participate and present their Papers",
     ],
+
+    note:[  
+      "All submitted papers must have plagiarism below 5% as per standard guidelines.",
+      "Please attach the payment confirmation email received during conference registration while submitting your paper.",
+      "Paper should be mailed to : dakshaasesnc@ksrct.ac.in ",
+    ],
+
+    templete_link:[
+      "Paper Template Download Link : https://drive.google.com/drive/folders/1rxX4vEv9-B2QKS1cZhu_uewq8lCy7Jnf ",
+
+    ],
     
+
     registrationdetails:[
       "Rs300 (Per Paper + 1 Author) + Rs150 (Per Co-Author)",
     ],
+
     date: "12 February 2026",
     venue: "Gallery Hall (Main Building)",
     registrationFee: "₹300",
@@ -158,12 +216,22 @@ const conferences = [
       "Incident Response and Forensics",
       "AI for Cybersecurity Policy and Governance",
       "Explainable AI (XAI) for Cybersecurity",
+      "Networking Protocols and Security",
     ],
     eligibility: [
       "Undergraduate (UG) and Postgraduate (PG) Students",
       "Research Scholars",
       "Academicians",
 
+    ],
+    note:[  
+      "All submitted papers must have plagiarism below 5% as per standard guidelines.",
+      "Please attach the payment confirmation email received during conference registration while submitting your paper.",
+      "Paper should be mailed to :  dakshaascsnc@ksrct.ac.in",
+
+    ],
+    templete_link:[
+      "Paper Template Download Link : https://drive.google.com/drive/folders/1rxX4vEv9-B2QKS1cZhu_uewq8lCy7Jnf ",
     ],
     rules: [
       "A paper may be authored by one or two members only.",
@@ -177,7 +245,7 @@ const conferences = [
       "The Organizing Committee’s decision shall be final in all matters related to acceptance and publication.",
 
     ],
-    registrationdetails:[
+    registrationdetails: [
       " Including one author per paper : ₹300",
       " Additional author per head : ₹150",
     ],
@@ -187,59 +255,99 @@ const conferences = [
     contact: {
         facultyCoordinator: [ 
           {
-            name: "Dr.C.Nallusamy",
-            phone: "+91 87542 54805",
+            name: "Mr K.C.Mohanraj",
+            phone: "+91 98427 93086",
             email: "",
           },
         ],
+          
         studentCoordinator: [
-      
+          {
+            name: "M PuPathee ",
+            phone: "+91 91501 35736",
+          },
+          {
+            name : "R Harshavarthini ",
+            phone:"+91 93454 01967"
+          }
         ],
       },
   },
-
+  
   {
     id: 4,
     img: mechcon,
-    title: "Advanced Engineering Applications and AI",
-    shortTitle: "Advanced Engineering & AI",
+    title: "Innovations in Smart and Green Intelligent Engineering Systems",
+    shortTitle: "Innovations in Smart and Green Intelligent Engineering Systems",
     department: "SCHOOL OF BUILDING & MECHANICAL SCIENCE",
     description:
       "The National Conference serves as a platform for students, researchers, academicians, and industry professionals to present and exchange ideas, research outcomes, and technological innovations in the field of Mechanical Engineering. The event aims to encourage technical discussions, promote knowledge sharing, and foster collaboration between academia and industry. It highlights recent advancements, practical engineering solutions, and emerging technologies that contribute to sustainable development and industrial progress, while helping participants gain insights into current trends and future challenges in the engineering domain.",
-    topics: [
-      "Sustainable & Green Engineering ",
-        "Additive Manufacturing and Advanced Materials",
-        "Digital Manufacturing, Automation and Robotics ",
-        "Advances in Automotive Engineering and Vehicle Dynamics",
-        "Tribology, Wear and Surface Engineering",
-        "Innovations in Machine Design and Optimization",
-        "Computational Fluid Dynamics (CFD) in Engineering Applications",
-        "Production Planning, Industrial Safety and Reliability",
-        "Mechanical Engineering for Industry, Society and Sustainability",
-        "Sensors and Transducers in Mechatronics Systems",
-        "Actuators and Drives in Automation",
-        "Robotics: Basic Structure, Types, and Applications",
-        "Human–Machine Interface (HMI) in Industrial Systems",
-        "IoT in Mechatronics Engineering",
-        "Mechatronics in Smart and Intelligent Systems",
-        "Mechatronics in Industry 4.0",
-        "Flight Control Systems in Drones",
-        "Smart Water Resources and Water Management ",
-        "Environmental Protection and Waste Management Technologies",
-        "Green and Sustainable Transportation Systems",
-        "Earthquake-Resistant and Safe Structures",
-        "Smart Cities and Urban Infrastructure Development",
-        "Use of GIS and Remote Sensing in Civil Engineering",
-        "Advanced Construction Materials and Management Practices"
-    ],
+    
+    tracks: [
+      {
+        name: "Department of Mechatronics Engineering",
+        topics: [
+          "Sensors and Transducers in Mechatronics Systems",
+          "Actuators and Drives in Automation",
+          "Basics of Industrial Automation using PLC",
+          "Embedded Systems in Mechatronics Applications",
+          "Robotics: Basic Structure, Types, and Applications",
+          "Human–Machine Interface (HMI) in Industrial Systems",
+          "Basics of Pneumatic and Hydraulic Control Systems",
+          "IoT in Mechatronics Engineering",
+          "Mechatronics in Smart and Intelligent Systems",
+          "Mechatronics in Industry 4.0",
+          "Aerodynamics of Multirotor Drones",
+          "Flight Control Systems in Drones",
+        ]
+      },
+      {
+        name:"Department of Mechanical Engineering",
+        topics: [
+          "Sustainable & Green Engineering",
+          "Design Optimization and Finite Element Analysis",
+          "Sustainable & Green Engineering",
+          "Additive Manufacturing and Advanced Materials",
+          "Digital Manufacturing, Automation and Robotics",
+          "Advances in Automotive Engineering and Vehicle Dynamics",
+          "Smart Materials and Structures",
+          "Tribology, Wear and Surface Engineering",
+          "Innovations in Machine Design and Optimization",
+          "Computational Fluid Dynamics (CFD) in Engineering Applications",
+          "Production Planning, Industrial Safety and Reliability",
+          "Robotics, Mechatronics and Control Systems",
+          "Mechanical Engineering for Industry, Society and Sustainability",
+        ]
+      },
+      {
+        name : "Department of Civil Engineering",
+        topics: [
+          "Sustainable and Climate-Resilient Infrastructure",
+          "Smart Water Resources and Water Management",
+          "Environmental Protection and Waste Management Technologies",
+          "Green and Sustainable Transportation Systems",
+          "Earthquake-Resistant and Safe Structures",
+          "Modern Geotechnical Engineering for Safe Foundations",
+          "Smart Cities and Urban Infrastructure Development",
+          "Use of GIS and Remote Sensing in Civil Engineering",
+          "Advanced Construction Materials and Management Practices",
+          "Application of AI and Digital Technologies in Civil Engineering",
+        ]
+      }
 
+    ],
 
     templete_link:[
       "Paper Template Download Link : https://drive.google.com/drive/folders/1rxX4vEv9-B2QKS1cZhu_uewq8lCy7Jnf ",
 
     ],
 
-    
+    note:[  
+      "All submitted papers must have plagiarism below 5% as per standard guidelines.",
+      "Please attach the payment confirmation email received during conference registration while submitting your paper.",
+      "Paper should be mailed to :  dakshaasbmsnc@ksrct.ac.in",
+
+    ],
 
     rules: [
     
@@ -271,9 +379,17 @@ const conferences = [
             email: "",
           },
           {
-            name: "Dr. G. VENKATACHALAM",
-            phone: "91+ 94423 35001 ",
+            name: "Dr J .Abdul Bari",
+            phone: "+91 99650 10625",
             email: "",
+          },
+          {
+            name: "Mr.M.Sanjay",
+            phone:"+91 63825 66247"
+          },
+          {
+            name:"Mr.P.Prakash",
+            phone:"+91 "
           }
         ],
         studentCoordinator: [
@@ -285,6 +401,13 @@ const conferences = [
           {
             name : "Mr. S. Narayanakumar ",
             phone:"+91 93445 22384 "
+          },
+          {
+            name:"Mr.P.A. Sathananth",
+            phone:"+91 63694 12252",
+          },{
+            name:"Mr.R.C.Sathyanarayanan",
+            phone:"+91 73730 46996",
           }
         ],
       },
@@ -321,17 +444,11 @@ const ConferenceSection = () => {
         </p>
         <div className="space-y-2">
           <p className="text-base sm:text-xl font-semibold">
-            <Mail className="inline w-5 h-5 mr-2" />
-            <span className="text-gray-300">Mail your abstract and conference paper to:</span>{" "}
-            <span className="text-primary font-bold">ncistemm@ksrct.ac.in</span><br></br><br></br>
+         
             {/*<span className="text-gray-300">Note : </span>*/}
 
           </p>
-          <p className="text-base sm:text-xl font-semibold">
-            <Phone className="inline w-5 h-5 mr-2" />
-            <span className="text-gray-300">Phone:</span>{" "}
-            <span className="text-primary font-bold">+91 9943442987</span>
-          </p>
+          
         </div>
       </motion.div>
 
@@ -573,11 +690,11 @@ const ConferenceSection = () => {
                 </div>
               )}
 
-              {/* Note Section */}
+              {/* Template Link Section */}
               {selectedConference.templete_link && Array.isArray(selectedConference.templete_link) && selectedConference.templete_link.length > 0 && (
                 <div className="mb-8">
                   <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
-                    Note
+                    Template
                   </h3>
                   <div className="grid grid-cols-1 gap-3">
                     {selectedConference.templete_link.map((note, idx) => {
@@ -613,6 +730,29 @@ const ConferenceSection = () => {
                         </motion.div>
                       );
                     })}
+                  </div>
+                </div>
+              )}
+
+              {/* Note Section */}
+              {selectedConference.note && Array.isArray(selectedConference.note) && selectedConference.note.length > 0 && (
+                <div className="mb-8 border-2 border-secondary bg-secondary/10 p-6 shadow-lg shadow-secondary/20">
+                  <h3 className="text-xl font-bold text-secondary mb-4 border-l-4 border-secondary pl-4">
+                    📧 Important Note - Paper Submission
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {selectedConference.note.map((noteItem, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="flex items-start gap-2 text-white"
+                      >
+                        <span className="text-secondary mt-1 font-bold">▸</span>
+                        <span className="text-sm font-medium">{noteItem}</span>
+                      </motion.div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -664,22 +804,28 @@ const ConferenceSection = () => {
                 </div>
               )}
 
-              {/* Contact Information */}
-              <div className="border-2 border-primary/30 bg-primary/5 p-5 mb-8">
-                <p className="text-white/60 text-sm uppercase tracking-widest mb-3">
-                  General Contact Information
-                </p>
-                <div className="flex flex-col gap-2 text-white/90">
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-primary" />
-                    <span className="text-sm">ncistemm@ksrct.ac.in</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-primary" />
-                    <span className="text-sm">+91 9943442987</span>
+              {/* General Contact Information */}
+              {selectedConference.generalContact && (
+                <div className="border-2 border-primary/30 bg-primary/5 p-5 mb-8">
+                  <p className="text-white/60 text-sm uppercase tracking-widest mb-3">
+                    General Contact Information
+                  </p>
+                  <div className="flex flex-col gap-2 text-white/90">
+                    {selectedConference.generalContact.email && (
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-primary" />
+                        <span className="text-sm">{selectedConference.generalContact.email}</span>
+                      </div>
+                    )}
+                    {selectedConference.generalContact.phone && (
+                      <div className="flex items-center gap-2">
+                        <Phone className="w-4 h-4 text-primary" />
+                        <span className="text-sm">{selectedConference.generalContact.phone}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Registration Button */}
               <button

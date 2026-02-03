@@ -17,6 +17,7 @@ import Tech21 from "../assets/EventsImages/EventDetails/TechnicalImages/vlsi_tec
 import Tech22 from "../assets/EventsImages/EventDetails/TechnicalImages/ft_tech1.webp";
 import Tech23 from "../assets/EventsImages/EventDetails/TechnicalImages/ece_tech1.webp";
 import Tech24 from "../assets/EventsImages/EventDetails/TechnicalImages/cody.webp";
+import Tech25 from "../assets/EventsImages/EventDetails/TechnicalImages/rcrace.webp";
 
 export const technicalDetails = [
   {
@@ -939,6 +940,11 @@ export const technicalDetails = [
           
           phone: "+91 96003 52820",
         },
+        {
+          name:"Mr.G.Harish Bhuvan",
+          phone:"+91 79047 70062",
+
+        },
       ],
     },
     registrationLink: "",
@@ -1434,6 +1440,10 @@ export const technicalDetails = [
           name: "Naveen J",
           phone: "+91 90801 21928",
         },
+        {
+          name : " Mohmmad Hazil S ",
+          phone : "+91 94439 07876",
+        },
       ],
     },
     registrationLink: "",
@@ -1519,6 +1529,80 @@ export const technicalDetails = [
     importantText: [
       "Do Register here after the completion of the payment to gain the access for MATLAB platform ",
     ],
+    registrationLink: "",
+  },
+
+  {
+    id: "tech-rcrace",
+    shortTitle: "RC Race",
+    title: "RC Race",
+    description: "RC Race is an exciting competition where participants control a remote-controlled vehicle and race it on a specially designed track. The objective is to complete the track in the least possible time while maintaining control of the vehicle. The event is designed for fun, speed, and thrill, making it enjoyable for both participants and spectators. No technical background is required.",
+    img: Tech25,
+    date: "February 13, 2026",
+    venue: " Ground (Near MCT)",
+    department: "Technical Events",
+    price: "₹ 500 per team",
+    rules: [
+      "Each participant/team will be provided a fixed time to complete the race.",
+      "The vehicle must stay within the track boundaries at all times.",
+      "Touching or lifting the vehicle during the race may result in a penalty.",
+      "If the vehicle goes off track, it must be placed back at the last checkpoint.",
+      "Any form of intentional damage or unsafe driving will lead to disqualification.",
+      "Judges’ decisions will be final and binding.",
+      "Individual participation or team of up to 2 members.",
+     
+       ],
+    /*rewards: [
+         {
+          position: "1st Prize",
+          emoji: "🥇",
+          amount: "₹ 5,000",
+        },
+        {
+          position: "2nd Prize",
+          emoji: "🥈",
+          amount: "₹3,000",
+        },
+       
+        {
+          position: "3rd Prize",
+          emoji: "🥉",
+          amount: "₹2,000",
+        },
+      ],
+      */
+
+
+
+
+  
+
+    schedule: [
+      {
+        date: "February 13, 2026",
+        time: "9:00 AM - 4:00 PM",
+        location: "	Ground (Near MCT)",
+      },
+    ],
+    contact: {
+      facultyCoordinator: [
+        {
+          name: "Mr. R. Vivek",
+          phone: "+91 72004 58826",
+        },
+      ],
+      studentCoordinator: [
+        {
+          name: "Mr. M. Boopathi",
+          phone: "+91 63829 91202",
+        },
+        {
+          name: "	Ms. P. Nisha",
+          phone: "+91 86676 40012",
+        },
+        
+      ],
+    },
     registrationLink: "",
   },
 

@@ -985,7 +985,7 @@ export const nonTechnicalDetails = [
           name: "Mrs. V. Indumathi",
           department: "",
           phone: "+91 99651 37001",
-          email: "indhumathi@ksrct.ac.in",
+          email: "indumathi@ksrct.ac.in",
         },
       ],
       studentCoordinator: [
@@ -1320,7 +1320,7 @@ export const nonTechnicalDetails = [
       {
         position: "3rd Prize",
         emoji: "🥉",
-        amount: "₹1,000",
+        amount: "₹1,500",
       },
     ],
     rules: [

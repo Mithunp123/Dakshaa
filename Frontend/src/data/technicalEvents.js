@@ -22,7 +22,7 @@ import Tech21 from "../assets/EventsImages/EventDetails/TechnicalImages/vlsi_tec
 import Tech22 from "../assets/EventsImages/EventDetails/TechnicalImages/ft_tech1.webp";
 import Tech23 from "../assets/EventsImages/EventDetails/TechnicalImages/ece_tech1.webp";
 import Tech24 from "../assets/EventsImages/EventDetails/TechnicalImages/cody.webp";
-
+import Tech25 from "../assets/EventsImages/EventDetails/TechnicalImages/rcrace.webp";
 
 
 export const technicalEvents = [
@@ -147,5 +147,10 @@ export const technicalEvents = [
     eventId: "tech-cody",
     price: 250,
   },
+  {
+    image: Tech25,
+    eventId: "tech-rcrace",
+    price: 250,
+  }
   
 ];
