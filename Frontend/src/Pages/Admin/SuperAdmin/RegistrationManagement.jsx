@@ -42,6 +42,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [downloadingReport, setDownloadingReport] = useState(false);
+  const [downloadingOverallReport, setDownloadingOverallReport] = useState(false);
   
   // New states for registration counts
   const [registrationCounts, setRegistrationCounts] = useState({
@@ -529,6 +530,183 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
     }
   };
 
+  // Generate Overall Report for All Assigned Events
+  const generateOverallReport = async () => {
+    if (eventStats.length === 0) {
+      alert('No events available to generate report');
+      return;
+    }
+
+    setDownloadingOverallReport(true);
+    try {
+      const doc = new jsPDF('landscape', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+
+      // Load logos as base64 with high quality
+      const loadImageAsBase64 = (url) => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'Anonymous';
+          img.onload = () => {
+            const scale = 4;
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+            ctx.scale(scale, scale);
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+            resolve({
+              data: canvas.toDataURL('image/png', 1.0),
+              width: img.width,
+              height: img.height
+            });
+          };
+          img.onerror = () => resolve(null);
+          img.src = url;
+        });
+      };
+
+      // Load logos
+      const dakshaaLogoData = await loadImageAsBase64(logo1);
+      const ksrctLogoData = await loadImageAsBase64(ksrctLogo);
+
+      // Header vertical center baseline
+      const headerY = 22;
+      
+      // KSRCT logo (left)
+      if (ksrctLogoData) {
+        const logoHeight = 30;
+        const aspectRatio = ksrctLogoData.width / ksrctLogoData.height;
+        const logoWidth = logoHeight * aspectRatio;
+        doc.addImage(ksrctLogoData.data, 'PNG', 14, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+      }
+      
+      // Dakshaa logo (right)
+      if (dakshaaLogoData) {
+        const logoHeight = 30;
+        const aspectRatio = dakshaaLogoData.width / dakshaaLogoData.height;
+        const logoWidth = logoHeight * aspectRatio;
+        doc.addImage(dakshaaLogoData.data, 'PNG', pageWidth - logoWidth - 14, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+      }
+      
+      // Header text block (centered)
+      doc.setFontSize(20);
+      doc.setTextColor(26, 54, 93);
+      doc.setFont('helvetica', 'bold');
+      doc.text('K.S.Rangasamy College of Technology', pageWidth / 2, headerY - 5, { align: 'center' });
+      doc.setFontSize(12);
+      doc.setTextColor(230, 126, 34);
+      doc.text('AUTONOMOUS | TIRUCHENGODE', pageWidth / 2, headerY + 2, { align: 'center' });
+      doc.setFontSize(16);
+      doc.setTextColor(197, 48, 48);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Dakshaa 2025 - Overall Registration Report', pageWidth / 2, headerY + 11, { align: 'center' });
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Generated on: ${new Date().toLocaleString()}`, pageWidth / 2, headerY + 18, { align: 'center' });
+
+      // Summary Statistics Section
+      const summaryY = headerY + 28;
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Summary Statistics', 14, summaryY);
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(60, 60, 60);
+      doc.text(`Total Events: ${eventStats.length}`, 14, summaryY + 7);
+      doc.text(`Total Registrations: ${totalRegistrations}`, 14, summaryY + 13);
+      doc.text(`Individual Registrations: ${registrationCounts.individual}`, 90, summaryY + 7);
+      doc.text(`Total Teams: ${registrationCounts.team}`, 90, summaryY + 13);
+      doc.text(`Team Leaders: ${registrationCounts.teamLeader}`, 170, summaryY + 7);
+      doc.text(`Team Members: ${registrationCounts.teamMember}`, 170, summaryY + 13);
+
+      // Event-wise Registration Table
+      const tableStartY = summaryY + 22;
+      
+      // Prepare table data
+      const columns = [
+        { header: 'S.No', dataKey: 'sno' },
+        { header: 'Event Name', dataKey: 'eventName' },
+        { header: 'Category', dataKey: 'category' },
+        { header: 'Registrations', dataKey: 'registrations' },
+        { header: 'Capacity', dataKey: 'capacity' }
+      ];
+
+      const tableData = eventStats.map((event, index) => ({
+        sno: index + 1,
+        eventName: event.name || 'N/A',
+        category: event.category || 'N/A',
+        registrations: event.totalRegistrations || 0,
+        capacity: event.capacity || 0
+      }));
+
+      // Generate table
+      autoTable(doc, {
+        columns: columns,
+        body: tableData,
+        startY: tableStartY,
+        theme: 'grid',
+        styles: {
+          fontSize: 9,
+          cellPadding: 3,
+          overflow: 'linebreak',
+          halign: 'left',
+          valign: 'middle'
+        },
+        headStyles: {
+          fillColor: [26, 54, 93],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        alternateRowStyles: {
+          fillColor: [245, 247, 250]
+        },
+        columnStyles: {
+          0: { cellWidth: 20, halign: 'center' },
+          1: { cellWidth: 120 },
+          2: { cellWidth: 50 },
+          3: { cellWidth: 40, halign: 'center' },
+          4: { cellWidth: 40, halign: 'center' }
+        },
+        margin: { left: 14, right: 14 },
+        didDrawPage: (data) => {
+          // Footer on every page
+          doc.setFontSize(8);
+          doc.setTextColor(100, 100, 100);
+          doc.text(
+            `Page ${doc.internal.getCurrentPageInfo().pageNumber}`,
+            pageWidth / 2,
+            pageHeight - 10,
+            { align: 'center' }
+          );
+          doc.text('Generated by Dakshaa Admin Portal', 14, pageHeight - 10);
+          doc.text(
+            `© ${new Date().getFullYear()} KSRCT`,
+            pageWidth - 14,
+            pageHeight - 10,
+            { align: 'right' }
+          );
+        }
+      });
+
+      // Download the PDF
+      const fileName = `Dakshaa_Overall_Registration_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+      
+    } catch (error) {
+      console.error('Error generating overall report:', error);
+      alert('Failed to generate overall report: ' + error.message);
+    } finally {
+      setDownloadingOverallReport(false);
+    }
+  };
+
   const executeTransfer = async () => {
     if (!selectedSourceReg || !selectedTargetEvent) return;
     
@@ -894,15 +1072,33 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
             </div>
           </div>
 
-          {!hideFinancials && (
+          <div className="flex items-center gap-3">
+            {/* Overall Report Button */}
             <button
-              onClick={() => setShowTransferModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-xl hover:bg-secondary/90 transition-colors shadow-lg shadow-secondary/20"
+              onClick={generateOverallReport}
+              disabled={downloadingOverallReport || eventStats.length === 0}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <ArrowRightLeft size={20} />
-              Transfer Event
+              {downloadingOverallReport ? (
+                <Loader2 className="animate-spin" size={20} />
+              ) : (
+                <Download size={20} />
+              )}
+              <span className="font-medium">
+                {downloadingOverallReport ? 'Generating...' : 'Overall Report'}
+              </span>
             </button>
-          )}
+            
+            {!hideFinancials && (
+              <button
+                onClick={() => setShowTransferModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-xl hover:bg-secondary/90 transition-colors shadow-lg shadow-secondary/20"
+              >
+                <ArrowRightLeft size={20} />
+                Transfer Event
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Stats Cards */}
