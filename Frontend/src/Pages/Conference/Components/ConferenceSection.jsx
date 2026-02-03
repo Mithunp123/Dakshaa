@@ -201,8 +201,8 @@ const conferences = [
   {
     id: 4,
     img: mechcon,
-    title: "SCHOOL OF BUILDING & MECHANICAL SCIENCE",
-    shortTitle: "SCHOOL OF BUILDING & MECHANICAL SCIENCE",
+    title: "Advanced Engineering Applications and AI",
+    shortTitle: "Advanced Engineering & AI",
     department: "SCHOOL OF BUILDING & MECHANICAL SCIENCE",
     description:
       "The National Conference serves as a platform for students, researchers, academicians, and industry professionals to present and exchange ideas, research outcomes, and technological innovations in the field of Mechanical Engineering. The event aims to encourage technical discussions, promote knowledge sharing, and foster collaboration between academia and industry. It highlights recent advancements, practical engineering solutions, and emerging technologies that contribute to sustainable development and industrial progress, while helping participants gain insights into current trends and future challenges in the engineering domain.",
@@ -233,7 +233,16 @@ const conferences = [
         "Advanced Construction Materials and Management Practices"
     ],
 
+
+    templete_link:[
+      "Paper Template Download Link : https://drive.google.com/drive/folders/1rxX4vEv9-B2QKS1cZhu_uewq8lCy7Jnf ",
+
+    ],
+
+    
+
     rules: [
+    
       "A paper may be authored by a maximum of two members only.", 
       "Participants must submit their Full Paper.", 
       "Full papers that meet the prescribed standards will be published in the Conference Proceedings.", 
@@ -560,6 +569,50 @@ const ConferenceSection = () => {
                         <span className="text-sm">{fee}</span>
                       </motion.div>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Note Section */}
+              {selectedConference.templete_link && Array.isArray(selectedConference.templete_link) && selectedConference.templete_link.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Note
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {selectedConference.templete_link.map((note, idx) => {
+                      const urlMatch = note.match(/https?:\/\/\S+/);
+                      const url = urlMatch ? urlMatch[0] : null;
+                      const label = url ? note.replace(url, "").trim() : note;
+
+                      return (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: idx * 0.05 }}
+                          className="flex items-start gap-2 text-gray-300"
+                        >
+                          <span className="text-primary mt-1">▸</span>
+                          {url ? (
+                            <span className="text-sm">
+                              {label}
+                              {label && " "}
+                              <a
+                                className="text-secondary underline hover:text-secondary/80 break-all"
+                                href={url}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                {url}
+                              </a>
+                            </span>
+                          ) : (
+                            <span className="text-sm">{note}</span>
+                          )}
+                        </motion.div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

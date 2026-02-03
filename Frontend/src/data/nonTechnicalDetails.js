@@ -119,7 +119,6 @@ export const nonTechnicalDetails = [
         {
           name: "Ms.J.K.Shalini",
           phone: "+91 98949 70113",
-          email: "dhanpalm@ksrct.ac.in",
         },
       ],
       studentCoordinator: [

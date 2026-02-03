@@ -908,7 +908,7 @@ export const technicalDetails = [
     papersubmission: [
       {
         description: [
-          "Paper Should be mailed to : "
+          "Paper Should be mailed to : fameassociationmct@gmail.com "
         ],
       },
     ],
@@ -1453,7 +1453,7 @@ export const technicalDetails = [
       "System provided in Laboratory.",
       "Mobile phones, books, or external references are strictly prohibited.",
     ],
-    rewards: [
+    /*rewards: [
          {
           position: "1st Prize",
           emoji: "🥇",
@@ -1471,7 +1471,7 @@ export const technicalDetails = [
           amount: "₹2,000",
         },
       ],
-      
+      */
 
 
 

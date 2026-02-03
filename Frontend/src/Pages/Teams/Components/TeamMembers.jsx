@@ -18,7 +18,6 @@ import cseasso from "../assest/vlsi-logo.webp";
 
 import kavinesh from "../../../assets/team_members/kavinesh.webp";
 import narendhar from "../../../assets/team_members/Narendhar.webp";
-import harish from "../../../assets/team_members/harish.webp";
 import hariprakash from "../../../assets/team_members/Hariprakash.webp";
 import deekshana from "../../../assets/team_members/Deekshana.webp";
 import deepak from "../../../assets/team_members/Deepak.webp";
@@ -29,7 +28,7 @@ import posterjoint from "../../../assets/team_members/joint_cor.webp";
 import des1 from "../../../assets/team_members/des1.webp";
 import des2 from "../../../assets/team_members/des2.webp";
 import des3 from "../../../assets/team_members/des3.webp";
-
+import kavi from "../../../assets/team_members/kavi.webp";
 
 const chiefCoordinator = [
    { id: 14, name: "Kavinesh", department: "", img: kavinesh, role: "AEVA", phone: "+91 94892 43775", associationLogo: aevaLogo },
@@ -37,14 +36,13 @@ const chiefCoordinator = [
 
 const jointCoordinators = [
   { id: 13, name: "Narendhar D ", department: "Artificix", img: narendhar, role: "Volunteers, Helpdesk & Participant Support ", phone: "+91 97516 73398", associationLogo: aidsasso },
-    //{ id: 12, name: "Kaviyarasu P", department: "Artificix", img: kaviyarasu, role: "Website, Content & Data Management ", phone: "+91 701067 64469", associationLogo: aidsasso },
+  { id: 12, name: "Kaviyarasu P", department: "Artificix", img: kavi, role: "Website, Content & Data Management ", phone: "+91 701067 64469", associationLogo: aidsasso },
 
   //{ id: 15, name: "Gopinath", department: "Department of AIML", img: gopinath, role: "Gopinath T ", phone: "+91 93611 63363", associationLogo: aevaLogo },
   //{ id : 17, name: "Saran Senthur Suthanthran", department: "IT", img: itco, role: "Registrations, Payments & Attendance ", phone: "+91 80566 70219", associationLogo: itasso},
   //{id : 18, name:"Yashas Yadav", department:"CSE", img:cseco, role:"Technical, Non-Technical & Team Events", phone:"+91 70108 43024", associationLogo:cseasso},
   {id :19, name:"Deepak C ", department:"Techragonz", img:deepak, role:"Technical, Non-Technical & Team Events", phone:"+91 63794 07526", associationLogo:csbsasso},
   {id :20, name:"Hari Prakash G ", department:"VLSI ENGINEERS AND DEVELOPERS ASSOCIATION ", img:hariprakash, role:"Workshops, Expos, Stalls & Resource Persons ", phone:"+91 89257 92409", associationLogo:vlsiasso},
-  {id :21, name:"Harish A ", department:"Artificix", img:harish, role:"Hackathon, Codeathon & Flagship Challenges", phone:"+91 63642 32959 ", associationLogo:aidsasso},
   {id :22, name:"Deekshana C S ", department:"AEVA", img:deekshana, role:"National Conference ", phone:"+91 90878 42931", associationLogo:aevaLogo},
   {id :23, name:"Aarush VS ", department:"CSE", img:posterjoint, role:"Design, Social Media & Promotions", phone:"+91 88918 50995", associationLogo:cseasso},
   //{id :24, name:"Tharun Kumar R ", department:"AIML", img:aimlco, role:"Accommodation & Lunch ", phone:"+91 77084 13624", associationLogo:aimlasso},

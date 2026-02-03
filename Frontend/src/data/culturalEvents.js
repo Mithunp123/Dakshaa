@@ -129,7 +129,7 @@ export const culturalDetails = [
     price: "₹150 (per member)",
     rules: [
       "Song Duration should be between 4 to 5 min",
-      "Team size should be between 2 to 10 members",
+      "Team size should be between 3 to 10 members",
       "Song should be in mp3 format and must be brought by the participants in pen drive",
       "Register before the final date",
       "Props: Allowed but should be pre-approved",
