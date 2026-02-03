@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, TicketCheck, TrendingUp, Radio, ArrowLeft } from "lucide-react";
+import { Users, TicketCheck, TrendingUp, Radio, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "../../supabase";
 import CountUp from "react-countup";
 import { useNavigate } from "react-router-dom";
@@ -53,6 +53,8 @@ const LiveStats = () => {
   const [deptStats, setDeptStats] = useState([]);
   const [isLive, setIsLive] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [expandedDept, setExpandedDept] = useState(null);
+  const [deptEventDetails, setDeptEventDetails] = useState({});
   const navigate = useNavigate();
   const eventLookupRef = useRef({});
 
@@ -221,6 +223,76 @@ const LiveStats = () => {
 
     } catch (err) {
         console.error("Dept stats fallback failed:", err);
+    }
+  };
+
+  const fetchDeptEventDetails = async (deptName) => {
+    try {
+        // Check if we already have this data cached
+        if (deptEventDetails[deptName]) {
+            return;
+        }
+
+        // Fetch all active events
+        const { data: events, error: eventsError } = await supabase
+            .from('events')
+            .select('id, event_id, name')
+            .eq('is_active', true);
+
+        if (eventsError) throw eventsError;
+
+        // Filter events by department
+        const deptEvents = events.filter(e => {
+            const dept = getDeptFromId(e.event_id);
+            return dept === deptName;
+        });
+
+        const eventIds = deptEvents.map(e => e.id);
+
+        if (eventIds.length === 0) {
+            setDeptEventDetails(prev => ({ ...prev, [deptName]: [] }));
+            return;
+        }
+
+        // Fetch registration counts for each event
+        const { data: registrations } = await supabase
+            .from('event_registrations_config')
+            .select('event_id')
+            .eq('payment_status', 'PAID')
+            .in('event_id', eventIds);
+
+        // Count registrations per event
+        const eventCounts = {};
+        (registrations || []).forEach(reg => {
+            eventCounts[reg.event_id] = (eventCounts[reg.event_id] || 0) + 1;
+        });
+
+        // Format the data
+        const eventDetails = deptEvents
+            .map(event => ({
+                id: event.id,
+                name: event.name,
+                count: eventCounts[event.id] || 0
+            }))
+            .filter(e => e.count > 0) // Only show events with registrations
+            .sort((a, b) => b.count - a.count);
+
+        setDeptEventDetails(prev => ({ ...prev, [deptName]: eventDetails }));
+
+    } catch (err) {
+        console.error("Error fetching dept event details:", err);
+        setDeptEventDetails(prev => ({ ...prev, [deptName]: [] }));
+    }
+  };
+
+  const toggleDeptExpansion = (deptName) => {
+    if (expandedDept === deptName) {
+        setExpandedDept(null);
+    } else {
+        setExpandedDept(deptName);
+        if (!deptEventDetails[deptName]) {
+            fetchDeptEventDetails(deptName);
+        }
     }
   };
 
@@ -526,7 +598,7 @@ const LiveStats = () => {
       <div className="absolute top-4 left-4 md:top-8 md:left-8 z-50 flex items-center gap-4 md:gap-8">
         <button 
           onClick={() => navigate(-1)}
-          className="text-gray-500 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10 w-fit"
+          className="text-gray-500 hover:text-white transition-colors p-2 rounded-full hover:bg-gray-800/20 w-fit"
         >
           <ArrowLeft size={24} className="md:w-8 md:h-8" />
         </button>
@@ -537,7 +609,7 @@ const LiveStats = () => {
         {particles.map(particle => (
           <motion.div
             key={particle.id}
-            className="absolute bg-white rounded-full opacity-20"
+            className="absolute bg-primary/20 rounded-full opacity-10"
             style={{
               left: `${particle.x}%`,
               top: `${particle.y}%`,
@@ -546,7 +618,7 @@ const LiveStats = () => {
             }}
             animate={{
               y: [0, -100, 0],
-              opacity: [0.2, 0.5, 0.2]
+              opacity: [0.1, 0.3, 0.1]
             }}
             transition={{
               duration: particle.duration,
@@ -557,12 +629,9 @@ const LiveStats = () => {
         ))}
       </div>
 
-      {/* Grid Background */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)] bg-[size:100px_100px] pointer-events-none"></div>
-
       {/* Live Indicator */}
       <motion.div 
-        className="absolute top-4 right-4 md:top-8 md:right-8 flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 bg-red-500/10 border border-red-500/30 rounded-full backdrop-blur-sm z-10"
+        className="absolute top-4 right-4 md:top-8 md:right-8 flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 bg-red-500/20 border border-red-500/40 rounded-full z-10"
         animate={{ scale: isLive ? [1, 1.1, 1] : 1 }}
         transition={{ duration: 0.3 }}
       >
@@ -602,7 +671,7 @@ const LiveStats = () => {
                         transition={{ delay: 0.2 }}
                         className="relative group h-full hidden lg:block"
                     >
-                        <div className="absolute -inset-1 bg-gradient-to-r from-secondary to-orange-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition duration-500"></div>
+                        <div className="absolute -inset-1 bg-gradient-to-r from-secondary to-orange-600 rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
                         
                         <div className="relative bg-gradient-to-br from-gray-900 to-black border border-orange-500/30 rounded-3xl p-6 h-full flex flex-col justify-center">
                         {/* Icon */}
@@ -650,7 +719,7 @@ const LiveStats = () => {
                         transition={{ delay: 0.4 }}
                         className="relative group h-full"
                     >
-                        <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition duration-500"></div>
+                        <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
                         
                         <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-3xl p-6 h-full flex flex-col justify-center">
                         {/* Icon */}
@@ -705,13 +774,13 @@ const LiveStats = () => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.6 + (index * 0.1) }}
-                        className="relative bg-white/5 rounded-2xl p-3 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors group overflow-hidden"
+                        className="relative bg-gray-900 border border-gray-700/50 rounded-2xl p-3 hover:border-primary/30 transition-all group overflow-hidden"
                     >
                         <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-40 transition-opacity">
                         <TicketCheck className="w-6 h-6 rotate-[-15deg]" />
                         </div>
                         <div className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1 h-4 flex items-end">{stat.category}</div>
-                        <div className="text-xl md:text-3xl font-bold bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent font-mono">
+                        <div className="text-xl md:text-3xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent font-mono">
                             <CountUp end={stat.count} duration={2} separator="," />
                         </div>
                     </motion.div>
@@ -738,7 +807,7 @@ const LiveStats = () => {
                     </div>
                  </div>
                  
-                 <div className="grid grid-cols-2 gap-3 overflow-hidden content-start pr-1">
+                 <div className="grid grid-cols-2 gap-2 overflow-y-auto xl:overflow-visible overflow-x-hidden content-start pr-1 max-h-[calc(100vh-250px)] xl:max-h-none scrollbar-hide">
                     <AnimatePresence mode="popLayout">
                         {deptStats.map((stat, index) => (
                             <motion.div
@@ -748,42 +817,154 @@ const LiveStats = () => {
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                className={`relative p-3 rounded-xl flex items-center justify-between group overflow-hidden ${
+                                className={`relative p-2 rounded-lg group cursor-pointer ${
                                     index === 0 ? 'bg-gradient-to-r from-yellow-600/80 to-amber-400/80 border border-yellow-400/50 shadow-lg shadow-yellow-500/20' : 
                                     index === 1 ? 'bg-gradient-to-r from-slate-600/80 to-slate-400/80 border border-slate-400/50 shadow-lg shadow-slate-500/20' :
                                     index === 2 ? 'bg-gradient-to-r from-orange-800/80 to-orange-600/80 border border-orange-500/50 shadow-lg shadow-orange-700/20' :
-                                    'bg-white/5 border border-white/5 hover:bg-white/10'
+                                    'bg-gray-900 border border-gray-700/50 hover:border-primary/40 hover:bg-gray-800'
                                 }`}
+                                onClick={() => toggleDeptExpansion(stat.dept)}
                             >
-                                {/* Glass Shine Effect */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
+                                {/* Glass Shine Effect - REMOVED */}
 
-                                <div className="flex items-center gap-3 z-10 w-full">
-                                    <div className={`font-black text-sm w-7 h-7 shrink-0 rounded-lg flex items-center justify-center shadow-inner ${
-                                        index < 3 ? 'bg-black/20 text-white backdrop-blur-sm' : 'bg-black/40 text-gray-400'
-                                    }`}>
-                                        {index + 1}
+                                <div className="relative flex items-center justify-between z-10 w-full">
+                                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                                        <div className={`font-black text-xs w-6 h-6 shrink-0 rounded-md flex items-center justify-center ${
+                                            index < 3 ? 'bg-black/40 text-white' : 'bg-black/60 text-gray-400'
+                                        }`}>
+                                            {index + 1}
+                                        </div>
+                                        <span className={`font-bold text-xs tracking-wide truncate ${index < 3 ? 'text-white' : 'text-gray-200'}`}>
+                                            {stat.dept}
+                                        </span>
                                     </div>
-                                    <span className={`font-bold text-sm tracking-wide truncate ${index < 3 ? 'text-white text-shadow-sm' : 'text-gray-200'}`}>
-                                        {stat.dept}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2 z-10 shrink-0">
-                                    <span className={`font-mono text-xl font-black tabular-nums ${
-                                        index < 3 ? 'text-white drop-shadow-md' : 'text-gray-400 group-hover:text-white transition-colors'
-                                    }`}>
-                                        {stat.count}
-                                    </span>
+                                    <div className="flex items-center gap-1.5 z-10 shrink-0 ml-1">
+                                        <span className={`font-mono text-lg font-black tabular-nums ${
+                                            index < 3 ? 'text-white' : 'text-gray-400 group-hover:text-white transition-colors'
+                                        }`}>
+                                            {stat.count}
+                                        </span>
+                                        <motion.div
+                                            animate={{ rotate: expandedDept === stat.dept ? 180 : 0 }}
+                                            transition={{ duration: 0.3 }}
+                                        >
+                                            <ChevronDown className={`w-3.5 h-3.5 ${index < 3 ? 'text-white' : 'text-gray-400'}`} />
+                                        </motion.div>
+                                    </div>
                                 </div>
                                 
                                 {/* Rank Icons */}
-                                {index === 0 && <div className="absolute top-0 right-0 text-3xl opacity-20 rotate-12 pointer-events-none">👑</div>}
-                                {index === 1 && <div className="absolute top-0 right-0 text-3xl opacity-20 rotate-12 pointer-events-none">🥈</div>}
-                                {index === 2 && <div className="absolute top-0 right-0 text-3xl opacity-20 rotate-12 pointer-events-none">🥉</div>}
+                                {index === 0 && <div className="absolute top-0.5 right-0.5 text-xl opacity-20 rotate-12 pointer-events-none">👑</div>}
+                                {index === 1 && <div className="absolute top-0.5 right-0.5 text-xl opacity-20 rotate-12 pointer-events-none">🥈</div>}
+                                {index === 2 && <div className="absolute top-0.5 right-0.5 text-xl opacity-20 rotate-12 pointer-events-none">🥉</div>}
                             </motion.div>
                         ))}
                     </AnimatePresence>
                  </div>
+                 
+                 {/* Events Details Overlay Card */}
+                 <AnimatePresence>
+                    {expandedDept && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                            onClick={() => setExpandedDept(null)}
+                        >
+                            <motion.div
+                                initial={{ scale: 0.9, y: 20 }}
+                                animate={{ scale: 1, y: 0 }}
+                                exit={{ scale: 0.9, y: 20 }}
+                                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                                className="bg-gradient-to-br from-gray-900 to-black border border-primary/30 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-2xl shadow-primary/20"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {/* Header */}
+                                <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700/30">
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-gradient-to-r from-primary to-purple-600 w-12 h-12 rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+                                            <TicketCheck className="text-white w-6 h-6" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-2xl font-black text-white uppercase tracking-wide">
+                                                {expandedDept}
+                                            </h3>
+                                            <p className="text-xs text-gray-400 font-semibold">Event Breakdown</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setExpandedDept(null)}
+                                        className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800/30 rounded-lg"
+                                    >
+                                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                {/* Content */}
+                                <div className="overflow-y-auto max-h-[calc(80vh-140px)] pr-2">
+                                    {deptEventDetails[expandedDept] === undefined ? (
+                                        <div className="text-center py-12">
+                                            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                            <p className="text-gray-400">Loading events...</p>
+                                        </div>
+                                    ) : deptEventDetails[expandedDept]?.length === 0 ? (
+                                        <div className="text-center py-12">
+                                            <div className="text-6xl mb-4 opacity-30">📊</div>
+                                            <p className="text-gray-400 font-semibold">No events with registrations found</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {deptEventDetails[expandedDept]?.map((event, idx) => (
+                                                <motion.div
+                                                    key={event.id}
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: idx * 0.05 }}
+                                                    className="group relative bg-gradient-to-br from-gray-900/50 to-black/50 hover:bg-gradient-to-br hover:from-gray-800/70 hover:to-black/70 border border-gray-700/30 hover:border-primary/30 rounded-xl p-4 transition-all"
+                                                >
+                                                    <div className="flex items-center justify-between gap-4">
+                                                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                            <div className="bg-primary/20 w-10 h-10 rounded-lg flex items-center justify-center shrink-0">
+                                                                <span className="text-primary font-bold text-sm">#{idx + 1}</span>
+                                                            </div>
+                                                            <div className="min-w-0 flex-1">
+                                                                <h4 className="text-white font-semibold text-sm group-hover:text-primary transition-colors truncate">
+                                                                    {event.name}
+                                                                </h4>
+                                                                <p className="text-xs text-gray-400">Registrations</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="bg-gradient-to-r from-primary/20 to-purple-600/20 border border-primary/30 rounded-lg px-4 py-2 shrink-0">
+                                                            <span className="text-2xl font-black text-primary font-mono tabular-nums">
+                                                                {event.count}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Footer Summary */}
+                                {deptEventDetails[expandedDept]?.length > 0 && (
+                                    <div className="mt-4 pt-4 border-t border-gray-700/30">
+                                        <div className="flex items-center justify-between bg-gradient-to-r from-primary/10 to-purple-600/10 rounded-lg p-3">
+                                            <span className="text-gray-300 font-semibold">Total Registrations</span>
+                                            <span className="text-3xl font-black text-primary font-mono">
+                                                {deptEventDetails[expandedDept]?.reduce((sum, e) => sum + e.count, 0)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+                            </motion.div>
+                        </motion.div>
+                    )}
+                 </AnimatePresence>
             </motion.div>
         </div>
 
@@ -805,10 +986,6 @@ const LiveStats = () => {
           </div>
         </motion.div>
       </div>
-
-      {/* Decorative Elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
 
       {/* Milestone Celebration Overlay */}
       <AnimatePresence>
@@ -846,13 +1023,13 @@ const LiveStats = () => {
                     ))}
                 </div>
 
-                <div className="relative z-10 text-center p-12 border-y-4 border-white/20 bg-black/50 w-full transform rotate-[-2deg]">
+                <div className="relative z-10 text-center p-12 border-y-4 border-primary/30 bg-black/50 w-full transform rotate-[-2deg]">
                     <motion.div
                         initial={{ y: 50, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ type: "spring", bounce: 0.6 }}
                     >
-                        <h2 className={`text-4xl md:text-5xl font-black uppercase tracking-widest mb-4 text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]`}>
+                        <h2 className={`text-4xl md:text-5xl font-black uppercase tracking-widest mb-4 text-white`}>
                             Milestone Reached!
                         </h2>
                         
