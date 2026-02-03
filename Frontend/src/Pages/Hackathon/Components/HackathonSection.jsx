@@ -10,7 +10,7 @@ export const hackathonEventDetails = {
   "hackathon-1": {
       id: "hackathon-1",
       title: "Neura-Hack 2.0 (36 Hours Hackathon)",
-      date: "12th Feb - 13th Feb, 2026",
+      date: "13th Feb - 14th Feb, 2026",
       venue: "T&P LAB",
       registrationFee:" ₹ 500 per head.",
       registrationLink: "",
@@ -59,7 +59,7 @@ export const hackathonEventDetails = {
       ],
       schedule: [
         {
-          date: "12th Feb - 13th Feb, 2026",
+          date: "13th Feb - 14th Feb, 2026",
           time: "9:00 AM to 9:00 PM",
           location: "T&P LAB",
         },

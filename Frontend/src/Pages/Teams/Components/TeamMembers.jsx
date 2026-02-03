@@ -12,7 +12,7 @@ import txtasso from "../assest/tafeta_txt_logo.webp";
 import csbsasso from "../assest/Techragonz_csbs_logo.webp";
 import vlsiasso from "../assest/vlsi-logo.webp";
 import itasso from "../assest/zita_it_logo.webp";
-import cseasso from "../assest/vlsi-logo.webp";
+import cseasso from "../assest/ascilogo.png";
 
 
 
@@ -56,16 +56,16 @@ const eventCoordinators = [
 ];
 
 const developers = [
-  { id: 2, name: "Vikas T", department: "Artificix", img: vikas, role: "Backend Developer", associationLogo: aidsasso },
-  { id: 3, name: "Mithun P", department: "Artificix", img: mithun, role: "Frontend Developer", associationLogo: aidsasso },
-  { id: 1, name: "Giridharan M", department: "AEVA", img: giri, role: "Lead Developer", associationLogo: aevaLogo },
+  { id: 2, name: "Vikas T", department: "Artificix", img: vikas, role: "", associationLogo: aidsasso },
+  { id: 3, name: "Mithun P", department: "Artificix", img: mithun, role: "", associationLogo: aidsasso },
+  { id: 1, name: "Giridharan M", department: "AEVA", img: giri, role: "", associationLogo: aevaLogo },
 
 ]
 
 const designers = [
-  { id: 7, name: "  Kumaran R Y", department: " ASCII", img: des1, role: "", associationLogo: aevaLogo },
-  { id: 8, name: " Sarath T S ", department: " ASCII", img: des2, role: "", associationLogo: csbsasso },
-  { id: 9, name: "  Mohitha shree D", department: " ASCII", img: des3, role: "", associationLogo: eeeasso },
+  { id: 7, name: "  Kumaran R Y", department: " ASCII", img: des1, role: "", associationLogo: cseasso },
+  { id: 8, name: " Sarath T S ", department: " ASCII", img: des2, role: "", associationLogo: cseasso },
+  { id: 9, name: "  Mohitha shree D", department: " ASCII", img: des3, role: "", associationLogo: cseasso },
 
   ];
 
@@ -97,6 +97,9 @@ const TechCard = ({ member, variant = "default", allowContact = false }) => {
           <img
             src={member.img}
             alt={member.name}
+            loading="eager"
+            decoding="async"
+            style={{ imageRendering: '-webkit-optimize-contrast' }}
             className="w-full h-full object-cover transition-all duration-700 grayscale group-hover:grayscale-0 group-hover:scale-110"
           />
 
@@ -114,8 +117,15 @@ const TechCard = ({ member, variant = "default", allowContact = false }) => {
         {/* Association Logo - Top Left */}
         {member.associationLogo && (
           <div className="absolute top-3 left-3 flex items-center gap-2 z-30">
-            <div className="w-12 h-12 rounded-full border-2 border-secondary bg-[#020617] p-1 shadow-lg shadow-secondary/20">
-              <img src={member.associationLogo} alt={member.association} className="w-full h-full object-cover rounded-full" />
+            <div className="w-12 h-12 rounded-full border-2 border-secondary bg-secondary/20 shadow-lg shadow-secondary/20 overflow-hidden">
+              <img 
+                src={member.associationLogo} 
+                alt={member.association} 
+                loading="eager"
+                decoding="async"
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
+                className="w-full h-full object-cover rounded-full" 
+              />
             </div>
           </div>
         )}
