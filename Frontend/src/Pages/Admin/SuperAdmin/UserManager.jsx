@@ -38,6 +38,7 @@ const UserManager = () => {
   const [userRegistrations, setUserRegistrations] = useState([]);
   const [userTeams, setUserTeams] = useState([]);
   const [allUserTeams, setAllUserTeams] = useState({});
+  const [referredByInfo, setReferredByInfo] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('users');
   const [messageForm, setMessageForm] = useState({ subject: '', body: '', target: 'all' });
@@ -82,16 +83,18 @@ const UserManager = () => {
         return;
       }
       
-      // Fetch all teams data
+      // Fetch all teams data including leader_id
       const { data: teamsData, error: teamsError } = await supabase
         .from('teams')
-        .select('id, team_name, event_id');
+        .select('id, team_name, event_id, leader_id');
       
       if (teamsError) {
         console.error('Error fetching teams:', teamsError);
         setAllUserTeams({});
         return;
       }
+      
+      console.log('Fetched teams data with leaders:', teamsData);
       
       // Create a map of team_id to team data for quick lookup
       const teamsMap = {};
@@ -114,6 +117,29 @@ const UserManager = () => {
           });
         });
       }
+      
+      // Also add team leaders from teams table (they might not be in team_members)
+      if (teamsData) {
+        teamsData.forEach(team => {
+          if (team.leader_id) {
+            if (!userTeamsMap[team.leader_id]) {
+              userTeamsMap[team.leader_id] = [];
+            }
+            // Only add if not already added from team_members
+            const alreadyExists = userTeamsMap[team.leader_id].some(t => t.team_id === team.id);
+            if (!alreadyExists) {
+              userTeamsMap[team.leader_id].push({
+                team_id: team.id,
+                user_id: team.leader_id,
+                role: 'leader',
+                teams: team
+              });
+            }
+          }
+        });
+      }
+      
+      console.log('Final userTeamsMap:', userTeamsMap);
       setAllUserTeams(userTeamsMap);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -125,36 +151,138 @@ const UserManager = () => {
   const fetchUserDetails = async (user) => {
     setSelectedUser(user);
     setIsModalOpen(true);
+    setReferredByInfo(null); // Reset
     try {
-      // Fetch registrations
+      // Fetch direct registrations from event_registrations_config
       const { data: regs } = await supabase
-        .from('registrations')
-        .select('*, events(*), combos(*)')
-        .eq('user_id', user.id);
+        .from('event_registrations_config')
+        .select('*, events(name, event_key)')
+        .eq('user_id', user.id)
+        .order('registered_at', { ascending: false });
       
-      setUserRegistrations(regs || []);
-
-      // Fetch teams
-      const { data: teams } = await supabase
+      // Fetch teams where user is a member (including leader)
+      // First try from team_members table
+      const { data: teams, error: teamsError } = await supabase
         .from('team_members')
-        .select('*, teams(*, events(*))')
+        .select('*, teams!inner(*, events(name), leader_id)')
         .eq('user_id', user.id);
       
-      setUserTeams(teams || []);
+      console.log('Fetched teams for user from team_members:', teams, teamsError);
+      
+      // Also check if user is a leader (from teams.leader_id)
+      const { data: leaderTeams, error: leaderError } = await supabase
+        .from('teams')
+        .select('*, events(name)')
+        .eq('leader_id', user.id);
+      
+      console.log('Fetched teams where user is leader:', leaderTeams, leaderError);
+      
+      // Combine both sources - convert leaderTeams to same structure as teams
+      const allTeams = [
+        ...(teams || []),
+        ...(leaderTeams || []).map(team => ({
+          team_id: team.id,
+          user_id: user.id,
+          role: 'leader',
+          teams: team
+        }))
+      ];
+      
+      // Remove duplicates based on team_id
+      const uniqueTeams = allTeams.filter((team, index, self) =>
+        index === self.findIndex((t) => t.team_id === t.team_id || t.team_id === team.teams?.id)
+      );
+      
+      console.log('Combined unique teams:', uniqueTeams);
+      
+      // For each team, fetch all team members including the leader
+      const teamsWithMembers = await Promise.all(
+        (uniqueTeams || []).map(async (tm) => {
+          const teamId = tm.team_id || tm.teams?.id;
+          
+          const { data: members } = await supabase
+            .from('team_members')
+            .select('*, profiles(full_name, email, college_name)')
+            .eq('team_id', teamId)
+            .order('role', { ascending: false }); // Leaders first
+          
+          console.log(`Team ${teamId} members:`, members);
+          
+          // Check if current user is the team leader
+          const isLeader = tm.teams?.leader_id === user.id;
+          
+          // For team members (not leaders), check if team leader has a registration for this event
+          let teamRegistration = null;
+          if (!isLeader && tm.teams?.event_id && tm.teams?.leader_id) {
+            // Use leader_id from teams table to get leader's registration
+            const { data: leaderReg } = await supabase
+              .from('event_registrations_config')
+              .select('*')
+              .eq('user_id', tm.teams.leader_id)
+              .eq('event_id', tm.teams.event_id)
+              .maybeSingle();
+            
+            if (leaderReg) {
+              teamRegistration = {
+                ...leaderReg,
+                isTeamRegistration: true,
+                teamName: tm.teams.team_name
+              };
+            }
+          }
+          
+          return { 
+            ...tm, 
+            team_id: teamId,
+            allMembers: members || [], 
+            teamRegistration, 
+            isLeader 
+          };
+        })
+      );
+      
+      console.log('Teams with members:', teamsWithMembers);
+      setUserTeams(teamsWithMembers || []);
+      
+      // Combine direct registrations with team-based registrations for display
+      const teamRegs = teamsWithMembers
+        .filter(tm => tm.teamRegistration)
+        .map(tm => ({
+          id: `team-${tm.id}`,
+          event_name: tm.teams?.events?.name,
+          registered_at: tm.created_at,
+          payment_status: tm.teamRegistration.payment_status,
+          payment_amount: null, // Team members don't pay individually
+          transaction_id: null,
+          isTeamRegistration: true,
+          teamName: tm.teams?.team_name,
+          events: { name: tm.teams?.events?.name }
+        }));
+      
+      const allRegistrations = [...(regs || []), ...teamRegs];
+      setUserRegistrations(allRegistrations);
 
-      // Fetch attendance
-      const { data: attendance } = await supabase
-        .from('attendance')
-        .select('*, events(*)')
-        .eq('user_id', user.id);
+      // Store referred by code/value directly (no user lookup)
+      if (user.referred_by) {
+        setReferredByInfo({
+          code: user.referred_by
+        });
+      }
+
+      // For timeline - no lookup needed
+      let referredByData = null;
+      if (user.referred_by) {
+        referredByData = { code: user.referred_by };
+      }
 
       // Combine into activity timeline
       const activity = [
         { type: 'profile', date: user.created_at, label: 'Account Created' },
-        ...(regs || []).map(r => ({ type: 'registration', date: r.created_at, label: `Registered for ${r.events?.title || r.combos?.name}` })),
-        ...(teams || []).map(t => ({ type: 'team', date: t.created_at, label: `Joined team ${t.teams?.name} for ${t.teams?.events?.title}` })),
-        ...(attendance || []).map(a => ({ type: 'attendance', date: a.created_at, label: `Checked in to ${a.events?.title}` }))
-      ].sort((a, b) => new Date(b.date) - new Date(a.date));
+        ...(user.referred_by && referredByData ? [{ type: 'referral', date: user.created_at, label: `Referred by ${referredByData.code}`, referredBy: referredByData }] : []),
+        ...(regs || []).map(r => ({ type: 'registration', date: r.registered_at, label: `Registered for ${r.event_name || r.events?.name}`, payment: r.payment_status, amount: r.payment_amount })),
+        ...teamRegs.map(r => ({ type: 'registration', date: r.registered_at, label: `Registered for ${r.event_name} (via team ${r.teamName})`, payment: r.payment_status, isTeam: true })),
+        ...(teamsWithMembers || []).map(t => ({ type: 'team', date: t.joined_at || t.created_at || new Date().toISOString(), label: `Joined team ${t.teams?.team_name} for ${t.teams?.events?.name}`, eventName: t.teams?.events?.name }))
+      ].filter(a => a.date).sort((a, b) => new Date(b.date) - new Date(a.date));
 
       setUserActivity(activity);
     } catch (error) {
@@ -399,31 +527,33 @@ const UserManager = () => {
                       <span className="font-medium text-gray-300 truncate">{user.roll_number || 'N/A'}</span>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3 text-sm text-gray-400 pt-2 border-t border-white/5">
-                    <Users size={16} className="shrink-0 mt-0.5" />
-                    <div className="flex-1 min-w-0">
-                      {allUserTeams[user.id] && allUserTeams[user.id].length > 0 ? (
-                        <div className="space-y-1">
-                          {allUserTeams[user.id].map((tm, idx) => (
-                            <div key={idx} className="flex items-center gap-2 flex-wrap">
-                              <span className="font-medium text-gray-300">
-                                {tm.teams?.team_name || 'Unknown Team'}
-                              </span>
-                              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                tm.role === 'leader' 
-                                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' 
-                                  : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                              }`}>
-                                {tm.role === 'leader' ? 'Leader' : 'Member'}
-                              </span>
-                            </div>
-                          ))}
+                  {/* Team Display - Prominent */}
+                  {allUserTeams[user.id] && allUserTeams[user.id].length > 0 ? (
+                    <div className="pt-3 border-t border-white/5">
+                      {allUserTeams[user.id].map((tm, idx) => (
+                        <div key={idx} className="flex items-center gap-2 mb-2">
+                          <Users size={16} className="shrink-0 text-secondary" />
+                          <span className="font-bold text-secondary text-sm">
+                            {tm.teams?.team_name || 'Unknown Team'}
+                          </span>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ml-auto ${
+                            tm.role === 'leader' 
+                              ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' 
+                              : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                          }`}>
+                            {tm.role === 'leader' ? '👑 Leader' : 'Member'}
+                          </span>
                         </div>
-                      ) : (
-                        <span className="text-gray-500 italic">No Team</span>
-                      )}
+                      ))}
                     </div>
-                  </div>
+                  ) : (
+                    <div className="pt-3 border-t border-white/5">
+                      <div className="flex items-center gap-2 text-gray-500 italic text-sm">
+                        <Users size={16} className="shrink-0" />
+                        <span>No Team</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-6 pt-6 border-t border-white/5 flex items-center justify-between">
@@ -607,6 +737,12 @@ const UserManager = () => {
                           <p className="text-xs text-gray-500 mb-1">Phone</p>
                           <p className="font-mono text-sm">{selectedUser.mobile_number || 'N/A'}</p>
                         </div>
+                        {referredByInfo && (
+                          <div className="p-4 bg-purple-500/10 rounded-2xl border border-purple-500/20">
+                            <p className="text-xs text-purple-400 mb-1 uppercase tracking-wider">Referred By</p>
+                            <p className="font-bold text-purple-300 font-mono">{referredByInfo.code}</p>
+                          </div>
+                        )}
                         <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
                           <p className="text-xs text-gray-500 mb-1">Account Created</p>
                           <p className="font-mono text-sm">{new Date(selectedUser.created_at).toLocaleString()}</p>
@@ -626,25 +762,25 @@ const UserManager = () => {
                           <p className="text-gray-500 text-sm italic">No registrations found</p>
                         ) : (
                           userRegistrations.map(reg => (
-                            <div key={reg.id} className="p-4 bg-white/5 rounded-2xl border border-white/10 flex justify-between items-center group">
-                              <div>
-                                <p className="font-bold">{reg.events?.title || reg.combos?.name}</p>
-                                <p className="text-xs text-gray-500">{new Date(reg.created_at).toLocaleDateString()}</p>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${reg.payment_status?.toUpperCase() === 'PAID' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
-                                  {reg.payment_status.toUpperCase()}
+                            <div key={reg.id} className={`p-4 rounded-2xl border group ${reg.isTeamRegistration ? 'bg-orange-500/10 border-orange-500/20' : 'bg-white/5 border-white/10'}`}>
+                              <div className="flex justify-between items-start mb-2">
+                                <div className="flex-1">
+                                  <p className="font-bold">{reg.event_name || reg.events?.name}</p>
+                                  {reg.isTeamRegistration && (
+                                    <p className="text-xs text-orange-400 mt-1">📋 Team: {reg.teamName}</p>
+                                  )}
+                                  <p className="text-xs text-gray-500">{new Date(reg.registered_at).toLocaleDateString()}</p>
+                                  {reg.payment_amount && (
+                                    <p className="text-xs text-gray-400 mt-1">₹{reg.payment_amount}</p>
+                                  )}
+                                </div>
+                                <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${reg.payment_status?.toUpperCase() === 'PAID' ? 'bg-green-500/10 text-green-500' : reg.payment_status?.toUpperCase() === 'PENDING' ? 'bg-yellow-500/10 text-yellow-500' : 'bg-red-500/10 text-red-500'}`}>
+                                  {reg.payment_status?.toUpperCase() || 'TEAM'}
                                 </span>
-                                {reg.combo_id && (
-                                  <button 
-                                    onClick={() => handleUnlinkCombo(reg)}
-                                    className="p-1.5 hover:bg-red-500/10 text-red-400 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
-                                    title="Unlink Combo"
-                                  >
-                                    <XCircle size={14} />
-                                  </button>
-                                )}
                               </div>
+                              {reg.transaction_id && (
+                                <p className="text-[10px] text-gray-500 font-mono">TXN: {reg.transaction_id}</p>
+                              )}
                             </div>
                           ))
                         )}
@@ -653,30 +789,44 @@ const UserManager = () => {
 
                     <section>
                       <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <Users size={14} /> Team Memberships
+                        <Users size={14} /> Team Members
                       </h4>
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         {userTeams.length === 0 ? (
                           <p className="text-gray-500 text-sm italic">Not in any teams</p>
                         ) : (
                           userTeams.map(tm => (
-                            <div key={tm.id} className="p-4 bg-white/5 rounded-2xl border border-white/10 flex justify-between items-center group">
-                              <div>
-                                <p className="font-bold">{tm.teams?.name}</p>
-                                <p className="text-xs text-gray-500">{tm.teams?.events?.title}</p>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${tm.role === 'lead' ? 'bg-secondary/10 text-secondary' : 'bg-white/5 text-gray-400'}`}>
+                            <div key={tm.id} className="p-4 bg-white/5 rounded-2xl border border-white/10 group">
+                              <div className="flex justify-between items-start mb-3">
+                                <div>
+                                  <p className="font-bold">{tm.teams?.team_name}</p>
+                                  <p className="text-xs text-gray-500">{tm.teams?.events?.name}</p>
+                                </div>
+                                <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${tm.role === 'leader' ? 'bg-secondary/10 text-secondary' : 'bg-white/5 text-gray-400'}`}>
                                   {tm.role.toUpperCase()}
                                 </span>
-                                <button 
-                                  onClick={() => handleSplitTeam(tm.id)}
-                                  className="p-1.5 hover:bg-red-500/10 text-red-400 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
-                                  title="Remove from Team"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
                               </div>
+                              {/* Team Members List - Always show for all users */}
+                              {tm.allMembers && tm.allMembers.length > 0 ? (
+                                <div className="mt-3 pt-3 border-t border-white/5">
+                                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Team Members ({tm.allMembers.length})</p>
+                                  <div className="space-y-2">
+                                    {tm.allMembers.map(member => (
+                                      <div key={member.id} className="flex items-center justify-between text-xs">
+                                        <div className="flex items-center gap-2">
+                                          <div className={`w-1.5 h-1.5 rounded-full ${member.role === 'leader' ? 'bg-secondary' : 'bg-gray-500'}`} />
+                                          <span className="text-gray-300">{member.profiles?.full_name}</span>
+                                        </div>
+                                        <span className="text-gray-500 text-[10px]">{member.profiles?.college_name?.substring(0, 20)}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="mt-3 pt-3 border-t border-white/5">
+                                  <p className="text-[10px] text-gray-500 italic">No team members loaded</p>
+                                </div>
+                              )}
                             </div>
                           ))
                         )}
@@ -695,9 +845,19 @@ const UserManager = () => {
                           <div key={i} className="relative pl-8">
                             <div className={`absolute left-0 top-1.5 w-4 h-4 rounded-full border-2 border-slate-900 ${
                               act.type === 'profile' ? 'bg-blue-500' : 
-                              act.type === 'registration' ? 'bg-secondary' : 'bg-green-500'
+                              act.type === 'referral' ? 'bg-purple-500' :
+                              act.type === 'registration' ? 'bg-secondary' : 
+                              act.type === 'team' ? 'bg-orange-500' : 'bg-green-500'
                             }`} />
                             <p className="text-sm font-bold">{act.label}</p>
+                            {act.type === 'registration' && act.payment && (
+                              <div className="flex gap-2 items-center mt-1">
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${act.payment === 'PAID' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
+                                  {act.payment}
+                                </span>
+                                {act.amount && <span className="text-xs text-gray-400">₹{act.amount}</span>}
+                              </div>
+                            )}
                             <p className="text-xs text-gray-500">{new Date(act.date).toLocaleString()}</p>
                           </div>
                         ))}
