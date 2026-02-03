@@ -253,11 +253,23 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
       const isTeamEvent = teamEventKeywords.some(keyword => eventName.includes(keyword));
 
       if (isTeamEvent) {
-        // For team events, fetch team data
+        // For team events, first get PAID registrations to filter teams
+        const { data: paidRegistrations, error: regError } = await supabase
+          .from('event_registrations_config')
+          .select('user_id')
+          .eq('event_id', selectedEvent.id)
+          .in('payment_status', ['PAID', 'completed']);
+
+        if (regError) throw regError;
+
+        const paidUserIds = paidRegistrations?.map(reg => reg.user_id) || [];
+        
+        // Fetch only teams where the leader has PAID status
         const { data: teamData, error: teamError } = await supabase
           .from('teams')
           .select('*')
-          .eq('event_id', selectedEvent.id);
+          .eq('event_id', selectedEvent.id)
+          .in('leader_id', paidUserIds);
 
         if (teamError) throw teamError;
 

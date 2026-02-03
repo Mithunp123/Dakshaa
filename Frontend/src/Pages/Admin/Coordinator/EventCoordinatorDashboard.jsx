@@ -110,11 +110,16 @@ const EventCoordinatorDashboard = () => {
       doc.setFontSize(12);
       doc.text(`Event: ${selectedEvent.name || 'Unknown'}`, pageWidth / 2, 40, { align: 'center' });
       
+      // Filter out pending status first
+      const paidParticipants = participants.filter(p => 
+        p.payment_status === 'PAID' || p.payment_status === 'completed'
+      );
+
       // Info Block
       doc.setFontSize(10);
       doc.text(`Report Generated: ${new Date().toLocaleString()}`, 15, 55);
       doc.text(`Coordinator: Admin`, 15, 60);
-      doc.text(`Total Participants: ${participants.length}`, 15, 65);
+      doc.text(`Total Participants: ${paidParticipants.length}`, 15, 65);
       doc.text(`Checked In: ${stats.totalCheckedIn}`, 80, 65);
 
       // Table
@@ -122,7 +127,7 @@ const EventCoordinatorDashboard = () => {
       const tableRows = [];
 
       // Sort by Name
-      const sortedParticipants = [...participants].sort((a, b) => 
+      const sortedParticipants = [...paidParticipants].sort((a, b) => 
         (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || '')
       );
 
@@ -261,11 +266,22 @@ const EventCoordinatorDashboard = () => {
   };
 
   useEffect(() => {
+    let isActive = true;
+    let pollingInterval = null;
+    
+    const loadData = async () => {
+      if (!isActive) return;
+      try {
+        await Promise.all([fetchParticipants(), fetchStats()]);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    };
+
     if (selectedEvent) {
       // Initial fetch
       console.log('📊 Loading participants and stats for:', selectedEvent.name);
-      fetchParticipants();
-      fetchStats();
+      loadData();
 
       // Set up real-time subscription for attendance changes
       const attendanceSubscription = supabase
@@ -279,8 +295,7 @@ const EventCoordinatorDashboard = () => {
           },
           (payload) => {
             console.log('🔄 Attendance change detected:', payload);
-            fetchParticipants();
-            fetchStats();
+            if (isActive) loadData();
           }
         )
         .subscribe();
@@ -298,27 +313,25 @@ const EventCoordinatorDashboard = () => {
           },
           (payload) => {
             console.log('🔄 Registration change detected:', payload);
-            fetchParticipants();
-            fetchStats();
+            if (isActive) loadData();
           }
         )
         .subscribe();
 
-      // Polling fallback: refresh both participants and stats every 30 seconds (reduced from 5s)
-      const pollingInterval = setInterval(() => {
-        if (import.meta.env.DEV) {
-          console.log('⏱️ Polling update...');
-        }
-        fetchParticipants();
-        fetchStats();
+      // Polling fallback: refresh both participants and stats every 30 seconds
+      pollingInterval = setInterval(() => {
+        if (!isActive) return;
+        console.log('⏱️ Polling update...');
+        loadData();
       }, 30000);
 
       // Cleanup subscriptions and interval on unmount or event change
       return () => {
+        isActive = false;
         console.log('🧹 Cleaning up subscriptions for:', selectedEvent.name);
         supabase.removeChannel(attendanceSubscription);
         supabase.removeChannel(registrationSubscription);
-        clearInterval(pollingInterval);
+        if (pollingInterval) clearInterval(pollingInterval);
       };
     }
   }, [selectedEvent]);
