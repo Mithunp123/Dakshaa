@@ -66,6 +66,49 @@ const Desk = () => {
     fetchWaitlist();
   }, []);
 
+  // Silent auto-refresh every 30 seconds
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      // Silent refresh without showing loading state
+      const silentFetchPendingPayments = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('registrations')
+            .select(`
+              *,
+              profiles:user_id (full_name, roll_number, mobile_number),
+              events:event_id (title, price)
+            `)
+            .eq('payment_status', 'pending')
+            .eq('payment_method', 'cash');
+
+          if (!error && data) {
+            setPendingPayments(data);
+          }
+        } catch (error) {
+          console.error('Silent refresh error:', error);
+        }
+      };
+
+      const silentFetchWaitlist = async () => {
+        try {
+          const { data } = await supabase
+            .from('waitlist')
+            .select('*, profiles!user_id(id, full_name, roll_number, email, mobile_number, college_name), events(*)')
+            .eq('status', 'waiting');
+          if (data) setWaitlist(data);
+        } catch (error) {
+          console.error('Silent waitlist refresh error:', error);
+        }
+      };
+
+      silentFetchPendingPayments();
+      silentFetchWaitlist();
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(refreshInterval);
+  }, []);
+
   const fetchWaitlist = async () => {
     const { data } = await supabase
       .from('waitlist')

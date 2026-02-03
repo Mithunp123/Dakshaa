@@ -2846,11 +2846,13 @@ const RegistrationForm = () => {
                             {showTeamDetails && (
                               <div className="mt-3 pt-3 border-t border-gray-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                   <label className="text-xs text-gray-400 block mb-1">Team Name</label>
+                                   <label className="text-xs text-gray-400 block mb-1">
+                                     {isConference ? 'Title of the Paper' : 'Team Name'}
+                                   </label>
                                    <input 
                                      type="text"
                                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-500 outline-none"
-                                     placeholder="Enter Team Name"
+                                     placeholder={isConference ? 'Enter Paper Title' : 'Enter Team Name'}
                                      value={teamDetailsMap[eventId]?.teamName || ''}
                                      onChange={(e) => handleTeamDetailsChange(eventId, 'teamName', e.target.value)}
                                    />
@@ -3027,11 +3029,13 @@ const RegistrationForm = () => {
                             {isTeam && (
                               <div className="mt-3 pt-3 border-t border-gray-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                   <label className="text-xs text-gray-400 block mb-1">Team Name *</label>
+                                   <label className="text-xs text-gray-400 block mb-1">
+                                     {(event.category || '').toLowerCase() === 'conference' ? 'Title of the Paper *' : 'Team Name *'}
+                                   </label>
                                    <input 
                                      type="text"
                                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-500 outline-none"
-                                     placeholder="Enter Team Name"
+                                     placeholder={(event.category || '').toLowerCase() === 'conference' ? 'Enter Paper Title' : 'Enter Team Name'}
                                      value={teamDetailsMap[eventId]?.teamName || ''}
                                      onChange={(e) => handleTeamDetailsChange(eventId, 'teamName', e.target.value)}
                                    />
