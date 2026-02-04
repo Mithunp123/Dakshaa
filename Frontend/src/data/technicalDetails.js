@@ -795,8 +795,126 @@ export const technicalDetails = [
     price: "₹250",
     topics: [
       {
-        title: "Emerging Food Processing Technologies",
-      },
+  title: "Precision Fermentation & Functional Foods",
+
+},
+{
+  title: "Green Enzymatic Food Processing",
+
+},
+{
+  title: "Agri-Waste Valorization",
+
+},
+{
+  title: "AI-Driven Farm-to-Factory Systems",
+
+},
+{
+  title: "Personalized Functional Nutrition",
+
+},
+{
+  title: "Advanced Food Fortification",
+
+},
+{
+  title: "Sustainable Plant Design",
+
+},
+{
+  title: "Food Industry Wastewater Management",
+
+},
+{
+  title: "Food Automation & Robotics",
+
+},
+{
+  title: "Smart Thermal Processing",
+
+},
+{
+  title: "Intelligent Food Plant Control",
+
+},
+{
+  title: "Smart Sensors in Food Machinery",
+
+},
+{
+  title: "Energy-Efficient Food Processing",
+
+},
+{
+  title: "Electrical Safety in Food Automation",
+
+},
+{
+  title: "Sensor Networks for Food Quality",
+
+},
+{
+  title: "Wireless Food Production Monitoring",
+
+},
+{
+  title: "VLSI Sensors for Food Safety",
+
+},
+{
+  title: "Chip-Based Food Quality Detection",
+
+},
+{
+  title: "AI-Driven Food Quality Prediction",
+
+},
+{
+  title: "ML-Based Shelf-Life Prediction",
+
+},
+{
+  title: "Big Data in Food Supply Chains",
+
+},
+{
+  title: "Smart Data for Food Safety",
+
+},
+{
+  title: "Cloud-Enabled Smart Food Factories",
+
+},
+{
+  title: "Cybersecurity in Food Automation",
+
+},
+{
+  title: "Digital Food Industry Transformation",
+
+},
+{
+  title: "IoT-Based Food Processing",
+
+},
+{
+  title: "Food Tech Business Analytics",
+
+},
+{
+  title: "Technology-Driven Food Management",
+
+},
+{
+  title: "Smart Fiber-Based Packaging",
+
+},
+{
+  title: "Food-Grade Fiber Packaging",
+
+},
+
     ],
     rewards: [
          {
