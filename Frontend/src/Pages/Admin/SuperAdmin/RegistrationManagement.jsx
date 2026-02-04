@@ -661,11 +661,14 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
       doc.setFont('helvetica', 'bold');
       doc.text('Summary Statistics', 14, summaryY);
       
+      // Calculate total paid registrations for the report
+      const totalPaidRegistrations = eventStats.reduce((sum, event) => sum + (event.paidRegistrations || 0), 0);
+
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(60, 60, 60);
       doc.text(`Total Events: ${eventStats.length}`, 14, summaryY + 7);
-      doc.text(`Total Registrations: ${totalRegistrations}`, 14, summaryY + 13);
+      doc.text(`Total Paid Registrations: ${totalPaidRegistrations}`, 14, summaryY + 13);
       doc.text(`Individual Registrations: ${registrationCounts.individual}`, 90, summaryY + 7);
       doc.text(`Total Teams: ${registrationCounts.team}`, 90, summaryY + 13);
       doc.text(`Team Leaders: ${registrationCounts.teamLeader}`, 170, summaryY + 7);
@@ -679,7 +682,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         { header: 'S.No', dataKey: 'sno' },
         { header: 'Event Name', dataKey: 'eventName' },
         { header: 'Category', dataKey: 'category' },
-        { header: 'Registrations', dataKey: 'registrations' },
+        { header: 'Count (Paid)', dataKey: 'registrations' },
         { header: 'Capacity', dataKey: 'capacity' }
       ];
 
@@ -687,7 +690,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         sno: index + 1,
         eventName: event.name || 'N/A',
         category: event.category || 'N/A',
-        registrations: event.totalRegistrations || 0,
+        registrations: event.paidRegistrations || 0,
         capacity: event.capacity || 0
       }));
 
@@ -882,7 +885,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
             .from('event_registrations_config')
             .select('*', { count: 'exact', head: true })
             .eq('event_id', event.id)
-            .eq('payment_status', 'PAID'),
+            .in('payment_status', ['PAID', 'completed']),
           supabase
             .from('event_registrations_config')
             .select('*', { count: 'exact', head: true })
