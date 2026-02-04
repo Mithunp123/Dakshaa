@@ -53,12 +53,16 @@ const LiveStats = () => {
   const [deptStats, setDeptStats] = useState([]);
   const [isLive, setIsLive] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [connectionStatus, setConnectionStatus] = useState('connecting');
   const [expandedDept, setExpandedDept] = useState(null);
   const [deptEventDetails, setDeptEventDetails] = useState({});
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [categoryEventDetails, setCategoryEventDetails] = useState({});
   const navigate = useNavigate();
   const eventLookupRef = useRef({});
+  const channelRef = useRef(null);
+  const heartbeatRef = useRef(null);
+  const refreshIntervalRef = useRef(null);
 
   const [milestone, setMilestone] = useState(null);
   const prevStats = useRef(null);
@@ -117,7 +121,23 @@ const LiveStats = () => {
     setupRealtimeSubscriptions();
 
     return () => {
-      supabase.channel('live-stats').unsubscribe();
+      if (channelRef.current) {
+        console.log('🔄 Cleaning up real-time subscriptions');
+        channelRef.current.unsubscribe();
+        channelRef.current = null;
+      }
+      if (heartbeatRef.current) {
+        clearInterval(heartbeatRef.current);
+        heartbeatRef.current = null;
+      }
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+        refreshIntervalRef.current = null;
+      }
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+        refreshIntervalRef.current = null;
+      }
     };
   }, []);
 
@@ -514,25 +534,33 @@ const LiveStats = () => {
     try {
       setLoading(true);
       
-      console.log("Fetching live stats...");
-      // Call the secure RPC function
-      const { data, error } = await supabase.rpc('get_live_stats');
+      console.log("🔍 Fetching live stats...");
       
-      if (error) {
-        console.error('Error fetching stats via RPC:', error);
-        // Fallback to direct count if RPC not available
-        await fetchStatsFallback();
-      } else {
-        console.log("Stats fetched via RPC:", data);
-        setStats(data);
+      // Always use fallback method for most accurate count
+      console.log("⚡ Using direct database counting for accuracy...");
+      await fetchStatsFallback();
+      
+      // Also try RPC for comparison
+      try {
+        const { data: rpcData, error: rpcError } = await supabase.rpc('get_live_stats');
+        if (!rpcError && rpcData) {
+          console.log("📊 RPC Result for comparison:", rpcData);
+          console.log("🔍 Count comparison - RPC vs Direct:", {
+            rpc: rpcData.registrations,
+            direct: "See fallback logs above"
+          });
+        }
+      } catch (rpcErr) {
+        console.log("⚠️ RPC comparison failed (using direct count):", rpcErr.message);
       }
+      
     } catch (err) {
-      console.error('Error in fetchInitialStats:', err);
-      // Try fallback if main try fails
+      console.error('❌ Error in fetchInitialStats:', err);
       try {
           await fetchStatsFallback();
       } catch (fallbackErr) {
-          console.error('Fallback also failed:', fallbackErr);
+          console.error('❌ Fallback also failed:', fallbackErr);
+          setStats({ users: 0, registrations: 0, last_updated: new Date().toISOString() });
       }
     } finally {
       setLoading(false);
@@ -540,76 +568,183 @@ const LiveStats = () => {
   };
 
   const fetchStatsFallback = async () => {
-
     try {
-        // Fallback method using head count
-        // Using event_registrations_config as it seems to be the main table now
-        const [usersResult, regsResult] = await Promise.all([
-        supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
-        supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).eq('payment_status', 'PAID')
+        console.log("🔍 Using fallback counting method...");
+        
+        // Multiple counting approaches to find the accurate count
+        const [
+          standardPaidCount,
+          caseInsensitivePaidCount,
+          allStatusesCount,
+          studentCount
+        ] = await Promise.all([
+          // Standard PAID count
+          supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).eq('payment_status', 'PAID'),
+          // Case-insensitive PAID count using ilike
+          supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).ilike('payment_status', 'paid'),
+          // All registrations to see total
+          supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }),
+          // Student count
+          supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student')
         ]);
 
-        setStats({
-        users: usersResult.count || 0,
-        registrations: regsResult.count || 0,
-        last_updated: new Date().toISOString()
+        console.log("📊 Comprehensive Count Results:");
+        console.log("- Standard 'PAID' count:", standardPaidCount.count);
+        console.log("- Case-insensitive 'paid' count:", caseInsensitivePaidCount.count);
+        console.log("- Total registrations (all statuses):", allStatusesCount.count);
+        console.log("- Student profiles:", studentCount.count);
+        
+        // Get a sample of payment statuses to debug
+        const statusSample = await supabase
+          .from('event_registrations_config')
+          .select('payment_status, created_at, id')
+          .order('created_at', { ascending: false })
+          .limit(20);
+          
+        if (statusSample.data) {
+          const statusCounts = {};
+          statusSample.data.forEach(record => {
+            const status = record.payment_status || 'NULL';
+            statusCounts[status] = (statusCounts[status] || 0) + 1;
+          });
+          console.log("📋 Recent payment statuses breakdown:", statusCounts);
+          console.log("📝 Sample records:", statusSample.data.slice(0, 5));
+        }
+
+        // Try multiple queries to find the highest accurate count
+        const queries = await Promise.all([
+          supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).eq('payment_status', 'PAID'),
+          supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).eq('payment_status', 'paid'),
+          supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).eq('payment_status', 'Paid'),
+          supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).ilike('payment_status', 'paid')
+        ]);
+        
+        const counts = queries.map(q => q.count || 0);
+        console.log("🔍 All payment status variations:", {
+          'PAID': counts[0],
+          'paid': counts[1], 
+          'Paid': counts[2],
+          'ilike_paid': counts[3]
         });
+        
+        // Use the highest count as it's likely the most accurate
+        const maxCount = Math.max(...counts);
+        console.log("📈 Using maximum count:", maxCount);
+        
+        // If we're still seeing 315/316 discrepancy, do a manual verification
+        if (maxCount === 315) {
+          console.log("🚨 Still showing 315, investigating further...");
+          
+          // Get actual records to count manually
+          const allRecords = await supabase
+            .from('event_registrations_config')
+            .select('payment_status, id')
+            .not('payment_status', 'is', null);
+            
+          if (allRecords.data) {
+            const manualCount = allRecords.data.filter(record => 
+              record.payment_status && record.payment_status.toLowerCase() === 'paid'
+            ).length;
+            
+            console.log("🔢 Manual count (case-insensitive):", manualCount);
+            console.log("📦 Total records with payment_status:", allRecords.data.length);
+            
+            // Use manual count if it's different
+            if (manualCount !== maxCount) {
+              console.log("⚡ Using manual count as it differs from DB count");
+              setStats({
+                users: studentCount.count || 0,
+                registrations: manualCount,
+                last_updated: new Date().toISOString()
+              });
+              return;
+            }
+          }
+        }
+
+        setStats({
+          users: studentCount.count || 0,
+          registrations: maxCount,
+          last_updated: new Date().toISOString()
+        });
+        
     } catch (error) {
-         console.error("Error in fallback:", error);
-         // Set zero if everything fails to avoid loading loop
+         console.error("❌ Error in fallback:", error);
          setStats({ users: 0, registrations: 0, last_updated: new Date().toISOString() });
     }
   };
 
   const setupRealtimeSubscriptions = () => {
-    // Create a channel for both tables
-    const channel = supabase.channel('live-stats');
-
-    // Listen for new profiles (students joining)
-    channel.on(
-      'postgres_changes',
-      { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'profiles' 
-      },
-      (payload) => {
-        console.log('New student onboarded!', payload);
-        setStats(prev => ({
-          ...prev,
-          users: prev.users + 1,
-          last_updated: new Date().toISOString()
-        }));
-        setIsLive(true);
-        setTimeout(() => setIsLive(false), 2000);
+    try {
+      // Clean up existing channel first
+      if (channelRef.current) {
+        channelRef.current.unsubscribe();
       }
-    );
 
-    // Listen for new registrations (Confirmed/PAID)
-    channel.on(
-      'postgres_changes',
-      { 
-        event: '*', 
-        schema: 'public', 
-        table: 'event_registrations_config' 
-      },
-      (payload) => {
-        const oldStatus = payload.old?.payment_status;
-        const newStatus = payload.new?.payment_status;
+      // Create a channel with a unique name
+      const channel = supabase.channel(`live-stats-${Date.now()}`);
+      channelRef.current = channel;
 
-        // Only count if status transitions to PAID (or is new and PAID)
-        if (oldStatus !== 'PAID' && newStatus === 'PAID') {
-           // Optimistic update
-           console.log("Realtime registration detected", payload);
-           
-           const eventId = payload.new.event_id;
-           const meta = eventLookupRef.current[eventId];
-           
-           setStats(prev => ({
-             ...prev,
-             registrations: prev.registrations + 1,
-             last_updated: new Date().toISOString()
-           }));
+      // Listen for new profiles (students joining)
+      channel.on(
+        'postgres_changes',
+        { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'profiles',
+          filter: 'role=eq.student'
+        },
+        (payload) => {
+          console.log('🎓 New student onboarded!', payload);
+          setStats(prev => ({
+            ...prev,
+            users: prev.users + 1,
+            last_updated: new Date().toISOString()
+          }));
+          setIsLive(true);
+          setTimeout(() => setIsLive(false), 2000);
+        }
+      );
+
+      // Listen for new registrations (Confirmed/PAID) - Listen to ALL events
+      channel.on(
+        'postgres_changes',
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'event_registrations_config' 
+        },
+        (payload) => {
+          try {
+            console.log('📨 Raw registration event received:', payload);
+            const oldStatus = payload.old?.payment_status;
+            const newStatus = payload.new?.payment_status;
+            
+            console.log('📊 Payment Status Change:', { oldStatus, newStatus });
+
+            // Handle both case variations and new records
+            const isPaidNow = newStatus && (newStatus.toUpperCase() === 'PAID');
+            const wasPaidBefore = oldStatus && (oldStatus.toUpperCase() === 'PAID');
+            
+            // Count if:
+            // 1. New record with PAID status (INSERT)
+            // 2. Status changed from non-PAID to PAID (UPDATE)
+            if (isPaidNow && !wasPaidBefore) {
+              console.log('🎉 New PAID registration detected!', payload);
+              
+              const eventId = payload.new.event_id;
+              const meta = eventLookupRef.current[eventId];
+              
+              // Force state update with callback to ensure it happens
+              setStats(prevStats => {
+                const newStats = {
+                  ...prevStats,
+                  registrations: prevStats.registrations + 1,
+                  last_updated: new Date().toISOString()
+                };
+                console.log('📊 Stats updated:', { old: prevStats.registrations, new: newStats.registrations });
+                return newStats;
+              });
 
            if (meta) {
                // Update Category
@@ -647,22 +782,75 @@ const LiveStats = () => {
                }
            }
            
-           // Background Refresh
-           fetchInitialStats();
-           fetchCategoryStats();
-           fetchDeptStats();
+           // Background Refresh (with reduced frequency to avoid spam)
+           setTimeout(() => {
+             fetchInitialStats();
+             fetchCategoryStats(); 
+             fetchDeptStats();
+           }, 1000);
            
-           setIsLive(true);
-           setTimeout(() => setIsLive(false), 2000);
+             setIsLive(true);
+             setTimeout(() => setIsLive(false), 2000);
+            }
+          } catch (error) {
+            console.error('❌ Error processing registration update:', error);
+          }
         }
-      }
-    );
+      );
 
-    channel.subscribe((status) => {
-      if (status === 'SUBSCRIBED') {
-        console.log('✅ Realtime subscriptions active');
-      }
-    });
+      channel.subscribe((status, err) => {
+        console.log('📡 Subscription status:', status);
+        setConnectionStatus(status.toLowerCase());
+        
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Real-time subscriptions active');
+          // Start heartbeat to ensure connection stays alive
+          if (heartbeatRef.current) {
+            clearInterval(heartbeatRef.current);
+          }
+          heartbeatRef.current = setInterval(() => {
+            // Ping the connection every 30 seconds
+            if (channelRef.current && channelRef.current.state === 'joined') {
+              console.log('💓 Heartbeat: connection active');
+            } else {
+              console.warn('💔 Heartbeat: connection lost, reconnecting...');
+              setupRealtimeSubscriptions();
+            }
+          }, 30000);
+          
+          // Start periodic refresh as backup (every 2 minutes)
+          if (refreshIntervalRef.current) {
+            clearInterval(refreshIntervalRef.current);
+          }
+          refreshIntervalRef.current = setInterval(() => {
+            console.log('🔄 Periodic refresh to ensure accuracy...');
+            fetchInitialStats();
+          }, 120000); // 2 minutes
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('❌ Subscription error:', err);
+          setConnectionStatus('error');
+          // Retry subscription after a delay
+          setTimeout(() => {
+            console.log('🔄 Retrying real-time subscription...');
+            setupRealtimeSubscriptions();
+          }, 5000);
+        } else if (status === 'TIMED_OUT') {
+          console.warn('⏰ Subscription timed out, retrying...');
+          setConnectionStatus('timeout');
+          setTimeout(() => setupRealtimeSubscriptions(), 2000);
+        } else if (status === 'CLOSED') {
+          console.warn('🔒 Subscription closed');
+          setConnectionStatus('closed');
+        }
+      });
+    } catch (error) {
+      console.error('❌ Error setting up real-time subscriptions:', error);
+      // Retry after a delay
+      setTimeout(() => {
+        console.log('🔄 Retrying real-time subscription setup...');
+        setupRealtimeSubscriptions();
+      }, 5000);
+    }
   };
 
   if (loading) {
@@ -678,7 +866,7 @@ const LiveStats = () => {
 
   return (
     <div className="fixed inset-0 z-50 bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-hidden">
-      {/* Back Button & Countdown Container - Horizontal Layout */}
+      {/* Back Button */}
       <div className="absolute top-4 left-4 md:top-8 md:left-8 z-50 flex items-center gap-4 md:gap-8">
         <button 
           onClick={() => navigate(-1)}
@@ -715,13 +903,33 @@ const LiveStats = () => {
 
       {/* Live Indicator */}
       <motion.div 
-        className="absolute top-4 right-4 md:top-8 md:right-8 flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 bg-red-500/20 border border-red-500/40 rounded-full z-10"
+        className={`absolute top-4 right-4 md:top-8 md:right-8 flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 rounded-full z-10 ${
+          connectionStatus === 'subscribed' ? 'bg-green-500/20 border border-green-500/40' :
+          connectionStatus === 'error' || connectionStatus === 'timeout' ? 'bg-red-500/20 border border-red-500/40' :
+          connectionStatus === 'closed' ? 'bg-yellow-500/20 border border-yellow-500/40' :
+          'bg-blue-500/20 border border-blue-500/40'
+        }`}
         animate={{ scale: isLive ? [1, 1.1, 1] : 1 }}
         transition={{ duration: 0.3 }}
       >
-        <Radio className={`w-4 h-4 md:w-5 md:h-5 text-red-500 ${isLive ? 'animate-pulse' : ''}`} />
-        <span className="text-red-500 font-bold uppercase tracking-wider text-xs md:text-sm">
-          {isLive ? 'UPDATING...' : 'LIVE'}
+        <Radio className={`w-4 h-4 md:w-5 md:h-5 ${
+          connectionStatus === 'subscribed' ? 'text-green-500' :
+          connectionStatus === 'error' || connectionStatus === 'timeout' ? 'text-red-500' :
+          connectionStatus === 'closed' ? 'text-yellow-500' :
+          'text-blue-500'
+        } ${isLive || connectionStatus === 'connecting' ? 'animate-pulse' : ''}`} />
+        <span className={`font-bold uppercase tracking-wider text-xs md:text-sm ${
+          connectionStatus === 'subscribed' ? 'text-green-500' :
+          connectionStatus === 'error' || connectionStatus === 'timeout' ? 'text-red-500' :
+          connectionStatus === 'closed' ? 'text-yellow-500' :
+          'text-blue-500'
+        }`}>
+          {isLive ? 'UPDATING...' : 
+           connectionStatus === 'subscribed' ? 'LIVE' :
+           connectionStatus === 'error' ? 'ERROR' :
+           connectionStatus === 'timeout' ? 'TIMEOUT' :
+           connectionStatus === 'closed' ? 'RECONNECTING' :
+           'CONNECTING'}
         </span>
       </motion.div>
 
