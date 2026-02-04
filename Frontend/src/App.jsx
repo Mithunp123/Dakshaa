@@ -73,6 +73,7 @@ export const preloadPages = {
 // Components that are always needed can remain static or also be lazy loaded if large
 import AuthRedirect from "./Components/AuthRedirect";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import SessionMonitor from "./Components/SessionMonitor";
 
 // Admin & Staff Imports (Lazy Loaded)
 const AdminLayout = lazy(() => import("./Pages/Admin/AdminLayout"));
@@ -141,6 +142,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen min-h-screen-safe" style={{ minHeight: '100vh', position: 'relative' }}>
+      <SessionMonitor />
       {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && <Navbar />}
       {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && <Tags />}
       <Suspense key={location.key} fallback={<LoadingScreen variant="pulse" text="Loading..." />}>

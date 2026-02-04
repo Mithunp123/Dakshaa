@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '../supabase';
+import silentRefreshManager from '../utils/silentRefresh';
 
 const AuthContext = createContext({});
 
@@ -173,7 +174,10 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     let mounted = true;
 
-    // 1. Initial Session Check (Async Validation)
+    // 1. Start Silent Refresh Manager
+    silentRefreshManager.start();
+
+    // 2. Initial Session Check (Async Validation)
     const initAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -265,6 +269,7 @@ export const AuthProvider = ({ children }) => {
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      silentRefreshManager.stop();
     };
   }, [fetchUserRole]); // fetchUserRole is memoized
 
@@ -272,6 +277,9 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       isLoggingOut.current = true;
+      
+      // Stop silent refresh manager
+      silentRefreshManager.stop();
       
       // Clear all cached data BEFORE signing out to prevent race conditions
       localStorage.removeItem('userRole');
@@ -282,6 +290,16 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('dakshaa_combos_cache');
       localStorage.removeItem('registrations_cache');
       sessionStorage.clear(); // Clear all sessionStorage
+      
+      // Clear service worker caches if available
+      try {
+        if ('caches' in window) {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map(name => caches.delete(name)));
+        }
+      } catch (cacheError) {
+        console.warn('Cache clearing error:', cacheError);
+      }
       
       // Sign out from Supabase
       const { error } = await supabase.auth.signOut();

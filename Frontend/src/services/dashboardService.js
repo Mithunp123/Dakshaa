@@ -1,8 +1,8 @@
-import { supabase } from "../supabase";
+import authenticatedSupabase from "../utils/authenticatedSupabase";
 
 /**
  * Dashboard Service
- * Handles user dashboard data and statistics
+ * Handles user dashboard data and statistics with automatic token refresh
  */
 
 /**
@@ -11,7 +11,7 @@ import { supabase } from "../supabase";
  */
 export const getDashboardStats = async () => {
   try {
-    const { data, error } = await supabase.rpc('get_user_dashboard_stats');
+    const { data, error } = await authenticatedSupabase.rpc('get_user_dashboard_stats');
 
     if (error) throw error;
 
@@ -36,13 +36,13 @@ export const getDashboardStats = async () => {
  */
 export const getUserRegistrations = async () => {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await authenticatedSupabase.auth.getSession();
     
     if (!session?.user) {
       throw new Error('User not authenticated');
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await authenticatedSupabase
       .from('registrations')
       .select(`
         *,

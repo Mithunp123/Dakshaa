@@ -20,9 +20,13 @@ import { supabase } from '../../../supabase';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { usePageAuth } from '../../../hooks/usePageAuth';
+import { useAuthenticatedRequest } from '../../../utils/silentRefresh';
 
 const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
   const location = useLocation();
+  const { isLoading: authLoading } = usePageAuth('Super Admin Overview');
+  const { makeRequest } = useAuthenticatedRequest();
   const [stats, setStats] = useState({
     totalRegistrations: 0,
     totalRevenue: 0,
@@ -45,6 +49,17 @@ const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
   const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
   
   const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+          <p className="text-emerald-500/80 font-mono text-sm">Loading Super Admin Dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Function to open all events
   const openAllEvents = async () => {

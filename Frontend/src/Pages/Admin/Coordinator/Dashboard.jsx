@@ -32,6 +32,8 @@ import {
   requestCameraPermission,
   vibrate
 } from '../../../utils/scannerConfig';
+import { usePageAuth } from '../../../hooks/usePageAuth';
+import { useAuthenticatedRequest } from '../../../utils/silentRefresh';
 
 // Helper function to format UUID as Dakshaa ID (first 8 characters uppercase)
 const formatDakshaaId = (uuid) => {
@@ -40,6 +42,8 @@ const formatDakshaaId = (uuid) => {
 };
 
 const CoordinatorDashboard = () => {
+  const { isLoading: authLoading } = usePageAuth('Event Coordinator Dashboard');
+  const { makeRequest } = useAuthenticatedRequest();
   const [assignedEvents, setAssignedEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [participants, setParticipants] = useState([]);
@@ -67,6 +71,17 @@ const CoordinatorDashboard = () => {
     selectedEventRef.current = selectedEvent;
     console.log('Event updated to:', selectedEvent?.name || selectedEvent?.id);
   }, [selectedEvent]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+          <p className="text-purple-500/80 font-mono text-sm">Loading Coordinator Dashboard...</p>
+        </div>
+      </div>
+    );
+  }
   
   // Stats - now with session breakdown
   const [stats, setStats] = useState({

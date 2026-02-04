@@ -9,13 +9,15 @@ import brochure from "../../assets/Brochure.pdf";
 import { supabase } from "../../supabase";
 import { preloadPages } from "../../App";
 import { useAuth } from "../../Components/AuthProvider";
+import { useSecureLogout } from "../../hooks/usePageAuth";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("Home");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { user, role: userRole, logout } = useAuth();
+  const { user, role: userRole } = useAuth();
+  const secureLogout = useSecureLogout();
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const location = useLocation();
@@ -24,8 +26,13 @@ const Navbar = () => {
   const preloadedRef = useRef(new Set());
 
   const handleLogout = async () => {
-    await logout();
-    navigate('/');
+    try {
+      await secureLogout();
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force navigation even if logout fails
+      navigate('/');
+    }
   };
 
   useEffect(() => {

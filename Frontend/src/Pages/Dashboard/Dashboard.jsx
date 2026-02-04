@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import DashboardLayout from './Components/DashboardLayout';
+import { usePageAuth } from '../../hooks/usePageAuth';
 
 // Lazy load dashboard components for better performance
 const DashboardHome = lazy(() => import('./Components/DashboardHome'));
@@ -20,6 +21,16 @@ const LoadingSpinner = () => (
 );
 
 const Dashboard = () => {
+  const { isLoading } = usePageAuth('Student Dashboard');
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
+
   return (
     <DashboardLayout>
       <Suspense fallback={<LoadingSpinner />}>

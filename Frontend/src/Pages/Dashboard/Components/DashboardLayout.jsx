@@ -18,10 +18,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../../supabase';
 import NotificationDropdown from './NotificationDropdown';
 import { useAuth } from '../../../Components/AuthProvider';
+import { useSecureLogout } from '../../../hooks/usePageAuth';
 
 const DashboardLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { user, role, logout } = useAuth();
+  const { user, role } = useAuth();
+  const secureLogout = useSecureLogout();
   
   // Use auth context user for display
   const userProfile = {
@@ -50,8 +52,13 @@ const DashboardLayout = ({ children }) => {
   ], []);
 
   const handleLogout = async () => {
-    await logout();
-    navigate('/');
+    try {
+      await secureLogout();
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force navigation even if logout fails
+      navigate('/');
+    }
   };
 
   return (

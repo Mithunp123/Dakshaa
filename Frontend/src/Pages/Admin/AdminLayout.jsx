@@ -26,6 +26,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../supabase';
 import { useAuth } from '../../Components/AuthProvider';
+import { usePageAuth, useSecureLogout } from '../../hooks/usePageAuth';
 
 // Role display information
 const roleDisplayInfo = {
@@ -44,7 +45,9 @@ const AdminLayout = () => {
   const location = useLocation();
   
   // Use centralized auth to persist role across refreshes
-  const { user, role: authRole, logout } = useAuth();
+  const { user, role: authRole } = useAuth();
+  const { isLoading: authLoading } = usePageAuth('Admin Dashboard');
+  const secureLogout = useSecureLogout();
   const [userRole, setUserRole] = useState(authRole);
 
   useEffect(() => {
@@ -182,14 +185,22 @@ const AdminLayout = () => {
   };
 
   const handleLogout = async () => {
-    await logout();
-    navigate('/');
+    try {
+      await secureLogout();
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force navigation even if logout fails
+      navigate('/');
+    }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary"></div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary"></div>
+          <p className="text-secondary/80 font-mono text-sm">Loading Admin Dashboard...</p>
+        </div>
       </div>
     );
   }
