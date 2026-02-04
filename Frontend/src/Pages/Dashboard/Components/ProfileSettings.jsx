@@ -77,7 +77,6 @@ const ProfileSettings = () => {
         .from("profiles")
         .update({
           full_name: formData.full_name,
-          mobile_number: formData.mobile_number,
           college_name: formData.college_name,
           department: formData.department,
           roll_number: formData.roll_number
@@ -140,7 +139,7 @@ const ProfileSettings = () => {
           <div className="bg-primary/5 border border-primary/20 rounded-3xl p-6 flex gap-4">
             <Shield className="text-primary-light shrink-0" size={20} />
             <p className="text-xs text-gray-400 leading-relaxed">
-              Your Registration ID and Email are permanent and cannot be changed. Contact support if you need to update these.
+              Your Registration ID, Email and Mobile Number are permanent and cannot be changed. Contact support if you need to update these.
             </p>
           </div>
         </div>
@@ -164,14 +163,14 @@ const ProfileSettings = () => {
 
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-400 flex items-center gap-2">
-                  <Phone size={14} /> Mobile Number
+                  <Phone size={14} /> Mobile Number (Read-only)
                 </label>
                 <input 
                   type="text" 
                   name="mobile_number"
                   value={formData.mobile_number}
-                  onChange={handleChange}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-secondary transition-colors"
+                  readOnly
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed"
                 />
               </div>
 
