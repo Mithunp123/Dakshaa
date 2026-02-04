@@ -232,7 +232,7 @@ const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
       let regQuery = supabase
         .from('event_registrations_config')
         .select('*', { count: 'exact', head: true })
-        .eq('payment_status', 'PAID');
+        .in('payment_status', ['PAID', 'completed']);
       
       regQuery = applyFilter(regQuery);
       const { count: regCount, error: regError } = await regQuery;
@@ -248,7 +248,7 @@ const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
       let paidQuery = supabase
         .from('event_registrations_config')
         .select('payment_amount')
-        .eq('payment_status', 'PAID');
+        .in('payment_status', ['PAID', 'completed']);
       
       paidQuery = applyFilter(paidQuery);
       const { data: paidRegistrations, error: paidError } = await paidQuery;

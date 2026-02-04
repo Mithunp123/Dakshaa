@@ -1468,27 +1468,12 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
                     </td>
                     <td className="p-4 text-center">
                       <div className="flex flex-col items-center">
-                        <span className="text-lg font-bold text-green-400">{event.totalRegistrations}</span>
-                        {/* Payment status breakdown for coordinators */}
-                        {coordinatorEvents && coordinatorEvents.length > 0 && (
-                          <div className="flex gap-1 mt-1 text-xs">
-                            {event.paidRegistrations > 0 && (
-                              <span className="px-1 py-0.5 bg-green-500/20 text-green-400 rounded">
-                                P:{event.paidRegistrations}
-                              </span>
-                            )}
-                            {event.pendingRegistrations > 0 && (
-                              <span className="px-1 py-0.5 bg-yellow-500/20 text-yellow-400 rounded">
-                                Pe:{event.pendingRegistrations}
-                              </span>
-                            )}
-                            {event.partialRegistrations > 0 && (
-                              <span className="px-1 py-0.5 bg-blue-500/20 text-blue-400 rounded">
-                                Pa:{event.partialRegistrations}
-                              </span>
-                            )}
-                          </div>
-                        )}
+                        <span className="text-lg font-bold text-green-400">
+                          {coordinatorEvents && coordinatorEvents.length > 0 
+                            ? event.paidRegistrations 
+                            : event.totalRegistrations}
+                        </span>
+                        {/* Badges hidden as per request */}
                       </div>
                     </td>
                     <td className="p-4 text-center">
@@ -1759,12 +1744,14 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           </div>
           <div className="flex flex-col items-end gap-3">
             <div className="text-right">
-              <p className="text-4xl font-bold text-secondary">{selectedEvent.totalRegistrations}</p>
+              <p className="text-4xl font-bold text-secondary">
+                {coordinatorEvents && coordinatorEvents.length > 0 ? selectedEvent.paidRegistrations : selectedEvent.totalRegistrations}
+              </p>
               <p className="text-gray-400">Total Registrations</p>
             </div>
             <button
               onClick={generateRegistrationReport}
-              disabled={downloadingReport || selectedEvent.totalRegistrations === 0}
+              disabled={downloadingReport || (coordinatorEvents && coordinatorEvents.length > 0 ? selectedEvent.paidRegistrations : selectedEvent.totalRegistrations) === 0}
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-secondary/20 to-primary/20 border border-secondary/30 rounded-xl hover:from-secondary/30 hover:to-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {downloadingReport ? (

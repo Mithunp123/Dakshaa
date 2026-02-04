@@ -396,6 +396,15 @@ const CoordinatorDashboard = () => {
         console.warn('No valid event ID for stats');
         return;
       }
+
+      // Always fetch the paid registration count directly
+      const { count: paidRegisteredCount } = await supabase
+          .from('event_registrations_config')
+          .select('*', { count: 'exact', head: true })
+          .eq('event_id', eventId)
+          .in('payment_status', ['PAID', 'completed']);
+          
+      const registeredCount = paidRegisteredCount || 0;
       
       // Use RPC function for dynamic stats with session breakdown
       const { data: statsData, error: statsError } = await supabase.rpc('get_event_stats', {
@@ -405,12 +414,6 @@ const CoordinatorDashboard = () => {
       if (statsError) {
         console.warn('Stats RPC error, falling back to direct queries:', statsError);
         // Fallback to direct queries using column-based session tracking
-        const { count: registered } = await supabase
-          .from('event_registrations_config')
-          .select('*', { count: 'exact', head: true })
-          .eq('event_id', eventId)
-          .in('payment_status', ['PAID', 'completed']);
-
         const eventKey = selectedEvent.event_key;
         
         // Count morning attendance using morning_attended column
@@ -428,21 +431,21 @@ const CoordinatorDashboard = () => {
           .eq('evening_attended', true);
 
         setStats({
-          registered: registered || 0,
+          registered: registeredCount,
           morningCheckedIn: morningCount || 0,
           eveningCheckedIn: eveningCount || 0,
           totalCheckedIn: (morningCount || 0) + (eveningCount || 0),
-          morningRemaining: (registered || 0) - (morningCount || 0),
-          eveningRemaining: (registered || 0) - (eveningCount || 0)
+          morningRemaining: registeredCount - (morningCount || 0),
+          eveningRemaining: registeredCount - (eveningCount || 0)
         });
       } else {
         setStats({
-          registered: statsData.registered || 0,
+          registered: registeredCount,
           morningCheckedIn: statsData.morning_attended || 0,
           eveningCheckedIn: statsData.evening_attended || 0,
           totalCheckedIn: statsData.total_attended || 0,
-          morningRemaining: statsData.morning_remaining || 0,
-          eveningRemaining: statsData.evening_remaining || 0
+          morningRemaining: registeredCount - (statsData.morning_attended || 0),
+          eveningRemaining: registeredCount - (statsData.evening_attended || 0)
         });
       }
     } catch (error) {
