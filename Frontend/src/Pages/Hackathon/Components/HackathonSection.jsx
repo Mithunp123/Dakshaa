@@ -535,7 +535,7 @@ export const hackathonEventDetails = {
       id: "hackathon-6",
       title: "Designathon 2026",
       date: "February 13, 2026",
-      registrationFee:" ₹ 500 per head.",
+      registrationFee:" ₹ 300 per head.",
       venue: "BASKARA BLOCK [ MECHANICAL] DESIGN CENTER",
       description: " This Designathon is centered on the innovative use of Computer-Aided Design (CAD) tools to create, redesign, and optimize mechanical components and systems for modern engineering applications. The event provides a creative and technical platform for Mechanical Engineering students to transform ideas into precise digital models using industry-standard CAD software.Participants will apply design thinking principles to develop concepts, create 3D models, perform assemblies, and generate engineering drawings while considering functionality, manufacturability, material selection, and sustainability. The Designathon encourages students to rethink conventional designs and propose efficient, lightweight, and cost-effective solutions through advanced CAD modeling techniques. ",
       rewards: [
