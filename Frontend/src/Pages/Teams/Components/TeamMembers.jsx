@@ -29,17 +29,17 @@ import des1 from "../../../assets/team_members/des1.webp";
 import des2 from "../../../assets/team_members/des2.webp";
 import des3 from "../../../assets/team_members/des3.webp";
 import kavi from "../../../assets/team_members/kavi.webp";
-
+import aathavan from "../../../assets/team_members/aadhavan.webp";
+import yadhav from "../../../assets/team_members/yadhav.webp";
+import tharun from "../../../assets/team_members/tharun.webp";
+import kari from "../../../assets/team_members/karmukilan.webp";
 
 //event coordinators
-
-
 import ec1 from "../../../assets/team_members/ec1.webp";
 import ec2 from "../../../assets/team_members/ec2.webp";
 import ec3 from "../../../assets/team_members/ec3.webp"
 //import ec5 from "../../../assets/team_members/ec5.png"
 import ec6 from "../../../assets/team_members/ec6.webp"
-import ec7 from "../../../assets/team_members/ec7.webp"
 import ec8 from "../../../assets/team_members/ec8.webp"
 import ec9 from "../../../assets/team_members/ec9.webp"
 import ec10 from "../../../assets/team_members/ec10.webp"
@@ -49,21 +49,22 @@ import ec13 from "../../../assets/team_members/ec13.webp"
 import ec14 from "../../../assets/team_members/ec14.webp";
 
 const chiefCoordinator = [
-   { id: 14, name: "Kavinesh", department: "", img: kavinesh, role: "AEVA", phone: "+91 94892 43775", associationLogo: aevaLogo },
+   { id: 14, name: "Kavinesh", department: "AEVA", img: kavinesh, role: "Chief Coordinator", phone: "+91 94892 43775", associationLogo: aevaLogo },
 ];
 
 const jointCoordinators = [
   { id: 13, name: "Narendhar D ", department: "Artificix", img: narendhar, role: "Volunteers, Helpdesk & Participant Support ", phone: "+91 97516 73398", associationLogo: aidsasso },
-  { id: 12, name: "Kaviyarasu P", department: "Artificix", img: kavi, role: "Website, Content & Data Management ", phone: "+91 701067 64469", associationLogo: aidsasso },
+  { id: 12, name: "Kaviyarasu P", department: "Artificix", img: kavi, role: "Website, Content & Data Management ", phone: "+91 701067 64469", associationLogo:""},
 
   //{ id: 15, name: "Gopinath", department: "Department of AIML", img: gopinath, role: "Gopinath T ", phone: "+91 93611 63363", associationLogo: aevaLogo },
-  //{ id : 17, name: "Saran Senthur Suthanthran", department: "IT", img: itco, role: "Registrations, Payments & Attendance ", phone: "+91 80566 70219", associationLogo: itasso},
-  //{id : 18, name:"Yashas Yadav", department:"CSE", img:cseco, role:"Technical, Non-Technical & Team Events", phone:"+91 70108 43024", associationLogo:cseasso},
+  //{ id : 17, name: "Saran Senthur Suthanthran", department: "IT", img: saran, role: "Registrations, Payments & Attendance ", phone: "+91 80566 70219", associationLogo: itasso},
+  {id : 18, name:"Yashas Yadav", department:"CSE", img:yadhav, role:"Technical, Non-Technical & Team Events", phone:"+91 70108 43024", associationLogo:cseasso},
   {id :19, name:"Deepak C ", department:"Techragonz", img:deepak, role:"Technical, Non-Technical & Team Events", phone:"+91 63794 07526", associationLogo:csbsasso},
   {id :20, name:"Hari Prakash G ", department:"VLSI ENGINEERS AND DEVELOPERS ASSOCIATION ", img:hariprakash, role:"Workshops, Expos, Stalls & Resource Persons ", phone:"+91 89257 92409", associationLogo:vlsiasso},
   {id :22, name:"Deekshana C S ", department:"AEVA", img:deekshana, role:"National Conference ", phone:"+91 90878 42931", associationLogo:aevaLogo},
   {id :23, name:"Aarush VS ", department:"CSE", img:posterjoint, role:"Design, Social Media & Promotions", phone:"+91 88918 50995", associationLogo:cseasso},
-  //{id :24, name:"Tharun Kumar R ", department:"AIML", img:aimlco, role:"Accommodation & Lunch ", phone:"+91 77084 13624", associationLogo:aimlasso},
+  { id : 205, name : "Aathavan G", department : "Zita" , img: aathavan,role:"Hackathon, Codeathon & Flagship Challenges ",phone: "++91 96008 02107",associationLogo:itasso},
+  {id :24, name:"Tharun Kumar R ", department:"AIML", img:tharun, role:"Accommodation & Lunch ", phone:"+91 77084 13624", associationLogo:aevaLogo},
 ];
 
 
@@ -74,7 +75,7 @@ const eventCoordinators = [
   { id: 103, name: "Peranandha K L", department: "ASCI", img: ec3, role: "Event Coordinator", phone: "+91 81485 37603", associationLogo: cseasso},
   //{ id: 105, name: "Vignesh", department: "Department of IT", img: ec5, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
   { id: 106, name: "Shanmugeshwara A", department: "ASCI", img: ec6, role: "Event Coordinator", phone: "+91 94871 19381", associationLogo: cseasso },
-  { id: 107, name: "Gokul P K", department: "SPICEE", img: ec7, role: "Event Coordinator", phone: "+91 63817 37390", associationLogo: eeeasso },
+  { id: 107, name: "KARMUHILAN V ", department: "SPICEE", img: kari, role: "Event Coordinator", phone: "+91 90252 44374", associationLogo: eeeasso },
   { id: 108, name: "Niranjana Devi S", department: "Vedha", img: ec8, role: "Event Coordinator", phone: "+91 82485 88418", associationLogo: vlsiasso},
   { id: 109, name: "Chandra Mohan G", department: "Techragonz", img: ec9, role: "Event Coordinator", phone: "+91 88709 25956", associationLogo: csbsasso },
   { id: 110, name: "Mujamil S", department: "SPICEE", img: ec10, role: "Event Coordinator", phone: "+91 75029 68410", associationLogo: eeeasso },
@@ -286,7 +287,7 @@ const TeamMembers = () => {
 
         {/* Designers */}
         <SectionTitle title="Designers" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-12 justify-items-center w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 justify-items-center w-full">
           {designers.map((member) => (
             <TechCard key={member.id} member={member} />
           ))}
