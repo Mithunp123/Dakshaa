@@ -161,43 +161,8 @@ const LiveStats = () => {
   };
 
   const fetchDeptStats = async () => {
-     try {
-       const { data, error } = await supabase.rpc("get_live_dept_stats");
-       if (!error && data) {
-         // Post-processing to merge CSE-AIML into AIML
-         const mergedMap = {};
-         
-         data.forEach(item => {
-             let deptName = item.dept;
-             // Normalize variants
-             if (deptName === 'CSE-AIML' || deptName === 'Aiml') {
-                 deptName = 'AIML';
-             }
-             if (deptName === 'VLSI') {
-                 deptName = 'EE(VLSI D&T)';
-             }
-             
-             mergedMap[deptName] = (mergedMap[deptName] || 0) + item.count;
-         });
-
-         const processedData = Object.keys(mergedMap)
-            .map(key => ({ dept: key, count: mergedMap[key] }))
-            .sort((a, b) => b.count - a.count);
-
-         setDeptStats(processedData);
-       } else {
-         console.warn("RPC dept stats fetch failed, attempting client-side fallback...", error);
-         await fetchDeptStatsFallback();
-       }
-     } catch (error) {
-       console.error("Error calling get_live_dept_stats:", error);
-       await fetchDeptStatsFallback();
-     }
-  };
-
-  const fetchDeptStatsFallback = async () => {
     try {
-        // Fetch ALL active events to categorize them locally
+        // Fetch ALL active events to categorize them locally (skipping RPC due to inconsistencies)
         const { data: events, error: eventsError } = await supabase
             .from('events')
             .select('id, event_id')
@@ -229,6 +194,10 @@ const LiveStats = () => {
             .in('event_id', targetEventIds); 
 
         const counts = {};
+        // Initialize with 0 for all departments that have active events
+        Object.values(eventDeptMap).forEach(dept => {
+            counts[dept] = 0;
+        });
         
         (paidRegs || []).forEach(reg => {
             const dept = eventDeptMap[reg.event_id];
@@ -242,11 +211,11 @@ const LiveStats = () => {
             .sort((a, b) => b.count - a.count);
             
         setDeptStats(formatted);
-
-    } catch (err) {
-        console.error("Dept stats fallback failed:", err);
+    } catch (error) {
+       console.error("Error fetching dept stats:", error);
     }
   };
+
 
   const fetchDeptEventDetails = async (deptName) => {
     try {
