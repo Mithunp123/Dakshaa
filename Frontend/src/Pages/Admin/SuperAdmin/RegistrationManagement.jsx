@@ -648,7 +648,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
       doc.setFontSize(16);
       doc.setTextColor(197, 48, 48);
       doc.setFont('helvetica', 'bold');
-      doc.text('Dakshaa 2025 - Overall Registration Report', pageWidth / 2, headerY + 11, { align: 'center' });
+      doc.text('Dakshaa 2026 - Overall Registration Report', pageWidth / 2, headerY + 11, { align: 'center' });
       doc.setFontSize(10);
       doc.setTextColor(100, 100, 100);
       doc.setFont('helvetica', 'normal');
