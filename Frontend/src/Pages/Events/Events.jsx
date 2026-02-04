@@ -130,7 +130,26 @@ const Events = () => {
 
   useEffect(() => {
     const categoryParam = searchParams.get('category');
-    if (categoryParam) {
+    const eventParam = searchParams.get('event');
+    
+    // Handle direct event parameter (for opening specific modals)
+    if (eventParam) {
+      if (eventParam === 'startup-pitch') {
+        // Set hackathon category and open startup pitch modal
+        setSelectedEvent(4); // hackathon category id
+        const index = events.findIndex(event => event.id === 4);
+        if (index !== -1) {
+          const anglePerEvent = 360 / events.length;
+          const targetRotation = -(index * anglePerEvent);
+          setRotation(targetRotation);
+        }
+        // Find and open the startup pitch hackathon modal
+        const startupPitchEvent = hackathonDetails.find(h => h.id === 5);
+        if (startupPitchEvent) {
+          setSelectedHackathon(startupPitchEvent);
+        }
+      }
+    } else if (categoryParam) {
       // Use constant category map
       const eventId = CATEGORY_MAP[categoryParam] || 1;
       setSelectedEvent(eventId);

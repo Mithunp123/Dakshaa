@@ -14,7 +14,7 @@ function Tags() {
           className="w-20 md:w-40 bg-white p-1 md:p-2 -rotate-90 transition-transform duration-300 ease-in-out cursor-pointer transform hover:translate-x-4"
           src={tnStartUp}
           alt=""
-          onClick={()=> navigate('/startups')}
+          onClick={()=> navigate('/events?event=startup-pitch')}
         />
         <img
           className="w-20 md:w-40 bg-white p-1 md:p-2 -rotate-90 transition-transform duration-300 ease-in-out cursor-pointer transform hover:translate-x-4"
