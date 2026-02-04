@@ -25,6 +25,10 @@ const SignUpForm = () => {
   });
 
   const handleChange = (e) => {
+    // Enforce numeric input for mobile number
+    if (e.target.name === 'mobileNumber' && !/^\d*$/.test(e.target.value)) {
+      return;
+    }
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -83,8 +87,8 @@ const SignUpForm = () => {
       return;
     }
 
-    if (formData.mobileNumber.length !== 10) {
-      toast.error("Mobile number must be 10 digits", {
+    if (!/^\d{10}$/.test(formData.mobileNumber)) {
+      toast.error("Mobile number must be exactly 10 numeric digits", {
         duration: 3000,
         position: 'top-center',
         style: {
@@ -525,3 +529,4 @@ const SignUpForm = () => {
 };
 
 export default SignUpForm;
+
