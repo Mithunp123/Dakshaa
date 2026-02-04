@@ -13,7 +13,7 @@ import csbsasso from "../assest/Techragonz_csbs_logo.webp";
 import vlsiasso from "../assest/vlsi-logo.webp";
 import itasso from "../assest/zita_it_logo.webp";
 import cseasso from "../assest/ascilogo.png";
-
+import cisso from "../assest/zion.jpeg";
 
 
 import kavinesh from "../../../assets/team_members/kavinesh.webp";
@@ -32,21 +32,21 @@ import kavi from "../../../assets/team_members/kavi.webp";
 
 
 //event coordinators
-/*
-import ec1 from "../../../assets/team_members/ec1.png";
-import ec2 from "../../../assets/team_members/ec2.jpg";
-import ec3 from "../../../assets/team_members/ec3.jpeg"
-import ec4 from "../../../assets/team_members/ec4.jpg"
-import ec5 from "../../../assets/team_members/ec5.png"
-import ec6 from "../../../assets/team_members/ec6.jpeg"
-import ec7 from "../../../assets/team_members/ec7.jpg"
-import ec8 from "../../../assets/team_members/ec8.png"
-import ec9 from "../../../assets/team_members/ec9.jpeg"
-import ec10 from "../../../assets/team_members/ec10.jpg"
-import ec11 from "../../../assets/team_members/ec11.heic"
-import ec12 from "../../../assets/team_members/ec12.jpg"
-import ec13 from "../../../assets/team_members/ec13.jpg"
-import ec14 from "../../../assets/team_members/ec14.jpg";*/
+
+
+import ec1 from "../../../assets/team_members/ec1.webp";
+import ec2 from "../../../assets/team_members/ec2.webp";
+import ec3 from "../../../assets/team_members/ec3.webp"
+//import ec5 from "../../../assets/team_members/ec5.png"
+import ec6 from "../../../assets/team_members/ec6.webp"
+import ec7 from "../../../assets/team_members/ec7.webp"
+import ec8 from "../../../assets/team_members/ec8.webp"
+import ec9 from "../../../assets/team_members/ec9.webp"
+import ec10 from "../../../assets/team_members/ec10.webp"
+//import ec11 from "../../../assets/team_members/ec11.webp"
+import ec12 from "../../../assets/team_members/ec12.webp"
+import ec13 from "../../../assets/team_members/ec13.webp"
+import ec14 from "../../../assets/team_members/ec14.webp";
 
 const chiefCoordinator = [
    { id: 14, name: "Kavinesh", department: "", img: kavinesh, role: "AEVA", phone: "+91 94892 43775", associationLogo: aevaLogo },
@@ -69,21 +69,20 @@ const jointCoordinators = [
 
 
 const eventCoordinators = [
-  /*{ id: 101, name: "Vignesh", department: "Department of IT", img: ec1, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
-    { id: 102, name: "Vignesh", department: "Department of IT", img: ec2, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
-  { id: 103, name: "Vignesh", department: "Department of IT", img: ec3, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
-  { id: 104, name: "Vignesh", department: "Department of IT", img: ec4, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
-  { id: 105, name: "Vignesh", department: "Department of IT", img: ec5, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
-  { id: 106, name: "Vignesh", department: "Department of IT", img: ec6, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
-  { id: 107, name: "Vignesh", department: "Department of IT", img: ec7, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
-  { id: 108, name: "Vignesh", department: "Department of IT", img: ec8, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
-  { id: 109, name: "Vignesh", department: "Department of IT", img: ec9, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
-  { id: 110, name: "Vignesh", department: "Department of IT", img: ec10, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
-  { id: 111, name: "Vignesh", department: "Department of IT", img: ec11, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
-  { id: 112, name: "Vignesh", department: "Department of IT", img: ec12, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+  { id: 101, name: "Elavarasan S", department: "Zion", img: ec1, role: "Event Coordinator", phone: "+91 70108 76905", associationLogo: cisso },
+    { id: 102, name: "Harini S K", department: "Techragonz", img: ec2, role: "Event Coordinator", phone: "+91 88384 01078", associationLogo:  csbsasso },
+  { id: 103, name: "Peranandha K L", department: "ASCI", img: ec3, role: "Event Coordinator", phone: "+91 81485 37603", associationLogo: cseasso},
+  //{ id: 105, name: "Vignesh", department: "Department of IT", img: ec5, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+  { id: 106, name: "Shanmugeshwara A", department: "ASCI", img: ec6, role: "Event Coordinator", phone: "+91 94871 19381", associationLogo: cseasso },
+  { id: 107, name: "Gokul P K", department: "SPICEE", img: ec7, role: "Event Coordinator", phone: "+91 63817 37390", associationLogo: eeeasso },
+  { id: 108, name: "Niranjana Devi S", department: "Vedha", img: ec8, role: "Event Coordinator", phone: "+91 82485 88418", associationLogo: vlsiasso},
+  { id: 109, name: "Chandra Mohan G", department: "Techragonz", img: ec9, role: "Event Coordinator", phone: "+91 88709 25956", associationLogo: csbsasso },
+  { id: 110, name: "Mujamil S", department: "SPICEE", img: ec10, role: "Event Coordinator", phone: "+91 75029 68410", associationLogo: eeeasso },
+  //{ id: 111, name: "Vignesh", department: "Department of IT", img: ec11, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
+  { id: 112, name: "Kamalanarayanan R", department: "Food Vist", img: ec12, role: "Event Coordinator", phone: "+91 90434 58427", associationLogo: ftasso },
 
-  { id: 113, name: "Vignesh", department: "Department of IT", img: ec13, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
-    { id: 114, name: "Vignesh", department: "Department of IT", img: ec14, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },*/
+  { id: 113, name: "Hari Kesavaraj", department: "Vedha", img: ec13, role: "Event Coordinator", phone: "+91 82702 78279", associationLogo: vlsiasso },
+    { id: 114, name: "Priyan G S", department: "Sparks Association", img: ec14, role: "Event Coordinator", phone: "+91 86680 57985", associationLogo: mechasso },
 
 ];
 
@@ -271,7 +270,7 @@ const TeamMembers = () => {
 
         {/* Event Coordinators */}
         <SectionTitle title="Event Coordinators" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 justify-items-center w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 justify-items-center w-full">
           {eventCoordinators.map((member) => (
             <TechCard key={member.id} member={member} allowContact={true} />
           ))}

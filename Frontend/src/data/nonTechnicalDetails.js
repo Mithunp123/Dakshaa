@@ -1370,53 +1370,26 @@ export const nonTechnicalDetails = [
     shortTitle: "TECH TALK",
     title: "TECH TALK",
     department: "Non-Technical Events",
-    date: "February 14, 2026",
-    venue: "",
+    date: "February 13, 2026",
+    venue: "Language Enrichment Center",
     price: "₹ 150 per Member",
     description:
-      "Tech Talk is an event where students can showcase their knowledge and skills in various technical domains. It includes presentations, discussions, and interactive sessions with industry experts.",
+      "The Talk Show aims to identify and nurture young individuals who possess strong communication abilities and leadership potential.",
     img: techtalk,
-    /*rounds: [
-      {
-        title: "Round 1",
-        description:
-          "Teams will be divided into three groups and ranked based on points and net run rate.",
-      },
-      {
-        title: "Round 2",
-        description:"The top three teams and one committee team will qualify for the Semi-Finals.",
-      },
-      {
-        title: "Round 3",
-        description:"Winners of the Semi-Finals will compete in the Final match.",
-      },
-    ],
-    rewards: [
-      {
-        position: "1st Prize",
-        emoji: "🥇",
-        amount: "₹5,000",
-      },
-      {
-        position: "2nd Prize",
-        emoji: "🥈",
-        amount: "₹3,000",
-      },
-      
-      {
-        position: "3rd Prize",
-        emoji: "🥉",
-        amount: "₹1,000",
-      },
-    ],*/
+    
     rules: [
-      "Each participant must prepare a presentation on a technical topic of their choice.",        
+      
+      " Topic Selection: Speakers must select a topic either in English Category or Tamil Category that carries a meaningful message and has the power to inspire the youth.",
+     "Time Limit: The duration of the talk should not exceed 10 minutes.",
+    	 "Presentation: Participants should demonstrate enthusiasm, confidence, positive attitude, and effective speaking skills to ensure an engaging and impactful delivery.",
+    	 "Registration Process: Students pursuing full-time Under-Graduation in Engineering and  Arts & Science can participate by registering and remitting the participation fee. ",
+       "A student can participate only once and the participation is limited to English or Tamil. ",
     ],
     schedule: [
       {
-        date: "February 14, 2026",
+        date: "February 13, 2026",
         time: "9.00 AM to 01.00 PM",
-        location: "",
+        location: "Language Enrichment Center",
       },
     ],
     contact: {
