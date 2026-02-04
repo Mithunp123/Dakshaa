@@ -55,6 +55,8 @@ const LiveStats = () => {
   const [loading, setLoading] = useState(true);
   const [expandedDept, setExpandedDept] = useState(null);
   const [deptEventDetails, setDeptEventDetails] = useState({});
+  const [expandedCategory, setExpandedCategory] = useState(null);
+  const [categoryEventDetails, setCategoryEventDetails] = useState({});
   const navigate = useNavigate();
   const eventLookupRef = useRef({});
 
@@ -292,6 +294,88 @@ const LiveStats = () => {
         setExpandedDept(deptName);
         if (!deptEventDetails[deptName]) {
             fetchDeptEventDetails(deptName);
+        }
+    }
+  };
+
+  const fetchCategoryEventDetails = async (categoryName) => {
+    try {
+        // Check if we already have this data cached
+        if (categoryEventDetails[categoryName]) {
+            return;
+        }
+
+        // Map category display name to database values
+        const categoryMap = {
+            'Workshop': ['workshop', 'workshops'],
+            'Non Tech': ['non-technical', 'non-tech', 'nontech', 'non tech'],
+            'Tech': ['technical'],
+            'Culturals': ['cultural', 'culturals'],
+            'Sports': ['sports', 'sport'],
+            'Hackathon': ['hackathon', 'hack']
+        };
+
+        const categoryVariants = categoryMap[categoryName] || [categoryName.toLowerCase()];
+
+        // Fetch all active events with matching categories
+        const { data: events, error: eventsError } = await supabase
+            .from('events')
+            .select('id, event_id, name, category')
+            .eq('is_active', true);
+
+        if (eventsError) throw eventsError;
+
+        // Filter events by category (case-insensitive)
+        const categoryEvents = events.filter(e => {
+            const eventCategory = (e.category || '').toLowerCase().trim();
+            return categoryVariants.some(variant => eventCategory.includes(variant));
+        });
+
+        const eventIds = categoryEvents.map(e => e.id);
+
+        if (eventIds.length === 0) {
+            setCategoryEventDetails(prev => ({ ...prev, [categoryName]: [] }));
+            return;
+        }
+
+        // Fetch registration counts for each event
+        const { data: registrations } = await supabase
+            .from('event_registrations_config')
+            .select('event_id')
+            .eq('payment_status', 'PAID')
+            .in('event_id', eventIds);
+
+        // Count registrations per event
+        const eventCounts = {};
+        (registrations || []).forEach(reg => {
+            eventCounts[reg.event_id] = (eventCounts[reg.event_id] || 0) + 1;
+        });
+
+        // Format the data
+        const eventDetails = categoryEvents
+            .map(event => ({
+                id: event.id,
+                name: event.name,
+                count: eventCounts[event.id] || 0
+            }))
+            .filter(e => e.count > 0) // Only show events with registrations
+            .sort((a, b) => b.count - a.count);
+
+        setCategoryEventDetails(prev => ({ ...prev, [categoryName]: eventDetails }));
+
+    } catch (err) {
+        console.error("Error fetching category event details:", err);
+        setCategoryEventDetails(prev => ({ ...prev, [categoryName]: [] }));
+    }
+  };
+
+  const toggleCategoryExpansion = (categoryName) => {
+    if (expandedCategory === categoryName) {
+        setExpandedCategory(null);
+    } else {
+        setExpandedCategory(categoryName);
+        if (!categoryEventDetails[categoryName]) {
+            fetchCategoryEventDetails(categoryName);
         }
     }
   };
@@ -774,12 +858,13 @@ const LiveStats = () => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.6 + (index * 0.1) }}
-                        className="relative bg-gray-900 border border-gray-700/50 rounded-2xl p-3 hover:border-primary/30 transition-all group overflow-hidden"
+                        className="relative bg-gray-900 border border-gray-700/50 rounded-2xl p-3 hover:border-primary/30 transition-all group overflow-hidden cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-primary/20"
+                        onClick={() => toggleCategoryExpansion(stat.category)}
                     >
                         <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-40 transition-opacity">
                         <TicketCheck className="w-6 h-6 rotate-[-15deg]" />
                         </div>
-                        <div className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1 h-4 flex items-end">{stat.category}</div>
+                        <div className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1 h-4 flex items-end group-hover:text-primary transition-colors">{stat.category}</div>
                         <div className="text-xl md:text-3xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent font-mono">
                             <CountUp end={stat.count} duration={2} separator="," />
                         </div>
@@ -844,12 +929,7 @@ const LiveStats = () => {
                                         }`}>
                                             {stat.count}
                                         </span>
-                                        <motion.div
-                                            animate={{ rotate: expandedDept === stat.dept ? 180 : 0 }}
-                                            transition={{ duration: 0.3 }}
-                                        >
-                                            <ChevronDown className={`w-3.5 h-3.5 ${index < 3 ? 'text-white' : 'text-gray-400'}`} />
-                                        </motion.div>
+                                        {/* Down arrow removed as requested */}
                                     </div>
                                 </div>
                                 
@@ -862,7 +942,7 @@ const LiveStats = () => {
                     </AnimatePresence>
                  </div>
                  
-                 {/* Events Details Overlay Card */}
+                 {/* Department Events Details Overlay Card */}
                  <AnimatePresence>
                     {expandedDept && (
                         <motion.div
@@ -957,6 +1037,110 @@ const LiveStats = () => {
                                             <span className="text-gray-300 font-semibold">Total Registrations</span>
                                             <span className="text-3xl font-black text-primary font-mono">
                                                 {deptEventDetails[expandedDept]?.reduce((sum, e) => sum + e.count, 0)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+                            </motion.div>
+                        </motion.div>
+                    )}
+                 </AnimatePresence>
+
+                 {/* Category Events Details Overlay Card */}
+                 <AnimatePresence>
+                    {expandedCategory && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                            onClick={() => setExpandedCategory(null)}
+                        >
+                            <motion.div
+                                initial={{ scale: 0.9, y: 20 }}
+                                animate={{ scale: 1, y: 0 }}
+                                exit={{ scale: 0.9, y: 20 }}
+                                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                                className="bg-gradient-to-br from-gray-900 to-black border border-secondary/30 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-2xl shadow-secondary/20"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {/* Header */}
+                                <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700/30">
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-gradient-to-r from-secondary to-orange-600 w-12 h-12 rounded-xl flex items-center justify-center shadow-lg shadow-secondary/30">
+                                            <TicketCheck className="text-white w-6 h-6" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-2xl font-black text-white uppercase tracking-wide">
+                                                {expandedCategory}
+                                            </h3>
+                                            <p className="text-xs text-gray-400 font-semibold">Event Breakdown</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setExpandedCategory(null)}
+                                        className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800/30 rounded-lg"
+                                    >
+                                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                {/* Content */}
+                                <div className="overflow-y-auto max-h-[calc(80vh-140px)] pr-2">
+                                    {categoryEventDetails[expandedCategory] === undefined ? (
+                                        <div className="text-center py-12">
+                                            <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                            <p className="text-gray-400">Loading events...</p>
+                                        </div>
+                                    ) : categoryEventDetails[expandedCategory]?.length === 0 ? (
+                                        <div className="text-center py-12">
+                                            <div className="text-6xl mb-4 opacity-30">📋</div>
+                                            <p className="text-gray-400 font-semibold">No events with registrations found</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {categoryEventDetails[expandedCategory]?.map((event, idx) => (
+                                                <motion.div
+                                                    key={event.id}
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: idx * 0.05 }}
+                                                    className="group relative bg-gradient-to-br from-gray-900/50 to-black/50 hover:bg-gradient-to-br hover:from-gray-800/70 hover:to-black/70 border border-gray-700/30 hover:border-secondary/30 rounded-xl p-4 transition-all"
+                                                >
+                                                    <div className="flex items-center justify-between gap-4">
+                                                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                            <div className="bg-secondary/20 w-10 h-10 rounded-lg flex items-center justify-center shrink-0">
+                                                                <span className="text-secondary font-bold text-sm">#{idx + 1}</span>
+                                                            </div>
+                                                            <div className="min-w-0 flex-1">
+                                                                <h4 className="text-white font-semibold text-sm group-hover:text-secondary transition-colors truncate">
+                                                                    {event.name}
+                                                                </h4>
+                                                                <p className="text-xs text-gray-400">Registrations</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="bg-gradient-to-r from-secondary/20 to-orange-600/20 border border-secondary/30 rounded-lg px-4 py-2 shrink-0">
+                                                            <span className="text-2xl font-black text-secondary font-mono tabular-nums">
+                                                                {event.count}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Footer Summary */}
+                                {categoryEventDetails[expandedCategory]?.length > 0 && (
+                                    <div className="mt-4 pt-4 border-t border-gray-700/30">
+                                        <div className="flex items-center justify-between bg-gradient-to-r from-secondary/10 to-orange-600/10 rounded-lg p-3">
+                                            <span className="text-gray-300 font-semibold">Total Registrations</span>
+                                            <span className="text-3xl font-black text-secondary font-mono">
+                                                {categoryEventDetails[expandedCategory]?.reduce((sum, e) => sum + e.count, 0)}
                                             </span>
                                         </div>
                                     </div>

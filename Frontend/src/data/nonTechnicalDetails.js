@@ -1367,8 +1367,8 @@ export const nonTechnicalDetails = [
 
   {
     id: "nontech-techtalk",
-    shortTitle: "TECH TALK",
-    title: "TECH TALK",
+    shortTitle: "TALK SHOW",
+    title: "TALK SHOW",
     department: "Non-Technical Events",
     date: "February 13, 2026",
     venue: "Language Enrichment Center",
