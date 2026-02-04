@@ -35,7 +35,7 @@ const formatDate = (date, formatStr) => {
   return formats[formatStr] || d.toLocaleString();
 };
 
-const AttendanceManagement = () => {
+const AttendanceManagement = ({ coordinatorEvents }) => {
   const location = useLocation();
   const [attendance, setAttendance] = useState([]);
   const [events, setEvents] = useState([]);
@@ -49,6 +49,9 @@ const AttendanceManagement = () => {
     morningCount: 0,
     eveningCount: 0
   });
+  
+  // Check if this is a coordinator view
+  const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
 
   useEffect(() => {
     loadEvents();
@@ -101,12 +104,32 @@ const AttendanceManagement = () => {
 
   const loadEvents = async () => {
     try {
-      const { data, error } = await supabase
-        .from('events')
-        .select('id, name, category')
-        .order('name');
+      let data;
+      
+      if (hasCoordinatorFilter) {
+        // For coordinators, use their assigned events
+        const allowedUUIDs = coordinatorEvents.map(e => e.id).filter(Boolean);
+        console.log('🎯 AttendanceManagement - Filtering by coordinator events:', allowedUUIDs);
+        
+        const { data: filteredData, error } = await supabase
+          .from('events')
+          .select('id, name, category')
+          .in('id', allowedUUIDs)
+          .order('name');
 
-      if (error) throw error;
+        if (error) throw error;
+        data = filteredData;
+      } else {
+        // For super admin, get all events
+        const { data: allData, error } = await supabase
+          .from('events')
+          .select('id, name, category')
+          .order('name');
+
+        if (error) throw error;
+        data = allData;
+      }
+      
       setEvents(data || []);
     } catch (error) {
       console.error('Error loading events:', error);
@@ -117,12 +140,29 @@ const AttendanceManagement = () => {
     try {
       setLoading(true);
       
-      // Get all attendance records grouped by event
-      const { data: attendanceData, error } = await supabase
-        .from('attendance')
-        .select('event_id, morning_attended, evening_attended');
+      let attendanceData;
+      
+      if (hasCoordinatorFilter) {
+        // For coordinators, filter by their assigned events
+        const allowedEventIds = coordinatorEvents.map(e => e.id).filter(Boolean);
+        console.log('📊 AttendanceManagement - Loading stats for coordinator events:', allowedEventIds);
+        
+        const { data, error } = await supabase
+          .from('attendance')
+          .select('event_id, morning_attended, evening_attended')
+          .in('event_id', allowedEventIds);
 
-      if (error) throw error;
+        if (error) throw error;
+        attendanceData = data;
+      } else {
+        // For super admin, get all attendance records
+        const { data, error } = await supabase
+          .from('attendance')
+          .select('event_id, morning_attended, evening_attended');
+
+        if (error) throw error;
+        attendanceData = data;
+      }
 
       // Group by event and calculate stats
       const statsMap = {};

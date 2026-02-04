@@ -33,6 +33,30 @@ import logo1 from '../../../assets/logo1.webp';
 import ksrctLogo from '../../../assets/ksrct.webp';
 import { fetchAllRecords, fetchAllRecordsWithJoins } from '../../../utils/bulkFetch';
 
+// Category color mapping
+const getCategoryColor = (category) => {
+  const categoryColors = {
+    'TECHNICAL': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+    'NON-TECHNICAL': 'bg-purple-500/20 text-purple-400 border-purple-500/30', 
+    'CULTURAL': 'bg-pink-500/20 text-pink-400 border-pink-500/30',
+    'SPORTS': 'bg-green-500/20 text-green-400 border-green-500/30',
+    'WORKSHOP': 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+    'SEMINAR': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+    'COMPETITION': 'bg-red-500/20 text-red-400 border-red-500/30',
+    'EXHIBITION': 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
+    'GAMING': 'bg-teal-500/20 text-teal-400 border-teal-500/30',
+    'ART': 'bg-rose-500/20 text-rose-400 border-rose-500/30'
+  };
+  
+  const normalizedCategory = category?.toUpperCase() || 'UNKNOWN';
+  return categoryColors[normalizedCategory] || 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+};
+
+// Format event type consistently
+const formatEventType = (isTeamEvent) => {
+  return isTeamEvent ? 'TEAM' : 'INDIVIDUAL';
+};
+
 const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) => {
   const location = useLocation();
   const [eventStats, setEventStats] = useState([]);
@@ -42,8 +66,15 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState(coordinatorEvents && coordinatorEvents.length > 0 ? 'paid' : 'all'); // Default to paid for coordinators
   const [downloadingReport, setDownloadingReport] = useState(false);
   const [downloadingOverallReport, setDownloadingOverallReport] = useState(false);
+  
+  // Filter state for event details view (just paid/pending)
+  const [detailsPaymentFilter, setDetailsPaymentFilter] = useState('all');
+  
+  // Cache for event stats to prevent reloading
+  const [eventStatsCache, setEventStatsCache] = useState(null);
   
   // New states for registration counts
   const [registrationCounts, setRegistrationCounts] = useState({
@@ -65,36 +96,47 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
   const [transferError, setTransferError] = useState('');
   const [transferSuccess, setTransferSuccess] = useState('');
 
-  const refreshData = () => {
+  const refreshData = async () => {
     console.log('🔄 Refreshing Registration Data...');
-    loadEventStats();
-    loadRegistrationCounts();
-    if (selectedEvent) {
-      loadEventRegistrations(selectedEvent.id);
+    try {
+      await loadEventStats();
+      await loadRegistrationCounts();
+      if (selectedEvent) {
+        await loadEventRegistrations(selectedEvent.id);
+      }
+    } catch (error) {
+      console.error('❌ Error refreshing data:', error);
     }
   };
 
-  // Auto-refresh on navigation or visibility
+  // Initial data load - runs on mount and when coordinatorEvents changes
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        refreshData();
+    let isMounted = true;
+    
+    const loadInitialData = async () => {
+      if (isMounted) {
+        await refreshData();
       }
     };
-
-    refreshData();
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    loadInitialData();
+    
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      isMounted = false;
     };
-  }, [location.pathname, coordinatorEvents]);
+  }, [coordinatorEvents]); // Re-run when coordinatorEvents changes
 
+  // Set default payment status filter for coordinators
   useEffect(() => {
-    loadEventStats();
-    loadRegistrationCounts();
+    if (coordinatorEvents && coordinatorEvents.length > 0) {
+      setPaymentStatusFilter('paid');
+    } else {
+      setPaymentStatusFilter('all');
+    }
+  }, [coordinatorEvents]);
 
-    // Set up real-time subscription for registration changes
+  // Real-time subscription only (initial load is in the other useEffect)
+  useEffect(() => {
     const registrationChannel = supabase
       .channel('registration-management')
       .on(
@@ -832,26 +874,54 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
 
       console.log('✅ Events loaded:', data?.length, 'events found');
 
-      // Get registration counts for each event
+      // Get registration counts for each event with payment status breakdown
       const statsPromises = data.map(async (event) => {
-        const { count, error: countError } = await supabase
-          .from('event_registrations_config')
-          .select('*', { count: 'exact', head: true })
-          .eq('event_id', event.id)
-          .eq('payment_status', 'PAID');
+        // Get all registration counts by payment status
+        const [paidResult, pendingResult, partialResult, totalResult] = await Promise.all([
+          supabase
+            .from('event_registrations_config')
+            .select('*', { count: 'exact', head: true })
+            .eq('event_id', event.id)
+            .eq('payment_status', 'PAID'),
+          supabase
+            .from('event_registrations_config')
+            .select('*', { count: 'exact', head: true })
+            .eq('event_id', event.id)
+            .eq('payment_status', 'PENDING'),
+          supabase
+            .from('event_registrations_config')
+            .select('*', { count: 'exact', head: true })
+            .eq('event_id', event.id)
+            .eq('payment_status', 'PARTIAL'),
+          supabase
+            .from('event_registrations_config')
+            .select('*', { count: 'exact', head: true })
+            .eq('event_id', event.id)
+        ]);
+
+        const paidCount = paidResult.count || 0;
+        const pendingCount = pendingResult.count || 0;
+        const partialCount = partialResult.count || 0;
+        const totalCount = totalResult.count || 0;
 
         return {
           ...event,
-          totalRegistrations: count || 0,
-          fillRate: event.capacity > 0 ? ((count || 0) / event.capacity * 100).toFixed(1) : 0
+          totalRegistrations: totalCount,
+          paidRegistrations: paidCount,
+          pendingRegistrations: pendingCount,
+          partialRegistrations: partialCount,
+          fillRate: event.capacity > 0 ? (totalCount / event.capacity * 100).toFixed(1) : 0
         };
       });
 
       const eventStatsData = await Promise.all(statsPromises);
       console.log('✅ Event stats calculated for', eventStatsData.length, 'events');
       setEventStats(eventStatsData);
+      setEventStatsCache(eventStatsData); // Cache the data
     } catch (error) {
       console.error('❌ Error loading event stats:', error);
+      // Set empty array on error to prevent infinite loading
+      setEventStats([]);
     } finally {
       setLoading(false);
     }
@@ -981,7 +1051,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         return;
       }
 
-      // 1. Fetch individual event registrations using bulk fetch
+      // 1. Fetch ALL event registrations using bulk fetch (filter in UI)
       console.log('📊 Fetching all registrations for event (bypassing 1000 limit)...');
       const { data: regs, error: regsError } = await fetchAllRecords(
         supabase,
@@ -989,8 +1059,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         '*',
         {
           filters: [
-            { column: 'event_id', operator: 'eq', value: eventId },
-            { column: 'payment_status', operator: 'eq', value: 'PAID' }
+            { column: 'event_id', operator: 'eq', value: eventId }
           ],
           orderBy: 'registered_at',
           orderAscending: false
@@ -1076,24 +1145,68 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
   };
 
   const handleEventClick = async (event) => {
+    // Prevent double clicks
+    if (loadingDetails) return;
+    
+    // Reset states first
+    setLoadingDetails(true);
+    setDetailsPaymentFilter('all'); // Reset filter
+    setEventRegistrations([]);
     setSelectedEvent(event);
-    await loadEventRegistrations(event.id);
+    
+    try {
+      await loadEventRegistrations(event.id);
+    } catch (error) {
+      console.error('Error loading event registrations:', error);
+    } finally {
+      setLoadingDetails(false);
+    }
   };
 
   const handleBackToList = () => {
+    // Reset all loading and detail states
+    setLoadingDetails(false);
     setSelectedEvent(null);
     setEventRegistrations([]);
+    setDetailsPaymentFilter('all');
+    
+    // Use cached stats if available to prevent reload
+    if (eventStatsCache && eventStatsCache.length > 0) {
+      setEventStats(eventStatsCache);
+    }
+    setLoading(false);
   };
 
   const filteredStats = eventStats.filter(event => {
     const matchesSearch = event.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (event.event_key || event.event_id || '').toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !categoryFilter || event.category === categoryFilter;
-    return matchesSearch && matchesCategory;
+    const matchesCategory = !categoryFilter || event.category?.toUpperCase() === categoryFilter;
+    const matchesPaymentStatus = paymentStatusFilter === 'all' || 
+                                 (paymentStatusFilter === 'paid' && event.paidRegistrations > 0) ||
+                                 (paymentStatusFilter === 'pending' && event.pendingRegistrations > 0) ||
+                                 (paymentStatusFilter === 'partial' && event.partialRegistrations > 0);
+    return matchesSearch && matchesCategory && matchesPaymentStatus;
   });
 
-  const categories = [...new Set(eventStats.map(e => e.category))];
-  const totalRegistrations = eventStats.reduce((sum, e) => sum + e.totalRegistrations, 0);
+  // Remove duplicates and handle null/undefined categories
+  const categories = [...new Set(eventStats
+    .map(e => e.category)
+    .filter(cat => cat && cat.trim() !== '') // Remove null, undefined, and empty strings
+    .map(cat => cat.toUpperCase()) // Normalize to uppercase for deduplication
+  )].sort(); // Sort alphabetically
+  // Calculate total registrations based on payment filter
+  const getTotalByPaymentFilter = (events) => {
+    return events.reduce((sum, e) => {
+      switch (paymentStatusFilter) {
+        case 'paid': return sum + (e.paidRegistrations || 0);
+        case 'pending': return sum + (e.pendingRegistrations || 0);
+        case 'partial': return sum + (e.partialRegistrations || 0);
+        default: return sum + (e.totalRegistrations || 0);
+      }
+    }, 0);
+  };
+  
+  const totalRegistrations = getTotalByPaymentFilter(filteredStats);
 
   if (loading) {
     return (
@@ -1173,7 +1286,14 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
               <Users className="text-green-400" size={28} />
               <div className="text-3xl font-bold text-green-400">{totalRegistrations}</div>
             </div>
-            <p className="text-gray-400 text-sm">Total Registrations</p>
+            <p className="text-gray-400 text-sm">
+              Total Registrations
+              {coordinatorEvents && coordinatorEvents.length > 0 && paymentStatusFilter !== 'all' && (
+                <span className="ml-1 text-xs">
+                  ({paymentStatusFilter.charAt(0).toUpperCase() + paymentStatusFilter.slice(1)} Only)
+                </span>
+              )}
+            </p>
           </motion.div>
 
           <motion.div
@@ -1262,13 +1382,35 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-4 py-3 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:border-secondary"
+            className="px-4 py-3 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:border-secondary text-white"
+            style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              color: 'white'
+            }}
           >
-            <option value="">All Categories</option>
+            <option value="" className="bg-gray-800 text-white">All Categories</option>
             {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+              <option key={cat} value={cat} className="bg-gray-800 text-white">{cat}</option>
             ))}
           </select>
+          
+          {/* Payment Status Filter for Coordinators */}
+          {coordinatorEvents && coordinatorEvents.length > 0 && (
+            <select
+              value={paymentStatusFilter}
+              onChange={(e) => setPaymentStatusFilter(e.target.value)}
+              className="px-4 py-3 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:border-secondary text-white"
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                color: 'white'
+              }}
+            >
+              <option value="all" className="bg-gray-800 text-white">All Payments</option>
+              <option value="paid" className="bg-gray-800 text-white">Paid Only</option>
+              <option value="pending" className="bg-gray-800 text-white">Pending Only</option>
+              <option value="partial" className="bg-gray-800 text-white">Partial Only</option>
+            </select>
+          )}
         </div>
 
         {/* Events Table */}
@@ -1304,12 +1446,12 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
                           {event.is_team_event ? (
                             <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded text-xs font-bold">
                               <Users className="w-3 h-3 inline mr-1" />
-                              TEAM
+                              {formatEventType(true)}
                             </span>
                           ) : (
                             <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-bold">
                               <UserPlus className="w-3 h-3 inline mr-1" />
-                              INDIVIDUAL
+                              {formatEventType(false)}
                             </span>
                           )}
                         </div>
@@ -1317,12 +1459,34 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
                       </div>
                     </td>
                     <td className="p-4">
-                      <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg text-xs font-bold">
-                        {event.category}
+                      <span className={`px-3 py-1 rounded-lg text-xs font-bold border ${getCategoryColor(event.category)}`}>
+                        {event.category?.toUpperCase() || 'N/A'}
                       </span>
                     </td>
                     <td className="p-4 text-center">
-                      <span className="text-lg font-bold text-green-400">{event.totalRegistrations}</span>
+                      <div className="flex flex-col items-center">
+                        <span className="text-lg font-bold text-green-400">{event.totalRegistrations}</span>
+                        {/* Payment status breakdown for coordinators */}
+                        {coordinatorEvents && coordinatorEvents.length > 0 && (
+                          <div className="flex gap-1 mt-1 text-xs">
+                            {event.paidRegistrations > 0 && (
+                              <span className="px-1 py-0.5 bg-green-500/20 text-green-400 rounded">
+                                P:{event.paidRegistrations}
+                              </span>
+                            )}
+                            {event.pendingRegistrations > 0 && (
+                              <span className="px-1 py-0.5 bg-yellow-500/20 text-yellow-400 rounded">
+                                Pe:{event.pendingRegistrations}
+                              </span>
+                            )}
+                            {event.partialRegistrations > 0 && (
+                              <span className="px-1 py-0.5 bg-blue-500/20 text-blue-400 rounded">
+                                Pa:{event.partialRegistrations}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="p-4 text-center">
                       <span className="text-gray-400">{event.capacity}</span>
@@ -1502,7 +1666,12 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
                            >
                              <div>
                                <p className="font-bold text-white">{ev.name}</p>
-                               <p className="text-xs text-gray-400">{ev.category} • Capacity: {ev.fillRate}% Full</p>
+                               <div className="flex items-center gap-2 mt-1">
+                                 <span className={`px-2 py-1 rounded text-xs font-bold ${getCategoryColor(ev.category)}`}>
+                                   {ev.category?.toUpperCase() || 'N/A'}
+                                 </span>
+                                 <span className="text-xs text-gray-400">• Capacity: {ev.fillRate}% Full</span>
+                               </div>
                              </div>
                              {selectedTargetEvent?.id === ev.id && <CheckCircle2 className="text-green-500" />}
                            </div>
@@ -1545,6 +1714,23 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
   }
 
   // Event Details View
+  if (loadingDetails) {
+    return (
+      <div className="space-y-8">
+        <button
+          onClick={handleBackToList}
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+        >
+          <ChevronRight size={20} className="rotate-180" />
+          Back to Events
+        </button>
+        <div className="h-96 flex items-center justify-center">
+          <Loader2 className="w-10 h-10 animate-spin text-secondary" />
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="space-y-8">
       {/* Back Button */}
@@ -1562,8 +1748,8 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           <div>
             <h2 className="text-3xl font-bold mb-2">{selectedEvent.name}</h2>
             <div className="flex items-center gap-4 text-sm">
-              <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg font-bold">
-                {selectedEvent.category}
+              <span className={`px-3 py-1 rounded-lg font-bold border ${getCategoryColor(selectedEvent.category)}`}>
+                {selectedEvent.category?.toUpperCase() || 'N/A'}
               </span>
               <span className="text-gray-400">Event Key: {selectedEvent.event_key || selectedEvent.event_id || '-'}</span>
             </div>
@@ -1612,12 +1798,50 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         </div>
       </div>
 
+      {/* Filters for Event Details */}
+      <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-4">
+        <span className="text-gray-400 text-sm font-medium">Filter by:</span>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setDetailsPaymentFilter('all')}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+              detailsPaymentFilter === 'all'
+                ? 'bg-secondary text-white'
+                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setDetailsPaymentFilter('PAID')}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+              detailsPaymentFilter === 'PAID'
+                ? 'bg-green-500 text-white'
+                : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+            }`}
+          >
+            Paid
+          </button>
+          <button
+            onClick={() => setDetailsPaymentFilter('PENDING')}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+              detailsPaymentFilter === 'PENDING'
+                ? 'bg-yellow-500 text-white'
+                : 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+            }`}
+          >
+            Pending
+          </button>
+        </div>
+      </div>
+
       {/* Event Details with Teams Support */}
       <EventDetailsWithTeams 
         event={selectedEvent}
         registrations={eventRegistrations}
         showTeamDetails={true}
         hideActions={hideFinancials}
+        paymentFilter={detailsPaymentFilter}
       />
     </div>
   );

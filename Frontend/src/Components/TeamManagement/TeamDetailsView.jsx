@@ -12,12 +12,24 @@ import {
   X
 } from "lucide-react";
 import { supabase } from "../../supabase";
+import { API_BASE_URL } from "../../config/api";
 
-const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true }) => {
+const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true, paymentFilter = 'all' }) => {
   const [teams, setTeams] = useState([]);
+  const [filteredTeams, setFilteredTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTeamMembers, setSelectedTeamMembers] = useState(null);
   const [showMembersModal, setShowMembersModal] = useState(false);
+
+  // Filter teams based on payment status
+  useEffect(() => {
+    if (paymentFilter === 'all') {
+      setFilteredTeams(teams);
+    } else {
+      const filtered = teams.filter(team => team.payment_status === paymentFilter);
+      setFilteredTeams(filtered);
+    }
+  }, [teams, paymentFilter]);
 
   // Fetch teams for this event
   const fetchEventTeams = async () => {
@@ -33,7 +45,7 @@ const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true }) => 
         limit: '100'
       });
       
-      const response = await fetch(`http://localhost:3000/api/admin/teams?${params}`);
+      const response = await fetch(`${API_BASE_URL}/api/admin/teams?${params}`);
       const result = await response.json();
       
       if (result.success) {
@@ -55,7 +67,7 @@ const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true }) => 
   const fetchTeamMembers = async (teamId) => {
     try {
       const params = new URLSearchParams({ event_id: eventId });
-      const response = await fetch(`http://localhost:3000/api/admin/teams/${teamId}/members?${params}`);
+      const response = await fetch(`${API_BASE_URL}/api/admin/teams/${teamId}/members?${params}`);
       const result = await response.json();
       
       if (result.success) {
@@ -120,12 +132,12 @@ const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true }) => 
     );
   }
 
-  if (teams.length === 0) {
+  if (filteredTeams.length === 0) {
     return (
       <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-lg p-8">
         <div className="text-center text-gray-400">
           <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p>No teams registered for this event</p>
+          <p>No {paymentFilter !== 'all' ? paymentFilter.toLowerCase() : ''} teams found for this event</p>
         </div>
       </div>
     );
@@ -142,7 +154,12 @@ const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true }) => 
             </div>
             <div>
               <h3 className="text-lg font-semibold text-white">{eventName}</h3>
-              <p className="text-sm text-gray-400">{teams.length} Teams Registered</p>
+              <p className="text-sm text-gray-400">
+                {filteredTeams.length} {paymentFilter !== 'all' ? paymentFilter.toLowerCase() : ''} Teams Registered
+                {paymentFilter !== 'all' && teams.length !== filteredTeams.length && (
+                  <span className="text-gray-500"> (of {teams.length} total)</span>
+                )}
+              </p>
             </div>
           </div>
           {onClose && (
@@ -180,7 +197,7 @@ const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true }) => 
           </thead>
           <tbody className="divide-y divide-gray-800">
             <AnimatePresence>
-              {teams.map((team, index) => (
+              {filteredTeams.map((team, index) => (
                 <motion.tr
                   key={team.id}
                   initial={{ opacity: 0, y: 10 }}

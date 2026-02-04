@@ -2,8 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Users, Eye, Calendar, MapPin } from "lucide-react";
 import TeamDetailsView from "../TeamManagement/TeamDetailsView";
 
-const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, hideActions = false }) => {
+const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, hideActions = false, paymentFilter = 'all' }) => {
   const [isTeamEvent, setIsTeamEvent] = useState(false);
+
+  // Filter registrations based on payment status
+  const filteredRegistrations = registrations?.filter(reg => {
+    if (paymentFilter === 'all') return true;
+    return reg.payment_status === paymentFilter;
+  }) || [];
 
   useEffect(() => {
     // First check the database is_team_event field
@@ -57,14 +63,15 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
           eventId={event?.id}
           eventName={event?.name}
           showHeader={true}
+          paymentFilter={paymentFilter}
         />
       </div>
     );
   }
 
   // Individual event registrations table
-  console.log(`👤 Individual Event "${event?.name}" - Registrations count:`, registrations?.length);
-  console.log(`👤 Individual Event registrations:`, registrations);
+  console.log(`👤 Individual Event "${event?.name}" - Registrations count:`, filteredRegistrations?.length);
+  console.log(`👤 Individual Event registrations:`, filteredRegistrations);
   
   return (
     <div>
@@ -74,7 +81,9 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
           <Eye className="w-5 h-5 text-green-400" />
           <div>
             <p className="text-green-400 font-medium">Individual Event</p>
-            <p className="text-gray-400 text-sm">Showing {registrations?.length || 0} individual participant registrations</p>
+            <p className="text-gray-400 text-sm">
+              Showing {filteredRegistrations?.length || 0} {paymentFilter !== 'all' ? paymentFilter.toLowerCase() : ''} participant registrations
+            </p>
           </div>
         </div>
       </div>
@@ -108,8 +117,8 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800">
-              {registrations && registrations.length > 0 ? (
-                registrations.map((registration, index) => (
+              {filteredRegistrations && filteredRegistrations.length > 0 ? (
+                filteredRegistrations.map((registration, index) => (
                   <tr key={registration.id} className="hover:bg-gray-800/30">
                     <td className="px-4 py-3 text-white">{index + 1}</td>
                     <td className="px-4 py-3">

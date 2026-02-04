@@ -56,6 +56,7 @@ const TermsAndConditions = lazy(() => import("./Pages/TermsAndConditions/TermsAn
 const NotFound = lazy(() => import("./Pages/NotFound"));
 
 // Preload functions for critical pages - call these on hover
+// Note: This is exported as a plain object (not a component) to be used in Navbar
 export const preloadPages = {
   home: () => import("./Pages/Home/Home"),
   events: () => import("./Pages/Events/Events"),
@@ -98,6 +99,7 @@ const RegistrationAdminDashboard = lazy(() => import("./Pages/Admin/RegAdmin/Reg
 const EventCoordinatorDashboard = lazy(() => import("./Pages/Admin/Coordinator/EventCoordinatorDashboard"));
 const CoordinatorOverviewPage = lazy(() => import("./Pages/Admin/Coordinator/OverviewPage"));
 const CoordinatorRegistrationPage = lazy(() => import("./Pages/Admin/Coordinator/RegistrationPage"));
+const CoordinatorAttendancePage = lazy(() => import("./Pages/Admin/Coordinator/AttendancePage"));
 const CoordinatorGlobalScanner = lazy(() => import("./Pages/Admin/Coordinator/GlobalScannerPage"));
 const AttendanceScanner = lazy(() => import("./Pages/Admin/Volunteer/AttendanceScanner"));
 const VolunteerDashboard = lazy(() => import("./Pages/Admin/Volunteer/VolunteerDashboard"));
@@ -414,6 +416,16 @@ function AppContent() {
                     allowedRoles={["event_coordinator", "super_admin"]}
                   >
                     <CoordinatorRegistrationPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="coordinator/attendance"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={["event_coordinator", "super_admin"]}
+                  >
+                    <CoordinatorAttendancePage />
                   </ProtectedRoute>
                 }
               />

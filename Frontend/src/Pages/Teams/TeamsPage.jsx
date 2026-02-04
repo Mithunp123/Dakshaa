@@ -4,6 +4,7 @@ import { Users, Trophy, DollarSign, TrendingUp, Shield, AlertTriangle } from "lu
 import TeamManagementTable from "../../Components/TeamManagement/TeamManagementTable";
 import { getCurrentUserProfile } from "../../utils/userUtils";
 import { supabase } from "../../supabase";
+import { API_BASE_URL } from "../../config/api";
 
 const TeamsPage = () => {
   const [events, setEvents] = useState([]);
@@ -41,7 +42,7 @@ const TeamsPage = () => {
         params.append('event_id', selectedEvent);
       }
       
-      const response = await fetch(`http://localhost:3000/api/admin/teams/statistics?${params}`);
+      const response = await fetch(`${API_BASE_URL}/api/admin/teams/statistics?${params}`);
       const result = await response.json();
       
       if (result.success) {
