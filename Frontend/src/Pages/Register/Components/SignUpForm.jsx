@@ -171,6 +171,35 @@ const SignUpForm = () => {
         return;
       }
 
+      // Check if mobile number already exists
+      const { data: existingMobile, error: mobileCheckError } = await supabase
+        .from('profiles')
+        .select('mobile_number')
+        .eq('mobile_number', formData.mobileNumber)
+        .maybeSingle();
+
+      // Ignore 406 errors
+      if (mobileCheckError && mobileCheckError.code !== 'PGRST116') {
+        console.error('Error checking mobile number:', mobileCheckError);
+      }
+
+      if (existingMobile) {
+        toast.error('Mobile number already registered. Please login or use a different number.', {
+          duration: 5000,
+          position: 'top-center',
+          style: {
+            background: '#ef4444',
+            color: '#fff',
+            padding: '16px',
+            borderRadius: '10px',
+            fontSize: '16px',
+            fontWeight: '600',
+          },
+        });
+        setLoading(false);
+        return;
+      }
+
       // 1. Sign up with Supabase Auth and pass metadata
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
