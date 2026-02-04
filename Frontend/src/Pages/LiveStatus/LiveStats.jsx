@@ -296,7 +296,6 @@ const LiveStats = () => {
                 name: event.name,
                 count: eventCounts[event.id] || 0
             }))
-            .filter(e => e.count > 0) // Only show events with registrations
             .sort((a, b) => b.count - a.count);
 
         setDeptEventDetails(prev => ({ ...prev, [deptName]: eventDetails }));
@@ -378,7 +377,6 @@ const LiveStats = () => {
                 name: event.name,
                 count: eventCounts[event.id] || 0
             }))
-            .filter(e => e.count > 0) // Only show events with registrations
             .sort((a, b) => b.count - a.count);
 
         setCategoryEventDetails(prev => ({ ...prev, [categoryName]: eventDetails }));
@@ -1202,7 +1200,7 @@ const LiveStats = () => {
                                     ) : deptEventDetails[expandedDept]?.length === 0 ? (
                                         <div className="text-center py-12">
                                             <div className="text-6xl mb-4 opacity-30">📊</div>
-                                            <p className="text-gray-400 font-semibold">No events with registrations found</p>
+                                            <p className="text-gray-400 font-semibold">No events found for this department</p>
                                         </div>
                                     ) : (
                                         <div className="space-y-2">
@@ -1226,8 +1224,14 @@ const LiveStats = () => {
                                                                 <p className="text-xs text-gray-400">Registrations</p>
                                                             </div>
                                                         </div>
-                                                        <div className="bg-gradient-to-r from-primary/20 to-purple-600/20 border border-primary/30 rounded-lg px-4 py-2 shrink-0">
-                                                            <span className="text-2xl font-black text-primary font-mono tabular-nums">
+                                                        <div className={`bg-gradient-to-r rounded-lg px-4 py-2 shrink-0 ${
+                                                            event.count > 0 
+                                                                ? 'from-primary/20 to-purple-600/20 border border-primary/30' 
+                                                                : 'from-gray-600/20 to-gray-500/20 border border-gray-500/30'
+                                                        }`}>
+                                                            <span className={`text-2xl font-black font-mono tabular-nums ${
+                                                                event.count > 0 ? 'text-primary' : 'text-gray-400'
+                                                            }`}>
                                                                 {event.count}
                                                             </span>
                                                         </div>
@@ -1306,7 +1310,7 @@ const LiveStats = () => {
                                     ) : categoryEventDetails[expandedCategory]?.length === 0 ? (
                                         <div className="text-center py-12">
                                             <div className="text-6xl mb-4 opacity-30">📋</div>
-                                            <p className="text-gray-400 font-semibold">No events with registrations found</p>
+                                            <p className="text-gray-400 font-semibold">No events found for this category</p>
                                         </div>
                                     ) : (
                                         <div className="space-y-2">
@@ -1330,8 +1334,14 @@ const LiveStats = () => {
                                                                 <p className="text-xs text-gray-400">Registrations</p>
                                                             </div>
                                                         </div>
-                                                        <div className="bg-gradient-to-r from-secondary/20 to-orange-600/20 border border-secondary/30 rounded-lg px-4 py-2 shrink-0">
-                                                            <span className="text-2xl font-black text-secondary font-mono tabular-nums">
+                                                        <div className={`bg-gradient-to-r rounded-lg px-4 py-2 shrink-0 ${
+                                                            event.count > 0 
+                                                                ? 'from-secondary/20 to-orange-600/20 border border-secondary/30' 
+                                                                : 'from-gray-600/20 to-gray-500/20 border border-gray-500/30'
+                                                        }`}>
+                                                            <span className={`text-2xl font-black font-mono tabular-nums ${
+                                                                event.count > 0 ? 'text-secondary' : 'text-gray-400'
+                                                            }`}>
                                                                 {event.count}
                                                             </span>
                                                         </div>
