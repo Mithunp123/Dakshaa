@@ -5,6 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet'); // Security headers
 const rateLimit = require('express-rate-limit'); // Rate limiting
 const { sendWelcomeEmail, sendPaymentSuccessEmail, sendOTPEmail } = require('./emailService');
+const { fetchAllRecords, fetchAllRecordsWithFilters } = require('./bulkFetch');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -2556,17 +2557,40 @@ app.get("/api/admin/teams", async (req, res) => {
           userRole = profile.role?.toLowerCase();
           console.log(`User ${profile.email} has role: ${userRole}`);
           
-          // If event coordinator, get their accessible events
+          // If event coordinator, get their assigned events from event_coordinators table
           if (userRole === 'event_coordinator') {
-            // For now, allowing all events for coordinators
-            // You can modify this logic based on your requirements
-            const { data: events } = await supabase
-              .from('events')
-              .select('id, name')
-              .eq('is_active', true);
+            const { data: coordEvents, error: coordError } = await supabase
+              .from('event_coordinators')
+              .select('event_id')
+              .eq('user_id', user_id);
             
-            accessibleEvents = events?.map(e => e.id) || [];
-            console.log(`Event coordinator ${profile.email} has access to ${accessibleEvents.length} events:`, events?.map(e => e.name));
+            if (coordError) {
+              console.log('Error getting coordinator events:', coordError.message);
+              accessibleEvents = [];
+            } else {
+              const coordEventIds = coordEvents?.map(c => c.event_id) || [];
+              console.log(`Coordinator ${profile.email} assigned to event_ids:`, coordEventIds);
+              
+              if (coordEventIds.length > 0) {
+                // Get the actual event UUIDs from the events table using the TEXT event_id field
+                const { data: events, error: eventsError } = await supabase
+                  .from('events')
+                  .select('id, name, event_id')
+                  .in('event_id', coordEventIds)
+                  .eq('is_active', true);
+                
+                if (eventsError) {
+                  console.log('Error getting events by event_id:', eventsError.message);
+                  accessibleEvents = [];
+                } else {
+                  accessibleEvents = events?.map(e => e.id) || [];
+                  console.log(`Event coordinator ${profile.email} has access to ${accessibleEvents.length} events:`, events?.map(e => ({ name: e.name, id: e.id, event_id: e.event_id })));
+                }
+              } else {
+                console.log(`Event coordinator ${profile.email} has no assigned events`);
+                accessibleEvents = [];
+              }
+            }
           }
         }
       } catch (error) {
@@ -2574,33 +2598,64 @@ app.get("/api/admin/teams", async (req, res) => {
       }
     }
 
-    // Build teams query
-    let query = supabase
-      .from('teams')
-      .select('*');
-
+    // Build teams query using bulk fetch
+    console.log('📊 Fetching teams using bulk fetch (bypassing 1000 limit)...');
     console.log('Query parameters:', { event_id, user_id, userRole, accessibleEvents: accessibleEvents?.length });
 
+    let teams;
     if (event_id) {
-      query = query.eq('event_id', event_id);
       console.log('Filtering by event_id:', event_id);
+      const { data: teamsData, error: teamsError } = await fetchAllRecordsWithFilters(
+        'teams', 
+        '*', 
+        { 
+          event_id: event_id,
+          ...(only_paid === 'true' && { is_active: true })
+        }
+      );
+      if (teamsError) throw teamsError;
+      teams = teamsData;
     } else if (userRole === 'event_coordinator' && accessibleEvents && accessibleEvents.length > 0) {
       // Filter teams by accessible events for coordinators
-      query = query.in('event_id', accessibleEvents);
-      console.log('Filtering coordinator accessible events:', accessibleEvents);
+      console.log('Filtering coordinator accessible events:', accessibleEvents.length);
+      const { data: teamsData, error: teamsError } = await fetchAllRecords(
+        'teams',
+        '*',
+        {
+          filters: [
+            { column: 'event_id', operator: 'in', value: accessibleEvents },
+            ...(only_paid === 'true' ? [{ column: 'is_active', operator: 'eq', value: true }] : [])
+          ],
+          orderBy: 'created_at',
+          orderAscending: false
+        }
+      );
+      if (teamsError) throw teamsError;
+      teams = teamsData;
+    } else if (userRole === 'event_coordinator') {
+      // If event coordinator has no accessible events, return empty result
+      console.log('Event coordinator has no accessible events, returning empty result');
+      return res.json({
+        success: true,
+        data: [],
+        user_role: userRole
+      });
+    } else {
+      // Fetch all teams for super admin
+      const { data: teamsData, error: teamsError } = await fetchAllRecords(
+        'teams',
+        '*',
+        {
+          filters: only_paid === 'true' ? [{ column: 'is_active', operator: 'eq', value: true }] : [],
+          orderBy: 'created_at',
+          orderAscending: false
+        }
+      );
+      if (teamsError) throw teamsError;
+      teams = teamsData;
     }
 
-    if (only_paid === 'true') {
-      query = query.eq('is_active', true);
-    }
-
-    const { data: teams, error: teamsError } = await query
-      .order('created_at', { ascending: false })
-      .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
-
-    if (teamsError) throw teamsError;
-
-    console.log(`Found ${teams?.length || 0} teams`);
+    console.log(`✅ Found ${teams?.length || 0} teams using bulk fetch`);
 
     if (!teams || teams.length === 0) {
       return res.json({
@@ -2613,26 +2668,33 @@ app.get("/api/admin/teams", async (req, res) => {
     const teamIds = teams.map(team => team.id);
     const leaderIds = teams.map(team => team.leader_id).filter(Boolean);
 
-    // Fetch team members with profiles - matching the Python reference
-    const { data: members } = await supabase
-      .from('team_members')
-      .select(`
+    // Fetch team members with profiles using bulk fetch
+    console.log('📊 Fetching team members using bulk fetch...');
+    const { data: members } = await fetchAllRecords(
+      'team_members',
+      `
         *,
         profiles(
           full_name,
           mobile_number,
           email
         )
-      `)
-      .in('team_id', teamIds);
+      `,
+      {
+        filters: [{ column: 'team_id', operator: 'in', value: teamIds }]
+      }
+    );
 
-    console.log(`Found ${members?.length || 0} team members for ${teamIds.length} teams`);
+    console.log(`✅ Found ${members?.length || 0} team members for ${teamIds.length} teams using bulk fetch`);
 
-    // Fetch leader profiles for ALL leader_ids to ensure we have them even if not in members list
-    const { data: leaderProfiles } = await supabase
-      .from('profiles')
-      .select('id, full_name, mobile_number, email')
-      .in('id', leaderIds);
+    // Fetch leader profiles using bulk fetch
+    const { data: leaderProfiles } = await fetchAllRecords(
+      'profiles',
+      'id, full_name, mobile_number, email',
+      {
+        filters: [{ column: 'id', operator: 'in', value: leaderIds }]
+      }
+    );
 
     // Group members by team_id and create leader profiles map
     const membersMap = {};

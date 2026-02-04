@@ -21,6 +21,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
+import { fetchAllRecords } from '../../../utils/bulkFetch';
 import toast from 'react-hot-toast';
 
 const RoleManagement = () => {
@@ -113,16 +114,25 @@ const RoleManagement = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+      console.log('📊 Fetching all users (bypassing 1000 limit)...');
+      
+      const { data, error } = await fetchAllRecords(
+        supabase, 
+        'profiles', 
+        '*',
+        {
+          orderBy: 'created_at',
+          orderAscending: false
+        }
+      );
 
       if (error) throw error;
+      
+      console.log(`✅ Loaded ${data?.length || 0} users total`);
       setUsers(data || []);
     } catch (error) {
-      console.error('Error fetching users:', error);
-      alert('Failed to load users');
+      console.error('❌ Error fetching users:', error);
+      toast.error('Failed to load users');
     } finally {
       setLoading(false);
     }
@@ -130,27 +140,43 @@ const RoleManagement = () => {
 
   const fetchEvents = async () => {
     try {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .eq('is_active', true)
-        .order('event_id');
+      console.log('📊 Fetching all events (bypassing 1000 limit)...');
+      
+      const { data, error } = await fetchAllRecords(
+        supabase, 
+        'events', 
+        '*',
+        {
+          filters: [{ column: 'is_active', operator: 'eq', value: true }],
+          orderBy: 'event_id',
+          orderAscending: true
+        }
+      );
 
       if (error) throw error;
+      
+      console.log(`✅ Loaded ${data?.length || 0} events total`);
       setEvents(data || []);
     } catch (error) {
-      console.error('Error fetching events:', error);
+      console.error('❌ Error fetching events:', error);
+      toast.error('Failed to load events');
     }
   };
 
   const fetchCoordinatorAssignments = async () => {
     try {
+      console.log('📊 Fetching all coordinator assignments (bypassing 1000 limit)...');
+      
       // Fetch coordinator assignments
-      const { data: assignments, error } = await supabase
-        .from('event_coordinators')
-        .select('*');
+      const { data: assignments, error } = await fetchAllRecords(
+        supabase, 
+        'event_coordinators', 
+        '*'
+      );
 
       if (error) throw error;
+
+      console.log(`✅ Loaded ${assignments?.length || 0} coordinator assignments total`);
 
       if (!assignments || assignments.length === 0) {
         setCoordinatorAssignments([]);
@@ -159,19 +185,27 @@ const RoleManagement = () => {
 
       // Fetch profiles for coordinators
       const userIds = [...new Set(assignments.map(a => a.user_id))];
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, full_name, email')
-        .in('id', userIds);
+      const { data: profiles } = await fetchAllRecords(
+        supabase,
+        'profiles',
+        'id, full_name, email',
+        {
+          filters: [{ column: 'id', operator: 'in', value: userIds }]
+        }
+      );
       
       const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
 
       // Fetch events for coordinators
       const eventIds = [...new Set(assignments.map(a => a.event_id))];
-      const { data: eventsData } = await supabase
-        .from('events')
-        .select('event_id, name, title, category')
-        .in('event_id', eventIds);
+      const { data: eventsData } = await fetchAllRecords(
+        supabase,
+        'events',
+        'event_id, name, title, category',
+        {
+          filters: [{ column: 'event_id', operator: 'in', value: eventIds }]
+        }
+      );
       
       const eventMap = new Map(eventsData?.map(e => [e.event_id, e]) || []);
 
@@ -184,7 +218,8 @@ const RoleManagement = () => {
 
       setCoordinatorAssignments(assignmentsWithData);
     } catch (error) {
-      console.error('Error fetching assignments:', error);
+      console.error('❌ Error fetching assignments:', error);
+      toast.error('Failed to load coordinator assignments');
     }
   };
 
@@ -309,6 +344,25 @@ const RoleManagement = () => {
       
       await handleUpdateRole(pendingRoleChange.userId, pendingRoleChange.newRole, true);
     }
+  };
+
+  // Helper functions for select all/clear all
+  const handleSelectAllEvents = () => {
+    const filteredEvents = events.filter(event => {
+      if (!eventSearchTerm) return true;
+      const searchLower = eventSearchTerm.toLowerCase();
+      const name = (event.name || event.title || event.event_id || '').toLowerCase();
+      const category = (event.category || '').toLowerCase();
+      return name.includes(searchLower) || category.includes(searchLower);
+    });
+    const allEventIds = filteredEvents.map(event => event.event_id);
+    setSelectedEvents(allEventIds);
+    toast.success(`Selected ${allEventIds.length} events`);
+  };
+
+  const handleClearAllEvents = () => {
+    setSelectedEvents([]);
+    toast.success('Cleared all selections');
   };
 
   const handleAssignCoordinator = async () => {
@@ -833,7 +887,12 @@ const RoleManagement = () => {
               </div>
 
               <div className="mb-8">
-                <p className="text-sm text-gray-400 mb-3">Select Events (Multiple)</p>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm text-gray-400">Select Events (Multiple)</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">Selected: {selectedEvents.length}</span>
+                  </div>
+                </div>
                 
                 {/* Event Search Input */}
                 <div className="mb-4 relative">
@@ -845,6 +904,34 @@ const RoleManagement = () => {
                     onChange={(e) => setEventSearchTerm(e.target.value)}
                     className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-purple-500/50 transition-all text-sm"
                   />
+                </div>
+
+                {/* Select All / Clear All Buttons */}
+                <div className="flex gap-2 mb-4">
+                  <button
+                    type="button"
+                    onClick={handleSelectAllEvents}
+                    disabled={events.length === 0}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-400 border border-green-500/30 rounded-lg hover:bg-green-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  >
+                    <CheckCircle2 size={16} />
+                    Select All {eventSearchTerm ? 'Filtered' : ''} ({events.filter(event => {
+                      if (!eventSearchTerm) return true;
+                      const searchLower = eventSearchTerm.toLowerCase();
+                      const name = (event.name || event.title || event.event_id || '').toLowerCase();
+                      const category = (event.category || '').toLowerCase();
+                      return name.includes(searchLower) || category.includes(searchLower);
+                    }).length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleClearAllEvents}
+                    disabled={selectedEvents.length === 0}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  >
+                    <X size={16} />
+                    Clear All
+                  </button>
                 </div>
 
                 <div className="grid grid-cols-1 gap-2 max-h-96 overflow-y-auto">

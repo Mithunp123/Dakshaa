@@ -31,6 +31,7 @@ import autoTable from 'jspdf-autotable';
 import EventDetailsWithTeams from '../../../Components/Registration/EventDetailsWithTeams';
 import logo1 from '../../../assets/logo1.webp';
 import ksrctLogo from '../../../assets/ksrct.webp';
+import { fetchAllRecords, fetchAllRecordsWithJoins } from '../../../utils/bulkFetch';
 
 const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) => {
   const location = useLocation();
@@ -248,10 +249,13 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
       // Fetch detailed registrations for the selected event
       let registrations = [];
       
-      // Check if it's a team event based on event name/category
-      const teamEventKeywords = ['paper presentation', 'team', 'group', 'mct'];
-      const eventName = selectedEvent?.name?.toLowerCase() || '';
-      const isTeamEvent = teamEventKeywords.some(keyword => eventName.includes(keyword));
+      // Check if it's a team event using database field first, then fallback to keywords
+      const isTeamEvent = selectedEvent?.is_team_event || 
+        (() => {
+          const teamEventKeywords = ['paper presentation', 'team', 'group', 'mct', 'hackathon', 'conference'];
+          const eventName = selectedEvent?.name?.toLowerCase() || '';
+          return teamEventKeywords.some(keyword => eventName.includes(keyword));
+        })();
 
       if (isTeamEvent) {
         // For team events, first get PAID registrations to filter teams
@@ -783,41 +787,50 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
     setLoading(true);
     try {
       const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
-      // Extract both UUID id and TEXT event_id for flexible filtering
-      const allowedUUIDs = hasCoordinatorFilter ? coordinatorEvents.map(e => e.id).filter(Boolean) : null;
-      const allowedEventIds = hasCoordinatorFilter ? coordinatorEvents.map(e => e.event_id).filter(Boolean) : null;
-      
+      console.log('📊 Loading all events (bypassing 1000 limit)...');
       console.log('📊 RegistrationManagement - coordinatorEvents count:', coordinatorEvents?.length);
-      console.log('📊 RegistrationManagement - coordinatorEvents:', coordinatorEvents?.map(e => ({ id: e.id, event_id: e.event_id, name: e.name })));
       console.log('🔍 RegistrationManagement - hasCoordinatorFilter:', hasCoordinatorFilter);
-      console.log('🎯 RegistrationManagement - allowedUUIDs:', allowedUUIDs);
-      console.log('🎯 RegistrationManagement - allowedEventIds (TEXT):', allowedEventIds);
 
-      let query = supabase
-        .from('events')
-        .select(`
-          id,
-          name,
-          event_id,
-          event_key,
-          category,
-          capacity,
-          price,
-          is_open
-        `)
-        .order('name');
+      let data;
+      if (hasCoordinatorFilter) {
+        // For coordinators, filter by their assigned events
+        const allowedUUIDs = coordinatorEvents.map(e => e.id).filter(Boolean);
+        console.log('🎯 RegistrationManagement - allowedUUIDs:', allowedUUIDs);
         
-      if (hasCoordinatorFilter && allowedUUIDs && allowedUUIDs.length > 0) {
-        // Use the UUID id field for filtering (coordinator events have full data including UUID)
-        query = query.in('id', allowedUUIDs);
-        console.log('🔍 Filtering events by UUID ids:', allowedUUIDs.length);
+        const { data: filteredData, error } = await fetchAllRecords(
+          supabase,
+          'events',
+          `id, name, event_id, event_key, category, capacity, price, is_open, is_team_event, min_team_size, max_team_size`,
+          {
+            filters: [
+              { column: 'is_active', operator: 'eq', value: true },
+              { column: 'id', operator: 'in', value: allowedUUIDs }
+            ],
+            orderBy: 'name',
+            orderAscending: true
+          }
+        );
+        
+        if (error) throw error;
+        data = filteredData;
+      } else {
+        // For super admin, get all events
+        const { data: allData, error } = await fetchAllRecords(
+          supabase,
+          'events',
+          `id, name, event_id, event_key, category, capacity, price, is_open, is_team_event, min_team_size, max_team_size`,
+          {
+            filters: [{ column: 'is_active', operator: 'eq', value: true }],
+            orderBy: 'name',
+            orderAscending: true
+          }
+        );
+        
+        if (error) throw error;
+        data = allData;
       }
 
-      const { data, error } = await query;
-
-      console.log('📊 Events query result:', data?.length, 'events found');
-
-      if (error) throw error;
+      console.log('✅ Events loaded:', data?.length, 'events found');
 
       // Get registration counts for each event
       const statsPromises = data.map(async (event) => {
@@ -835,9 +848,10 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
       });
 
       const eventStatsData = await Promise.all(statsPromises);
+      console.log('✅ Event stats calculated for', eventStatsData.length, 'events');
       setEventStats(eventStatsData);
     } catch (error) {
-      console.error('Error loading event stats:', error);
+      console.error('❌ Error loading event stats:', error);
     } finally {
       setLoading(false);
     }
@@ -948,13 +962,40 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
   const loadEventRegistrations = async (eventId) => {
     setLoadingDetails(true);
     try {
-      // 1. Fetch registrations
-      const { data: regs, error: regsError } = await supabase
-        .from('event_registrations_config')
-        .select('*')
-        .eq('event_id', eventId)
-        .eq('payment_status', 'PAID')
-        .order('registered_at', { ascending: false });
+      // First check if this is a team event
+      const currentEvent = eventStats.find(e => e.id === eventId);
+      const isTeamEvent = currentEvent?.is_team_event || 
+        (() => {
+          const teamEventKeywords = ['paper presentation', 'team', 'group', 'mct', 'hackathon', 'conference'];
+          const eventName = currentEvent?.name?.toLowerCase() || '';
+          return teamEventKeywords.some(keyword => eventName.includes(keyword));
+        })();
+
+      console.log('🔍 Loading registrations for event:', currentEvent?.name, 'Is team event:', isTeamEvent);
+
+      if (isTeamEvent) {
+        // For team events, we'll let the EventDetailsWithTeams component handle the data loading
+        // Just set empty array here as TeamDetailsView will fetch its own data
+        setEventRegistrations([]);
+        setLoadingDetails(false);
+        return;
+      }
+
+      // 1. Fetch individual event registrations using bulk fetch
+      console.log('📊 Fetching all registrations for event (bypassing 1000 limit)...');
+      const { data: regs, error: regsError } = await fetchAllRecords(
+        supabase,
+        'event_registrations_config',
+        '*',
+        {
+          filters: [
+            { column: 'event_id', operator: 'eq', value: eventId },
+            { column: 'payment_status', operator: 'eq', value: 'PAID' }
+          ],
+          orderBy: 'registered_at',
+          orderAscending: false
+        }
+      );
 
       if (regsError) throw regsError;
 
@@ -964,16 +1005,21 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         return;
       }
 
-      // 2. Fetch profiles manualy to avoid join errors on missing columns
+      // 2. Fetch profiles using bulk fetch to avoid join errors and 1000 limit
       const userIds = [...new Set(regs.map(r => r.user_id))];
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, full_name, email, mobile_number, college_name, department, roll_number')
-        .in('id', userIds);
+      console.log(`📊 Fetching profiles for ${userIds.length} users...`);
+      const { data: profiles, error: profilesError } = await fetchAllRecords(
+        supabase,
+        'profiles',
+        'id, full_name, email, mobile_number, college_name, department, roll_number',
+        {
+          filters: [{ column: 'id', operator: 'in', value: userIds }]
+        }
+      );
       
       if (profilesError) throw profilesError;
 
-      const profileMap = new Map(profiles.map(p => [p.id, p]));
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
 
       // 3. Combine data
       const combined = regs.map(r => {
@@ -991,9 +1037,11 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         };
       });
 
+      console.log('✅ Loaded', combined.length, 'individual registrations for event');
       setEventRegistrations(combined);
     } catch (error) {
-      console.error('Error loading event registrations:', error);
+      console.error('❌ Error loading event registrations:', error);
+      setEventRegistrations([]);
     } finally {
       setLoadingDetails(false);
     }
@@ -1250,7 +1298,21 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
                   >
                     <td className="p-4">
                       <div>
-                        <p className="font-bold">{event.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-bold">{event.name}</p>
+                          {/* Team/Individual indicator */}
+                          {event.is_team_event ? (
+                            <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded text-xs font-bold">
+                              <Users className="w-3 h-3 inline mr-1" />
+                              TEAM
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-bold">
+                              <UserPlus className="w-3 h-3 inline mr-1" />
+                              INDIVIDUAL
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-gray-500">{event.event_key || event.event_id || '-'}</p>
                       </div>
                     </td>
@@ -1555,6 +1617,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         event={selectedEvent}
         registrations={eventRegistrations}
         showTeamDetails={true}
+        hideActions={hideFinancials}
       />
     </div>
   );

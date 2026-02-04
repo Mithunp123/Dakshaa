@@ -11,6 +11,7 @@ import {
   AlertCircle,
   X
 } from "lucide-react";
+import { supabase } from "../../supabase";
 
 const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true }) => {
   const [teams, setTeams] = useState([]);
@@ -23,19 +24,28 @@ const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true }) => 
     try {
       setLoading(true);
       
+      // Get current user to pass for role-based filtering
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const params = new URLSearchParams({
         event_id: eventId,
-        limit: '50'
+        user_id: user?.id,
+        limit: '100'
       });
       
       const response = await fetch(`http://localhost:3000/api/admin/teams?${params}`);
       const result = await response.json();
       
       if (result.success) {
-        setTeams(result.data);
+        console.log('🏆 Fetched teams for event:', eventId, 'Count:', result.data?.length);
+        setTeams(result.data || []);
+      } else {
+        console.error('❌ Error fetching teams:', result.error);
+        setTeams([]);
       }
     } catch (error) {
-      console.error("Error fetching teams:", error);
+      console.error("❌ Error fetching teams:", error);
+      setTeams([]);
     } finally {
       setLoading(false);
     }

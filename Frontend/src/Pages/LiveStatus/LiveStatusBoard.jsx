@@ -10,6 +10,7 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { supabase } from "../../supabase";
+import { fetchAllRecords } from '../../utils/bulkFetch';
 import { useNavigate } from "react-router-dom";
 
 const LiveStatusBoard = () => {
@@ -99,12 +100,20 @@ const LiveStatusBoard = () => {
 
   const fetchEvents = async () => {
     try {
-      const { data, error } = await supabase
-        .from("events")
-        .select("*")
-        .order("start_time", { ascending: true });
+      console.log('📊 Fetching all events for live status (bypassing 1000 limit)...');
+      const { data, error } = await fetchAllRecords(
+        supabase,
+        'events',
+        '*',
+        {
+          orderBy: 'start_time',
+          orderAscending: true
+        }
+      );
 
       if (error) throw error;
+
+      console.log(`✅ Loaded ${data?.length || 0} events for live status`);
 
       const now = new Date();
       
@@ -123,7 +132,7 @@ const LiveStatusBoard = () => {
       setNowHappening(live);
       setUpNext(upcoming);
     } catch (error) {
-      console.error("Error fetching events:", error);
+      console.error("❌ Error fetching events:", error);
     }
   };
 
