@@ -913,7 +913,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           paidRegistrations: paidCount,
           pendingRegistrations: pendingCount,
           partialRegistrations: partialCount,
-          fillRate: event.capacity > 0 ? (totalCount / event.capacity * 100).toFixed(1) : 0
+          fillRate: event.capacity > 0 ? (paidCount / event.capacity * 100).toFixed(1) : 0
         };
       });
 
@@ -1204,7 +1204,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         case 'paid': return sum + (e.paidRegistrations || 0);
         case 'pending': return sum + (e.pendingRegistrations || 0);
         case 'partial': return sum + (e.partialRegistrations || 0);
-        default: return sum + (e.totalRegistrations || 0);
+        default: return sum + (e.paidRegistrations || 0); // Changed to show paid by default
       }
     }, 0);
   };
@@ -1290,7 +1290,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
               <div className="text-3xl font-bold text-green-400">{totalRegistrations}</div>
             </div>
             <p className="text-gray-400 text-sm">
-              Total Registrations
+              Paid Registrations
               {coordinatorEvents && coordinatorEvents.length > 0 && paymentStatusFilter !== 'all' && (
                 <span className="ml-1 text-xs">
                   ({paymentStatusFilter.charAt(0).toUpperCase() + paymentStatusFilter.slice(1)} Only)
@@ -1469,9 +1469,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
                     <td className="p-4 text-center">
                       <div className="flex flex-col items-center">
                         <span className="text-lg font-bold text-green-400">
-                          {coordinatorEvents && coordinatorEvents.length > 0 
-                            ? event.paidRegistrations 
-                            : event.totalRegistrations}
+                          {event.paidRegistrations}
                         </span>
                         {/* Badges hidden as per request */}
                       </div>

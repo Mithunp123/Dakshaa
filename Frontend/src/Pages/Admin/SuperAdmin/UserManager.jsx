@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
 import { AnimatePresence } from 'framer-motion';
+import { fetchAllRecords } from '../../../utils/bulkFetch';
 
 const UserManager = () => {
   const location = useLocation();
@@ -42,6 +43,7 @@ const UserManager = () => {
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('users');
   const [messageForm, setMessageForm] = useState({ subject: '', body: '', target: 'all' });
+  const [loadingUserDetails, setLoadingUserDetails] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -64,18 +66,31 @@ const UserManager = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+      console.log('📊 Fetching all users (bypassing 1000 limit)...');
+      
+      // Use bulkFetch to handle pagination automatically
+      const { data, error } = await fetchAllRecords(
+        supabase,
+        'profiles',
+        '*',
+        {
+          orderBy: 'created_at',
+          orderAscending: false,
+          pageSize: 1000
+        }
+      );
       
       if (error) throw error;
+      console.log(`✅ Fetched ${data?.length || 0} users successfully`);
       setUsers(data);
       
-      // Fetch team members data
-      const { data: teamMembersData, error: teamMembersError } = await supabase
-        .from('team_members')
-        .select('user_id, role, team_id');
+      // Fetch team members data using bulkFetch
+      const { data: teamMembersData, error: teamMembersError } = await fetchAllRecords(
+        supabase,
+        'team_members',
+        'user_id, role, team_id',
+        { pageSize: 1000 }
+      );
       
       if (teamMembersError) {
         console.error('Error fetching team members:', teamMembersError);
@@ -83,10 +98,13 @@ const UserManager = () => {
         return;
       }
       
-      // Fetch all teams data including leader_id
-      const { data: teamsData, error: teamsError } = await supabase
-        .from('teams')
-        .select('id, team_name, event_id, leader_id');
+      // Fetch all teams data including leader_id using bulkFetch
+      const { data: teamsData, error: teamsError } = await fetchAllRecords(
+        supabase,
+        'teams',
+        'id, team_name, event_id, leader_id',
+        { pageSize: 1000 }
+      );
       
       if (teamsError) {
         console.error('Error fetching teams:', teamsError);
@@ -149,9 +167,15 @@ const UserManager = () => {
   };
 
   const fetchUserDetails = async (user) => {
+    // CRITICAL: Reset all state before loading new user to prevent showing stale data
     setSelectedUser(user);
+    setUserRegistrations([]);
+    setUserTeams([]);
+    setUserActivity([]);
+    setReferredByInfo(null);
+    setLoadingUserDetails(true);
     setIsModalOpen(true);
-    setReferredByInfo(null); // Reset
+    
     try {
       // Fetch direct registrations from event_registrations_config
       const { data: regs } = await supabase
@@ -287,6 +311,8 @@ const UserManager = () => {
       setUserActivity(activity);
     } catch (error) {
       console.error('Error fetching user details:', error);
+    } finally {
+      setLoadingUserDetails(false);
     }
   };
 
@@ -691,6 +717,14 @@ const UserManager = () => {
 
               {/* Modal Content */}
               <div className="flex-1 overflow-y-auto p-8">
+                {loadingUserDetails ? (
+                  <div className="flex items-center justify-center h-64">
+                    <div className="text-center">
+                      <Loader2 className="w-12 h-12 animate-spin text-secondary mx-auto mb-4" />
+                      <p className="text-gray-400">Loading user details...</p>
+                    </div>
+                  </div>
+                ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   {/* Left Column: Details & Correction */}
                   <div className="space-y-8">
@@ -865,6 +899,7 @@ const UserManager = () => {
                     </section>
                   </div>
                 </div>
+                )}
               </div>
             </motion.div>
           </div>
