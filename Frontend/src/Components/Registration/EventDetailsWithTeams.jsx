@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from "react";
-import { Users, Eye, Calendar, MapPin } from "lucide-react";
+import { Users, Eye, MoreVertical } from "lucide-react";
 import TeamDetailsView from "../TeamManagement/TeamDetailsView";
+import { motion, AnimatePresence } from "framer-motion";
 
-const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, hideActions = false, paymentFilter = 'all' }) => {
+const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, hideActions = false, paymentFilter = 'all', onRefresh }) => {
   const [isTeamEvent, setIsTeamEvent] = useState(false);
+  const [activeActionMenu, setActiveActionMenu] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedParticipant, setSelectedParticipant] = useState(null);
 
   // Filter registrations based on payment status
   const filteredRegistrations = registrations?.filter(reg => {
     if (paymentFilter === 'all') return true;
     return reg.payment_status === paymentFilter;
   }) || [];
+
+  // Action handler
+  const handleViewDetails = (participant) => {
+    setSelectedParticipant(participant);
+    setShowDetailsModal(true);
+    setActiveActionMenu(null);
+  };
 
   useEffect(() => {
     // First check the database is_team_event field
@@ -43,6 +54,18 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
     }
   }, [event]);
 
+  // Close action menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (activeActionMenu && !e.target.closest('.action-menu-container')) {
+        setActiveActionMenu(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activeActionMenu]);
+
   // For team events, show TeamDetailsView only
   // For individual events, show individual registrations table
   if (isTeamEvent && showTeamDetails) {
@@ -73,8 +96,138 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
   console.log(`👤 Individual Event "${event?.name}" - Registrations count:`, filteredRegistrations?.length);
   console.log(`👤 Individual Event registrations:`, filteredRegistrations);
   
+  // Participant Details Modal
+  const ParticipantDetailsModal = () => {
+    if (!showDetailsModal || !selectedParticipant) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          className="bg-gray-900 border border-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        >
+          {/* Header */}
+          <div className="sticky top-0 bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-white">Participant Details</h2>
+            <button
+              onClick={() => setShowDetailsModal(false)}
+              className="text-gray-400 hover:text-white p-2 hover:bg-gray-800 rounded"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="p-6 space-y-6">
+            {/* Personal Information */}
+            <div>
+              <h3 className="text-lg font-semibold text-cyan-400 mb-3">Personal Information</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-gray-400 text-sm">Full Name</p>
+                  <p className="text-white font-medium">
+                    {selectedParticipant.profiles?.full_name || selectedParticipant.user_name || 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Email</p>
+                  <p className="text-white font-medium">
+                    {selectedParticipant.profiles?.email || 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Mobile Number</p>
+                  <p className="text-white font-medium">
+                    {selectedParticipant.profiles?.mobile_number || 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">College/Institution</p>
+                  <p className="text-white font-medium">
+                    {selectedParticipant.profiles?.college_name || selectedParticipant.college || 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Department</p>
+                  <p className="text-white font-medium">
+                    {selectedParticipant.profiles?.department || 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Roll Number</p>
+                  <p className="text-white font-medium">
+                    {selectedParticipant.profiles?.roll_no || 'N/A'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Registration Information */}
+            <div>
+              <h3 className="text-lg font-semibold text-cyan-400 mb-3">Registration Information</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-gray-400 text-sm">Registration ID</p>
+                  <p className="text-white font-medium font-mono">
+                    {selectedParticipant.id || 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Registered On</p>
+                  <p className="text-white font-medium">
+                    {new Date(selectedParticipant.registered_at || selectedParticipant.created_at).toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Payment Status</p>
+                  <span className={`inline-block px-3 py-1 rounded-full text-sm ${
+                    selectedParticipant.payment_status === 'PAID' 
+                      ? 'bg-green-500/20 text-green-400' 
+                      : 'bg-yellow-500/20 text-yellow-400'
+                  }`}>
+                    {selectedParticipant.payment_status || 'PENDING'}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Attendance</p>
+                  <span className={`inline-block px-3 py-1 rounded-full text-sm ${
+                    selectedParticipant.attended 
+                      ? 'bg-green-500/20 text-green-400' 
+                      : 'bg-gray-500/20 text-gray-400'
+                  }`}>
+                    {selectedParticipant.attended ? 'Present' : 'Not Marked'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Event Information */}
+            <div>
+              <h3 className="text-lg font-semibold text-cyan-400 mb-3">Event Information</h3>
+              <div className="bg-gray-800/50 rounded-lg p-4">
+                <p className="text-white font-semibold text-lg">{event?.name}</p>
+                <p className="text-gray-400 text-sm mt-1">{event?.category}</p>
+                {event?.price && (
+                  <p className="text-cyan-400 mt-2">₹{event.price}</p>
+                )}
+              </div>
+            </div>
+
+
+          </div>
+        </motion.div>
+      </div>
+    );
+  };
+  
   return (
     <div>
+      {/* Participant Details Modal */}
+      <AnimatePresence>
+        {showDetailsModal && <ParticipantDetailsModal />}
+      </AnimatePresence>
       {/* Individual Event Header */}
       <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 mb-4">
         <div className="flex items-center gap-2">
@@ -145,9 +298,38 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
                     </td>
                     {!hideActions && (
                       <td className="px-4 py-3">
-                        <button className="text-cyan-400 hover:text-cyan-300">
-                          <Eye className="w-4 h-4" />
-                        </button>
+                        <div className="relative action-menu-container">
+                          <button 
+                            onClick={() => setActiveActionMenu(activeActionMenu === registration.id ? null : registration.id)}
+                            className="text-gray-400 hover:text-cyan-400 p-1 rounded hover:bg-gray-800/50"
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </button>
+
+                          {/* Action Dropdown Menu */}
+                          <AnimatePresence>
+                            {activeActionMenu === registration.id && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                                transition={{ duration: 0.15 }}
+                                className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50"
+                              >
+                                <div className="py-1">
+                                  {/* View Details */}
+                                  <button
+                                    onClick={() => handleViewDetails(registration)}
+                                    className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700/50 flex items-center gap-2"
+                                  >
+                                    <Eye className="w-4 h-4 text-blue-400" />
+                                    View Details
+                                  </button>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
                       </td>
                     )}
                   </tr>

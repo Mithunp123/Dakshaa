@@ -1830,6 +1830,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         showTeamDetails={true}
         hideActions={hideFinancials}
         paymentFilter={detailsPaymentFilter}
+        onRefresh={() => selectedEvent && loadEventRegistrations(selectedEvent.id)}
       />
     </div>
   );
