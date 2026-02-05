@@ -145,7 +145,6 @@ const conferences = [
     ],
     rules: [
      "Only registered participants can attend and present.",
-     "Plagiarism less than 15% only allowed.",
      "Submit original papers; copying results in Disqualification.",
      "Present on time according to your assigned slot.",
      "E-Certificates will be given only to those who participate and present their Papers",

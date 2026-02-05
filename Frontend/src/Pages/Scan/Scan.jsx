@@ -18,6 +18,7 @@ const Scan = () => {
   const [scanning, setScanning] = useState(false);
   const [cameraError, setCameraError] = useState(null);
   const [cameraId, setCameraId] = useState(null);
+  const [participantInfo, setParticipantInfo] = useState(null);
   const html5QrCodeRef = useRef(null);
 
   useEffect(() => {
@@ -122,30 +123,66 @@ const Scan = () => {
 
   const validateTicket = async (qrString) => {
     setStatus('loading');
+    setParticipantInfo(null);
+    
     try {
-      // Format: userId-eventId-timestamp
-      const [userId, eventId] = qrString.split('-');
+      // Try to parse as JSON (new format)
+      let userId, regId, events;
       
-      const { data: registration, error } = await supabase
-        .from('registrations')
-        .select('*, events(title)')
-        .eq('qr_code_string', qrString)
+      try {
+        const qrData = JSON.parse(qrString);
+        userId = qrData.userId;
+        regId = qrData.regId;
+        events = qrData.events || [];
+      } catch (e) {
+        // Fallback for old format: userId or userId-eventId-timestamp
+        userId = qrString.split('-')[0];
+        regId = null;
+        events = [];
+      }
+
+      // Fetch participant profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
         .single();
 
-      if (error || !registration) {
+      if (profileError || !profile) {
         setStatus('error');
-        setMessage('Invalid Ticket or Registration not found.');
+        setMessage('Participant not found.');
         return;
       }
 
-      // Here you could also check if the current user (coordinator) 
-      // is authorized for this specific eventId
-      
+      setParticipantInfo(null);
+      // If events weren't in QR, fetch them from database
+      if (!events || events.length === 0) {
+        const { data: registrations } = await supabase
+          .from('event_registrations_config')
+          .select('events(name)')
+          .eq('user_id', userId)
+          .in('payment_status', ['PAID', 'completed']);
+        
+        events = registrations?.map(r => r.events?.name).filter(Boolean) || [];
+      }
+
+      const participantData = {
+        name: profile.full_name,
+        regId: regId || `DAK26-${userId.substring(0, 8).toUpperCase()}`,
+        college: profile.college_name,
+        department: profile.department,
+        mobile: profile.mobile_number,
+        events: events
+      };
+
+      setParticipantInfo(participantData);
       setStatus('success');
-      setMessage(`Valid Ticket for ${registration.events.title}`);
+      setMessage(`Valid Entry Pass for ${profile.full_name}`);
+      
     } catch (err) {
+      console.error('Error validating ticket:', err);
       setStatus('error');
-      setMessage('Error validating ticket.');
+      setMessage('Error validating QR code.');
     }
   };
 
@@ -184,6 +221,37 @@ const Scan = () => {
               <>
                 <CheckCircle className="w-20 h-20 text-green-500 mb-4" />
                 <h2 className="text-2xl font-bold text-green-500">Access Granted</h2>
+                
+                {participantInfo && (
+                  <div className="mt-6 bg-gray-800/50 rounded-lg p-4 w-full text-left">
+                    <div className="mb-3">
+                      <p className="text-xs text-gray-500 uppercase">Name</p>
+                      <p className="text-lg font-bold text-white">{participantInfo.name}</p>
+                    </div>
+                    <div className="mb-3">
+                      <p className="text-xs text-gray-500 uppercase">Registration ID</p>
+                      <p className="text-md font-mono text-orange-400">{participantInfo.regId}</p>
+                    </div>
+                    {participantInfo.college && (
+                      <div className="mb-3">
+                        <p className="text-xs text-gray-500 uppercase">College</p>
+                        <p className="text-sm text-gray-300">{participantInfo.college}</p>
+                      </div>
+                    )}
+                    {participantInfo.events && participantInfo.events.length > 0 && (
+                      <div className="mb-3">
+                        <p className="text-xs text-gray-500 uppercase mb-2">Registered Events</p>
+                        <div className="space-y-1">
+                          {participantInfo.events.map((event, idx) => (
+                            <div key={idx} className="text-sm bg-blue-500/20 text-blue-300 px-3 py-1 rounded">
+                              {event}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <p className="mt-2 text-gray-300">{message}</p>
               </>
             )}

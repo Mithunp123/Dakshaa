@@ -1,0 +1,156 @@
+/* QR Print Sheet Styles - Minimal Layout */
+
+/* Hide everything except print content when printing */
+@media print {
+  /* Reset everything */
+  * {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide EVERYTHING on the page by default */
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 210mm !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+  }
+
+  /* Hide all body children */
+  body > * {
+    display: none !important;
+  }
+
+  /* Show ONLY our print container */
+  body > .qr-print-container {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    width: 210mm !important;
+    height: auto !important;
+    background: white !important;
+  }
+
+  .qr-print-container * {
+    visibility: visible !important;
+  }
+
+  /* Page settings */
+  @page {
+    margin: 0;
+    padding: 0;
+    size: A4 portrait;
+  }
+  
+  /* Each print page */
+  .qr-print-page {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    height: 297mm !important;
+    max-height: 297mm !important;
+    page-break-after: always !important;
+    page-break-inside: avoid !important;
+    break-after: page !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 30px !important;
+    background: white !important;
+  }
+  
+  .qr-print-page:last-child,
+  .qr-print-page:only-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  /* Ensure QR elements are visible */
+  .qr-print-qr-wrapper,
+  .qr-print-name,
+  .qr-print-id {
+    display: block !important;
+    visibility: visible !important;
+  }
+}
+
+/* Container - screen styles */
+.qr-print-container {
+  width: 100%;
+  background: white;
+}
+
+/* Each page - clean white page with centered content */
+.qr-print-page {
+  width: 210mm;
+  height: 297mm;
+  background: white;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  page-break-after: always;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+}
+
+/* Remove page break from last page */
+.qr-print-page:last-child {
+  page-break-after: auto;
+}
+
+/* QR Code Wrapper - just the QR, no decorations */
+.qr-print-qr-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Participant Name - simple centered text */
+.qr-print-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: #000000;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Registration ID - DAK26-ID */
+.qr-print-id {
+  font-size: 24px;
+  font-weight: 600;
+  color: #000000;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Screen view - HIDE the preview, only show in print */
+@media screen {
+  .qr-print-container {
+    position: fixed;
+    top: -9999px;
+    left: -9999px;
+    width: 210mm;
+    height: auto;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .qr-print-page {
+    margin: 0;
+  }
+}

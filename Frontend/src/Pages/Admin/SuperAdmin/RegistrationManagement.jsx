@@ -29,9 +29,11 @@ import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import EventDetailsWithTeams from '../../../Components/Registration/EventDetailsWithTeams';
+import QRPrintSheet from '../../../Components/QR/QRPrintSheet';
 import logo1 from '../../../assets/logo1.webp';
 import ksrctLogo from '../../../assets/ksrct.webp';
 import { fetchAllRecords, fetchAllRecordsWithJoins } from '../../../utils/bulkFetch';
+import toast from 'react-hot-toast';
 
 // Category color mapping
 const getCategoryColor = (category) => {
@@ -96,6 +98,12 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
   const [transferError, setTransferError] = useState('');
   const [transferSuccess, setTransferSuccess] = useState('');
 
+  // QR Print States
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [printParticipants, setPrintParticipants] = useState([]);
+  const [printingQR, setPrintingQR] = useState(false);
+  const [currentUserProfile, setCurrentUserProfile] = useState(null);
+
   const refreshData = async () => {
     console.log('🔄 Refreshing Registration Data...');
     try {
@@ -106,6 +114,432 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
       }
     } catch (error) {
       console.error('❌ Error refreshing data:', error);
+    }
+  };
+
+  // Fetch current user profile
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          
+          if (profile) {
+            setCurrentUserProfile(profile);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  // Function to fetch participant's registered events
+  const fetchParticipantEvents = async (userId) => {
+    try {
+      const { data: registrations } = await supabase
+        .from('event_registrations_config')
+        .select('events(name)')
+        .eq('user_id', userId)
+        .in('payment_status', ['PAID', 'completed']);
+      
+      return registrations?.map(r => r.events?.name).filter(Boolean) || [];
+    } catch (error) {
+      console.error('Error fetching participant events:', error);
+      return [];
+    }
+  };
+
+  // Function to check if user can print QR
+  const canPrintQR = (participantProfile) => {
+    // Super admin can always print
+    if (currentUserProfile?.role === 'super_admin') {
+      return { allowed: true, reason: '' };
+    }
+    
+    // Coordinators can only print once
+    if (currentUserProfile?.role === 'event_coordinator') {
+      if (participantProfile?.is_print) {
+        return { allowed: false, reason: 'QR code already printed for this participant' };
+      }
+      return { allowed: true, reason: '' };
+    }
+    
+    return { allowed: false, reason: 'Insufficient permissions' };
+  };
+
+  // Function to handle QR printing
+  const handlePrintQR = async () => {
+    if (!selectedEvent || eventRegistrations.length === 0) {
+      toast.error('No registrations to print');
+      return;
+    }
+
+    setPrintingQR(true);
+    console.log('🖨️ Starting QR print for event:', selectedEvent.name);
+    console.log('📊 Event registrations count:', eventRegistrations.length);
+    console.log('📋 Sample registration data:', eventRegistrations[0]);
+    
+    try {
+      // Check if it's a team event
+      const isTeamEvent = selectedEvent?.is_team_event;
+      const participants = [];
+
+      console.log(`🎯 Event type: ${isTeamEvent ? 'TEAM' : 'INDIVIDUAL'}`);
+
+      if (isTeamEvent) {
+        // For team events, fetch only PAID teams and their members
+        const { data: teams } = await supabase
+          .from('teams')
+          .select(`
+            id,
+            name,
+            payment_status,
+            team_members (
+              user_id,
+              profiles (
+                id,
+                full_name,
+                is_print
+              )
+            )
+          `)
+          .eq('event_id', selectedEvent.id)
+          .in('payment_status', ['PAID', 'completed']);
+
+        console.log('👥 Fetched PAID teams:', teams?.length || 0);
+
+        if (teams && teams.length > 0) {
+          for (const team of teams) {
+            if (team.team_members && team.team_members.length > 0) {
+              for (const member of team.team_members) {
+                const profile = member.profiles;
+                const userId = profile?.id || member.user_id;
+                
+                if (!userId) {
+                  console.warn('Skipping team member - no user ID found:', member);
+                  continue;
+                }
+
+                if (profile && profile.full_name) {
+                  // Check if can print
+                  const printCheck = canPrintQR(profile);
+                  if (!printCheck.allowed) {
+                    toast.error(`Cannot print for ${profile.full_name}: ${printCheck.reason}`);
+                    continue;
+                  }
+
+                  const events = await fetchParticipantEvents(userId);
+                  participants.push({
+                    id: userId,
+                    userId: userId,
+                    name: profile.full_name || 'Team Member',
+                    regId: `DAK26-${userId.substring(0, 8).toUpperCase()}`,
+                    registeredEvents: events
+                  });
+                } else {
+                  console.warn('Skipping team member - incomplete profile data:', member);
+                }
+              }
+            }
+          }
+        } else {
+          console.log('⚠️ No paid teams found for this event');
+        }
+      } else {
+        // For individual events
+        const paidRegistrations = eventRegistrations.filter(
+          reg => reg.payment_status === 'PAID' || reg.payment_status === 'completed'
+        );
+
+        console.log('💳 Paid registrations:', paidRegistrations.length);
+
+        for (const reg of paidRegistrations) {
+          const profile = reg.profiles;
+          const userId = profile?.id || reg.user_id;
+          
+          if (!userId) {
+            console.warn('Skipping registration - no user ID found:', reg);
+            continue;
+          }
+
+          if (profile && profile.full_name) {
+            // Check if can print
+            const printCheck = canPrintQR(profile);
+            if (!printCheck.allowed) {
+              toast.error(`Cannot print for ${profile.full_name}: ${printCheck.reason}`);
+              continue;
+            }
+
+            const events = await fetchParticipantEvents(userId);
+            participants.push({
+              id: userId,
+              userId: userId,
+              name: profile.full_name || 'Participant',
+              regId: `DAK26-${userId.substring(0, 8).toUpperCase()}`,
+              registeredEvents: events
+            });
+          } else {
+            console.warn('Skipping registration - incomplete profile data:', reg);
+          }
+        }
+      }
+
+      console.log('✅ Prepared participants for printing:', participants.length);
+
+      if (participants.length === 0) {
+        toast.error('No participants eligible for QR printing');
+        setPrintingQR(false);
+        return;
+      }
+
+      // Mark participants as printed (only for coordinators)
+      if (currentUserProfile?.role === 'event_coordinator') {
+        const userIds = participants.map(p => p.userId);
+        await supabase
+          .from('profiles')
+          .update({ is_print: true })
+          .in('id', userIds);
+      }
+
+      setPrintParticipants(participants);
+      setShowPrintModal(true);
+      toast.success(`Prepared ${participants.length} QR code${participants.length > 1 ? 's' : ''} for printing`);
+      
+    } catch (error) {
+      console.error('Error preparing QR print:', error);
+      console.error('Error stack:', error.stack);
+      
+      // More specific error messages
+      if (error.message?.includes('substring')) {
+        toast.error('Error: Invalid participant data. Please contact support.');
+      } else if (error.message?.includes('fetch')) {
+        toast.error('Error: Failed to fetch participant data. Please try again.');
+      } else {
+        toast.error(`Failed to prepare QR codes: ${error.message || 'Unknown error'}`);
+      }
+    } finally {
+      setPrintingQR(false);
+    }
+  };
+
+  const handlePrintComplete = () => {
+    setShowPrintModal(false);
+    setPrintParticipants([]);
+    // Don't show toast here - we can't know if user actually printed or cancelled
+  };
+
+  // Function to handle printing QR for a single participant
+  const handlePrintSingleQR = async (registration) => {
+    // Prevent double-click
+    if (printingQR) {
+      console.log('⚠️ Print already in progress, ignoring click');
+      return;
+    }
+    
+    setPrintingQR(true);
+    
+    try {
+      const profile = registration.profiles;
+      const userId = profile?.id || registration.user_id;
+      
+      console.log('🖨️ Print Single QR - Starting for user:', userId);
+      
+      if (!userId) {
+        toast.error('Invalid user data');
+        setPrintingQR(false);
+        return;
+      }
+
+      // Check payment status
+      if (registration.payment_status !== 'PAID' && registration.payment_status !== 'completed') {
+        toast.error('QR codes can only be printed for paid registrations');
+        setPrintingQR(false);
+        return;
+      }
+
+      // For coordinators, check if QR was already printed by ANY coordinator
+      if (currentUserProfile?.role === 'event_coordinator') {
+        // Check the is_print status from the profile
+        const isPrinted = profile?.is_print || false;
+        if (isPrinted) {
+          toast.error('QR code already printed for this participant');
+          setPrintingQR(false);
+          return;
+        }
+      }
+
+      // Fetch registered events
+      const events = await fetchParticipantEvents(userId);
+      
+      const participant = {
+        id: userId,
+        userId: userId,
+        name: profile.full_name || 'Participant',
+        regId: `DAK26-${userId.substring(0, 8).toUpperCase()}`,
+        registeredEvents: events
+      };
+
+      console.log('🖨️ Print Single QR - Participant object:', participant);
+      console.log('🖨️ Print Single QR - Events found:', events?.length || 0);
+      
+      // Clear previous state completely
+      setShowPrintModal(false);
+      setPrintParticipants([]);
+      
+      // Wait a moment to ensure state is cleared
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Set new participant data
+      setPrintParticipants([participant]);
+      
+      // Wait again before showing modal
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      setShowPrintModal(true);
+      
+      // Mark as printed (only for coordinators)
+      if (currentUserProfile?.role === 'event_coordinator') {
+        await supabase
+          .from('profiles')
+          .update({ is_print: true })
+          .eq('id', userId);
+      }
+      
+      toast.success('QR code prepared for printing');
+      
+    } catch (error) {
+      console.error('Error preparing single QR:', error);
+      toast.error('Failed to prepare QR code');
+    } finally {
+      setPrintingQR(false);
+    }
+  };
+
+  // Handle printing QR codes for team (all team members get separate pages)
+  const handlePrintTeamQR = async (team) => {
+    // Prevent double-click
+    if (printingQR) {
+      console.log('⚠️ Print already in progress, ignoring click');
+      return;
+    }
+    
+    setPrintingQR(true);
+    
+    try {
+      console.log('🖨️ Print Team QR - Starting for team:', team.name);
+      console.log('🖨️ Team data:', team);
+
+      // Check payment status
+      if (team.payment_status !== 'PAID' && !team.is_active) {
+        toast.error('QR codes can only be printed for paid teams');
+        setPrintingQR(false);
+        return;
+      }
+
+      // Collect all team members (leader + members)
+      const allMembers = [];
+
+      // Add leader
+      if (team.leader_id) {
+        allMembers.push({
+          userId: team.leader_id,
+          name: team.leader_name || 'Team Leader',
+          role: 'leader'
+        });
+      }
+
+      // Add members from members_list if available
+      if (team.members_list && team.members_list.length > 0) {
+        team.members_list.forEach(member => {
+          if (member.user_id && member.role !== 'leader') {
+            allMembers.push({
+              userId: member.user_id,
+              name: member.full_name || 'Member',
+              role: 'member'
+            });
+          }
+        });
+      }
+
+      console.log('🖨️ Team members to print:', allMembers.length);
+
+      if (allMembers.length === 0) {
+        toast.error('No team members found to print');
+        setPrintingQR(false);
+        return;
+      }
+
+      // For coordinators, check if ANY member already printed
+      if (currentUserProfile?.role === 'event_coordinator') {
+        // Check if all members have already been printed
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, is_print')
+          .in('id', allMembers.map(m => m.userId));
+        
+        const allPrinted = profiles && profiles.every(p => p.is_print === true);
+        if (allPrinted) {
+          toast.error('QR codes already printed for all team members');
+          setPrintingQR(false);
+          return;
+        }
+      }
+
+      // Build participant objects for each member
+      const participants = await Promise.all(
+        allMembers.map(async (member) => {
+          const events = await fetchParticipantEvents(member.userId);
+          return {
+            id: member.userId,
+            userId: member.userId,
+            name: member.name,
+            regId: `DAK26-${member.userId.substring(0, 8).toUpperCase()}`,
+            registeredEvents: events
+          };
+        })
+      );
+
+      console.log('🖨️ Print Team QR - Participants prepared:', participants.length);
+
+      // Clear previous state completely
+      setShowPrintModal(false);
+      setPrintParticipants([]);
+      
+      // Wait a moment to ensure state is cleared
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Set new participant data (each will be on separate page)
+      setPrintParticipants(participants);
+      
+      // Wait again before showing modal
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      setShowPrintModal(true);
+      
+      // Mark as printed (only for coordinators)
+      if (currentUserProfile?.role === 'event_coordinator') {
+        const memberIds = allMembers.map(m => m.userId);
+        await supabase
+          .from('profiles')
+          .update({ is_print: true })
+          .in('id', memberIds);
+      }
+      
+      toast.success(`${participants.length} QR code(s) prepared for printing`);
+      
+    } catch (error) {
+      console.error('Error preparing team QR:', error);
+      toast.error('Failed to prepare team QR codes');
+    } finally {
+      setPrintingQR(false);
     }
   };
 
@@ -1083,7 +1517,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
       const { data: profiles, error: profilesError } = await fetchAllRecords(
         supabase,
         'profiles',
-        'id, full_name, email, mobile_number, college_name, department, roll_number',
+        'id, full_name, email, mobile_number, college_name, department, roll_number, is_print',
         {
           filters: [{ column: 'id', operator: 'in', value: userIds }]
         }
@@ -1099,12 +1533,14 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         return {
           ...r,
           profiles: {
+            id: profile.id || r.user_id,
             full_name: profile.full_name || 'Unknown',
             email: profile.email || 'N/A',
             phone: profile.mobile_number || 'N/A',
             college_name: profile.college_name || 'N/A',
             department: profile.department || 'N/A',
-            roll_no: profile.roll_number || 'N/A'
+            roll_no: profile.roll_number || 'N/A',
+            is_print: profile.is_print || false
           }
         };
       });
@@ -1831,7 +2267,20 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         hideActions={hideFinancials}
         paymentFilter={detailsPaymentFilter}
         onRefresh={() => selectedEvent && loadEventRegistrations(selectedEvent.id)}
+        onPrintQR={handlePrintSingleQR}
+        onPrintTeamQR={handlePrintTeamQR}
+        printingQR={printingQR}
+        isCoordinator={currentUserProfile?.role === 'event_coordinator'}
       />
+
+      {/* QR Print Modal */}
+      {showPrintModal && printParticipants.length > 0 && (
+        <QRPrintSheet
+          key={printParticipants[0]?.id || Date.now()}
+          participants={printParticipants}
+          onPrintComplete={handlePrintComplete}
+        />
+      )}
     </div>
   );
 };

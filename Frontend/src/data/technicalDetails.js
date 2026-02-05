@@ -520,7 +520,7 @@ export const technicalDetails = [
     date: "February 13, 2026",
     venue: "IT Park (Smart ClassRoom)",
     department: "Technical Events",
-    price: "₹250",
+    price: "₹150 Per Participant",
     rules: [
       " A team may consist of a maximum of two (2) participants.",
       "Papers must be related to bot technologies (software bots, hardware bots, AI bots, IoT bots, automation, robotics, etc.).",

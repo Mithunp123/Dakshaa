@@ -97,7 +97,7 @@ export const nonTechnicalDetails = [
     venue: "AB 410",
     price: "₹150 per Member",
     description:
-      "The IPL Auction is an exciting strategy-based event that simulates the real Indian Premier League player auction experience, where participants act as franchise owners and build a balanced cricket team by analyzing player statistics and bidding within a limited virtual budget. The event emphasizes teamwork, financial planning, and quick decision-making, making it engaging for cricket enthusiasts and strategy lovers alike. It will be conducted for a duration of 3 hours at AB 410, with free registration for participants who have registered for any Technical Event, Non-Technical Event, or Workshop.",
+      "The IPL Auction is an exciting strategy-based event that simulates the real Indian Premier League player auction experience, where participants act as franchise owners and build a balanced cricket team by analyzing player statistics and bidding within a limited virtual budget. The event emphasizes teamwork, financial planning, and quick decision-making, making it engaging for cricket enthusiasts and strategy lovers alike. It will be conducted for a duration of 3 hours at AB 410.",
     img: NonTech2,
     rules: [
       "Teams must consist of exactly 3 members.",

@@ -104,17 +104,29 @@ const GlobalScannerPage = () => {
       const support = checkCameraSupport();
       const config = getCameraConfig(support.isMobile);
       
-      const isMobileDevice = /iPhone|iPad|iPod|Android|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const cameraConfig = isMobileDevice 
-        ? { facingMode: { exact: "environment" } }
-        : { facingMode: "user" };
-
-      await html5QrCodeRef.current.start(
-        cameraConfig,
-        config,
-        onScanSuccess,
-        () => {}
-      );
+      // Always prefer back camera (environment) for QR scanning
+      // Only use front camera (user) as fallback
+      let cameraConfig = { facingMode: "environment" };
+      
+      try {
+        // Try back camera first
+        await html5QrCodeRef.current.start(
+          cameraConfig,
+          config,
+          onScanSuccess,
+          () => {}
+        );
+      } catch (backCamError) {
+        console.log('Back camera failed, trying front camera:', backCamError);
+        // Fallback to front camera if back fails
+        cameraConfig = { facingMode: "user" };
+        await html5QrCodeRef.current.start(
+          cameraConfig,
+          config,
+          onScanSuccess,
+          () => {}
+        );
+      }
     } catch (error) {
       const errorInfo = getCameraErrorMessage(error);
       setCameraError(errorInfo.message);
@@ -144,9 +156,36 @@ const GlobalScannerPage = () => {
     }, 1000);
   };
 
-  const markGlobalAttendance = async (userId) => {
+  const markGlobalAttendance = async (decodedText) => {
     try {
       setSubmitting(true);
+
+      // Parse QR code data - can be JSON or plain UUID
+      let userId;
+      let qrData = null;
+      
+      try {
+        // Try to parse as JSON (new QR format)
+        qrData = JSON.parse(decodedText);
+        userId = qrData.userId || qrData.id;
+        console.log('📱 Parsed QR data:', qrData);
+      } catch (e) {
+        // Fallback to plain UUID (old format)
+        userId = decodedText;
+        console.log('📱 Using plain UUID:', userId);
+      }
+
+      if (!userId) {
+        toast.error('Invalid QR code format');
+        return;
+      }
+
+      // Validate UUID format
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(userId)) {
+        toast.error('Invalid participant ID in QR code');
+        return;
+      }
 
       const { data: participant, error: participantError } = await supabase
         .from('profiles')
@@ -160,6 +199,23 @@ const GlobalScannerPage = () => {
       }
 
       const assignedEventIds = assignedEvents.map(event => event.id);
+      const assignedEventNames = assignedEvents.map(event => event.name?.toLowerCase());
+      
+      // Check if QR has events list that doesn't match coordinator's events
+      if (qrData?.events && Array.isArray(qrData.events)) {
+        const qrEventNames = qrData.events.map(e => e.toLowerCase());
+        const hasMatchingEvent = qrEventNames.some(qrEvent => 
+          assignedEventNames.some(assignedEvent => 
+            assignedEvent?.includes(qrEvent) || qrEvent.includes(assignedEvent || '')
+          )
+        );
+        
+        if (!hasMatchingEvent) {
+          toast.error(`${participant.full_name} is registered for "${qrData.events.join(', ')}" - not your assigned event`);
+          return;
+        }
+      }
+      
       const { data: registrations, error: regError } = await supabase
         .from('event_registrations_config')
         .select(`

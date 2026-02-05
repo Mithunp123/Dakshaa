@@ -171,29 +171,41 @@ const AttendanceScanner = () => {
       const support = checkCameraSupport();
       const config = getCameraConfig(support.isMobile);
 
-      // Force back camera on mobile devices (regardless of viewport/desktop mode)
-      const isMobileDevice = /iPhone|iPad|iPod|Android|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
-      const cameraConfig = cameraId 
-        ? cameraId 
-        : isMobileDevice
-          ? { facingMode: { exact: "environment" } } // Force back camera on mobile
-          : { facingMode: "user" }; // Desktop default
-
       console.log('\u{1F4F8} Scanner configuration:', {
-        isMobile: isMobileDevice,
+        isMobile: support.isMobile,
         cameraId: cameraId,
-        cameraConfig: cameraConfig,
         qrConfig: config
       });
 
-      console.log('\u{23F3} Starting camera...');
-      await html5QrCodeRef.current.start(
-        cameraConfig,
-        config,
-        onScanSuccess,
-        () => {} // Silent error handler
-      );
+      // If specific camera selected, use it
+      if (cameraId) {
+        console.log('\u{23F3} Starting with specific camera:', cameraId);
+        await html5QrCodeRef.current.start(
+          cameraId,
+          config,
+          onScanSuccess,
+          () => {}
+        );
+      } else {
+        // Try back camera first (environment), fallback to front (user)
+        try {
+          console.log('\u{23F3} Trying back camera (environment)...');
+          await html5QrCodeRef.current.start(
+            { facingMode: "environment" },
+            config,
+            onScanSuccess,
+            () => {}
+          );
+        } catch (backCamError) {
+          console.log('\u{26A0} Back camera failed, trying front camera:', backCamError.message);
+          await html5QrCodeRef.current.start(
+            { facingMode: "user" },
+            config,
+            onScanSuccess,
+            () => {}
+          );
+        }
+      }
 
       console.log('\u{2705} Scanner started successfully!');
       setScanning(true);
@@ -229,8 +241,21 @@ const AttendanceScanner = () => {
     // Stop scanner temporarily
     await stopScanner();
     
+    // Parse QR code data - can be JSON or plain UUID
+    let userId;
+    try {
+      // Try to parse as JSON (new QR format)
+      const qrData = JSON.parse(decodedText);
+      userId = qrData.userId || qrData.id;
+      console.log('📱 Parsed QR data:', qrData);
+    } catch (e) {
+      // Fallback to plain UUID (old format)
+      userId = decodedText;
+      console.log('📱 Using plain UUID:', userId);
+    }
+    
     // Process the scanned user ID
-    await processScannedUser(decodedText);
+    await processScannedUser(userId);
   }, []);
 
   const processScannedUser = async (userId) => {
@@ -238,6 +263,31 @@ const AttendanceScanner = () => {
     setScannedUser(null);
     setUserEvents([]);
     setShowEventSelection(false);
+
+    // Validate userId
+    if (!userId) {
+      setScanResult({
+        status: "error",
+        message: "Invalid QR code - no user ID found",
+        code: "INVALID_QR"
+      });
+      errorAudio.current?.play().catch(() => {});
+      setLoading(false);
+      return;
+    }
+
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      setScanResult({
+        status: "error",
+        message: "Invalid participant ID format in QR code",
+        code: "INVALID_UUID"
+      });
+      errorAudio.current?.play().catch(() => {});
+      setLoading(false);
+      return;
+    }
 
     try {
       // Get user profile
