@@ -19,6 +19,7 @@ import Tech23 from "../assets/EventsImages/EventDetails/TechnicalImages/ece_tech
 import Tech24 from "../assets/EventsImages/EventDetails/TechnicalImages/cody.webp";
 import Tech25 from "../assets/EventsImages/EventDetails/TechnicalImages/rcrace.webp";
 
+
 export const technicalDetails = [
   {
     id: "tech-aids",
@@ -1723,7 +1724,5 @@ export const technicalDetails = [
     },
     registrationLink: "",
   },
-
-
 
 ];

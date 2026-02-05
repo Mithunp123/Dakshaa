@@ -86,7 +86,7 @@ const eventCoordinators = [
   { id: 112, name: "Kamalanarayanan R", department: "Food Vist", img: ec12, role: "Event Coordinator", phone: "+91 90434 58427", associationLogo: ftasso },
   { id: 113, name: "Hari Kesavaraj", department: "Veda", img: ec13, role: "Event Coordinator", phone: "+91 82702 78279", associationLogo: vlsiasso },
   { id: 114, name: "Priyan G S", department: "Sparks Association", img: ec14, role: "Event Coordinator", phone: "+91 86680 57985", associationLogo: mechasso },
-  {id:115,name:"Monika R",department:"AEVA",img: monika, role: "Event Coordinator", phone: "+91 93696 07816", associationLogo:aevaLogo },
+  {id:115,name:"Monika R",department:"AEVA",img: monika, role: "Event Coordinator", phone: "+91 93636 07816", associationLogo:aevaLogo },
   {id:116,name:"Yaswanth J",department:"AEVA",img: Yaswanth, role: "Event Coordinator", phone: "+91 94814 08075", associationLogo:aevaLogo}
 ];
 

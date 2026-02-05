@@ -25,6 +25,9 @@ import Tech24 from "../assets/EventsImages/EventDetails/TechnicalImages/cody.web
 import Tech25 from "../assets/EventsImages/EventDetails/TechnicalImages/rcrace.webp";
 
 
+
+
+
 export const technicalEvents = [
   {
     image: Tech1,
@@ -151,6 +154,6 @@ export const technicalEvents = [
     image: Tech25,
     eventId: "tech-rcrace",
     price: 250,
-  }
-  
+  },
+
 ];

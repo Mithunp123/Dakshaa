@@ -123,7 +123,7 @@ const Events = () => {
     {
       id: 7,
       image: NonTechnicalImage,
-      name: "Expos & shows",
+      name: "Project/Paper/Poster",
       descriptionImages: exposAndShowsEvents,
     },
   ];
