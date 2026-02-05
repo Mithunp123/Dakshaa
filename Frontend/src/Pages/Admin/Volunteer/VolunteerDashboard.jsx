@@ -140,8 +140,17 @@ const VolunteerDashboard = () => {
         return;
       }
 
-      // Wait for DOM to be ready
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Set scanning to true first to trigger React re-render
+      setScanning(true);
+
+      // Wait longer for React to commit DOM changes and element to be available
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Check if the element exists before initializing scanner
+      const qrReaderElement = document.getElementById("volunteer-qr-reader");
+      if (!qrReaderElement) {
+        throw new Error('QR reader element not found in DOM. Please try again.');
+      }
       
       html5QrCodeRef.current = new Html5Qrcode("volunteer-qr-reader", {
         verbose: false
@@ -157,11 +166,46 @@ const VolunteerDashboard = () => {
       const config = getCameraConfig(support.isMobile);
 
       // Try back camera using different methods
-      // Priority: camera ID > exact environment > environment > user (front)
+      // MOBILE: exact environment > environment > camera ID > user (front)
+      // DESKTOP: camera ID > environment > user (front)
       let cameraStarted = false;
       const isMobile = support.isMobile;
       
-      // Method 1: Try using detected camera ID (Highest priority - detected back camera)
+      // Method 1: For MOBILE - Try exact facingMode environment FIRST (FORCES back camera)
+      if (isMobile && !cameraStarted) {
+        try {
+          console.log('📸 [Mobile] Trying EXACT facingMode: environment (Priority #1)');
+          await html5QrCodeRef.current.start(
+            { facingMode: { exact: "environment" } },
+            config,
+            (decodedText) => onScanSuccess(decodedText, mode),
+            () => {}
+          );
+          console.log('✅ Back camera started (exact environment)');
+          cameraStarted = true;
+        } catch (error) {
+          console.log('⚠️ Exact back camera failed:', error.message);
+        }
+      }
+
+      // Method 2: Try general facingMode environment (back camera)
+      if (!cameraStarted) {
+        try {
+          console.log('📸 Trying facingMode: environment');
+          await html5QrCodeRef.current.start(
+            { facingMode: "environment" },
+            config,
+            (decodedText) => onScanSuccess(decodedText, mode),
+            () => {}
+          );
+          console.log('✅ Back camera started (environment)');
+          cameraStarted = true;
+        } catch (error) {
+          console.log('⚠️ Back camera (environment) failed:', error.message);
+        }
+      }
+      
+      // Method 3: Try using detected camera ID (fallback for desktop/specific devices)
       if (cameraId && !cameraStarted) {
         try {
           console.log('📸 Trying selected camera ID:', cameraId);
@@ -175,40 +219,6 @@ const VolunteerDashboard = () => {
           cameraStarted = true;
         } catch (error) {
           console.log('⚠️ Camera ID failed:', error.message);
-        }
-      }
-      
-      // Method 2: Try exact facingMode environment (FORCES back camera on mobile)
-      if (isMobile && !cameraStarted) {
-        try {
-          console.log('📸 [Mobile] Trying exact facingMode: environment');
-          await html5QrCodeRef.current.start(
-            { facingMode: { exact: "environment" } },
-            config,
-            (decodedText) => onScanSuccess(decodedText, mode),
-            () => {}
-          );
-          console.log('✅ Back camera started (exact)');
-          cameraStarted = true;
-        } catch (error) {
-          console.log('⚠️ Exact back camera failed:', error.message);
-        }
-      }
-
-      // Method 3: Try facingMode environment (back camera - works on most devices)
-      if (!cameraStarted) {
-        try {
-          console.log('📸 Trying facingMode: environment');
-          await html5QrCodeRef.current.start(
-            { facingMode: "environment" },
-            config,
-            (decodedText) => onScanSuccess(decodedText, mode),
-            () => {}
-          );
-          console.log('✅ Back camera started');
-          cameraStarted = true;
-        } catch (error) {
-          console.log('⚠️ Back camera failed:', error.message);
         }
       }
 
@@ -230,7 +240,6 @@ const VolunteerDashboard = () => {
         }
       }
 
-      setScanning(true);
     } catch (error) {
       console.error('Scanner error:', error);
       const errorInfo = getCameraErrorMessage(error);
@@ -270,7 +279,7 @@ const VolunteerDashboard = () => {
     if (mode === 'gate') {
       await verifyGatePass(decodedText);
     } else if (mode === 'kit') {
-      await distributeKit(decodedText);
+      await deliverKit(decodedText);
     }
   };
 
