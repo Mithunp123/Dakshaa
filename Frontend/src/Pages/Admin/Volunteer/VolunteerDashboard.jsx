@@ -314,81 +314,114 @@ const VolunteerDashboard = () => {
       console.log('Is DAK Registration ID:', isDakRegId, 'Is UUID:', isUUID, 'Code:', registrationCode);
       
       let profile = null;
-      let allRegistrations = null;
+      let paidRegistrations = null;
       
       // Strategy 1: PRIMARY - Try as registration_id (DAK26-XXXX format)
-      // This is the main flow for volunteers verifying gate passes
       console.log('🔍 PRIMARY: Trying as registration_id:', registrationCode);
       
-      const { data: registration, error: regError } = await supabase
+      // First check if this registration code exists in the old registrations table
+      const { data: oldRegistration, error: oldRegError } = await supabase
         .from('registrations')
-        .select(`
-          *,
-          profiles!registrations_user_id_fkey(*),
-          events(*)
-        `)
+        .select('user_id, registration_id')
         .eq('registration_id', registrationCode)
         .single();
 
-      if (!regError && registration) {
-        profile = registration.profiles;
-        console.log('✅ Found registration:', registration.registration_id);
-        console.log('   Payment Status:', registration.payment_status);
-        console.log('   Event:', registration.events?.event_name);
-        
-        // Get all registrations for this user to show complete picture
-        const { data: regs } = await supabase
-          .from('registrations')
-          .select('*, events(*)')
-          .eq('user_id', registration.user_id);
-          
-        allRegistrations = regs || [registration];
+      let userId = null;
+
+      if (!oldRegError && oldRegistration) {
+        userId = oldRegistration.user_id;
+        console.log('✅ Found registration code, user_id:', userId);
       }
       
       // Strategy 2: FALLBACK - If UUID format, treat as user_id
-      if (!profile && isUUID) {
+      if (!userId && isUUID) {
         console.log('🔍 FALLBACK: Trying as user ID (UUID):', cleanedContent);
-        
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', cleanedContent)
-          .single();
-          
-        if (!profileError && profileData) {
-          profile = profileData;
-          console.log('✅ Found profile by user ID:', profile.full_name);
-          
-          // Get all registrations for this user
-          const { data: regs } = await supabase
-            .from('registrations')
-            .select('*, events(*)')
-            .eq('user_id', cleanedContent);
-            
-          allRegistrations = regs || [];
-        }
+        userId = cleanedContent;
       }
       
       // Strategy 3: Final attempt - try as user_id for non-UUID formats
-      if (!profile) {
+      if (!userId) {
         console.log('🔍 Final attempt - trying as user_id:', cleanedContent);
-        
+        userId = cleanedContent;
+      }
+
+      // Get user profile
+      if (userId) {
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', cleanedContent)
+          .eq('id', userId)
           .single();
           
         if (!profileError && profileData) {
           profile = profileData;
-          console.log('✅ Found profile on final attempt:', profile.full_name);
+          console.log('✅ Found profile:', profile.full_name);
           
-          const { data: regs } = await supabase
-            .from('registrations')
-            .select('*, events(*)')
-            .eq('user_id', cleanedContent);
+          // Get ONLY PAID registrations from event_registrations_config
+          const { data: paidRegs, error: regsError } = await supabase
+            .from('event_registrations_config')
+            .select(`
+              *,
+              events:event_id(*)
+            `)
+            .eq('user_id', userId)
+            .eq('payment_status', 'PAID');
             
-          allRegistrations = regs || [];
+          if (!regsError && paidRegs) {
+            console.log('✅ Found paid registrations:', paidRegs.length);
+            
+            // For each registration, check if it's a team event and get team details
+            const registrationsWithTeams = await Promise.all(
+              paidRegs.map(async (reg) => {
+                const event = reg.events;
+                
+                // Check if this is a team event (has max_team_size > 1)
+                if (event?.max_team_size > 1) {
+                  // First, find if user is in any team for this event
+                  const { data: teamMembership } = await supabase
+                    .from('team_members')
+                    .select('team_id')
+                    .eq('user_id', userId);
+                    
+                  if (teamMembership && teamMembership.length > 0) {
+                    // Find the team for this specific event
+                    const { data: eventTeam } = await supabase
+                      .from('teams')
+                      .select('id, team_name')
+                      .eq('event_id', event.id)
+                      .in('id', teamMembership.map(tm => tm.team_id))
+                      .single();
+                      
+                    if (eventTeam) {
+                      // Get all team members for this team
+                      const { data: allMembers } = await supabase
+                        .from('team_members')
+                        .select(`
+                          profiles:user_id(
+                            full_name,
+                            email
+                          )
+                        `)
+                        .eq('team_id', eventTeam.id);
+                        
+                      console.log('✅ Found team for event:', event.event_name, 'Team:', eventTeam.team_name);
+                      return {
+                        ...reg,
+                        teamInfo: {
+                          team_name: eventTeam.team_name,
+                          team_members: allMembers?.map(member => member.profiles?.full_name).filter(Boolean) || []
+                        }
+                      };
+                    }
+                  }
+                }
+                
+                return reg;
+              })
+            );
+            
+            paidRegistrations = registrationsWithTeams;
+          }
         }
       }
       
@@ -400,9 +433,9 @@ const VolunteerDashboard = () => {
         return;
       }
       
-      // Show all registered events for this user
+      // Show only paid registered events for this user
       playTingSound();
-      showRegisteredEvents(profile, allRegistrations || []);
+      showRegisteredEvents(profile, paidRegistrations || []);
       
     } catch (error) {
       console.error('Error verifying gate pass:', error);
@@ -554,17 +587,14 @@ const VolunteerDashboard = () => {
     audio.play().catch(() => {});
   };
 
-  const showRegisteredEvents = (profile, registrations) => {
+  const showRegisteredEvents = (profile, paidRegistrations) => {
     const notification = document.createElement('div');
     notification.className = 'fixed inset-0 bg-slate-900/95 z-[9999] flex items-center justify-center backdrop-blur-sm p-4 overflow-y-auto';
     
-    // Show only PAID events
-    const paidRegistrations = registrations.filter(r => r.payment_status?.toUpperCase() === 'PAID');
-    const totalRegistrations = registrations.length;
-    const pendingCount = totalRegistrations - paidRegistrations.length;
+    console.log('Displaying paid registrations:', paidRegistrations.length);
     
     notification.innerHTML = `
-      <div class="bg-slate-800 rounded-3xl w-full max-w-md max-h-[90vh] overflow-hidden">
+      <div class="bg-slate-800 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-hidden">
         <!-- Header -->
         <div class="bg-gradient-to-r from-green-500/20 to-emerald-500/20 p-6 border-b border-white/10">
           <div class="text-center mb-4">
@@ -578,21 +608,16 @@ const VolunteerDashboard = () => {
             <p class="text-xs text-gray-400 mt-1">${profile?.email || ''}</p>
           </div>
           
-          <div class="flex justify-center gap-4 text-sm">
+          <div class="flex justify-center">
             <div class="bg-green-500/20 px-4 py-2 rounded-full border border-green-500/30">
               <span class="text-green-400 font-bold">${paidRegistrations.length}</span>
               <span class="text-gray-300 ml-1">Paid Events</span>
             </div>
-            ${pendingCount > 0 ? `
-              <div class="bg-gray-500/20 px-3 py-2 rounded-full border border-gray-500/30">
-                <span class="text-gray-400 text-xs">${pendingCount} pending</span>
-              </div>
-            ` : ''}
           </div>
         </div>
         
         <!-- Paid Events List -->
-        <div class="p-4 space-y-3 max-h-[50vh] overflow-y-auto">
+        <div class="p-4 space-y-3 max-h-[60vh] overflow-y-auto">
           ${paidRegistrations.length === 0 ? `
             <div class="text-center py-8">
               <svg class="w-16 h-16 text-gray-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -603,18 +628,38 @@ const VolunteerDashboard = () => {
             </div>
           ` : paidRegistrations.map(reg => `
             <div class="bg-green-500/10 rounded-2xl p-4 border border-green-500/30">
-              <div class="flex items-start justify-between">
+              <div class="flex items-start justify-between mb-3">
                 <div class="flex-1">
-                  <h3 class="font-bold text-white text-sm mb-1">${reg.events?.event_name || reg.event_name || 'Event'}</h3>
+                  <h3 class="font-bold text-white text-base mb-1">${reg.events?.event_name || reg.event_name || 'Event'}</h3>
                   <p class="text-xs text-gray-400 mb-2">${reg.events?.event_type || 'Type: N/A'} • ${reg.events?.category || ''}</p>
-                  <p class="text-xs text-gray-500">ID: ${reg.registration_id || reg.id}</p>
-                  ${reg.team_name ? `<p class="text-xs text-purple-400 mt-1">Team: ${reg.team_name}</p>` : ''}
                 </div>
                 <div class="text-right">
                   <span class="text-xs px-3 py-1 rounded-full bg-green-500/20 text-green-400 border border-green-500/30 font-bold">✓ PAID</span>
-                  ${reg.amount ? `<p class="text-xs text-gray-400 mt-1">₹${reg.amount}</p>` : ''}
+                  ${reg.payment_amount ? `<p class="text-xs text-gray-400 mt-1">₹${reg.payment_amount}</p>` : ''}
                 </div>
               </div>
+              
+              ${reg.teamInfo ? `
+                <div class="bg-purple-500/10 border border-purple-500/30 rounded-xl p-3 mt-3">
+                  <div class="flex items-center gap-2 mb-2">
+                    <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    <span class="text-sm font-bold text-purple-400">Team: ${reg.teamInfo.team_name}</span>
+                  </div>
+                  <div class="text-xs text-gray-300">
+                    <p class="font-semibold mb-1">Team Members:</p>
+                    <div class="space-y-1">
+                      ${reg.teamInfo.team_members.map(member => `
+                        <div class="flex items-center gap-2">
+                          <div class="w-2 h-2 bg-purple-400 rounded-full flex-shrink-0"></div>
+                          <span>${member}</span>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
             </div>
           `).join('')}
         </div>
@@ -622,7 +667,7 @@ const VolunteerDashboard = () => {
         <!-- Footer -->
         <div class="p-4 border-t border-white/10">
           <button onclick="this.closest('.fixed').remove()" class="w-full py-3 bg-green-500/10 hover:bg-green-500/20 text-green-400 font-bold rounded-2xl transition-all border border-green-500/20">
-            Close • Verified Paid Events
+            Close • Verified Paid Events Only
           </button>
         </div>
       </div>
@@ -743,11 +788,11 @@ const VolunteerDashboard = () => {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-6"
             >
-              <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-[2.5rem] p-8 text-center">
+              <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/5 border border-green-500/20 rounded-[2.5rem] p-8 text-center">
                 <ShieldCheck className="mx-auto text-green-500 mb-4" size={56} />
                 <h3 className="text-2xl font-bold mb-2">Student Registration Scanner</h3>
                 <p className="text-gray-400 mb-1">View Student's Paid Events Only</p>
-                <p className="text-sm text-gray-500">Shows verified paid registrations for venue access</p>
+                <p className="text-sm text-gray-500">Shows verified paid registrations with team details</p>
               </div>
 
               <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8">
@@ -758,7 +803,7 @@ const VolunteerDashboard = () => {
                     </div>
                     <div className="text-center">
                       <h3 className="text-xl font-bold mb-2">Ready to Scan</h3>
-                      <p className="text-gray-400">Scan student's QR code to verify paid events</p>
+                      <p className="text-gray-400">Scan student's QR code to view paid events & teams</p>
                     </div>
                     <button
                       onClick={() => startScanning('gate')}
