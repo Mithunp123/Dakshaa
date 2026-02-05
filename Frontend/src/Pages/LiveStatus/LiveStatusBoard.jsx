@@ -74,13 +74,15 @@ const LiveStatusBoard = () => {
       const { data, error } = await supabase.rpc("get_live_stats");
       
       if (!error && data) {
-        setTotalRegistrations(data.total_registrations);
+        setTotalRegistrations(data.total_registrations || 0);
       } else {
         // Fallback or retry logic could go here
         console.error("Error fetching stats:", error);
+        setTotalRegistrations(0);
       }
     } catch (error) {
       console.error("Error calling get_live_stats:", error);
+      setTotalRegistrations(0);
     }
   };
 
@@ -243,7 +245,7 @@ const LiveStatusBoard = () => {
             >
                 <div className="text-gray-400 text-2xl font-medium uppercase tracking-[0.2em] mb-4">Total Registrations</div>
                 <div className="text-[12rem] leading-none font-bold bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 bg-clip-text text-transparent filter drop-shadow-[0_0_30px_rgba(59,130,246,0.5)]">
-                    {totalRegistrations.toLocaleString()}
+                    {(totalRegistrations || 0).toLocaleString()}
                 </div>
                 <div className="mt-8 flex items-center gap-2 px-4 py-2 bg-green-500/10 rounded-full border border-green-500/20 text-green-400">
                     <span className="relative flex h-3 w-3">

@@ -1,9 +1,22 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, TicketCheck, TrendingUp, Radio, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
+import { Users, TicketCheck, TrendingUp, Radio, ArrowLeft } from "lucide-react";
 import { supabase } from "../../supabase";
 import CountUp from "react-countup";
 import { useNavigate } from "react-router-dom";
+
+// Helper to extract conference name from event_id
+const getConferenceNameFromId = (rawId) => {
+    if (!rawId) return null;
+    const eid = rawId.toLowerCase();
+    
+    // Match pattern: conference-event-{name}
+    const match = eid.match(/conference-event-(.+)/);
+    if (match && match[1]) {
+        return match[1].toUpperCase();
+    }
+    return null;
+};
 
 // Helper to extract department from event_id
 const getDeptFromId = (rawId) => {
@@ -58,6 +71,8 @@ const LiveStats = () => {
   const [deptEventDetails, setDeptEventDetails] = useState({});
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [categoryEventDetails, setCategoryEventDetails] = useState({});
+  const [expandedConference, setExpandedConference] = useState(null);
+  const [conferenceEventDetails, setConferenceEventDetails] = useState({});
   const navigate = useNavigate();
   const eventLookupRef = useRef({});
   const channelRef = useRef(null);
@@ -286,10 +301,152 @@ const LiveStats = () => {
     }
   };
 
+  const fetchConferenceEventDetails = async (conferenceName) => {
+    try {
+        console.log('🎪 Fetching events for conference:', conferenceName);
+        // Check if we already have this data cached
+        if (conferenceEventDetails[conferenceName]) {
+            console.log('✅ Conference data already cached');
+            return;
+        }
+
+        // Fetch all active conference events
+        const { data: events, error: eventsError } = await supabase
+            .from('events')
+            .select('id, event_id, name')
+            .eq('is_active', true)
+            .eq('category', 'conference');
+
+        console.log('📋 All conference events:', events);
+        if (eventsError) throw eventsError;
+
+        // Filter events by conference name
+        const conferenceEvents = events.filter(e => {
+            const confName = getConferenceNameFromId(e.event_id);
+            console.log(`Checking event ${e.event_id}: extracted name = ${confName}, target = ${conferenceName}`);
+            return confName === conferenceName;
+        });
+
+        console.log('🔍 Filtered events for', conferenceName, ':', conferenceEvents);
+        const eventIds = conferenceEvents.map(e => e.id);
+
+        if (eventIds.length === 0) {
+            setConferenceEventDetails(prev => ({ ...prev, [conferenceName]: [] }));
+            return;
+        }
+
+        // Fetch registration counts for each event
+        const { data: registrations } = await supabase
+            .from('event_registrations_config')
+            .select('event_id')
+            .eq('payment_status', 'PAID')
+            .in('event_id', eventIds);
+
+        // Count registrations per event
+        const eventCounts = {};
+        (registrations || []).forEach(reg => {
+            eventCounts[reg.event_id] = (eventCounts[reg.event_id] || 0) + 1;
+        });
+
+        // Format the data
+        const eventDetails = conferenceEvents
+            .map(event => ({
+                id: event.id,
+                name: event.name,
+                count: eventCounts[event.id] || 0
+            }))
+            .sort((a, b) => b.count - a.count);
+
+        console.log('✅ Conference event details ready:', eventDetails);
+        setConferenceEventDetails(prev => ({ ...prev, [conferenceName]: eventDetails }));
+
+    } catch (err) {
+        console.error("Error fetching conference event details:", err);
+        setConferenceEventDetails(prev => ({ ...prev, [conferenceName]: [] }));
+    }
+  };
+
+  const toggleConferenceExpansion = (conferenceName) => {
+    if (expandedConference === conferenceName) {
+        setExpandedConference(null);
+    } else {
+        setExpandedConference(conferenceName);
+        if (!conferenceEventDetails[conferenceName]) {
+            fetchConferenceEventDetails(conferenceName);
+        }
+    }
+  };
+
   const fetchCategoryEventDetails = async (categoryName) => {
     try {
         // Check if we already have this data cached
         if (categoryEventDetails[categoryName]) {
+            return;
+        }
+
+        // Special handling for Conference - show conference names instead of events
+        if (categoryName === 'Conference') {
+            console.log('🎯 Fetching Conference events...');
+            // Fetch all active conference events
+            const { data: events, error: eventsError } = await supabase
+                .from('events')
+                .select('id, event_id, name')
+                .eq('is_active', true)
+                .eq('category', 'conference');
+
+            console.log('📊 Conference events fetched:', events);
+            if (eventsError) throw eventsError;
+
+            // Group by conference name
+            const conferenceMap = {};
+            events.forEach(e => {
+                const confName = getConferenceNameFromId(e.event_id);
+                if (confName) {
+                    if (!conferenceMap[confName]) {
+                        conferenceMap[confName] = [];
+                    }
+                    conferenceMap[confName].push(e.id);
+                }
+            });
+
+            const allEventIds = Object.values(conferenceMap).flat();
+
+            if (allEventIds.length === 0) {
+                setCategoryEventDetails(prev => ({ ...prev, [categoryName]: [] }));
+                return;
+            }
+
+            // Fetch registration counts
+            const { data: registrations } = await supabase
+                .from('event_registrations_config')
+                .select('event_id')
+                .eq('payment_status', 'PAID')
+                .in('event_id', allEventIds);
+
+            // Count registrations per conference
+            const conferenceCounts = {};
+            (registrations || []).forEach(reg => {
+                // Find which conference this event belongs to
+                for (const [confName, eventIds] of Object.entries(conferenceMap)) {
+                    if (eventIds.includes(reg.event_id)) {
+                        conferenceCounts[confName] = (conferenceCounts[confName] || 0) + 1;
+                        break;
+                    }
+                }
+            });
+
+            // Format as event-like data for display
+            const conferenceDetails = Object.entries(conferenceMap)
+                .map(([confName]) => ({
+                    id: confName,
+                    name: confName,
+                    count: conferenceCounts[confName] || 0,
+                    isConference: true // Flag to identify this as a conference group
+                }))
+                .sort((a, b) => b.count - a.count);
+
+            console.log('✅ Conference details formatted:', conferenceDetails);
+            setCategoryEventDetails(prev => ({ ...prev, [categoryName]: conferenceDetails }));
             return;
         }
 
@@ -379,7 +536,8 @@ const LiveStats = () => {
             { category: 'Tech', count: 0, dbKey: 'technical' },
             { category: 'Culturals', count: 0, dbKey: 'cultural' },
             { category: 'Sports', count: 0, dbKey: 'sports' },
-            { category: 'Hackathon', count: 0, dbKey: 'hackathon' }
+            { category: 'Hackathon', count: 0, dbKey: 'hackathon' },
+            { category: 'Conference', count: 0, dbKey: 'conference' }
         ];
 
         // Map DB data to our structure with case-insensitive matching
@@ -401,6 +559,8 @@ const LiveStats = () => {
                     finalStats[4].count += count;
                 } else if (category.includes('hackathon') || category === 'hack') {
                     finalStats[5].count += count;
+                } else if (category === 'conference') {
+                    finalStats[6].count += count;
                 }
             });
         }
@@ -432,7 +592,7 @@ const LiveStats = () => {
       // Map event_id(uuid) -> category
       const eventCategoryMap = {};
       events.forEach(e => {
-        eventCategoryMap[e.id] = e.category; // Uses UUID ID now
+        eventCategoryMap[e.id] = (e.category || '').toLowerCase().trim();
       });
 
       // 2. Fetch all paid registrations that belong to students
@@ -480,6 +640,7 @@ const LiveStats = () => {
       const culturalCount = (counts['cultural'] || 0) + (counts['culturals'] || 0);
       const sportsCount = (counts['sports'] || 0) + (counts['sport'] || 0);
       const hackathonCount = (counts['hackathon'] || 0) + (counts['hack'] || 0);
+      const conferenceCount = counts['conference'] || 0;
       
        const finalStats = [
             { category: 'Workshop', count: workshopCount },
@@ -487,7 +648,8 @@ const LiveStats = () => {
             { category: 'Tech', count: techCount },
             { category: 'Culturals', count: culturalCount },
             { category: 'Sports', count: sportsCount },
-            { category: 'Hackathon', count: hackathonCount }
+            { category: 'Hackathon', count: hackathonCount },
+            { category: 'Conference', count: conferenceCount }
         ];
 
       setCategoryStats(finalStats);
@@ -1025,7 +1187,7 @@ const LiveStats = () => {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="hidden xl:grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 shrink-0"
+                    className="hidden xl:grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-4 shrink-0"
                 >
                     {categoryStats.map((stat, index) => (
                     <motion.div 
@@ -1289,7 +1451,14 @@ const LiveStats = () => {
                                                     initial={{ opacity: 0, x: -20 }}
                                                     animate={{ opacity: 1, x: 0 }}
                                                     transition={{ delay: idx * 0.05 }}
-                                                    className="group relative bg-gradient-to-br from-gray-900/50 to-black/50 hover:bg-gradient-to-br hover:from-gray-800/70 hover:to-black/70 border border-gray-700/30 hover:border-secondary/30 rounded-xl p-4 transition-all"
+                                                    className={`group relative bg-gradient-to-br from-gray-900/50 to-black/50 hover:bg-gradient-to-br hover:from-gray-800/70 hover:to-black/70 border border-gray-700/30 hover:border-secondary/30 rounded-xl p-4 transition-all ${
+                                                        event.isConference ? 'cursor-pointer' : ''
+                                                    }`}
+                                                    onClick={() => {
+                                                        if (event.isConference) {
+                                                            toggleConferenceExpansion(event.name);
+                                                        }
+                                                    }}
                                                 >
                                                     <div className="flex items-center justify-between gap-4">
                                                         <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -1300,7 +1469,9 @@ const LiveStats = () => {
                                                                 <h4 className="text-white font-semibold text-sm group-hover:text-secondary transition-colors truncate">
                                                                     {event.name}
                                                                 </h4>
-                                                                <p className="text-xs text-gray-400">Registrations</p>
+                                                                <p className="text-xs text-gray-400">
+                                                                    {event.isConference ? 'Conference • Click for Events' : 'Registrations'}
+                                                                </p>
                                                             </div>
                                                         </div>
                                                         <div className={`bg-gradient-to-r rounded-lg px-4 py-2 shrink-0 ${
@@ -1328,6 +1499,116 @@ const LiveStats = () => {
                                             <span className="text-gray-300 font-semibold">Total Registrations</span>
                                             <span className="text-3xl font-black text-secondary font-mono">
                                                 {categoryEventDetails[expandedCategory]?.reduce((sum, e) => sum + e.count, 0)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+                            </motion.div>
+                        </motion.div>
+                    )}
+                 </AnimatePresence>
+
+                 {/* Conference Events Details Overlay Card */}
+                 <AnimatePresence>
+                    {expandedConference && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                            onClick={() => setExpandedConference(null)}
+                        >
+                            <motion.div
+                                initial={{ scale: 0.9, y: 20 }}
+                                animate={{ scale: 1, y: 0 }}
+                                exit={{ scale: 0.9, y: 20 }}
+                                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                                className="bg-gradient-to-br from-gray-900 to-black border border-primary/30 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-2xl shadow-primary/20"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {/* Header */}
+                                <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700/30">
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-gradient-to-r from-primary to-purple-600 w-12 h-12 rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+                                            <TicketCheck className="text-white w-6 h-6" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-2xl font-black text-white uppercase tracking-wide">
+                                                {expandedConference}
+                                            </h3>
+                                            <p className="text-xs text-gray-400 font-semibold">Conference Events</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setExpandedConference(null)}
+                                        className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800/30 rounded-lg"
+                                    >
+                                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                {/* Content */}
+                                <div className="overflow-y-auto max-h-[calc(80vh-140px)] pr-2">
+                                    {conferenceEventDetails[expandedConference] === undefined ? (
+                                        <div className="text-center py-12">
+                                            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                            <p className="text-gray-400">Loading events...</p>
+                                        </div>
+                                    ) : conferenceEventDetails[expandedConference]?.length === 0 ? (
+                                        <div className="text-center py-12">
+                                            <div className="text-6xl mb-4 opacity-30">📊</div>
+                                            <p className="text-gray-400 font-semibold">No events found for this conference</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {conferenceEventDetails[expandedConference]?.map((event, idx) => (
+                                                <motion.div
+                                                    key={event.id}
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: idx * 0.05 }}
+                                                    className="group relative bg-gradient-to-br from-gray-900/50 to-black/50 hover:bg-gradient-to-br hover:from-gray-800/70 hover:to-black/70 border border-gray-700/30 hover:border-primary/30 rounded-xl p-4 transition-all"
+                                                >
+                                                    <div className="flex items-center justify-between gap-4">
+                                                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                            <div className="bg-primary/20 w-10 h-10 rounded-lg flex items-center justify-center shrink-0">
+                                                                <span className="text-primary font-bold text-sm">#{idx + 1}</span>
+                                                            </div>
+                                                            <div className="min-w-0 flex-1">
+                                                                <h4 className="text-white font-semibold text-sm group-hover:text-primary transition-colors truncate">
+                                                                    {event.name}
+                                                                </h4>
+                                                                <p className="text-xs text-gray-400">Registrations</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className={`bg-gradient-to-r rounded-lg px-4 py-2 shrink-0 ${
+                                                            event.count > 0 
+                                                                ? 'from-primary/20 to-purple-600/20 border border-primary/30' 
+                                                                : 'from-gray-600/20 to-gray-500/20 border border-gray-500/30'
+                                                        }`}>
+                                                            <span className={`text-2xl font-black font-mono tabular-nums ${
+                                                                event.count > 0 ? 'text-primary' : 'text-gray-400'
+                                                            }`}>
+                                                                {event.count}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Footer Summary */}
+                                {conferenceEventDetails[expandedConference]?.length > 0 && (
+                                    <div className="mt-4 pt-4 border-t border-gray-700/30">
+                                        <div className="flex items-center justify-between bg-gradient-to-r from-primary/10 to-purple-600/10 rounded-lg p-3">
+                                            <span className="text-gray-300 font-semibold">Total Registrations</span>
+                                            <span className="text-3xl font-black text-primary font-mono">
+                                                {conferenceEventDetails[expandedConference]?.reduce((sum, e) => sum + e.count, 0)}
                                             </span>
                                         </div>
                                     </div>
