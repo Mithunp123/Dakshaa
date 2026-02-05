@@ -171,15 +171,14 @@ const AdminLayout = () => {
         { label: 'Overview', icon: LayoutDashboard, path: '/admin/coordinator/overview' },
         { label: 'Registration Management', icon: ClipboardList, path: '/admin/coordinator/registration' },
         { label: 'Attendance Management', icon: Users, path: '/admin/coordinator/attendance' },
-        { label: 'Global Scanner', icon: QrCode, path: '/admin/coordinator/global-scanner' },
+        { label: 'Gate Pass Scanner', icon: ShieldCheck, path: '/volunteer' },
         { label: 'Attendance Scanner', icon: Shield, path: '/admin/coordinator' }
       );
     }
 
     if (userRole === 'volunteer' || userRole === 'super_admin') {
       items.push(
-        { label: 'Global Scanner', icon: QrCode, path: '/volunteer' },
-        { label: 'Gate Check', icon: ShieldCheck, path: '/volunteer/gate' }
+        { label: 'Gate Pass Scanner', icon: ShieldCheck, path: '/volunteer' }
       );
     }
 

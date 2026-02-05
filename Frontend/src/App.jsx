@@ -472,9 +472,8 @@ function AppContent() {
                 </ProtectedRoute>
               }
             >
-              <Route index element={<CoordinatorGlobalScanner />} />
+              <Route index element={<VolunteerDashboard />} />
               <Route path="scanner" element={<AttendanceScanner />} />
-              <Route path="gate" element={<VolunteerDashboard />} />
             </Route>
 
             {/* 404 Route - Must be last */}

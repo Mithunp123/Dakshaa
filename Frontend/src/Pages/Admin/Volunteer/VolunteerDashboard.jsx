@@ -51,6 +51,20 @@ const VolunteerDashboard = () => {
 
   useEffect(() => {
     fetchVenues();
+    
+    // Cleanup on unmount
+    return () => {
+      if (html5QrCodeRef.current) {
+        try {
+          if (html5QrCodeRef.current.isScanning) {
+            html5QrCodeRef.current.stop();
+          }
+          html5QrCodeRef.current.clear();
+        } catch (e) {
+          console.log('Cleanup error:', e);
+        }
+      }
+    };
   }, []);
 
   const fetchVenues = async () => {
@@ -105,39 +119,96 @@ const VolunteerDashboard = () => {
     setScanMode(mode);
     setCameraError(null);
 
-    const hasCamera = await getCameras();
-    if (!hasCamera) {
-      setScanning(false);
-      return;
-    }
-
     try {
-      if (!html5QrCodeRef.current) {
-        html5QrCodeRef.current = new Html5Qrcode("volunteer-qr-reader", {
-          verbose: false
-        });
+      // Stop any existing scanner first
+      if (html5QrCodeRef.current) {
+        try {
+          if (html5QrCodeRef.current.isScanning) {
+            await html5QrCodeRef.current.stop();
+          }
+          await html5QrCodeRef.current.clear();
+        } catch (e) {
+          console.log('Cleanup error:', e);
+        }
+        html5QrCodeRef.current = null;
       }
 
+      const hasCamera = await getCameras();
+      if (!hasCamera) {
+        setScanning(false);
+        return;
+      }
+
+      // Wait for DOM to be ready
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      html5QrCodeRef.current = new Html5Qrcode("volunteer-qr-reader", {
+        verbose: false
+      });
+
       const support = checkCameraSupport();
+      
+      // Check if we're in a secure context
+      if (!support.isSecureContext) {
+        throw new Error('Camera access requires HTTPS. Please use https:// or localhost');
+      }
+      
       const config = getCameraConfig(support.isMobile);
 
-      // Force back camera on mobile devices
-      const isMobileDevice = /iPhone|iPad|iPod|Android|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      // Try back camera using different methods
+      let cameraStarted = false;
       
-      const cameraConfig = cameraId 
-        ? cameraId 
-        : isMobileDevice
-          ? { facingMode: { exact: "environment" } }
-          : { facingMode: "user" };
+      // Method 1: Try using detected camera ID (most reliable on mobile)
+      if (cameraId) {
+        try {
+          console.log('📸 Trying camera ID:', cameraId);
+          await html5QrCodeRef.current.start(
+            cameraId,
+            config,
+            (decodedText) => onScanSuccess(decodedText, mode),
+            () => {}
+          );
+          console.log('✅ Camera started with ID');
+          cameraStarted = true;
+        } catch (error) {
+          console.log('⚠️ Camera ID failed:', error.message);
+        }
+      }
 
-      console.log('📸 Volunteer scanner:', { isMobile: isMobileDevice, mode });
+      // Method 2: Try facingMode environment (back camera)
+      if (!cameraStarted) {
+        try {
+          console.log('📸 Trying facingMode: environment');
+          await html5QrCodeRef.current.start(
+            { facingMode: "environment" },
+            config,
+            (decodedText) => onScanSuccess(decodedText, mode),
+            () => {}
+          );
+          console.log('✅ Back camera started');
+          cameraStarted = true;
+        } catch (error) {
+          console.log('⚠️ Back camera failed:', error.message);
+        }
+      }
 
-      await html5QrCodeRef.current.start(
-        cameraConfig,
-        config,
-        (decodedText) => onScanSuccess(decodedText, mode),
-        () => {} // Silent error handler
-      );
+      // Method 3: Fallback to front camera
+      if (!cameraStarted) {
+        try {
+          console.log('📸 Trying facingMode: user (front camera)');
+          await html5QrCodeRef.current.start(
+            { facingMode: "user" },
+            config,
+            (decodedText) => onScanSuccess(decodedText, mode),
+            () => {}
+          );
+          console.log('✅ Front camera started');
+          cameraStarted = true;
+        } catch (error) {
+          console.error('❌ All camera methods failed');
+          throw new Error('Failed to start camera. Please check permissions.');
+        }
+      }
 
       setScanning(true);
     } catch (error) {
@@ -145,6 +216,14 @@ const VolunteerDashboard = () => {
       const errorInfo = getCameraErrorMessage(error);
       setCameraError(errorInfo.message);
       setScanning(false);
+      
+      // Cleanup on error
+      if (html5QrCodeRef.current) {
+        try {
+          html5QrCodeRef.current.clear();
+        } catch (e) {}
+        html5QrCodeRef.current = null;
+      }
     }
   };
 
