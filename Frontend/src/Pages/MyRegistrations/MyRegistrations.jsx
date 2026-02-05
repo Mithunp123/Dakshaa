@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import {
   Calendar,
   Clock,
-  MapPin,
   Check,
   Package,
   RefreshCw,
@@ -490,12 +489,6 @@ const MyRegistrations = () => {
                               {formatTime(reg.events.start_time)}
                             </span>
                           )}
-                          {reg.events?.venue && (
-                            <span className="flex items-center gap-1 text-gray-400">
-                              <MapPin size={14} />
-                              {reg.events.venue}
-                            </span>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -509,11 +502,6 @@ const MyRegistrations = () => {
                     >
                       {reg.payment_status || "CONFIRMED"}
                     </span>
-                    {(reg.payment_amount || reg.events?.price) && (
-                      <span className="text-xl font-bold text-blue-400">
-                        ₹{reg.payment_amount || reg.events.price}
-                      </span>
-                    )}
                     <span className="text-xs text-gray-500">
                       Registered: {formatDate(reg.registered_at || reg.created_at)}
                     </span>
