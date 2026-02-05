@@ -293,17 +293,33 @@ const VolunteerDashboard = () => {
 
       console.log('QR Content:', qrContent);
       
-      // Parse QR code content
-      let registrationCode = qrContent;
-      if (qrContent.includes('\n')) {
+      // Clean the QR content
+      const cleanedContent = qrContent.trim();
+      
+      // Parse QR code content for multi-line format (e.g., "DEVAPRAKASH\nDAK26-9852F679")
+      let registrationCode = cleanedContent;
+      if (cleanedContent.includes('\n')) {
         // QR contains multiple lines, extract registration code (second line)
-        const lines = qrContent.trim().split('\n');
-        registrationCode = lines[1] || lines[0];
+        const lines = cleanedContent.split('\n');
+        registrationCode = lines[1]?.trim() || lines[0]?.trim();
       }
       
-      console.log('Looking up registration code:', registrationCode);
+      // Check if it looks like a DAK registration ID (DAK26-XXXX format)
+      const isDakRegId = /^DAK\d{2}-[A-Z0-9]+$/i.test(registrationCode);
       
-      // First try to find registration by registration_id
+      // Check if it's a UUID format (user ID)
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const isUUID = uuidRegex.test(cleanedContent);
+      
+      console.log('Is DAK Registration ID:', isDakRegId, 'Is UUID:', isUUID, 'Code:', registrationCode);
+      
+      let profile = null;
+      let allRegistrations = null;
+      
+      // Strategy 1: PRIMARY - Try as registration_id (DAK26-XXXX format)
+      // This is the main flow for volunteers verifying gate passes
+      console.log('🔍 PRIMARY: Trying as registration_id:', registrationCode);
+      
       const { data: registration, error: regError } = await supabase
         .from('registrations')
         .select(`
@@ -314,45 +330,80 @@ const VolunteerDashboard = () => {
         .eq('registration_id', registrationCode)
         .single();
 
-      if (regError || !registration) {
-        // If no registration found by registration_id, try treating it as user_id
-        const { data: profile, error: profileError } = await supabase
+      if (!regError && registration) {
+        profile = registration.profiles;
+        console.log('✅ Found registration:', registration.registration_id);
+        console.log('   Payment Status:', registration.payment_status);
+        console.log('   Event:', registration.events?.event_name);
+        
+        // Get all registrations for this user to show complete picture
+        const { data: regs } = await supabase
+          .from('registrations')
+          .select('*, events(*)')
+          .eq('user_id', registration.user_id);
+          
+        allRegistrations = regs || [registration];
+      }
+      
+      // Strategy 2: FALLBACK - If UUID format, treat as user_id
+      if (!profile && isUUID) {
+        console.log('🔍 FALLBACK: Trying as user ID (UUID):', cleanedContent);
+        
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('*, registrations(*, events(*))')
-          .eq('id', qrContent.trim())
+          .select('*')
+          .eq('id', cleanedContent)
           .single();
-
-        if (profileError || !profile) {
-          console.error('No registration or profile found for:', qrContent);
-          playBuzzSound();
-          showFailureNotification('INVALID QR CODE', 'Registration not found');
-          return;
+          
+        if (!profileError && profileData) {
+          profile = profileData;
+          console.log('✅ Found profile by user ID:', profile.full_name);
+          
+          // Get all registrations for this user
+          const { data: regs } = await supabase
+            .from('registrations')
+            .select('*, events(*)')
+            .eq('user_id', cleanedContent);
+            
+          allRegistrations = regs || [];
         }
-
-        // Show all registered events
-        showRegisteredEvents(profile, profile.registrations);
+      }
+      
+      // Strategy 3: Final attempt - try as user_id for non-UUID formats
+      if (!profile) {
+        console.log('🔍 Final attempt - trying as user_id:', cleanedContent);
+        
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', cleanedContent)
+          .single();
+          
+        if (!profileError && profileData) {
+          profile = profileData;
+          console.log('✅ Found profile on final attempt:', profile.full_name);
+          
+          const { data: regs } = await supabase
+            .from('registrations')
+            .select('*, events(*)')
+            .eq('user_id', cleanedContent);
+            
+          allRegistrations = regs || [];
+        }
+      }
+      
+      // If still no profile found, show error
+      if (!profile) {
+        console.error('❌ No profile found for QR:', qrContent);
+        playBuzzSound();
+        showFailureNotification('INVALID QR CODE', 'User or registration not found');
         return;
       }
-
-      // Get all registrations for this user to show complete event list
-      const { data: allRegistrations, error: allRegError } = await supabase
-        .from('registrations')
-        .select(`
-          *,
-          events(*)
-        `)
-        .eq('user_id', registration.user_id);
-
-      if (allRegError) {
-        console.error('Error fetching all registrations:', allRegError);
-        // Still show the single registration if we can't get all
-        showRegisteredEvents(registration.profiles, [registration]);
-        return;
-      }
-
+      
       // Show all registered events for this user
       playTingSound();
-      showRegisteredEvents(registration.profiles, allRegistrations || [registration]);
+      showRegisteredEvents(profile, allRegistrations || []);
+      
     } catch (error) {
       console.error('Error verifying gate pass:', error);
       playBuzzSound();
@@ -370,43 +421,78 @@ const VolunteerDashboard = () => {
 
       console.log('Kit QR Content:', qrContent);
       
-      // Parse QR code content
-      let registrationCode = qrContent;
+      // Clean the QR content
+      const cleanedContent = qrContent.trim();
+      
+      // Check if it's a UUID format (user ID)
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const isUUID = uuidRegex.test(cleanedContent);
+      
+      // Parse QR code content for multi-line format
+      let registrationCode = cleanedContent;
+      if (cleanedContent.includes('\n')) {
+        const lines = cleanedContent.split('\n');
+        registrationCode = lines[1]?.trim() || lines[0]?.trim();
+      }
+      
+      console.log('Is UUID:', isUUID, 'Registration Code:', registrationCode);
+      
       let userId = null;
+      let profile = null;
       
-      if (qrContent.includes('\n')) {
-        // QR contains multiple lines, extract registration code (second line)
-        const lines = qrContent.trim().split('\n');
-        registrationCode = lines[1] || lines[0];
+      // Strategy 1: If UUID format, use as user_id directly
+      if (isUUID) {
+        console.log('🔍 Trying as user ID (UUID):', cleanedContent);
+        
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', cleanedContent)
+          .single();
+          
+        if (!profileError && profileData) {
+          userId = cleanedContent;
+          profile = profileData;
+          console.log('✅ Found profile by user ID:', profile.full_name);
+        }
       }
       
-      console.log('Looking up for kit delivery:', registrationCode);
-      
-      // First try to find registration by registration_id
-      const { data: registration, error: regError } = await supabase
-        .from('registrations')
-        .select(`
-          *,
-          profiles!registrations_user_id_fkey(*)
-        `)
-        .eq('registration_id', registrationCode)
-        .single();
+      // Strategy 2: Try as registration_id
+      if (!userId) {
+        console.log('🔍 Trying as registration_id:', registrationCode);
+        
+        const { data: registration, error: regError } = await supabase
+          .from('registrations')
+          .select(`*, profiles!registrations_user_id_fkey(*)`)
+          .eq('registration_id', registrationCode)
+          .single();
 
-      if (registration && !regError) {
-        userId = registration.user_id;
-      } else {
-        // Fallback: treat as user ID
-        userId = qrContent.trim();
+        if (!regError && registration) {
+          userId = registration.user_id;
+          profile = registration.profiles;
+          console.log('✅ Found via registration_id, user:', profile?.full_name);
+        }
+      }
+      
+      // Strategy 3: Final attempt - try as user_id
+      if (!userId) {
+        console.log('🔍 Final attempt - trying as user_id:', cleanedContent);
+        
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', cleanedContent)
+          .single();
+          
+        if (!profileError && profileData) {
+          userId = cleanedContent;
+          profile = profileData;
+          console.log('✅ Found on final attempt:', profile.full_name);
+        }
       }
 
-      // Check if user exists
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (profileError || !profile) {
+      if (!userId || !profile) {
+        console.error('❌ User not found for QR:', qrContent);
         playBuzzSound();
         showFailureNotification('INVALID QR CODE', 'User not found');
         return;
@@ -472,17 +558,19 @@ const VolunteerDashboard = () => {
     const notification = document.createElement('div');
     notification.className = 'fixed inset-0 bg-slate-900/95 z-[9999] flex items-center justify-center backdrop-blur-sm p-4 overflow-y-auto';
     
+    // Show only PAID events
     const paidRegistrations = registrations.filter(r => r.payment_status?.toUpperCase() === 'PAID');
-    const pendingRegistrations = registrations.filter(r => r.payment_status?.toUpperCase() !== 'PAID');
+    const totalRegistrations = registrations.length;
+    const pendingCount = totalRegistrations - paidRegistrations.length;
     
     notification.innerHTML = `
       <div class="bg-slate-800 rounded-3xl w-full max-w-md max-h-[90vh] overflow-hidden">
         <!-- Header -->
-        <div class="bg-gradient-to-r from-secondary/20 to-purple-500/20 p-6 border-b border-white/10">
+        <div class="bg-gradient-to-r from-green-500/20 to-emerald-500/20 p-6 border-b border-white/10">
           <div class="text-center mb-4">
-            <div class="w-20 h-20 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-3 border-4 border-secondary/30">
-              <svg class="w-12 h-12 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-4 border-green-500/30">
+              <svg class="w-12 h-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <h2 class="text-2xl font-bold text-white">${profile?.full_name || 'Student'}</h2>
@@ -491,28 +579,30 @@ const VolunteerDashboard = () => {
           </div>
           
           <div class="flex justify-center gap-4 text-sm">
-            <div class="bg-green-500/20 px-3 py-1 rounded-full">
+            <div class="bg-green-500/20 px-4 py-2 rounded-full border border-green-500/30">
               <span class="text-green-400 font-bold">${paidRegistrations.length}</span>
-              <span class="text-gray-300 ml-1">Paid</span>
+              <span class="text-gray-300 ml-1">Paid Events</span>
             </div>
-            <div class="bg-yellow-500/20 px-3 py-1 rounded-full">
-              <span class="text-yellow-400 font-bold">${pendingRegistrations.length}</span>
-              <span class="text-gray-300 ml-1">Pending</span>
-            </div>
+            ${pendingCount > 0 ? `
+              <div class="bg-gray-500/20 px-3 py-2 rounded-full border border-gray-500/30">
+                <span class="text-gray-400 text-xs">${pendingCount} pending</span>
+              </div>
+            ` : ''}
           </div>
         </div>
         
-        <!-- Events List -->
+        <!-- Paid Events List -->
         <div class="p-4 space-y-3 max-h-[50vh] overflow-y-auto">
-          ${registrations.length === 0 ? `
+          ${paidRegistrations.length === 0 ? `
             <div class="text-center py-8">
               <svg class="w-16 h-16 text-gray-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
               </svg>
-              <p class="text-gray-400">No registrations found</p>
+              <p class="text-gray-400">No paid events found</p>
+              <p class="text-xs text-gray-500 mt-2">Student needs to complete payment</p>
             </div>
-          ` : registrations.map(reg => `
-            <div class="bg-slate-700/50 rounded-2xl p-4 border ${reg.payment_status?.toUpperCase() === 'PAID' ? 'border-green-500/30' : 'border-yellow-500/30'}">
+          ` : paidRegistrations.map(reg => `
+            <div class="bg-green-500/10 rounded-2xl p-4 border border-green-500/30">
               <div class="flex items-start justify-between">
                 <div class="flex-1">
                   <h3 class="font-bold text-white text-sm mb-1">${reg.events?.event_name || reg.event_name || 'Event'}</h3>
@@ -521,11 +611,7 @@ const VolunteerDashboard = () => {
                   ${reg.team_name ? `<p class="text-xs text-purple-400 mt-1">Team: ${reg.team_name}</p>` : ''}
                 </div>
                 <div class="text-right">
-                  <span class="text-xs px-2 py-1 rounded-full ${
-                    reg.payment_status?.toUpperCase() === 'PAID' 
-                      ? 'bg-green-500/20 text-green-400' 
-                      : 'bg-yellow-500/20 text-yellow-400'
-                  }">${reg.payment_status || 'Pending'}</span>
+                  <span class="text-xs px-3 py-1 rounded-full bg-green-500/20 text-green-400 border border-green-500/30 font-bold">✓ PAID</span>
                   ${reg.amount ? `<p class="text-xs text-gray-400 mt-1">₹${reg.amount}</p>` : ''}
                 </div>
               </div>
@@ -535,8 +621,8 @@ const VolunteerDashboard = () => {
         
         <!-- Footer -->
         <div class="p-4 border-t border-white/10">
-          <button onclick="this.closest('.fixed').remove()" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl transition-all border border-white/10">
-            Close
+          <button onclick="this.closest('.fixed').remove()" class="w-full py-3 bg-green-500/10 hover:bg-green-500/20 text-green-400 font-bold rounded-2xl transition-all border border-green-500/20">
+            Close • Verified Paid Events
           </button>
         </div>
       </div>
@@ -660,8 +746,8 @@ const VolunteerDashboard = () => {
               <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-[2.5rem] p-8 text-center">
                 <ShieldCheck className="mx-auto text-green-500 mb-4" size={56} />
                 <h3 className="text-2xl font-bold mb-2">Student Registration Scanner</h3>
-                <p className="text-gray-400 mb-1">View Student's Event Registrations</p>
-                <p className="text-sm text-gray-500">Shows all events student is registered for</p>
+                <p className="text-gray-400 mb-1">View Student's Paid Events Only</p>
+                <p className="text-sm text-gray-500">Shows verified paid registrations for venue access</p>
               </div>
 
               <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8">
@@ -672,7 +758,7 @@ const VolunteerDashboard = () => {
                     </div>
                     <div className="text-center">
                       <h3 className="text-xl font-bold mb-2">Ready to Scan</h3>
-                      <p className="text-gray-400">Scan student's QR code to view their registrations</p>
+                      <p className="text-gray-400">Scan student's QR code to verify paid events</p>
                     </div>
                     <button
                       onClick={() => startScanning('gate')}
