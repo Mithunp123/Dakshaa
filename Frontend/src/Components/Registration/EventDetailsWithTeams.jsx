@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Users, Eye, MoreVertical } from "lucide-react";
+import { Users, Eye, MoreVertical, Printer, Loader2 } from "lucide-react";
 import TeamDetailsView from "../TeamManagement/TeamDetailsView";
 import { motion, AnimatePresence } from "framer-motion";
 
-const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, hideActions = false, paymentFilter = 'all', onRefresh }) => {
+const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, hideActions = false, paymentFilter = 'all', onRefresh, onPrintQR, onPrintTeamQR, printingQR = false, isCoordinator = false }) => {
   const [isTeamEvent, setIsTeamEvent] = useState(false);
   const [activeActionMenu, setActiveActionMenu] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -87,6 +87,9 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
           eventName={event?.name}
           showHeader={true}
           paymentFilter={paymentFilter}
+          onPrintTeamQR={onPrintTeamQR}
+          printingQR={printingQR}
+          isCoordinator={isCoordinator}
         />
       </div>
     );
@@ -267,6 +270,9 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
                     Actions
                   </th>
                 )}
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                  Print QR
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800">
@@ -332,11 +338,36 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
                         </div>
                       </td>
                     )}
+                    <td className="px-4 py-3">
+                      {registration.payment_status === 'PAID' || registration.payment_status === 'completed' ? (
+                        isCoordinator && registration.profile?.is_print ? (
+                          <span className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500/20 border border-yellow-500/30 rounded-lg text-yellow-400">
+                            <Printer className="w-4 h-4" />
+                            <span className="text-xs font-medium">Already Printed</span>
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => onPrintQR && onPrintQR(registration)}
+                            disabled={printingQR || !onPrintQR}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg hover:bg-green-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-green-400"
+                          >
+                            {printingQR ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Printer className="w-4 h-4" />
+                            )}
+                            <span className="text-xs font-medium">Print QR</span>
+                          </button>
+                        )
+                      ) : (
+                        <span className="text-gray-500 text-xs">Payment pending</span>
+                      )}
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={hideActions ? 4 : 5} className="px-4 py-8 text-center text-gray-400">
+                  <td colSpan={hideActions ? 5 : 6} className="px-4 py-8 text-center text-gray-400">
                     <div className="flex flex-col items-center gap-2">
                       <Eye className="w-8 h-8 opacity-50" />
                       <p>No registrations found for this event</p>

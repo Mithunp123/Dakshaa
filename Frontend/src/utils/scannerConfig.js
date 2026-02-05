@@ -133,19 +133,42 @@ export const selectBestCamera = (cameras) => {
   // Detect if device is mobile (check userAgent, NOT screen size)
   const isMobile = /iPhone|iPad|iPod|Android|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   
+  console.log('📷 Available cameras:', cameras.map(c => ({ id: c.id, label: c.label })));
+  
   if (isMobile) {
     // On mobile, ALWAYS prefer back/rear/environment camera
-    // This works even if user switches to desktop viewport
-    const backCamera = cameras.find(d => 
-      d.label.toLowerCase().includes('back') || 
-      d.label.toLowerCase().includes('rear') ||
-      d.label.toLowerCase().includes('environment') ||
-      d.label.toLowerCase().includes('facing back')
-    );
+    // Check various label patterns used by different devices
+    const backCamera = cameras.find(d => {
+      const label = d.label.toLowerCase();
+      return label.includes('back') || 
+             label.includes('rear') ||
+             label.includes('environment') ||
+             label.includes('facing back') ||
+             label.includes('camera 0') ||  // Some devices use "camera 0" for back
+             label.includes('camera2') ||   // Some Android devices
+             (label.includes('0,') && !label.includes('front')); // Pattern like "0, facing back"
+    });
     
     if (backCamera) {
       console.log('✅ Mobile detected - using back camera:', backCamera.label);
       return backCamera.id;
+    }
+    
+    // If no back camera found by label, try to avoid front camera
+    const nonFrontCamera = cameras.find(d => {
+      const label = d.label.toLowerCase();
+      return !label.includes('front') && !label.includes('user') && !label.includes('selfie');
+    });
+    
+    if (nonFrontCamera) {
+      console.log('✅ Mobile - using non-front camera:', nonFrontCamera.label);
+      return nonFrontCamera.id;
+    }
+    
+    // If multiple cameras and none identified, use last one (often back camera on mobile)
+    if (cameras.length > 1) {
+      console.log('⚠️ Using last camera (likely back):', cameras[cameras.length - 1].label);
+      return cameras[cameras.length - 1].id;
     }
     
     console.warn('⚠️ Back camera not found on mobile, using first available');
@@ -164,12 +187,28 @@ export const requestCameraPermission = async (retryCount = 0) => {
   const isMobile = /iPhone|iPad|iPod|Android|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   
   try {
-    // Request permission - force back camera on mobile
-    const constraints = isMobile 
-      ? { video: { facingMode: { ideal: "environment" } } }
-      : { video: true };
+    let stream = null;
     
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    if (isMobile) {
+      // On mobile, explicitly request BACK camera with exact constraint
+      try {
+        // First try exact constraint (forces back camera)
+        console.log('📱 Requesting back camera permission (exact)...');
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { exact: "environment" } }
+        });
+        console.log('✅ Back camera permission granted');
+      } catch (exactError) {
+        // If exact fails, try ideal as fallback
+        console.log('⚠️ Exact back camera failed, trying ideal...');
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" } }
+        });
+      }
+    } else {
+      // Desktop - any camera is fine
+      stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    }
     
     // Stop stream immediately (we just needed permission)
     stream.getTracks().forEach(track => track.stop());

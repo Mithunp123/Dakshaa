@@ -435,7 +435,7 @@ function AppContent() {
                   <ProtectedRoute
                     allowedRoles={["event_coordinator", "super_admin"]}
                   >
-                    <VolunteerDashboard />
+                    <CoordinatorGlobalScanner />
                   </ProtectedRoute>
                 }
               />
@@ -467,7 +467,7 @@ function AppContent() {
             <Route
               path="/volunteer"
               element={
-                <ProtectedRoute allowedRoles={["volunteer", "super_admin"]}>
+                <ProtectedRoute allowedRoles={["volunteer", "super_admin", "event_coordinator"]}>
                   <AdminLayout />
                 </ProtectedRoute>
               }

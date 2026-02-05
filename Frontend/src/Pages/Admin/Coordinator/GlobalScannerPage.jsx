@@ -33,6 +33,7 @@ const GlobalScannerPage = () => {
   const [scanning, setScanning] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [cameraError, setCameraError] = useState(null);
+  const [cameraId, setCameraId] = useState(null);
   const scannerRef = useRef(null);
   const html5QrCodeRef = useRef(null);
 
@@ -85,7 +86,13 @@ const GlobalScannerPage = () => {
       const devices = await Html5Qrcode.getCameras();
       if (!devices || devices.length === 0) {
         setCameraError('No cameras found');
+        return;
       }
+      
+      // Select best camera (back camera on mobile)
+      const bestCameraId = selectBestCamera(devices);
+      setCameraId(bestCameraId);
+      console.log('📷 Selected camera:', bestCameraId, devices);
     } catch (error) {
       const errorInfo = getCameraErrorMessage(error);
       setCameraError(errorInfo.message);
@@ -97,28 +104,100 @@ const GlobalScannerPage = () => {
       setScanning(true);
       setCameraError(null);
       
+      // Wait for DOM to be ready
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       if (!html5QrCodeRef.current) {
         html5QrCodeRef.current = new Html5Qrcode("qr-scanner", { verbose: false });
       }
 
       const support = checkCameraSupport();
-      const config = getCameraConfig(support.isMobile);
       
-      const isMobileDevice = /iPhone|iPad|iPod|Android|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const cameraConfig = isMobileDevice 
-        ? { facingMode: { exact: "environment" } }
-        : { facingMode: "user" };
+      // Check if we're in a secure context
+      if (!support.isSecureContext) {
+        throw new Error('Camera access requires HTTPS. Please use https:// or localhost');
+      }
+      
+      const config = getCameraConfig(support.isMobile);
+      const isMobile = support.isMobile;
+      
+      // Priority: camera ID (most reliable) > exact environment > environment > user (front as last resort)
+      let cameraStarted = false;
+      
+      // Method 1: Try using selected camera ID (most reliable method)
+      if (cameraId && !cameraStarted) {
+        try {
+          console.log('📸 Trying selected camera ID:', cameraId);
+          await html5QrCodeRef.current.start(
+            cameraId,
+            config,
+            onScanSuccess,
+            () => {}
+          );
+          console.log('✅ Camera started with ID');
+          cameraStarted = true;
+        } catch (error) {
+          console.log('⚠️ Camera ID failed:', error.message);
+        }
+      }
+      
+      // Method 2: Try exact facingMode environment (FORCES back camera on mobile)
+      if (isMobile && !cameraStarted) {
+        try {
+          console.log('📸 [Mobile] Trying exact facingMode: environment');
+          await html5QrCodeRef.current.start(
+            { facingMode: { exact: "environment" } },
+            config,
+            onScanSuccess,
+            () => {}
+          );
+          console.log('✅ Back camera started (exact)');
+          cameraStarted = true;
+        } catch (error) {
+          console.log('⚠️ Exact back camera failed:', error.message);
+        }
+      }
 
-      await html5QrCodeRef.current.start(
-        cameraConfig,
-        config,
-        onScanSuccess,
-        () => {}
-      );
+      // Method 3: Try facingMode environment (back camera)
+      if (!cameraStarted) {
+        try {
+          console.log('📸 Trying facingMode: environment');
+          await html5QrCodeRef.current.start(
+            { facingMode: "environment" },
+            config,
+            onScanSuccess,
+            () => {}
+          );
+          console.log('✅ Back camera started');
+          cameraStarted = true;
+        } catch (error) {
+          console.log('⚠️ Back camera failed:', error.message);
+        }
+      }
+
+      // Method 4: Last resort - front camera
+      if (!cameraStarted) {
+        try {
+          console.log('📸 Trying facingMode: user (front camera - last resort)');
+          await html5QrCodeRef.current.start(
+            { facingMode: "user" },
+            config,
+            onScanSuccess,
+            () => {}
+          );
+          console.log('✅ Front camera started');
+          cameraStarted = true;
+        } catch (error) {
+          console.error('❌ All camera methods failed');
+          throw error;
+        }
+      }
     } catch (error) {
+      console.error('Scanner start error:', error);
       const errorInfo = getCameraErrorMessage(error);
       setCameraError(errorInfo.message);
       setScanning(false);
+      toast.error(errorInfo.message || 'Failed to start camera');
     }
   };
 
@@ -144,10 +223,37 @@ const GlobalScannerPage = () => {
     }, 1000);
   };
 
-  const markGlobalAttendance = async (userId) => {
+  const markGlobalAttendance = async (decodedText) => {
     try {
       setSubmitting(true);
 
+      // Parse QR code data - can be JSON or plain UUID
+      let userId;
+      
+      try {
+        // Try to parse as JSON (legacy QR format)
+        const qrData = JSON.parse(decodedText);
+        userId = qrData.userId || qrData.id;
+        console.log('📱 Parsed JSON QR, extracted userId:', userId);
+      } catch (e) {
+        // Plain UUID format (current format)
+        userId = decodedText;
+        console.log('📱 Using plain UUID:', userId);
+      }
+
+      if (!userId) {
+        toast.error('Invalid QR code format');
+        return;
+      }
+
+      // Validate UUID format
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(userId)) {
+        toast.error('Invalid participant ID in QR code');
+        return;
+      }
+
+      // Fetch participant profile
       const { data: participant, error: participantError } = await supabase
         .from('profiles')
         .select('id, full_name, email, phone, college')
@@ -160,44 +266,124 @@ const GlobalScannerPage = () => {
       }
 
       const assignedEventIds = assignedEvents.map(event => event.id);
-      const { data: registrations, error: regError } = await supabase
+      
+      // Fetch ALL registrations for this user (to show what they're registered for)
+      const { data: allRegistrations, error: allRegError } = await supabase
         .from('event_registrations_config')
         .select(`
           *,
           events_config:event_id (id, name, event_key)
         `)
         .eq('user_id', userId)
-        .in('event_id', assignedEventIds)
         .in('payment_status', ['PAID', 'completed']);
 
-      if (regError) {
+      if (allRegError) {
         toast.error('Error checking registrations');
         return;
       }
 
-      if (!registrations || registrations.length === 0) {
-        toast.error(`${participant.full_name} is not registered for any of your assigned events`);
+      // Get event names the student is registered for
+      const registeredEventNames = allRegistrations?.map(r => r.events_config?.name).filter(Boolean) || [];
+
+      // Check if student has any paid registrations
+      if (!allRegistrations || allRegistrations.length === 0) {
+        toast.error(`${participant.full_name} has no paid registrations`);
         return;
       }
 
+      // Filter to only coordinator's assigned events
+      const registrations = allRegistrations?.filter(r => assignedEventIds.includes(r.event_id)) || [];
+
+      // Get current user for marking attendance
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+      // If coordinator has NO matching assigned events - just show info (blue toast)
+      if (!registrations || registrations.length === 0) {
+        toast.custom((t) => (
+          <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-blue-500 shadow-lg rounded-2xl pointer-events-auto p-4`}>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                <UserCheck className="text-blue-500" size={28} />
+              </div>
+              <div className="flex-1">
+                <p className="text-white font-bold text-lg">{participant.full_name}</p>
+                <p className="text-white/80 text-sm">{formatDakshaaId(participant.id)}</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <p className="text-white/90 text-xs font-medium">⚠️ Not your assigned event</p>
+              <p className="text-white/90 text-xs font-medium">Registered events:</p>
+              {registeredEventNames.map((name, idx) => (
+                <div key={idx} className="text-white/80 text-xs px-2 py-1 bg-white/20 rounded">
+                  • {name}
+                </div>
+              ))}
+            </div>
+          </div>
+        ), { duration: 4000 });
+        return;
+      }
+
+      // Coordinator IS assigned to this event - mark attendance
+      const eventToMark = registrations[0].events_config;
+
+      // Mark attendance using RPC
+      const { data: attendanceResult, error: attendanceError } = await supabase.rpc("mark_event_attendance", {
+        p_user_id: userId,
+        p_event_id: eventToMark?.id || registrations[0].event_id,
+        p_scanned_by: currentUser?.id,
+        p_scan_location: null
+      });
+
+      // Show success with attendance marked info
+      const eventName = eventToMark?.name || 'Event';
+      let isAlreadyAttended = attendanceResult?.already_attended;
+
+      // Handle duplicate attendance error (when attendance was already marked)
+      if (attendanceError) {
+        console.error('Attendance error:', attendanceError);
+        
+        // Check if it's a duplicate key error (attendance already marked)
+        if (attendanceError.message?.includes('duplicate key') || 
+            attendanceError.message?.includes('attendance_user_id_event_id_key') ||
+            attendanceError.code === '23505') {
+          // Treat as already attended
+          isAlreadyAttended = true;
+        } else {
+          // Other errors - show error toast
+          toast.error(attendanceError.message || 'Failed to mark attendance');
+          return;
+        }
+      }
+
       toast.custom((t) => (
-        <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-blue-500 shadow-lg rounded-2xl pointer-events-auto p-4`}>
+        <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full ${isAlreadyAttended ? 'bg-yellow-500' : 'bg-green-500'} shadow-lg rounded-2xl pointer-events-auto p-4`}>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-              <UserCheck className="text-blue-500" size={28} />
+              <UserCheck className={isAlreadyAttended ? 'text-yellow-500' : 'text-green-500'} size={28} />
             </div>
             <div className="flex-1">
               <p className="text-white font-bold text-lg">{participant.full_name}</p>
               <p className="text-white/80 text-sm">{formatDakshaaId(participant.id)}</p>
             </div>
           </div>
-          <div className="space-y-1">
-            <p className="text-white/90 text-sm font-medium">Registered Events:</p>
-            {registrations.map((reg) => (
-              <div key={reg.id} className="text-white/80 text-xs px-2 py-1 bg-white/20 rounded">
-                {reg.events_config?.name || 'Unknown Event'}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="text-white" size={16} />
+              <p className="text-white font-medium">
+                {isAlreadyAttended ? 'Already attended' : 'Attendance marked'}: {eventName}
+              </p>
+            </div>
+            {registeredEventNames.length > 1 && (
+              <div className="mt-2">
+                <p className="text-white/90 text-xs font-medium">Also registered for:</p>
+                {registeredEventNames.filter(n => n !== eventName).map((name, idx) => (
+                  <div key={idx} className="text-white/70 text-xs">
+                    • {name}
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         </div>
       ), { duration: 4000 });
