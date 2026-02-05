@@ -1175,6 +1175,30 @@ const Events = () => {
                       {selectedHackathon.description}
                     </p>
 
+                    {(Array.isArray(selectedHackathon.lunchannouncement)
+                      ? selectedHackathon.lunchannouncement.length > 0
+                      : Boolean(selectedHackathon.lunchannouncement)) && (
+                      <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
+                          <span className="text-yellow-400 font-semibold text-sm">Note:</span>
+                        </div>
+                        {Array.isArray(selectedHackathon.lunchannouncement) ? (
+                          <ul className="list-disc pl-6 text-yellow-300 text-sm mt-1 ml-1 space-y-1">
+                            {selectedHackathon.lunchannouncement.map((note, index) => (
+                              <li key={index} className="break-words">
+                                {note}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-yellow-300 text-sm mt-1 ml-7 break-words">
+                            {selectedHackathon.lunchannouncement}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
                     {/* Event Details */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                       <div className="flex items-center gap-2 text-gray-300">

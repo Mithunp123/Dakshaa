@@ -33,19 +33,22 @@ import aathavan from "../../../assets/team_members/aadhavan.webp";
 import yadhav from "../../../assets/team_members/yadhav.webp";
 import tharun from "../../../assets/team_members/tharun.webp";
 import kari from "../../../assets/team_members/karmukilan.webp";
+import saran from "../../../assets/team_members/saran.webp";
 
 //event coordinators
 import ec1 from "../../../assets/team_members/ec1.webp";
 import ec2 from "../../../assets/team_members/ec2.webp";
-import ec3 from "../../../assets/team_members/ec3.webp"
+import ec3 from "../../../assets/team_members/ec3.webp";
+import monika from "../../../assets/team_members/monika.webp";
+import Yaswanth from "../../../assets/team_members/Yaswanth.webp";
 //import ec5 from "../../../assets/team_members/ec5.png"
-import ec6 from "../../../assets/team_members/ec6.webp"
-import ec8 from "../../../assets/team_members/ec8.webp"
-import ec9 from "../../../assets/team_members/ec9.webp"
-import ec10 from "../../../assets/team_members/ec10.webp"
+import ec6 from "../../../assets/team_members/ec6.webp";
+import ec8 from "../../../assets/team_members/ec8.webp";
+import ec9 from "../../../assets/team_members/ec9.webp";
+import ec10 from "../../../assets/team_members/ec10.webp";
 //import ec11 from "../../../assets/team_members/ec11.webp"
-import ec12 from "../../../assets/team_members/ec12.webp"
-import ec13 from "../../../assets/team_members/ec13.webp"
+import ec12 from "../../../assets/team_members/ec12.webp";
+import ec13 from "../../../assets/team_members/ec13.webp";
 import ec14 from "../../../assets/team_members/ec14.webp";
 
 const chiefCoordinator = [
@@ -54,16 +57,17 @@ const chiefCoordinator = [
 
 const jointCoordinators = [
   { id: 13, name: "Narendhar D ", department: "Artificix", img: narendhar, role: "Volunteers, Helpdesk & Participant Support ", phone: "+91 97516 73398", associationLogo: aidsasso },
-  { id: 12, name: "Kaviyarasu P", department: "Artificix", img: kavi, role: "Website, Content & Data Management ", phone: "+91 701067 64469", associationLogo:""},
+  { id: 12, name: "Kaviyarasu P", department: "Artificix", img: kavi, role: "Website, Content & Data Management ", phone: "+91 701067 64469", associationLogo:aidsasso},
   //{ id: 15, name: "Gopinath", department: "Department of AIML", img: gopinath, role: "Gopinath T ", phone: "+91 93611 63363", associationLogo: aevaLogo },
-  //{ id : 17, name: "Saran Senthur Suthanthran", department: "IT", img: saran, role: "Registrations, Payments & Attendance ", phone: "+91 80566 70219", associationLogo: itasso},
-  {id : 18, name:"Yashas Yadav", department:"CSE", img:yadhav, role:"Technical, Non-Technical & Team Events", phone:"+91 70108 43024", associationLogo:cseasso},
+  { id : 17, name: "Saran Senthur Suthanthran", department: "ZITA", img:saran, role: "Registrations, Payments & Attendance ", phone: "+91 80566 70219", associationLogo: itasso},
+  {id : 18, name:"Yashas Yadav", department:"ASCI", img:yadhav, role:"Technical, Non-Technical & Team Events", phone:"+91 70108 43024", associationLogo:cseasso},
   {id :19, name:"Deepak C ", department:"Techragonz", img:deepak, role:"Technical, Non-Technical & Team Events", phone:"+91 63794 07526", associationLogo:csbsasso},
   {id :20, name:"Hari Prakash G ", department:"VLSI ENGINEERS AND DEVELOPERS ASSOCIATION ", img:hariprakash, role:"Workshops, Expos, Stalls & Resource Persons ", phone:"+91 89257 92409", associationLogo:vlsiasso},
   {id :22, name:"Deekshana C S ", department:"AEVA", img:deekshana, role:"National Conference ", phone:"+91 90878 42931", associationLogo:aevaLogo},
-  {id :23, name:"Aarush VS ", department:"CSE", img:posterjoint, role:"Design, Social Media & Promotions", phone:"+91 88918 50995", associationLogo:cseasso},
+  {id :23, name:"Aarush VS ", department:"ASCI", img:posterjoint, role:"Design, Social Media & Promotions", phone:"+91 88918 50995", associationLogo:cseasso},
   { id : 205, name : "Aathavan G", department : "Zita" , img: aathavan,role:"Hackathon, Codeathon & Flagship Challenges ",phone: "++91 96008 02107",associationLogo:itasso},
-  {id :24, name:"Tharun Kumar R ", department:"AIML", img:tharun, role:"Accommodation & Lunch ", phone:"+91 77084 13624", associationLogo:aevaLogo},
+  {id :24, name:"Tharun Kumar R ", department:"AIML", img:tharun, role:"EDC & Accommodation & Lunch ", phone:"+91 77084 13624", associationLogo:aevaLogo},
+  
 ];
 
 
@@ -75,13 +79,15 @@ const eventCoordinators = [
   //{ id: 105, name: "Vignesh", department: "Department of IT", img: ec5, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
   { id: 106, name: "Shanmugeshwara A", department: "ASCI", img: ec6, role: "Event Coordinator", phone: "+91 94871 19381", associationLogo: cseasso },
   { id: 107, name: "KARMUHILAN V ", department: "SPICEE", img: kari, role: "Event Coordinator", phone: "+91 90252 44374", associationLogo: eeeasso },
-  { id: 108, name: "Niranjana Devi S", department: "Vedha", img: ec8, role: "Event Coordinator", phone: "+91 82485 88418", associationLogo: vlsiasso},
+  { id: 108, name: "Niranjana Devi S", department: "Veda", img: ec8, role: "Event Coordinator", phone: "+91 82485 88418", associationLogo: vlsiasso},
   { id: 109, name: "Chandra Mohan G", department: "Techragonz", img: ec9, role: "Event Coordinator", phone: "+91 88709 25956", associationLogo: csbsasso },
   { id: 110, name: "Mujamil S", department: "SPICEE", img: ec10, role: "Event Coordinator", phone: "+91 75029 68410", associationLogo: eeeasso },
   //{ id: 111, name: "Vignesh", department: "Department of IT", img: ec11, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
   { id: 112, name: "Kamalanarayanan R", department: "Food Vist", img: ec12, role: "Event Coordinator", phone: "+91 90434 58427", associationLogo: ftasso },
-  { id: 113, name: "Hari Kesavaraj", department: "Vedha", img: ec13, role: "Event Coordinator", phone: "+91 82702 78279", associationLogo: vlsiasso },
+  { id: 113, name: "Hari Kesavaraj", department: "Veda", img: ec13, role: "Event Coordinator", phone: "+91 82702 78279", associationLogo: vlsiasso },
   { id: 114, name: "Priyan G S", department: "Sparks Association", img: ec14, role: "Event Coordinator", phone: "+91 86680 57985", associationLogo: mechasso },
+  {id:115,name:"Monika R",department:"AEVA",img: monika, role: "Event Coordinator", phone: "+91 93696 07816", associationLogo:aevaLogo },
+  {id:116,name:"Yaswanth J",department:"AEVA",img: Yaswanth, role: "Event Coordinator", phone: "+91 94814 08075", associationLogo:aevaLogo}
 ];
 
 const developers = [

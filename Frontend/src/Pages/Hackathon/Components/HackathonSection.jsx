@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { supabase } from "../../../supabase";
 import { motion } from "framer-motion";
-import { ChevronDown, ChevronUp, ArrowLeft, Trophy } from "lucide-react"; 
+import { ChevronDown, ChevronUp, ArrowLeft, Trophy, AlertTriangle } from "lucide-react"; 
 import { useNavigate, useLocation } from "react-router-dom";
 import { hackathonEvents } from "../../../data/hackathonEvents";
 
@@ -32,6 +32,9 @@ export const hackathonEventDetails = {
           emoji: "🥉",
           amount: "₹10,000",
         },
+      ],
+      lunchannouncement:[
+        "Lunch and accommodation are Free for all participants during the hackathon.",
       ],
       
       /*rounds: [
@@ -64,6 +67,7 @@ export const hackathonEventDetails = {
           location: "T&P LAB",
         },
       ],
+
       contact: {
         facultyCoordinator: [
           {
@@ -122,6 +126,9 @@ export const hackathonEventDetails = {
           emoji: "🥉",
           amount: "₹2,000",
         },
+      ],
+        lunchannouncement:[
+        "Lunch and accommodation are Free for all participants during the hackathon.",
       ],
       rounds: [
         {
@@ -349,6 +356,9 @@ export const hackathonEventDetails = {
           amount: "₹5,000",
         },
       ],
+       lunchannouncement:[
+        "lunch and accommodation are Free for all participants during the hackathon.",
+      ],
       rounds: [
         {
           title: "Themes",
@@ -535,7 +545,7 @@ export const hackathonEventDetails = {
       id: "hackathon-6",
       title: "Designathon 2026",
       date: "February 13, 2026",
-      registrationFee:" ₹ 300 per head.",
+      registrationFee:" ₹ 300  per head.",
       venue: "BASKARA BLOCK [ MECHANICAL] DESIGN CENTER",
       description: " This Designathon is centered on the innovative use of Computer-Aided Design (CAD) tools to create, redesign, and optimize mechanical components and systems for modern engineering applications. The event provides a creative and technical platform for Mechanical Engineering students to transform ideas into precise digital models using industry-standard CAD software.Participants will apply design thinking principles to develop concepts, create 3D models, perform assemblies, and generate engineering drawings while considering functionality, manufacturability, material selection, and sustainability. The Designathon encourages students to rethink conventional designs and propose efficient, lightweight, and cost-effective solutions through advanced CAD modeling techniques. ",
       rewards: [
@@ -654,6 +664,9 @@ export const hackathonEventDetails = {
             "Based on the performance, Participants will be short listed for further rounds."
           ]
         },
+      ],
+       lunchannouncement:[
+        "Lunch and accommodation are Free for all participants during the hackathon.",
       ],
 
 
@@ -959,6 +972,30 @@ const HackathonSection = () => {
             <p className="text-xl font-bold text-yellow-400 animate-pulse">
               Registration Begins on 27-01-2026
             </p>
+
+            {(Array.isArray(event.lunchannouncement)
+              ? event.lunchannouncement.length > 0
+              : Boolean(event.lunchannouncement)) && (
+              <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mt-4 mb-2 w-full max-w-2xl">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
+                  <span className="text-yellow-400 font-semibold text-sm">Note:</span>
+                </div>
+                {Array.isArray(event.lunchannouncement) ? (
+                  <ul className="list-disc pl-6 text-yellow-300 text-sm mt-1 ml-1 space-y-1">
+                    {event.lunchannouncement.map((note, index) => (
+                      <li key={index} className="break-words">
+                        {note}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-yellow-300 text-sm mt-1 ml-7 break-words">
+                    {event.lunchannouncement}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Register Now Button */}
             <motion.button
