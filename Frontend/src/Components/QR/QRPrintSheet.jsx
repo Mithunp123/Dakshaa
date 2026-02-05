@@ -73,14 +73,10 @@ const QRPrintSheet = ({ participants, onPrintComplete }) => {
         console.log(`🖨️ QRPrintSheet - Rendering page ${index + 1} for:`, participant.name);
         return (
           <div key={participant.id || participant.userId || index} className="qr-print-page">
-            {/* QR Code */}
+            {/* QR Code - Use plain UUID format (old format) for compatibility */}
             <div className="qr-print-qr-wrapper">
               <QRCodeCanvas
-                value={JSON.stringify({
-                  userId: participant.userId || participant.id,
-                  regId: participant.regId,
-                  events: participant.registeredEvents || []
-                })}
+                value={participant.userId || participant.id}
                 size={280}
                 level="H"
                 includeMargin={true}

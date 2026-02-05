@@ -162,15 +162,14 @@ const GlobalScannerPage = () => {
 
       // Parse QR code data - can be JSON or plain UUID
       let userId;
-      let qrData = null;
       
       try {
-        // Try to parse as JSON (new QR format)
-        qrData = JSON.parse(decodedText);
+        // Try to parse as JSON (legacy QR format)
+        const qrData = JSON.parse(decodedText);
         userId = qrData.userId || qrData.id;
-        console.log('📱 Parsed QR data:', qrData);
+        console.log('📱 Parsed JSON QR, extracted userId:', userId);
       } catch (e) {
-        // Fallback to plain UUID (old format)
+        // Plain UUID format (current format)
         userId = decodedText;
         console.log('📱 Using plain UUID:', userId);
       }
@@ -187,6 +186,7 @@ const GlobalScannerPage = () => {
         return;
       }
 
+      // Fetch participant profile
       const { data: participant, error: participantError } = await supabase
         .from('profiles')
         .select('id, full_name, email, phone, college')
@@ -199,61 +199,113 @@ const GlobalScannerPage = () => {
       }
 
       const assignedEventIds = assignedEvents.map(event => event.id);
-      const assignedEventNames = assignedEvents.map(event => event.name?.toLowerCase());
       
-      // Check if QR has events list that doesn't match coordinator's events
-      if (qrData?.events && Array.isArray(qrData.events)) {
-        const qrEventNames = qrData.events.map(e => e.toLowerCase());
-        const hasMatchingEvent = qrEventNames.some(qrEvent => 
-          assignedEventNames.some(assignedEvent => 
-            assignedEvent?.includes(qrEvent) || qrEvent.includes(assignedEvent || '')
-          )
-        );
-        
-        if (!hasMatchingEvent) {
-          toast.error(`${participant.full_name} is registered for "${qrData.events.join(', ')}" - not your assigned event`);
-          return;
-        }
-      }
-      
-      const { data: registrations, error: regError } = await supabase
+      // Fetch ALL registrations for this user (to show what they're registered for)
+      const { data: allRegistrations, error: allRegError } = await supabase
         .from('event_registrations_config')
         .select(`
           *,
           events_config:event_id (id, name, event_key)
         `)
         .eq('user_id', userId)
-        .in('event_id', assignedEventIds)
         .in('payment_status', ['PAID', 'completed']);
 
-      if (regError) {
+      if (allRegError) {
         toast.error('Error checking registrations');
         return;
       }
 
-      if (!registrations || registrations.length === 0) {
-        toast.error(`${participant.full_name} is not registered for any of your assigned events`);
+      // Get event names the student is registered for
+      const registeredEventNames = allRegistrations?.map(r => r.events_config?.name).filter(Boolean) || [];
+
+      // Check if student has any paid registrations
+      if (!allRegistrations || allRegistrations.length === 0) {
+        toast.error(`${participant.full_name} has no paid registrations`);
         return;
       }
 
+      // Filter to only coordinator's assigned events
+      const registrations = allRegistrations?.filter(r => assignedEventIds.includes(r.event_id)) || [];
+
+      // Get current user for marking attendance
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+      // If coordinator has NO matching assigned events - just show info (blue toast)
+      if (!registrations || registrations.length === 0) {
+        toast.custom((t) => (
+          <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-blue-500 shadow-lg rounded-2xl pointer-events-auto p-4`}>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                <UserCheck className="text-blue-500" size={28} />
+              </div>
+              <div className="flex-1">
+                <p className="text-white font-bold text-lg">{participant.full_name}</p>
+                <p className="text-white/80 text-sm">{formatDakshaaId(participant.id)}</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <p className="text-white/90 text-xs font-medium">⚠️ Not your assigned event</p>
+              <p className="text-white/90 text-xs font-medium">Registered events:</p>
+              {registeredEventNames.map((name, idx) => (
+                <div key={idx} className="text-white/80 text-xs px-2 py-1 bg-white/20 rounded">
+                  • {name}
+                </div>
+              ))}
+            </div>
+          </div>
+        ), { duration: 4000 });
+        return;
+      }
+
+      // Coordinator IS assigned to this event - mark attendance
+      const eventToMark = registrations[0].events_config;
+
+      // Mark attendance using RPC
+      const { data: attendanceResult, error: attendanceError } = await supabase.rpc("mark_event_attendance", {
+        p_user_id: userId,
+        p_event_id: eventToMark?.id || registrations[0].event_id,
+        p_scanned_by: currentUser?.id,
+        p_scan_location: null
+      });
+
+      if (attendanceError) {
+        console.error('Attendance error:', attendanceError);
+        toast.error(attendanceError.message || 'Failed to mark attendance');
+        return;
+      }
+
+      // Show success with attendance marked info
+      const eventName = eventToMark?.name || 'Event';
+      const isAlreadyAttended = attendanceResult?.already_attended;
+
       toast.custom((t) => (
-        <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-blue-500 shadow-lg rounded-2xl pointer-events-auto p-4`}>
+        <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full ${isAlreadyAttended ? 'bg-yellow-500' : 'bg-green-500'} shadow-lg rounded-2xl pointer-events-auto p-4`}>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-              <UserCheck className="text-blue-500" size={28} />
+              <UserCheck className={isAlreadyAttended ? 'text-yellow-500' : 'text-green-500'} size={28} />
             </div>
             <div className="flex-1">
               <p className="text-white font-bold text-lg">{participant.full_name}</p>
               <p className="text-white/80 text-sm">{formatDakshaaId(participant.id)}</p>
             </div>
           </div>
-          <div className="space-y-1">
-            <p className="text-white/90 text-sm font-medium">Registered Events:</p>
-            {registrations.map((reg) => (
-              <div key={reg.id} className="text-white/80 text-xs px-2 py-1 bg-white/20 rounded">
-                {reg.events_config?.name || 'Unknown Event'}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="text-white" size={16} />
+              <p className="text-white font-medium">
+                {isAlreadyAttended ? 'Already attended' : 'Attendance marked'}: {eventName}
+              </p>
+            </div>
+            {registeredEventNames.length > 1 && (
+              <div className="mt-2">
+                <p className="text-white/90 text-xs font-medium">Also registered for:</p>
+                {registeredEventNames.filter(n => n !== eventName).map((name, idx) => (
+                  <div key={idx} className="text-white/70 text-xs">
+                    • {name}
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         </div>
       ), { duration: 4000 });

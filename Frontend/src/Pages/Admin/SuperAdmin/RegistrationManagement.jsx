@@ -2179,13 +2179,13 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           <div className="flex flex-col items-end gap-3">
             <div className="text-right">
               <p className="text-4xl font-bold text-secondary">
-                {coordinatorEvents && coordinatorEvents.length > 0 ? selectedEvent.paidRegistrations : selectedEvent.totalRegistrations}
+                {selectedEvent.paidRegistrations || 0}
               </p>
               <p className="text-gray-400">Total Registrations</p>
             </div>
             <button
               onClick={generateRegistrationReport}
-              disabled={downloadingReport || (coordinatorEvents && coordinatorEvents.length > 0 ? selectedEvent.paidRegistrations : selectedEvent.totalRegistrations) === 0}
+              disabled={downloadingReport || (selectedEvent.paidRegistrations || 0) === 0}
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-secondary/20 to-primary/20 border border-secondary/30 rounded-xl hover:from-secondary/30 hover:to-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {downloadingReport ? (

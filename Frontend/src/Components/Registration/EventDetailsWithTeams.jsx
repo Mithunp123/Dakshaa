@@ -266,15 +266,13 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
                   Registered
                 </th>
                 {!hideActions && (
-                  <>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                      Actions
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                      Print QR
-                    </th>
-                  </>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                    Actions
+                  </th>
                 )}
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                  Print QR
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800">
@@ -305,73 +303,71 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
                       {new Date(registration.registered_at || registration.created_at).toLocaleDateString()}
                     </td>
                     {!hideActions && (
-                      <>
-                        <td className="px-4 py-3">
-                          <div className="relative action-menu-container">
-                            <button 
-                              onClick={() => setActiveActionMenu(activeActionMenu === registration.id ? null : registration.id)}
-                              className="text-gray-400 hover:text-cyan-400 p-1 rounded hover:bg-gray-800/50"
-                            >
-                              <MoreVertical className="w-4 h-4" />
-                            </button>
+                      <td className="px-4 py-3">
+                        <div className="relative action-menu-container">
+                          <button 
+                            onClick={() => setActiveActionMenu(activeActionMenu === registration.id ? null : registration.id)}
+                            className="text-gray-400 hover:text-cyan-400 p-1 rounded hover:bg-gray-800/50"
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </button>
 
-                            {/* Action Dropdown Menu */}
-                            <AnimatePresence>
-                              {activeActionMenu === registration.id && (
-                                <motion.div
-                                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                  transition={{ duration: 0.15 }}
-                                  className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50"
-                                >
-                                  <div className="py-1">
-                                    {/* View Details */}
-                                    <button
-                                      onClick={() => handleViewDetails(registration)}
-                                      className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700/50 flex items-center gap-2"
-                                    >
-                                      <Eye className="w-4 h-4 text-blue-400" />
-                                      View Details
-                                    </button>
-                                  </div>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          {registration.payment_status === 'PAID' || registration.payment_status === 'completed' ? (
-                            isCoordinator && registration.profile?.is_print ? (
-                              <span className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500/20 border border-yellow-500/30 rounded-lg text-yellow-400">
-                                <Printer className="w-4 h-4" />
-                                <span className="text-xs font-medium">Already Printed</span>
-                              </span>
-                            ) : (
-                              <button
-                                onClick={() => onPrintQR && onPrintQR(registration)}
-                                disabled={printingQR || !onPrintQR}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg hover:bg-green-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-green-400"
+                          {/* Action Dropdown Menu */}
+                          <AnimatePresence>
+                            {activeActionMenu === registration.id && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                                transition={{ duration: 0.15 }}
+                                className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50"
                               >
-                                {printingQR ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <Printer className="w-4 h-4" />
-                                )}
-                                <span className="text-xs font-medium">Print QR</span>
-                              </button>
-                            )
-                          ) : (
-                            <span className="text-gray-500 text-xs">Payment pending</span>
-                          )}
-                        </td>
-                      </>
+                                <div className="py-1">
+                                  {/* View Details */}
+                                  <button
+                                    onClick={() => handleViewDetails(registration)}
+                                    className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700/50 flex items-center gap-2"
+                                  >
+                                    <Eye className="w-4 h-4 text-blue-400" />
+                                    View Details
+                                  </button>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </td>
                     )}
+                    <td className="px-4 py-3">
+                      {registration.payment_status === 'PAID' || registration.payment_status === 'completed' ? (
+                        isCoordinator && registration.profile?.is_print ? (
+                          <span className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500/20 border border-yellow-500/30 rounded-lg text-yellow-400">
+                            <Printer className="w-4 h-4" />
+                            <span className="text-xs font-medium">Already Printed</span>
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => onPrintQR && onPrintQR(registration)}
+                            disabled={printingQR || !onPrintQR}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg hover:bg-green-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-green-400"
+                          >
+                            {printingQR ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Printer className="w-4 h-4" />
+                            )}
+                            <span className="text-xs font-medium">Print QR</span>
+                          </button>
+                        )
+                      ) : (
+                        <span className="text-gray-500 text-xs">Payment pending</span>
+                      )}
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={hideActions ? 4 : 6} className="px-4 py-8 text-center text-gray-400">
+                  <td colSpan={hideActions ? 5 : 6} className="px-4 py-8 text-center text-gray-400">
                     <div className="flex flex-col items-center gap-2">
                       <Eye className="w-8 h-8 opacity-50" />
                       <p>No registrations found for this event</p>
