@@ -97,11 +97,20 @@ const GlobalScannerPage = () => {
       setScanning(true);
       setCameraError(null);
       
+      // Wait for DOM to be ready
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       if (!html5QrCodeRef.current) {
         html5QrCodeRef.current = new Html5Qrcode("qr-scanner", { verbose: false });
       }
 
       const support = checkCameraSupport();
+      
+      // Check if we're in a secure context
+      if (!support.isSecureContext) {
+        throw new Error('Camera access requires HTTPS. Please use https:// or localhost');
+      }
+      
       const config = getCameraConfig(support.isMobile);
       
       // Always prefer back camera (environment) for QR scanning
@@ -110,27 +119,37 @@ const GlobalScannerPage = () => {
       
       try {
         // Try back camera first
+        console.log('Attempting to start back camera...');
         await html5QrCodeRef.current.start(
           cameraConfig,
           config,
           onScanSuccess,
           () => {}
         );
+        console.log('Back camera started successfully');
       } catch (backCamError) {
-        console.log('Back camera failed, trying front camera:', backCamError);
+        console.log('Back camera failed, trying front camera:', backCamError.message);
         // Fallback to front camera if back fails
         cameraConfig = { facingMode: "user" };
-        await html5QrCodeRef.current.start(
-          cameraConfig,
-          config,
-          onScanSuccess,
-          () => {}
-        );
+        try {
+          await html5QrCodeRef.current.start(
+            cameraConfig,
+            config,
+            onScanSuccess,
+            () => {}
+          );
+          console.log('Front camera started successfully');
+        } catch (frontCamError) {
+          console.error('Both cameras failed:', frontCamError);
+          throw frontCamError;
+        }
       }
     } catch (error) {
+      console.error('Scanner start error:', error);
       const errorInfo = getCameraErrorMessage(error);
       setCameraError(errorInfo.message);
       setScanning(false);
+      toast.error(errorInfo.message || 'Failed to start camera');
     }
   };
 
@@ -268,15 +287,26 @@ const GlobalScannerPage = () => {
         p_scan_location: null
       });
 
-      if (attendanceError) {
-        console.error('Attendance error:', attendanceError);
-        toast.error(attendanceError.message || 'Failed to mark attendance');
-        return;
-      }
-
       // Show success with attendance marked info
       const eventName = eventToMark?.name || 'Event';
-      const isAlreadyAttended = attendanceResult?.already_attended;
+      let isAlreadyAttended = attendanceResult?.already_attended;
+
+      // Handle duplicate attendance error (when attendance was already marked)
+      if (attendanceError) {
+        console.error('Attendance error:', attendanceError);
+        
+        // Check if it's a duplicate key error (attendance already marked)
+        if (attendanceError.message?.includes('duplicate key') || 
+            attendanceError.message?.includes('attendance_user_id_event_id_key') ||
+            attendanceError.code === '23505') {
+          // Treat as already attended
+          isAlreadyAttended = true;
+        } else {
+          // Other errors - show error toast
+          toast.error(attendanceError.message || 'Failed to mark attendance');
+          return;
+        }
+      }
 
       toast.custom((t) => (
         <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full ${isAlreadyAttended ? 'bg-yellow-500' : 'bg-green-500'} shadow-lg rounded-2xl pointer-events-auto p-4`}>

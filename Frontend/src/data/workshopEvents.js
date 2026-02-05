@@ -185,14 +185,14 @@ export const workshopDetails = [
     description: "Step into the AI Arcade and discover how AI tools can supercharge game development — build smarter, faster, and more creative games using cutting-edge AI tools.",
     img: workshop2,
     date: "February 12, 2026",
-    venue: "AB Lab 3",
+    venue: "UIPath Laboratory",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
        
         time: "1 Day",
-        venue: "AB Lab 3",
+        venue: "UIPath Laboratory",
         registrationFee: "₹300",
       },
     ],
@@ -245,7 +245,7 @@ export const workshopDetails = [
     description: "This workshop introduces Next-Generation Sequencing (NGS) technologies used in modern and future genomic and biomedical research. Participants gain industry-oriented knowledge on advanced sequencing platforms, workflows, and data analysis trends. The session connects molecular biology and genomics theory with real-time clinical, agricultural, and research applications.",
     img: workshop3,
     date: "February 12, 2026",
-    venue: "Dr. M S Swaminathan Biotech Seminar Hall",
+    venue: "AB LAB-1",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
@@ -253,7 +253,7 @@ export const workshopDetails = [
        
         date: "February 12, 2026",
         time: "1 Day",
-        location: "Dr. M S Swaminathan Biotech Seminar Hall",
+        location: "AB LAB-1",
       },
     ],
     contact: {
@@ -631,13 +631,13 @@ export const workshopDetails = [
     description: "This workshop introduces emerging technologies used in modern and future vehicles. Participants gain industry-oriented knowledge on advanced vehicle systems and design trends. The session connects engineering theory with real-time automotive applications.",
     img: workshop13,
     date: "February 12, 2026",
-    venue: "Bhaskara Block [Mechanical]",
+    venue: "Design Centre",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "Bhaskara Block [Mechanical]",
+        location: "Design Centre",
         time: "1 Day",
         date: "February 12, 2026",
       },
@@ -825,13 +825,13 @@ export const workshopDetails = [
     description: "This workshop provides an introduction to Artificial Intelligence, Machine Learning, Deep Learning, and Image Processing using MATLAB in a practical and easy-to-understand manner. Participants will learn how intelligent models are built, how neural networks are trained, and how images are processed and analysed. The session includes hands-on experience with real-time applications such as classification, prediction, object detection, along with applications in Electric Vehicles (EVs) and Robotics. ",
     img: workshop17,
     date: "February 12, 2026",
-    venue: "UiPath Laboratory, IT PARK",
+    venue: "AB LAB-3",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "UiPath Laboratory, IT PARK  ",
+        location: "AB LAB-3",
         time: "1:00PM to 4:30PM ",
         date: "February 12, 2026",
       },

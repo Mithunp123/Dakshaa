@@ -178,7 +178,8 @@ const AdminLayout = () => {
 
     if (userRole === 'volunteer' || userRole === 'super_admin') {
       items.push(
-        { label: 'Global Scanner', icon: QrCode, path: '/volunteer' }
+        { label: 'Global Scanner', icon: QrCode, path: '/volunteer' },
+        { label: 'Gate Check', icon: ShieldCheck, path: '/volunteer/gate' }
       );
     }
 

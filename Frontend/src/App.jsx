@@ -435,7 +435,7 @@ function AppContent() {
                   <ProtectedRoute
                     allowedRoles={["event_coordinator", "super_admin"]}
                   >
-                    <VolunteerDashboard />
+                    <CoordinatorGlobalScanner />
                   </ProtectedRoute>
                 }
               />
@@ -467,13 +467,14 @@ function AppContent() {
             <Route
               path="/volunteer"
               element={
-                <ProtectedRoute allowedRoles={["volunteer", "super_admin"]}>
+                <ProtectedRoute allowedRoles={["volunteer", "super_admin", "event_coordinator"]}>
                   <AdminLayout />
                 </ProtectedRoute>
               }
             >
-              <Route index element={<VolunteerDashboard />} />
+              <Route index element={<CoordinatorGlobalScanner />} />
               <Route path="scanner" element={<AttendanceScanner />} />
+              <Route path="gate" element={<VolunteerDashboard />} />
             </Route>
 
             {/* 404 Route - Must be last */}

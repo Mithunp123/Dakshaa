@@ -11,7 +11,7 @@ export const hackathonEventDetails = {
       id: "hackathon-1",
       title: "Neura-Hack 2.0 (36 Hours Hackathon)",
       date: "12th Feb - 13th Feb, 2026",
-      venue: "T&P LAB",
+      venue: "IT LAB 1 (IT PARK)",
       registrationFee:" ₹ 500 per head.",
       registrationLink: "",
       description: "NeuraHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, Defend, and Secure technology to shape the future of digital innovation.",
@@ -64,7 +64,7 @@ export const hackathonEventDetails = {
         {
           date: "12th Feb - 13th Feb, 2026",
           time: "9:00 AM to 9:00 PM",
-          location: "T&P LAB",
+          location: "IT LAB 1 (IT PARK)",
         },
       ],
 
@@ -240,7 +240,7 @@ export const hackathonEventDetails = {
       id: "hackathon-3",
       title: "Neura Code 2.O - Relay Edition",
       date: "February 13 2026 ",
-      venue: "IT LAB 1",
+      venue: "Bhumi Lab (IT PARK)",
       registrationFee:" ₹ 300 per head.",
       registrationLink: " ",
       description: "Relay Edition is a solo-based web design challenge where a reference website design is provided. Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
@@ -310,7 +310,7 @@ export const hackathonEventDetails = {
         {
           date: "February 13, 2026",
           time: "09:00 AM",
-          location: "IT LAB 1",
+          location: "Bhumi Lab (IT PARK)",
         },
       ],
       contact: {
@@ -336,7 +336,7 @@ export const hackathonEventDetails = {
       id: "hackathon-4",
       title: "24-Hour Vibe Coding Hackathon",
       date: "February 13, 2026",
-      venue: "Bhumi Lab , Cyberdome, Tutorial class",
+      venue: "UI Path Lab (IT PARK)",
       registrationFee:" ₹ 500 per head.",
       description: "The 24-Hour Vibe Coding Hackathon is an intensive, creativity-driven coding event where participants design and prototype real-world software solutions using Lovable AI. The hackathon emphasizes problem-first thinking, rapid iteration, and meaningful impact rather than product pitching or hardware-based development.Participants will receive problem statements on the spot and are expected to ideate, build, and present a working solution within 24 hours using limited AI credits—encouraging smart, intentional, and efficient development",
       rewards: [
@@ -409,7 +409,7 @@ export const hackathonEventDetails = {
           
           date: "February 13, 2026",
           time: "09:00 AM",
-          location: "Bhumi Lab , Cyberdome, Tutorial class",
+          location: "UI Path Lab (IT PARK)",
         },
       ],
       contact: {
@@ -546,7 +546,7 @@ export const hackathonEventDetails = {
       title: "Designathon 2026",
       date: "February 13, 2026",
       registrationFee:" ₹ 300  per head.",
-      venue: "BASKARA BLOCK [ MECHANICAL] DESIGN CENTER",
+      venue: "DESIGN CENTER (Mechanical Block)",
       description: " This Designathon is centered on the innovative use of Computer-Aided Design (CAD) tools to create, redesign, and optimize mechanical components and systems for modern engineering applications. The event provides a creative and technical platform for Mechanical Engineering students to transform ideas into precise digital models using industry-standard CAD software.Participants will apply design thinking principles to develop concepts, create 3D models, perform assemblies, and generate engineering drawings while considering functionality, manufacturability, material selection, and sustainability. The Designathon encourages students to rethink conventional designs and propose efficient, lightweight, and cost-effective solutions through advanced CAD modeling techniques. ",
       rewards: [
         {
@@ -588,7 +588,7 @@ export const hackathonEventDetails = {
          
           date: "February 13, 2026",
           time: "09:00 AM",
-          location: "BASKARA BLOCK [ MECHANICAL] DESIGN CENTER",
+          location: "DESIGN CENTER (Mechanical Block)",
         },
       ],
       contact: {
@@ -737,7 +737,7 @@ export const hackathonEventDetails = {
       id: "hackathon-8",
       title: "Cloudathon ",
       date: "13 February 2026",
-      venue: "AB Lab 4",
+      venue: "Shine Lab (IT PARK)",
       registrationFee:" ₹ 500 per head.",
       registrationLink: "",
       description: "CLOUDATHON is a high-energy, hands-on cloud hackathon where ideas turn into scalable, real-world solutions. Build, deploy, and optimize cloud-powered applications while tackling today’s most exciting tech challenges. ",
@@ -800,7 +800,7 @@ export const hackathonEventDetails = {
         {
           date: "13 February 2026",
           time: "9:00 AM to 4:00 PM",
-          location: "AB Lab 4",
+          location: "Shine Lab (IT PARK)",
         },
       ],
       contact: {

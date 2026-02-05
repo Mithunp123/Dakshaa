@@ -27,7 +27,7 @@ export const technicalDetails = [
     description: "The AI Mystery Box Challenge is a one-day technical event designed to test participants’ analytical thinking, creativity, and practical skills in Artificial Intelligence and Machine Learning. This event offers a unique, problem-solving experience where teams are challenged with an unknown AI task revealed only at the start of the competition. Participants will receive a mystery box containing a real-world dataset and a problem statement. Once the box is opened upon official announcement, teams must quickly analyze the problem, design an appropriate machine learning solution, and develop a working model within the given time. To enhance practical applicability, teams are also required to integrate their model with a functional web interface, simulating industry-level AI deployment.The event encourages collaborative teamwork, effective time management, and hands- on implementation of AI concepts such as data preprocessing, model selection, training, evaluation, and deployment. With internet access permitted, participants can explore libraries, frameworks, and documentation to refine their solutions.The AI Mystery Box Challenge will be conducted at AI Lab 2 with a registration fee of ₹250 per head. This event is ideal for students who are passionate about AI, Data Science, and real-time problem solving, and who wish to showcase their technical expertise in a competitive environment.",
     img: Tech1,
     date: "February 13, 2026",
-    venue: "AI Lab 2",
+    venue: "AB Lab 2",
     department: "Technical Events",
     price: "₹250",
     rules: [
@@ -63,7 +63,7 @@ export const technicalDetails = [
       {
         date: "February 13, 2026",
         time: "9:00 AM - 4:00 PM",
-        location: "AI Lab 2",
+        location: "AB Lab 2",
       },
     ],
     contact: {
@@ -105,7 +105,7 @@ export const technicalDetails = [
     description: "System Sense is a technical challenge designed to evaluate heuristic principles, identify design and interaction issues, and propose effective improvements within a limited time. Where participants assess systems based on established usability guidelines such as clarity, consistency, feedback, and user control. By applying these principles, participants develop practical solutions that enhance both user experience and business efficiency.",
     img: Tech2,
     date: "February 13, 2026",
-    venue: "AB Lab 4",
+    venue: "AB Lab 4 (Academic Block)",
     department: "Technical Events",
     price: "₹250",
     rules: [
@@ -171,7 +171,7 @@ export const technicalDetails = [
       {
         date: "February 13, 2026",
         time: "2-3 hrs",
-        location: "AB Lab 4",
+        location: "AB Lab 4 (Academic Block)",
       },
     ],
     contact: {
@@ -372,7 +372,7 @@ export const technicalDetails = [
     description: "Transform 2D concepts into immersive 3D environments while demonstrating your mastery of spatial efficiency and creative problem-solving. This challenge tests your ability to visualize volume and texture in a high-energy setting. Bring your ideas to life, from sleek modern interiors to complex structural exteriors.",
     img: Tech7,
     date: "February 13, 2026",
-    venue: "Civil CADD Laboratory",
+    venue: "Civil CADD Lab (Civil Block)",
     department: "Technical Events",
     price: "₹250",
     rules: [
@@ -1165,7 +1165,7 @@ export const technicalDetails = [
     description: "DrapeX: Fabric Draping in Action offers hands-on practice in both basic and advanced fabric draping techniques using dress forms. Participants will understand fabric behavior such as fall, flow, and structure through the use of different fabrics, while applying creativity and technical skills to create original draped designs. The event also focuses on translating draped forms into garment silhouettes and design concepts.",
     img: Tech19,
     date: "February 13, 2026",
-    venue: "Garment Construction Lab-TT",
+    venue: "Garment Construction Lab (Textile Department)",
     department: "Technical Events",
     price: "₹250",
     rules: [
@@ -1201,7 +1201,7 @@ export const technicalDetails = [
         
         date: "February 13, 2026",
         time: "3 hours",
-        location: "Garment Construction Lab-TT",
+        location: "Garment Construction Lab (Textile Department)",
       },
     ],
     contact: {
@@ -1573,7 +1573,7 @@ export const technicalDetails = [
     description: "It is an online, interactive game-based event designed to test MATLAB programming skills through puzzle-solving. It’s going to be conducted for 1 hour duration. Top 10 participants will be certified by MathWorks.",
     img: Tech24,
     date: "February 13, 2026",
-    venue: " UiPath Laboratory, IT PARK",
+    venue: " AB LAB 3 (Academic Block)",
     department: "Technical Events",
     price: "₹250",
     rules: [
@@ -1614,7 +1614,7 @@ export const technicalDetails = [
       {
         date: "February 13, 2026",
         time: "9:00 AM - 4:00 PM",
-        location: " UiPath Laboratory, IT PARK",
+        location: " AB LAB 3 (Academic Block)",
       },
     ],
     contact: {
@@ -1657,7 +1657,7 @@ export const technicalDetails = [
     description: "RC Race is an exciting competition where participants control a remote-controlled vehicle and race it on a specially designed track. The objective is to complete the track in the least possible time while maintaining control of the vehicle. The event is designed for fun, speed, and thrill, making it enjoyable for both participants and spectators. No technical background is required.",
     img: Tech25,
     date: "February 13, 2026",
-    venue: " Ground (Near MCT)",
+    venue: "Breeze Land",
     department: "Technical Events",
     price: "₹ 500 per team",
     rules: [
@@ -1699,7 +1699,7 @@ export const technicalDetails = [
       {
         date: "February 13, 2026",
         time: "9:00 AM - 4:00 PM",
-        location: "	Ground (Near MCT)",
+        location: "	Breeze Land",
       },
     ],
     contact: {

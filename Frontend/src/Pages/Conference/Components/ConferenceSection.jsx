@@ -91,7 +91,7 @@ const conferences = [
     ],
 
     date: "12 February 2026 ",
-    venue: "Dr. M S Swaminathan Biotech Seminar Hall",
+    venue: "A102 (Main Building)",
     contact: {
         facultyCoordinator: [
           {
@@ -167,7 +167,7 @@ const conferences = [
     ],
 
     date: "12 February 2026",
-    venue: "Gallery Hall (Main Building)",
+    venue: "A103 (Main Building)",
     registrationFee: "₹300",
     contact: {
         facultyCoordinator: [
@@ -249,7 +249,7 @@ const conferences = [
       " Additional author per head : ₹150",
     ],
     date: "12 February 2026",
-    venue: "KSRCT Campus",
+    venue: "A112,A113 (Main Building)",
     registrationFee: "₹300",
     contact: {
         facultyCoordinator: [ 
@@ -369,7 +369,7 @@ const conferences = [
       " Additional author per head : ₹150",
     ],
     date: "12 February 2026",
-    venue: " Seminar Hall  [ Mechanical Block]  ",
+    venue: "A203 (Main Building)",
     registrationFee: "₹300",
     contact: {
         facultyCoordinator: [

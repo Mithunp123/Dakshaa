@@ -29,7 +29,7 @@ export const nonTechnicalDetails = [
     title: "AI Meme Contest",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "AB 409",
+    venue: "AB 409 (Academic Block)",
     price: "₹150 per Member",
     description:
       "The AI Meme Contest is a fun-filled one-day non-technical event that combines creativity, humor, and artificial intelligence concepts through visually engaging memes. Participants will create original memes based on given AI-related themes using either AI-based tools or manual editing, with a strong focus on originality and ethical content creation. The event encourages innovative thinking and expressive digital creativity in a light-hearted competitive environment. It will be conducted at AB 408, with a registration fee of ₹150, and is open to both individuals and teams.",
@@ -94,7 +94,7 @@ export const nonTechnicalDetails = [
     title: "IPL AUCTION",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "AB 410",
+    venue: "AB 410 (Academic Block)",
     price: "₹150 per Member",
     description:
       "The IPL Auction is an exciting strategy-based event that simulates the real Indian Premier League player auction experience, where participants act as franchise owners and build a balanced cricket team by analyzing player statistics and bidding within a limited virtual budget. The event emphasizes teamwork, financial planning, and quick decision-making, making it engaging for cricket enthusiasts and strategy lovers alike. It will be conducted for a duration of 3 hours at AB 410.",
@@ -111,7 +111,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "1:30 PM to 3:00 PM",
-        location: " AB 410",
+        location: " AB 410 (Academic Block) ",
       },
     ],
     contact: {
@@ -152,7 +152,7 @@ export const nonTechnicalDetails = [
     title: "Just-a-Minute (JAM)",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "Dr. M S. Swaminathan Biotech Seminar Hall",
+    venue: "Bio Process Lab (Biotechnology Department)",
     price: "₹150 per Member",
     description:
       "Just-A-Minute (JAM) is a fast-paced speaking event where participants must speak on a given topic for one full minute without hesitation, repetition, or deviation. It tests quick thinking, clarity of thought, confidence, and effective communication skills in a fun and engaging way.",
@@ -169,7 +169,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "1 hour",
-        location: " Dr. M S. Swaminathan Biotech Seminar Hall",
+        location: " Bio Process Lab (Biotechnology Department)",
       },
     ],
     contact: {
@@ -206,7 +206,7 @@ export const nonTechnicalDetails = [
     title: "Civil Circuit (Connection)",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "Civil CADD Laboratory",
+    venue: "Civil CADD Lab (Civil Department)",
     price: "₹150 per Member",
     description:
       "Civil Circuit (Connection) is an engaging non-technical event designed to test participants' speed, logical thinking, and basic technical understanding of civil engineering concepts. Through multiple interactive rounds, participants will identify connections between civil engineering terms, categorize materials and processes, and recognize logos of construction brands and government agencies. The event encourages teamwork, quick thinking, and industry awareness in a competitive yet fun environment.",
@@ -243,7 +243,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "9.00 AM to 11.00 PM",
-        location: "Civil CADD Laboratory",
+        location: "Civil CADD Lab (Civil Department)",
       },
     ],
     contact: {
@@ -276,7 +276,7 @@ export const nonTechnicalDetails = [
     title: "Emoji Pictionary",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "AB 211",
+    venue: "AB 211 (Academic Block)",
     price: "₹150 per Member",
     description:
       "Emoji Pictionary is a fast-paced and entertaining non-technical event where participants decode famous movie titles, book plots, or well-known phrases represented entirely through emoji sequences. This event adds a digital twist to the classic game of Pictionary by replacing drawings with emojis, challenging participants' creativity, interpretation skills, and quick thinking. Teams race against time to correctly guess the answers based on visual emoji clues, making the event both fun and intellectually stimulating.",
@@ -311,7 +311,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "2–3 Hours",
-        location: "AB 211",
+        location: "AB 211 (Academic Block)",
       },
     ],
     contact: {
@@ -457,7 +457,7 @@ export const nonTechnicalDetails = [
     title: "LineX",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "Quadrangle , Main Building",
+    venue: "Quadrangle (Main Building)",
     price: "₹150 per Member",
     description:
       "LineX is a robotics-based non-technical event where participants compete head-to-head by controlling robots using a remote control. The robots must navigate through a predefined track filled with multiple obstacles. The participant who completes the track in the shortest time is declared the winner. This event focuses on testing speed, precision, control skills, and the ability to handle robots effectively under competitive conditions.",
@@ -482,7 +482,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "9.00 AM to 11:00 AM",
-        location: "Quadrangle , Main Building",
+        location: "Quadrangle (Main Building)",
       },
     ],
     contact: {
@@ -688,7 +688,7 @@ export const nonTechnicalDetails = [
     title: "Unit Wars",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "EE 303",
+    venue: "EE 304",
     price: "₹150 per Member",
     description:
       "Unit Wars is an educational quiz-based non-technical event focusing on fundamental and derived SI units used in science and engineering. The event challenges participants' conceptual understanding, memory, and speed, making it both informative and competitive.",
@@ -711,7 +711,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "2 Hours",
-        location: "EE 303",
+        location: "EE 304",
       },
     ],
     contact: {
@@ -749,7 +749,7 @@ export const nonTechnicalDetails = [
     title: "Unmasking Brands & Flavours",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "Smart class room[Food Technology]",
+    venue: "AB 308 (Academic Block)",
     price: "₹150 per Member",
     description:
       "Unmasking Brands & Flavours is an interactive non-technical event that challenges participants' knowledge of corporate branding and food recognition. Through a fun, three-level game format, the event tests awareness, teamwork, and quick thinking by combining logo identification, performance-based guessing, and culinary knowledge in an engaging and competitive environment.",
@@ -788,7 +788,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "9.00 AM to 4.00 PM",
-        location: "Smart class room[Food Technology]",
+        location: "AB 308 (Academic Block)",
       },
     ],
     contact: {
@@ -870,7 +870,7 @@ export const nonTechnicalDetails = [
     title: "Face Painting",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "KSRCT MCA Class,F Block",
+    venue: "MCA 103 (MBA Department)",
     price: "₹150 per Member",
     description:
       "Face Painting is a fun, creative, and engaging non-technical event that brings out the artistic talents of participants. This event offers a platform for students to express their imagination through colors, designs, and meaningful themes painted on faces. Participants can showcase styles such as cartoons, abstract art, nature-inspired patterns, cultural motifs, and message-driven creativity.",
@@ -888,7 +888,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "1 Hour",
-        location: "KSRCT MCA Class,F Block",
+        location: "MCA 103 (MBA Department)",
       },
     ],
     contact: {
@@ -939,7 +939,7 @@ export const nonTechnicalDetails = [
     title: "Mind Spark",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "Hall No: MC 306",
+    venue: "MC 306 (MBA Block)",
     price: "₹150 per Member",
     description:
       "Mind Spark Arena is a three-round knowledge-based non-technical event designed to test participants' intelligence, observation skills, and brand awareness. Teams compete through a general quiz, a visual picture connection round, and a logo & brand tagline identification challenge. Participants must think fast, connect ideas smartly, and demonstrate their mental agility to win.",
@@ -976,7 +976,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "10:30 AM to 12.30PM",
-        location: "Hall No: MC 306",
+        location: "MC 306 (MBA Block)",
       },
     ],
     contact: {
@@ -1037,7 +1037,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "10:00 AM to 12.30PM",
-        location: "Robotics Laboratory(MCT Block)",
+        location: "Robotics Laboratory (MCT Block)",
       },
     ],
     contact: {
@@ -1074,7 +1074,7 @@ export const nonTechnicalDetails = [
     title: "Freezeframe",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "CLASS ROOM C107 [ MECHANICAL ]",
+    venue: "CLASS C107 (MECHANICAL)",
     price: "₹150 per Member",
     description:
       "Freezeframe is a creative photography contest focused on visual storytelling and awareness. Participants capture meaningful moments within the college campus without any editing or filters. The event promotes observational skills, creativity, and the ability to convey a message through a single photograph.",
@@ -1099,7 +1099,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "1 Hour",
-        location: "CLASS ROOM C107 [ MECHANICAL ]",
+        location: "CLASS C107 (MECHANICAL)",
       },
     ],
     contact: {
