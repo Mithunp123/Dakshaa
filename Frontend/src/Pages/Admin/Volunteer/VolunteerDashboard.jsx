@@ -51,6 +51,7 @@ const VolunteerDashboard = () => {
 
   useEffect(() => {
     fetchVenues();
+    getCameras(); // Request camera permission on mount
     
     // Cleanup on unmount
     return () => {
@@ -156,12 +157,14 @@ const VolunteerDashboard = () => {
       const config = getCameraConfig(support.isMobile);
 
       // Try back camera using different methods
+      // Priority: camera ID > exact environment > environment > user (front)
       let cameraStarted = false;
+      const isMobile = support.isMobile;
       
-      // Method 1: Try using detected camera ID (most reliable on mobile)
-      if (cameraId) {
+      // Method 1: Try using detected camera ID (Highest priority - detected back camera)
+      if (cameraId && !cameraStarted) {
         try {
-          console.log('📸 Trying camera ID:', cameraId);
+          console.log('📸 Trying selected camera ID:', cameraId);
           await html5QrCodeRef.current.start(
             cameraId,
             config,
@@ -174,8 +177,25 @@ const VolunteerDashboard = () => {
           console.log('⚠️ Camera ID failed:', error.message);
         }
       }
+      
+      // Method 2: Try exact facingMode environment (FORCES back camera on mobile)
+      if (isMobile && !cameraStarted) {
+        try {
+          console.log('📸 [Mobile] Trying exact facingMode: environment');
+          await html5QrCodeRef.current.start(
+            { facingMode: { exact: "environment" } },
+            config,
+            (decodedText) => onScanSuccess(decodedText, mode),
+            () => {}
+          );
+          console.log('✅ Back camera started (exact)');
+          cameraStarted = true;
+        } catch (error) {
+          console.log('⚠️ Exact back camera failed:', error.message);
+        }
+      }
 
-      // Method 2: Try facingMode environment (back camera)
+      // Method 3: Try facingMode environment (back camera - works on most devices)
       if (!cameraStarted) {
         try {
           console.log('📸 Trying facingMode: environment');
@@ -192,10 +212,10 @@ const VolunteerDashboard = () => {
         }
       }
 
-      // Method 3: Fallback to front camera
+      // Method 4: Last resort - front camera
       if (!cameraStarted) {
         try {
-          console.log('📸 Trying facingMode: user (front camera)');
+          console.log('📸 Trying facingMode: user (front camera - last resort)');
           await html5QrCodeRef.current.start(
             { facingMode: "user" },
             config,
@@ -586,7 +606,7 @@ const VolunteerDashboard = () => {
 
               {/* Scanner */}
               <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8">
-                {scanning !== 'kit' ? (
+                {(!scanning || scanMode !== 'kit') ? (
                   <div className="space-y-6">
                     <div className="w-32 h-32 mx-auto bg-purple-500/10 rounded-[2rem] flex items-center justify-center border-4 border-purple-500/20">
                       <Camera className="text-purple-500" size={64} />

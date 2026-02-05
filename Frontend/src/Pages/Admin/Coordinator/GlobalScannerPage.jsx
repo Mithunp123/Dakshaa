@@ -33,6 +33,7 @@ const GlobalScannerPage = () => {
   const [scanning, setScanning] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [cameraError, setCameraError] = useState(null);
+  const [cameraId, setCameraId] = useState(null);
   const scannerRef = useRef(null);
   const html5QrCodeRef = useRef(null);
 
@@ -85,7 +86,13 @@ const GlobalScannerPage = () => {
       const devices = await Html5Qrcode.getCameras();
       if (!devices || devices.length === 0) {
         setCameraError('No cameras found');
+        return;
       }
+      
+      // Select best camera (back camera on mobile)
+      const bestCameraId = selectBestCamera(devices);
+      setCameraId(bestCameraId);
+      console.log('📷 Selected camera:', bestCameraId, devices);
     } catch (error) {
       const errorInfo = getCameraErrorMessage(error);
       setCameraError(errorInfo.message);
@@ -112,36 +119,77 @@ const GlobalScannerPage = () => {
       }
       
       const config = getCameraConfig(support.isMobile);
+      const isMobile = support.isMobile;
       
-      // Always prefer back camera (environment) for QR scanning
-      // Only use front camera (user) as fallback
-      let cameraConfig = { facingMode: "environment" };
+      // Priority: camera ID (most reliable) > exact environment > environment > user (front as last resort)
+      let cameraStarted = false;
       
-      try {
-        // Try back camera first
-        console.log('Attempting to start back camera...');
-        await html5QrCodeRef.current.start(
-          cameraConfig,
-          config,
-          onScanSuccess,
-          () => {}
-        );
-        console.log('Back camera started successfully');
-      } catch (backCamError) {
-        console.log('Back camera failed, trying front camera:', backCamError.message);
-        // Fallback to front camera if back fails
-        cameraConfig = { facingMode: "user" };
+      // Method 1: Try using selected camera ID (most reliable method)
+      if (cameraId && !cameraStarted) {
         try {
+          console.log('📸 Trying selected camera ID:', cameraId);
           await html5QrCodeRef.current.start(
-            cameraConfig,
+            cameraId,
             config,
             onScanSuccess,
             () => {}
           );
-          console.log('Front camera started successfully');
-        } catch (frontCamError) {
-          console.error('Both cameras failed:', frontCamError);
-          throw frontCamError;
+          console.log('✅ Camera started with ID');
+          cameraStarted = true;
+        } catch (error) {
+          console.log('⚠️ Camera ID failed:', error.message);
+        }
+      }
+      
+      // Method 2: Try exact facingMode environment (FORCES back camera on mobile)
+      if (isMobile && !cameraStarted) {
+        try {
+          console.log('📸 [Mobile] Trying exact facingMode: environment');
+          await html5QrCodeRef.current.start(
+            { facingMode: { exact: "environment" } },
+            config,
+            onScanSuccess,
+            () => {}
+          );
+          console.log('✅ Back camera started (exact)');
+          cameraStarted = true;
+        } catch (error) {
+          console.log('⚠️ Exact back camera failed:', error.message);
+        }
+      }
+
+      // Method 3: Try facingMode environment (back camera)
+      if (!cameraStarted) {
+        try {
+          console.log('📸 Trying facingMode: environment');
+          await html5QrCodeRef.current.start(
+            { facingMode: "environment" },
+            config,
+            onScanSuccess,
+            () => {}
+          );
+          console.log('✅ Back camera started');
+          cameraStarted = true;
+        } catch (error) {
+          console.log('⚠️ Back camera failed:', error.message);
+        }
+      }
+
+      // Method 4: Last resort - front camera
+      if (!cameraStarted) {
+        try {
+          console.log('📸 Trying facingMode: user (front camera - last resort)');
+          await html5QrCodeRef.current.start(
+            { facingMode: "user" },
+            config,
+            onScanSuccess,
+            () => {}
+          );
+          console.log('✅ Front camera started');
+          cameraStarted = true;
+        } catch (error) {
+          console.error('❌ All camera methods failed');
+          throw error;
         }
       }
     } catch (error) {
