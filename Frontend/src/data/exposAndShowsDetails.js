@@ -67,7 +67,7 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to: aidspaper@ksrct.ac.in"
+          "Paper should be mailed to: "
         ],
       },
     ],
@@ -115,7 +115,7 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to: aimlpaper@ksrct.ac.in"
+          "Paper should be mailed to:"
         ],
       },
     ],
@@ -163,7 +163,7 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to: itpaper@ksrct.ac.in"
+          "Paper should be mailed to: "
         ],
       },
     ],
@@ -209,7 +209,7 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to: csbspaper@ksrct.ac.in"
+          "Paper should be mailed to: "
         ],
       },
     ],
@@ -257,7 +257,7 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to: ftpaper@ksrct.ac.in"
+          "Paper should be mailed to: "
         ],
       },
     ],
@@ -305,7 +305,7 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to: vlsipaper@ksrct.ac.in"
+          "Paper should be mailed to: "
         ],
       },
     ],
@@ -353,7 +353,7 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to: biopaper@ksrct.ac.in"
+          "Paper should be mailed to: "
         ],
       },
     ],
@@ -473,15 +473,19 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
+          name: "Mr.D.Balakrishnan",
           designation: "Professor, Dept. of AI/ML",
-          email: "",
+          phone: "+91 9489796499",
         },
+        {
+          name: "Mr.S.Vinoth kumar",
+          phone:"+91 7548898727",
+        }
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "AI/ML",
+          name: "Gautam vijay K K",
+          phone:"+91 6374455463",
         },
         {
           name: "Student Coordinator 2",

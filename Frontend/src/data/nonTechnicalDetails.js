@@ -1411,8 +1411,8 @@ export const nonTechnicalDetails = [
       ],
       studentCoordinator: [
         {
-          name: "",
-          phone: "",
+          name: "S. Subithra",
+          phone: "+91 99527 34197",
         },
   
       ],
