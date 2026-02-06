@@ -5,7 +5,7 @@ import aidspaper from "../assets/EventsImages/EventDetails/paper/aids_paper.webp
 import aimlpaper from "../assets/EventsImages/EventDetails/paper/aiml_paper.webp";
 import itpaper from "../assets/EventsImages/EventDetails/paper/it_paper.webp";
 import csbspaper from "../assets/EventsImages/EventDetails/paper/csbs_paper.webp";
-import ftpaper from "../assets/EventsImages/EventDetails/paper/ft_paper.webp";
+//import ftpaper from "../assets/EventsImages/EventDetails/paper/ft_paper.webp";
 import vlsipaper from "../assets/EventsImages/EventDetails/paper/vlsi_paper.webp";
 import biopaper from "../assets/EventsImages/EventDetails/paper/bio_paper.webp";
 
@@ -131,19 +131,22 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of AI/ML",
-          email: "",
+          name: "Mr.R.Gopinath ",
+          phone:"+91 9865978725 "
+        },
+        {
+          name:"Mrs.C.Janani",
+          phone:"+91 7373020735",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "AI/ML",
+          name: "Gautam vijay K K",
+          phone:"+91 6374455463"
         },
         {
-          name: "Student Coordinator 2",
-          department: "AI/ML",
+          name: "Sharumathi P",
+          phone:"+91 9360361185"
         },
       ],
     },
@@ -243,53 +246,7 @@ export const exposAndShowsDetails = [
     },
   },
 
-  {
-    id: "paper-ft",
-    img: ftpaper,
-    shortTitle: "FT Paper",
-    title: "Fashion Technology Paper Presentation",
-    description: "Showcase your innovative research in Fashion Technology.",
-    date: "12 February 2026",
-    venue: "Conference Hall E",
-    price: "₹150 per member",
-    registrationLink: "",
-    schedule: [],
-    papersubmission: [
-      {
-        description: [
-          "Paper should be mailed to: "
-        ],
-      },
-    ],
-    theme: ["Innovation in Fashion and Textiles"],
-    rules: [
-      "Papers must be original and submitted in PDF format before the deadline",
-      "Participants may present individually or in teams (max 2–3 members)",
-      "Presentation time is 8–10 minutes, followed by a short Q&A session",
-      "Presentations should be prepared in PPT or PDF format",
-      "Papers will be evaluated based on innovation, technical content, and clarity",
-      "Judges' decisions are final, and certificates will be provided to participants"
-    ],
-    contact: {
-      facultyCoordinator: [
-        {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of Fashion Technology",
-          email: "",
-        },
-      ],
-      studentCoordinator: [
-        {
-          name: "Student Coordinator 1",
-          department: "Fashion Technology",
-        },
-        {
-          name: "Student Coordinator 2",
-          department: "Fashion Technology",
-        },
-      ],
-    },
-  },
+  
 
   {
     id: "paper-vlsi",
@@ -484,12 +441,12 @@ export const exposAndShowsDetails = [
       ],
       studentCoordinator: [
         {
-          name: "Gautam vijay K K",
-          phone:"+91 6374455463",
+          name: "Nissanth S P",
+          phone:"+91 6385643934",
         },
         {
-          name: "Student Coordinator 2",
-          department: "AI/ML",
+          name: "Divya prabha Shree N S",
+          phone:"+91 9042495498",
         },
       ],
     },

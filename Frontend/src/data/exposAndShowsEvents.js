@@ -3,7 +3,7 @@ import aidspaper from "../assets/EventsImages/EventDetails/paper/aids_paper.webp
 import aimlpaper from "../assets/EventsImages/EventDetails/paper/aiml_paper.webp";
 import itpaper from "../assets/EventsImages/EventDetails/paper/it_paper.webp";
 import csbspaper from "../assets/EventsImages/EventDetails/paper/csbs_paper.webp";
-import ftpaper from "../assets/EventsImages/EventDetails/paper/ft_paper.webp";
+//import ftpaper from "../assets/EventsImages/EventDetails/paper/ft_paper.webp";
 import vlsipaper from "../assets/EventsImages/EventDetails/paper/vlsi_paper.webp";
 import biopaper from "../assets/EventsImages/EventDetails/paper/bio_paper.webp";
 
@@ -94,10 +94,6 @@ export const exposAndShowsEvents = [
   {
     image: csbspaper,
     eventId: "paper-csbs",
-  },
-  {
-    image: ftpaper,
-    eventId: "paper-ft",
   },
   {
     image: vlsipaper,
