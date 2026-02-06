@@ -2267,10 +2267,6 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         hideActions={hideFinancials}
         paymentFilter={detailsPaymentFilter}
         onRefresh={() => selectedEvent && loadEventRegistrations(selectedEvent.id)}
-        onPrintQR={handlePrintSingleQR}
-        onPrintTeamQR={handlePrintTeamQR}
-        printingQR={printingQR}
-        isCoordinator={currentUserProfile?.role === 'event_coordinator'}
       />
 
       {/* QR Print Modal */}

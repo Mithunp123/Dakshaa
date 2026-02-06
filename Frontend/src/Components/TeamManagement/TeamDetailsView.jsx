@@ -9,20 +9,17 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
-  X,
-  Printer,
-  Loader2
+  X
 } from "lucide-react";
 import { supabase } from "../../supabase";
 import { API_BASE_URL } from "../../config/api";
 
-const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true, paymentFilter = 'all', onPrintTeamQR, printingQR = false, isCoordinator = false }) => {
+const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true, paymentFilter = 'all' }) => {
   const [teams, setTeams] = useState([]);
   const [filteredTeams, setFilteredTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTeamMembers, setSelectedTeamMembers] = useState(null);
   const [showMembersModal, setShowMembersModal] = useState(false);
-  const [printingTeamId, setPrintingTeamId] = useState(null);
 
   // Filter teams based on payment status
   useEffect(() => {
@@ -196,9 +193,6 @@ const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true, payme
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                 Created
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Print QR
-              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
@@ -281,33 +275,6 @@ const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true, payme
                         hour12: true
                       }).replace(',', '')}
                     </span>
-                  </td>
-                  
-                  {/* Print QR */}
-                  <td className="px-4 py-3">
-                    {(team.payment_status === 'PAID' || team.is_active) ? (
-                      isCoordinator && team.all_printed ? (
-                        <span className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500/20 border border-yellow-500/30 rounded-lg text-yellow-400">
-                          <Printer className="w-4 h-4" />
-                          <span className="text-xs font-medium">Already Printed</span>
-                        </span>
-                      ) : (
-                        <button
-                          onClick={() => onPrintTeamQR && onPrintTeamQR(team)}
-                          disabled={printingQR || !onPrintTeamQR || printingTeamId === team.id}
-                          className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg hover:bg-green-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-green-400"
-                        >
-                          {(printingQR && printingTeamId === team.id) ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Printer className="w-4 h-4" />
-                          )}
-                          <span className="text-xs font-medium">Print QR</span>
-                        </button>
-                      )
-                    ) : (
-                      <span className="text-gray-500 text-xs">Payment pending</span>
-                    )}
                   </td>
                 </motion.tr>
               ))}
