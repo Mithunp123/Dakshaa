@@ -298,6 +298,7 @@ const conferences = [
           "Mechatronics in Industry 4.0",
           "Aerodynamics of Multirotor Drones",
           "Flight Control Systems in Drones",
+          "Sustainable and Green Energy Source"
         ]
       },
       {

@@ -1401,8 +1401,12 @@ export const nonTechnicalDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "",
-          phone: " ",
+          name: "Ms.S.Kiruthika",
+          phone: "+91 96986 99928",
+        },
+        {
+          name : "Dr.A.Palaniappan",
+          phone : "+91 98943 66121",
         },
       ],
       studentCoordinator: [
@@ -1410,10 +1414,7 @@ export const nonTechnicalDetails = [
           name: "",
           phone: "",
         },
-        {
-          name: "",
-          phone: "",
-        },
+  
       ],
     },
     registrationLink: "",

@@ -73,24 +73,18 @@ export const exposAndShowsDetails = [
     ],
     theme: ["Innovations in AI & Data Science for Tomorrow"],
     rules: [
-      "Team size: 2-4 members",
-      "Paper must be original and unpublished",
-      "Presentation duration: 10-12 minutes followed by 3-5 minutes Q&A",
-      "Submit abstract before deadline",
-      "Use of plagiarized content will lead to disqualification",
-      "All team members must be present during presentation",
-      "Submit your paper in IEEE format",
-      "Bring a soft copy of your presentation on a USB drive",
-      "Arrive 15 minutes before your scheduled slot",
-      "Dress code: Formal attire",
-      "Judges' decision will be final"
+      "Papers must be original and submitted in PDF format before the deadline",
+      "Participants may present individually or in teams (max 2–3 members)",
+      "Presentation time is 8–10 minutes, followed by a short Q&A session",
+      "Presentations should be prepared in PPT or PDF format",
+      "Papers will be evaluated based on innovation, technical content, and clarity",
+      "Judges' decisions are final, and certificates will be provided to participants"
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr. Faculty Name",
           designation: "Professor, Dept. of AIDS",
-          phone: "+91 XXXXXXXXXX",
           email: "",
         },
       ],
@@ -98,12 +92,10 @@ export const exposAndShowsDetails = [
         {
           name: "Student Coordinator 1",
           department: "AIDS",
-          phone: "+91 XXXXXXXXXX",
         },
         {
           name: "Student Coordinator 2",
           department: "AIDS",
-          phone: "+91 XXXXXXXXXX",
         },
       ],
     },
@@ -129,24 +121,18 @@ export const exposAndShowsDetails = [
     ],
     theme: ["Machine Learning: Shaping the Future"],
     rules: [
-      "Team size: 2-4 members",
-      "Paper must be original and unpublished",
-      "Presentation duration: 10-12 minutes followed by 3-5 minutes Q&A",
-      "Submit abstract before deadline",
-      "Use of plagiarized content will lead to disqualification",
-      "All team members must be present during presentation",
-      "Submit your paper in IEEE format",
-      "Bring a soft copy of your presentation on a USB drive",
-      "Arrive 15 minutes before your scheduled slot",
-      "Dress code: Formal attire",
-      "Judges' decision will be final"
+      "Papers must be original and submitted in PDF format before the deadline",
+      "Participants may present individually or in teams (max 2–3 members)",
+      "Presentation time is 8–10 minutes, followed by a short Q&A session",
+      "Presentations should be prepared in PPT or PDF format",
+      "Papers will be evaluated based on innovation, technical content, and clarity",
+      "Judges' decisions are final, and certificates will be provided to participants"
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr. Faculty Name",
           designation: "Professor, Dept. of AI/ML",
-          phone: "+91 XXXXXXXXXX",
           email: "",
         },
       ],
@@ -154,12 +140,10 @@ export const exposAndShowsDetails = [
         {
           name: "Student Coordinator 1",
           department: "AI/ML",
-          phone: "+91 XXXXXXXXXX",
         },
         {
           name: "Student Coordinator 2",
           department: "AI/ML",
-          phone: "+91 XXXXXXXXXX",
         },
       ],
     },
@@ -185,37 +169,27 @@ export const exposAndShowsDetails = [
     ],
     theme: ["IT Solutions for Digital Transformation"],
     rules: [
-      "Team size: 2-4 members",
-      "Paper must be original and unpublished",
-      "Presentation duration: 10-12 minutes followed by 3-5 minutes Q&A",
-      "Submit abstract before deadline",
-      "Use of plagiarized content will lead to disqualification",
-      "All team members must be present during presentation",
-      "Submit your paper in IEEE format",
-      "Bring a soft copy of your presentation on a USB drive",
-      "Arrive 15 minutes before your scheduled slot",
-      "Dress code: Formal attire",
-      "Judges' decision will be final"
+      "Papers must be original and submitted in PDF format before the deadline",
+      "Participants may present individually or in teams (max 2–3 members)",
+      "Presentation time is 8–10 minutes, followed by a short Q&A session",
+      "Presentations should be prepared in PPT or PDF format",
+      "Papers will be evaluated based on innovation, technical content, and clarity",
+      "Judges' decisions are final, and certificates will be provided to participants"
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of IT",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
-        },
+                },
       ],
       studentCoordinator: [
         {
           name: "Student Coordinator 1",
           department: "IT",
-          phone: "+91 XXXXXXXXXX",
         },
         {
           name: "Student Coordinator 2",
           department: "IT",
-          phone: "+91 XXXXXXXXXX",
         },
       ],
     },
@@ -241,24 +215,18 @@ export const exposAndShowsDetails = [
     ],
     theme: ["Bridging Technology and Business"],
     rules: [
-      "Team size: 2-4 members",
-      "Paper must be original and unpublished",
-      "Presentation duration: 10-12 minutes followed by 3-5 minutes Q&A",
-      "Submit abstract before deadline",
-      "Use of plagiarized content will lead to disqualification",
-      "All team members must be present during presentation",
-      "Submit your paper in IEEE format",
-      "Bring a soft copy of your presentation on a USB drive",
-      "Arrive 15 minutes before your scheduled slot",
-      "Dress code: Formal attire",
-      "Judges' decision will be final"
+      "Papers must be original and submitted in PDF format before the deadline",
+      "Participants may present individually or in teams (max 2–3 members)",
+      "Presentation time is 8–10 minutes, followed by a short Q&A session",
+      "Presentations should be prepared in PPT or PDF format",
+      "Papers will be evaluated based on innovation, technical content, and clarity",
+      "Judges' decisions are final, and certificates will be provided to participants"
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr. Faculty Name",
           designation: "Professor, Dept. of CSBS",
-          phone: "+91 XXXXXXXXXX",
           email: "",
         },
       ],
@@ -266,12 +234,10 @@ export const exposAndShowsDetails = [
         {
           name: "Student Coordinator 1",
           department: "CSBS",
-          phone: "+91 XXXXXXXXXX",
         },
         {
           name: "Student Coordinator 2",
           department: "CSBS",
-          phone: "+91 XXXXXXXXXX",
         },
       ],
     },
@@ -297,24 +263,18 @@ export const exposAndShowsDetails = [
     ],
     theme: ["Innovation in Fashion and Textiles"],
     rules: [
-      "Team size: 2-4 members",
-      "Paper must be original and unpublished",
-      "Presentation duration: 10-12 minutes followed by 3-5 minutes Q&A",
-      "Submit abstract before deadline",
-      "Use of plagiarized content will lead to disqualification",
-      "All team members must be present during presentation",
-      "Submit your paper in IEEE format",
-      "Bring a soft copy of your presentation on a USB drive",
-      "Arrive 15 minutes before your scheduled slot",
-      "Dress code: Formal attire",
-      "Judges' decision will be final"
+      "Papers must be original and submitted in PDF format before the deadline",
+      "Participants may present individually or in teams (max 2–3 members)",
+      "Presentation time is 8–10 minutes, followed by a short Q&A session",
+      "Presentations should be prepared in PPT or PDF format",
+      "Papers will be evaluated based on innovation, technical content, and clarity",
+      "Judges' decisions are final, and certificates will be provided to participants"
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr. Faculty Name",
           designation: "Professor, Dept. of Fashion Technology",
-          phone: "+91 XXXXXXXXXX",
           email: "",
         },
       ],
@@ -322,12 +282,10 @@ export const exposAndShowsDetails = [
         {
           name: "Student Coordinator 1",
           department: "Fashion Technology",
-          phone: "+91 XXXXXXXXXX",
         },
         {
           name: "Student Coordinator 2",
           department: "Fashion Technology",
-          phone: "+91 XXXXXXXXXX",
         },
       ],
     },
@@ -353,24 +311,18 @@ export const exposAndShowsDetails = [
     ],
     theme: ["Advances in VLSI and Semiconductor Technology"],
     rules: [
-      "Team size: 2-4 members",
-      "Paper must be original and unpublished",
-      "Presentation duration: 10-12 minutes followed by 3-5 minutes Q&A",
-      "Submit abstract before deadline",
-      "Use of plagiarized content will lead to disqualification",
-      "All team members must be present during presentation",
-      "Submit your paper in IEEE format",
-      "Bring a soft copy of your presentation on a USB drive",
-      "Arrive 15 minutes before your scheduled slot",
-      "Dress code: Formal attire",
-      "Judges' decision will be final"
+      "Papers must be original and submitted in PDF format before the deadline",
+      "Participants may present individually or in teams (max 2–3 members)",
+      "Presentation time is 8–10 minutes, followed by a short Q&A session",
+      "Presentations should be prepared in PPT or PDF format",
+      "Papers will be evaluated based on innovation, technical content, and clarity",
+      "Judges' decisions are final, and certificates will be provided to participants"
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr. Faculty Name",
           designation: "Professor, Dept. of VLSI",
-          phone: "+91 XXXXXXXXXX",
           email: "",
         },
       ],
@@ -378,12 +330,10 @@ export const exposAndShowsDetails = [
         {
           name: "Student Coordinator 1",
           department: "VLSI",
-          phone: "+91 XXXXXXXXXX",
         },
         {
           name: "Student Coordinator 2",
           department: "VLSI",
-          phone: "+91 XXXXXXXXXX",
         },
       ],
     },
@@ -409,24 +359,18 @@ export const exposAndShowsDetails = [
     ],
     theme: ["Biotechnology for Sustainable Future"],
     rules: [
-      "Team size: 2-4 members",
-      "Paper must be original and unpublished",
-      "Presentation duration: 10-12 minutes followed by 3-5 minutes Q&A",
-      "Submit abstract before deadline",
-      "Use of plagiarized content will lead to disqualification",
-      "All team members must be present during presentation",
-      "Submit your paper in IEEE format",
-      "Bring a soft copy of your presentation on a USB drive",
-      "Arrive 15 minutes before your scheduled slot",
-      "Dress code: Formal attire",
-      "Judges' decision will be final"
+      "Papers must be original and submitted in PDF format before the deadline",
+      "Participants may present individually or in teams (max 2–3 members)",
+      "Presentation time is 8–10 minutes, followed by a short Q&A session",
+      "Presentations should be prepared in PPT or PDF format",
+      "Papers will be evaluated based on innovation, technical content, and clarity",
+      "Judges' decisions are final, and certificates will be provided to participants"
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr. Faculty Name",
           designation: "Professor, Dept. of Biotechnology",
-          phone: "+91 XXXXXXXXXX",
           email: "",
         },
       ],
@@ -434,12 +378,10 @@ export const exposAndShowsDetails = [
         {
           name: "Student Coordinator 1",
           department: "Biotechnology",
-          phone: "+91 XXXXXXXXXX",
         },
         {
           name: "Student Coordinator 2",
           department: "Biotechnology",
-          phone: "+91 XXXXXXXXXX",
         },
       ],
     },
@@ -450,55 +392,54 @@ export const exposAndShowsDetails = [
     id: "poster-aids",
     img: aidsposter,
     shortTitle: "AIDS Poster",
-    title: "AIDS Poster Presentation",
-    description: "Display your innovative research through creative poster presentations in AI & Data Science.",
+    title: "MindMatrix",
+    description: "Our event provides a platform for students to present innovative ideas and solutions to real-world problems.Participants will showcase their concepts visually through posters and explain them to the judges. The event encourages creativity, problem-solving, and effective communication skills.",
     date: "13 February 2026",
     venue: "Exhibition Hall A",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
-    postersubmission: [
-      {
-        description: [
-          "Poster details should be mailed to: aidsposter@ksrct.ac.in"
-        ],
-      },
-    ],
-    theme: ["Visualizing AI & Data Science Innovations"],
+    
+    theme: 
+    [    "Vanishing Spice: The Pepper Blight of Kolli Hills.",
+          "The Coconut Siege: Tiruchengode’s Pest Crisis.",
+          "The Water Beneath: Cancer Clusters in Erode.",
+          "The Air We’ve Learned to Ignore: The Paper Mill Smell.",
+          "The Silent Invasion: A Shola Forest Story.",
+          "The Price of Beauty: Peacocks in Namakkal.",
+          "When the Market Sleeps, the Bears Wake.",
+          "Too Much to Sell: The Cabbage and Onion Crisis.",
+          "When the Hills Shift: Saving Homes Before the Soil Slides.",
+          "The Smell That Stays: Life Near SPB Colony.",],
     rules: [
-      "Team size: 2-3 members",
-      "Poster size: A1 or A0 (portrait orientation preferred)",
-      "Content must be original and well-researched",
-      "Participants must be present at their poster for judging",
-      "No plagiarism will be tolerated",
-      "Poster should be self-explanatory",
-      "Use high-quality graphics and readable fonts",
-      "Include title, authors, and institution details",
-      "Balance text and visuals effectively",
-      "Bring pins/tape for mounting",
-      "Be prepared to explain your poster to judges and visitors",
-      "Setup time: 30 minutes before event"
+      "Poster must clearly explain the problem, idea, and outcome.",
+
+      "Standard poster size and format should be followed.",
+
+      "Individual or team participation is allowed (maximum 2 members).",
+
+      "3–5 minutes will be given for explanation.",
+
+      "Evaluation is based on clarity, creativity, and presentation.",
+
+      "Judges’ decision is final.",
     ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of AIDS",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          name: "Ms.A P Janani",
+         
+          phone: "+91 8838942548",
+          
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "AIDS",
-          phone: "+91 XXXXXXXXXX",
+          name: "Hemalatha M ",
+         
+          phone: "+91 9150786483",
         },
-        {
-          name: "Student Coordinator 2",
-          department: "AIDS",
-          phone: "+91 XXXXXXXXXX",
-        },
+       
       ],
     },
   },
@@ -514,34 +455,26 @@ export const exposAndShowsDetails = [
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
-    postersubmission: [
-      {
-        description: [
-          "Poster details should be mailed to: aimlposter@ksrct.ac.in"
-        ],
-      },
-    ],
+   
     theme: ["Machine Learning Visualized"],
     rules: [
-      "Team size: 2-3 members",
-      "Poster size: A1 or A0 (portrait orientation preferred)",
-      "Content must be original and well-researched",
-      "Participants must be present at their poster for judging",
-      "No plagiarism will be tolerated",
-      "Poster should be self-explanatory",
-      "Use high-quality graphics and readable fonts",
-      "Include title, authors, and institution details",
-      "Balance text and visuals effectively",
-      "Bring pins/tape for mounting",
-      "Be prepared to explain your poster to judges and visitors",
-      "Setup time: 30 minutes before event"
+      "Poster must clearly explain the problem, idea, and outcome.",
+
+      "Standard poster size and format should be followed.",
+
+      "Individual or team participation is allowed (maximum 2 members).",
+
+      "3–5 minutes will be given for explanation.",
+
+      "Evaluation is based on clarity, creativity, and presentation.",
+
+      "Judges' decision is final.",
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr. Faculty Name",
           designation: "Professor, Dept. of AI/ML",
-          phone: "+91 XXXXXXXXXX",
           email: "",
         },
       ],
@@ -549,12 +482,10 @@ export const exposAndShowsDetails = [
         {
           name: "Student Coordinator 1",
           department: "AI/ML",
-          phone: "+91 XXXXXXXXXX",
         },
         {
           name: "Student Coordinator 2",
           department: "AI/ML",
-          phone: "+91 XXXXXXXXXX",
         },
       ],
     },
@@ -571,34 +502,26 @@ export const exposAndShowsDetails = [
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
-    postersubmission: [
-      {
-        description: [
-          "Poster details should be mailed to: civilposter@ksrct.ac.in"
-        ],
-      },
-    ],
+   
     theme: ["Building Tomorrow's Infrastructure"],
     rules: [
-      "Team size: 2-3 members",
-      "Poster size: A1 or A0 (portrait orientation preferred)",
-      "Content must be original and well-researched",
-      "Participants must be present at their poster for judging",
-      "No plagiarism will be tolerated",
-      "Poster should be self-explanatory",
-      "Use high-quality graphics and readable fonts",
-      "Include title, authors, and institution details",
-      "Balance text and visuals effectively",
-      "Bring pins/tape for mounting",
-      "Be prepared to explain your poster to judges and visitors",
-      "Setup time: 30 minutes before event"
+      "Poster must clearly explain the problem, idea, and outcome.",
+
+      "Standard poster size and format should be followed.",
+
+      "Individual or team participation is allowed (maximum 2 members).",
+
+      "3–5 minutes will be given for explanation.",
+
+      "Evaluation is based on clarity, creativity, and presentation.",
+
+      "Judges' decision is final.",
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr. Faculty Name",
           designation: "Professor, Dept. of Civil Engineering",
-          phone: "+91 XXXXXXXXXX",
           email: "",
         },
       ],
@@ -606,12 +529,10 @@ export const exposAndShowsDetails = [
         {
           name: "Student Coordinator 1",
           department: "Civil Engineering",
-          phone: "+91 XXXXXXXXXX",
         },
         {
           name: "Student Coordinator 2",
           department: "Civil Engineering",
-          phone: "+91 XXXXXXXXXX",
         },
       ],
     },
@@ -628,34 +549,26 @@ export const exposAndShowsDetails = [
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
-    postersubmission: [
-      {
-        description: [
-          "Poster details should be mailed to: itposter@ksrct.ac.in"
-        ],
-      },
-    ],
+   
     theme: ["IT Innovations Visualized"],
     rules: [
-      "Team size: 2-3 members",
-      "Poster size: A1 or A0 (portrait orientation preferred)",
-      "Content must be original and well-researched",
-      "Participants must be present at their poster for judging",
-      "No plagiarism will be tolerated",
-      "Poster should be self-explanatory",
-      "Use high-quality graphics and readable fonts",
-      "Include title, authors, and institution details",
-      "Balance text and visuals effectively",
-      "Bring pins/tape for mounting",
-      "Be prepared to explain your poster to judges and visitors",
-      "Setup time: 30 minutes before event"
+      "Poster must clearly explain the problem, idea, and outcome.",
+
+      "Standard poster size and format should be followed.",
+
+      "Individual or team participation is allowed (maximum 2 members).",
+
+      "3–5 minutes will be given for explanation.",
+
+      "Evaluation is based on clarity, creativity, and presentation.",
+
+      "Judges' decision is final.",
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr. Faculty Name",
           designation: "Professor, Dept. of IT",
-          phone: "+91 XXXXXXXXXX",
           email: "",
         },
       ],
@@ -663,12 +576,10 @@ export const exposAndShowsDetails = [
         {
           name: "Student Coordinator 1",
           department: "IT",
-          phone: "+91 XXXXXXXXXX",
         },
         {
           name: "Student Coordinator 2",
           department: "IT",
-          phone: "+91 XXXXXXXXXX",
         },
       ],
     },
@@ -678,55 +589,46 @@ export const exposAndShowsDetails = [
     id: "poster-cse",
     img: cseposter,
     shortTitle: "CSE Poster",
-    title: "Computer Science Poster Presentation",
-    description: "Showcase your computer science research through visual poster presentations.",
+    title: "NEURO LEARN ",
+    description: "AI helps detect cyber threats, prevent attacks, and improve digital security through smart data analysis.AI chatbots support learning by providing instant help, personalized content, and interactive education.",
     date: "13 February 2026",
     venue: "Exhibition Hall E",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
-    postersubmission: [
-      {
-        description: [
-          "Poster details should be mailed to: cseposter@ksrct.ac.in"
-        ],
-      },
+    
+    theme: ["Artificial Intelligence in Cybersecurity",
+      "Generative AI & Chatbots in Education",
     ],
-    theme: ["Computing Innovations Visualized"],
     rules: [
-      "Team size: 2-3 members",
-      "Poster size: A1 or A0 (portrait orientation preferred)",
-      "Content must be original and well-researched",
-      "Participants must be present at their poster for judging",
-      "No plagiarism will be tolerated",
-      "Poster should be self-explanatory",
-      "Use high-quality graphics and readable fonts",
-      "Include title, authors, and institution details",
-      "Balance text and visuals effectively",
-      "Bring pins/tape for mounting",
-      "Be prepared to explain your poster to judges and visitors",
-      "Setup time: 30 minutes before event"
+      "Poster must clearly explain the problem, idea, and outcome.",
+
+      "Standard poster size and format should be followed.",
+
+      "Individual or team participation is allowed (maximum 2 members).",
+
+      "3–5 minutes will be given for explanation.",
+
+      "Evaluation is based on clarity, creativity, and presentation.",
+
+      "Judges' decision is final.",
     ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of CSE",
-          phone: "+91 XXXXXXXXXX",
+          name: "Mangaiyarkarasi R",
+        
+          phone: "+91 8807401541",
           email: "",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
+          name: "SHARAN ",
           department: "CSE",
-          phone: "+91 XXXXXXXXXX",
+          phone: "+91 9363906022",
         },
-        {
-          name: "Student Coordinator 2",
-          department: "CSE",
-          phone: "+91 XXXXXXXXXX",
-        },
+       
       ],
     },
   },
@@ -735,55 +637,48 @@ export const exposAndShowsDetails = [
     id: "poster-ece",
     img: eceposter,
     shortTitle: "ECE Poster",
-    title: "ECE Poster Presentation",
-    description: "Display your electronics and communication research through creative posters.",
+    title: "Innovations in AI, Embedded Systems, and Next-Generation Wireless Communication",
+    description: "This poster presentation provides students with a platform to showcase innovative ideas and research in Electronics and Communication Engineering. Participants will visually present emerging technologies, system designs, applications, and advancements in areas such as electronics, communication systems, embedded systems, VLSI, IoT, and signal processing. The session promotes technical knowledge sharing, creativity, and meaningful scientific discussions among students, faculty members, and industry experts.",
     date: "13 February 2026",
     venue: "Exhibition Hall F",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
-    postersubmission: [
-      {
-        description: [
-          "Poster details should be mailed to: eceposter@ksrct.ac.in"
-        ],
-      },
+   
+    theme: [" Emerging Trends in Embedded Systems and Intelligent Automation",
+      " Role of AI in Next-Generation Wireless Communication (6G)",
+      "Edge Computing in IoT Systems",
+      "Revolutionary Applications of AI in Electronics and Communication Engineering",
     ],
-    theme: ["Electronic Innovations for Connected World"],
     rules: [
-      "Team size: 2-3 members",
-      "Poster size: A1 or A0 (portrait orientation preferred)",
-      "Content must be original and well-researched",
-      "Participants must be present at their poster for judging",
-      "No plagiarism will be tolerated",
-      "Poster should be self-explanatory",
-      "Use high-quality graphics and readable fonts",
-      "Include title, authors, and institution details",
-      "Balance text and visuals effectively",
-      "Bring pins/tape for mounting",
-      "Be prepared to explain your poster to judges and visitors",
-      "Setup time: 30 minutes before event"
+      "Poster must clearly explain the problem, idea, and outcome.",
+
+      "Standard poster size and format should be followed.",
+
+      "Individual or team participation is allowed (maximum 2 members).",
+
+      "3–5 minutes will be given for explanation.",
+
+      "Evaluation is based on clarity, creativity, and presentation.",
+
+      "Judges' decision is final.",
     ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
+          name: "Mr.R.Poovarasan",
           designation: "Professor, Dept. of ECE",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          phone: "+91 95663 74935",
+          
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
+          name: "Sanjay Dharan P",
           department: "ECE",
-          phone: "+91 XXXXXXXXXX",
+          phone: "+91 9790328645",
         },
-        {
-          name: "Student Coordinator 2",
-          department: "ECE",
-          phone: "+91 XXXXXXXXXX",
-        },
+        
       ],
     },
   },
@@ -792,41 +687,35 @@ export const exposAndShowsDetails = [
     id: "poster-eee",
     img: eeeposter,
     shortTitle: "EEE Poster",
-    title: "EEE Poster Presentation",
+    title: "Electro Nexus",
     description: "Showcase your electrical engineering innovations through poster displays.",
     date: "13 February 2026",
     venue: "Exhibition Hall G",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
-    postersubmission: [
-      {
-        description: [
-          "Poster details should be mailed to: eeeposter@ksrct.ac.in"
-        ],
-      },
+    
+    theme: ["1.Smart Grid Technology.",
+
     ],
-    theme: ["Powering the Future with Innovation"],
     rules: [
-      "Team size: 2-3 members",
-      "Poster size: A1 or A0 (portrait orientation preferred)",
-      "Content must be original and well-researched",
-      "Participants must be present at their poster for judging",
-      "No plagiarism will be tolerated",
-      "Poster should be self-explanatory",
-      "Use high-quality graphics and readable fonts",
-      "Include title, authors, and institution details",
-      "Balance text and visuals effectively",
-      "Bring pins/tape for mounting",
-      "Be prepared to explain your poster to judges and visitors",
-      "Setup time: 30 minutes before event"
+      "Poster must clearly explain the problem, idea, and outcome.",
+
+      "Standard poster size and format should be followed.",
+
+      "Individual or team participation is allowed (maximum 2 members).",
+
+      "3–5 minutes will be given for explanation.",
+
+      "Evaluation is based on clarity, creativity, and presentation.",
+
+      "Judges' decision is final.",
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr. Faculty Name",
           designation: "Professor, Dept. of EEE",
-          phone: "+91 XXXXXXXXXX",
           email: "",
         },
       ],
@@ -834,12 +723,10 @@ export const exposAndShowsDetails = [
         {
           name: "Student Coordinator 1",
           department: "EEE",
-          phone: "+91 XXXXXXXXXX",
         },
         {
           name: "Student Coordinator 2",
           department: "EEE",
-          phone: "+91 XXXXXXXXXX",
         },
       ],
     },
@@ -849,54 +736,45 @@ export const exposAndShowsDetails = [
     id: "poster-csbs",
     img: csbsposter,
     shortTitle: "CSBS Poster",
-    title: "CSBS Poster Presentation",
-    description: "Present your CSBS research through creative and informative posters.",
+    title: "Where Humanity Meets the Future ",
+    description: "Mental Health in the Age of Social Media: Shows the difference between fake online happiness and real emotions, promoting awareness and support.From Classroom to Corporate: Explains the journey from student learning to industry skills and careers.Human-Centered Automation: Highlights how technology supports humans instead of replacing them.",
     date: "13 February 2026",
     venue: "Exhibition Hall H",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
-    postersubmission: [
-      {
-        description: [
-          "Poster details should be mailed to: csbsposter@ksrct.ac.in"
-        ],
-      },
+    
+    theme: [
+      "Mental Health in the Age of Social Media ",
+      "From Classroom to Corporate ",
+      "Human-Centered Automation: Technology That Augments,Not Replaces",
     ],
-    theme: ["Technology Meets Business"],
     rules: [
-      "Team size: 2-3 members",
-      "Poster size: A1 or A0 (portrait orientation preferred)",
-      "Content must be original and well-researched",
-      "Participants must be present at their poster for judging",
-      "No plagiarism will be tolerated",
-      "Poster should be self-explanatory",
-      "Use high-quality graphics and readable fonts",
-      "Include title, authors, and institution details",
-      "Balance text and visuals effectively",
-      "Bring pins/tape for mounting",
-      "Be prepared to explain your poster to judges and visitors",
-      "Setup time: 30 minutes before event"
+      "Poster must clearly explain the problem, idea, and outcome.",
+
+      "Standard poster size and format should be followed.",
+
+      "Individual or team participation is allowed (maximum 2 members).",
+
+      "3–5 minutes will be given for explanation.",
+
+      "Evaluation is based on clarity, creativity, and presentation.",
+
+      "Judges' decision is final.",
     ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
+          name: "Mr. S. Vignesh ",
           designation: "Professor, Dept. of CSBS",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          phone: "+91 9944820102",
+        
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "CSBS",
-          phone: "+91 XXXXXXXXXX",
-        },
-        {
-          name: "Student Coordinator 2",
-          department: "CSBS",
-          phone: "+91 XXXXXXXXXX",
+          name: "Sudiksha R",    
+          phone: "+91 9080113283",
         },
       ],
     },
@@ -906,55 +784,41 @@ export const exposAndShowsDetails = [
     id: "poster-vlsi",
     img: vlsiposter,
     shortTitle: "VLSI Poster",
-    title: "VLSI Poster Presentation",
-    description: "Display your VLSI design innovations through visual poster presentations.",
+    title: "Beyond silicon - intelligent and emerging technologies ",
+    description: "This theme highlights how modern VLSI is evolving beyond traditional silicon to enable intelligent and emerging technologies like AI hardware, edge devices, wearable health systems, autonomous vehicles, and quantum computing. It focuses on smart, efficient chips that power the future of real-time, decision-making systems.",
     date: "13 February 2026",
     venue: "Exhibition Hall I",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
-    postersubmission: [
-      {
-        description: [
-          "Poster details should be mailed to: vlsiposter@ksrct.ac.in"
-        ],
-      },
-    ],
-    theme: ["Miniaturization and Integration in VLSI"],
+   
+    theme: ["1.AI Chips: How Hardware Accelerates Machine Learning",
+            "Edge AI Hardware for Smart Devices",
+            "Wearable Health Monitoring Chips",
+            "VLSI in Autonomous Vehicles"
+          ],
     rules: [
-      "Team size: 2-3 members",
-      "Poster size: A1 or A0 (portrait orientation preferred)",
-      "Content must be original and well-researched",
-      "Participants must be present at their poster for judging",
-      "No plagiarism will be tolerated",
-      "Poster should be self-explanatory",
-      "Use high-quality graphics and readable fonts",
-      "Include title, authors, and institution details",
-      "Balance text and visuals effectively",
-      "Bring pins/tape for mounting",
-      "Be prepared to explain your poster to judges and visitors",
-      "Setup time: 30 minutes before event"
+      "Poster must clearly explain the problem, idea, and outcome.",
+      "Standard poster size and format should be followed.",
+      "Individual or team participation is allowed (maximum 2 members).",
+      "3–5 minutes will be given for explanation.",
+      "Evaluation is based on clarity, creativity, and presentation.",
+      "Judges' decision is final.",
     ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of VLSI",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          name: "Mrs. C. Saranya ",
+          phone: "+91 99945 88990",
+          
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "VLSI",
-          phone: "+91 XXXXXXXXXX",
+          name: "Om Ganesh S Y",     
+          phone: "+91 8838073003",
         },
-        {
-          name: "Student Coordinator 2",
-          department: "VLSI",
-          phone: "+91 XXXXXXXXXX",
-        },
+        
       ],
     },
   },
@@ -970,34 +834,21 @@ export const exposAndShowsDetails = [
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
-    postersubmission: [
-      {
-        description: [
-          "Poster details should be mailed to: bioposter@ksrct.ac.in"
-        ],
-      },
-    ],
+    
     theme: ["Biotech Innovations for Life"],
     rules: [
-      "Team size: 2-3 members",
-      "Poster size: A1 or A0 (portrait orientation preferred)",
-      "Content must be original and well-researched",
-      "Participants must be present at their poster for judging",
-      "No plagiarism will be tolerated",
-      "Poster should be self-explanatory",
-      "Use high-quality graphics and readable fonts",
-      "Include title, authors, and institution details",
-      "Balance text and visuals effectively",
-      "Bring pins/tape for mounting",
-      "Be prepared to explain your poster to judges and visitors",
-      "Setup time: 30 minutes before event"
+      "Poster must clearly explain the problem, idea, and outcome.",
+      "Standard poster size and format should be followed.",
+      "Individual or team participation is allowed (maximum 2 members).",
+      "3–5 minutes will be given for explanation.",
+      "Evaluation is based on clarity, creativity, and presentation.",
+      "Judges' decision is final.",
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr. Faculty Name",
           designation: "Professor, Dept. of Biotechnology",
-          phone: "+91 XXXXXXXXXX",
           email: "",
         },
       ],
@@ -1005,12 +856,10 @@ export const exposAndShowsDetails = [
         {
           name: "Student Coordinator 1",
           department: "Biotechnology",
-          phone: "+91 XXXXXXXXXX",
         },
         {
           name: "Student Coordinator 2",
           department: "Biotechnology",
-          phone: "+91 XXXXXXXXXX",
         },
       ],
     },
@@ -1020,54 +869,57 @@ export const exposAndShowsDetails = [
     id: "poster-mech",
     img: mechposter,
     shortTitle: "Mech Poster",
-    title: "Mechanical Engineering Poster Presentation",
-    description: "Present your mechanical engineering innovations through visual posters.",
+    title: "Smart and Sustainable Engineering Solutions for the Future",
+    description: "This theme focuses on advanced mechanical engineering innovations that promote smart automation, sustainability, and efficiency across industries. It covers Industry 4.0 technologies, zero-emission systems, and smart agricultural solutions that integrate digital intelligence, energy efficiency, and eco-friendly design to address future industrial, environmental, and societal challenges.",
     date: "13 February 2026",
     venue: "Exhibition Hall K",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
-    postersubmission: [
+    
+    theme: [
       {
         description: [
-          "Poster details should be mailed to: mechposter@ksrct.ac.in"
+        "Industrial 4.0",
+        "Zero Emission",
+        "Smart Agriculture",
         ],
       },
     ],
-    theme: ["Mechanical Innovations for Modern World"],
     rules: [
-      "Team size: 2-3 members",
-      "Poster size: A1 or A0 (portrait orientation preferred)",
-      "Content must be original and well-researched",
-      "Participants must be present at their poster for judging",
-      "No plagiarism will be tolerated",
-      "Poster should be self-explanatory",
-      "Use high-quality graphics and readable fonts",
-      "Include title, authors, and institution details",
-      "Balance text and visuals effectively",
-      "Bring pins/tape for mounting",
-      "Be prepared to explain your poster to judges and visitors",
-      "Setup time: 30 minutes before event"
+      "Poster must clearly explain the problem, idea, and outcome.",
+
+      "Standard poster size and format should be followed.",
+
+      "Individual or team participation is allowed (maximum 2 members).",
+
+      "3–5 minutes will be given for explanation.",
+
+      "Evaluation is based on clarity, creativity, and presentation.",
+
+      "Judges' decision is final.",
     ],
-    contact: {
+    act: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of Mechanical Engineering",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          name: "Mr.P.Tamilrasu",
+          designation: "Assistant Professor, Dept. of Mechanical Engineering",
+          phone: "+91 9600792888",
+          
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
+          name: "Ms.A.Harini",
           department: "Mechanical Engineering",
-          phone: "+91 XXXXXXXXXX",
+          phone: "+91 6379414177",
+          email:"amalrajharini@gmail.com",
         },
         {
-          name: "Student Coordinator 2",
+          name: "Mr.G.S.Priyan",
           department: "Mechanical Engineering",
-          phone: "+91 XXXXXXXXXX",
+          phone: "+91 8668057985",
+          email:"Gspriyan6661@gmail.com",
         },
       ],
     },
@@ -1084,34 +936,26 @@ export const exposAndShowsDetails = [
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
-    postersubmission: [
-      {
-        description: [
-          "Poster details should be mailed to: mctposter@ksrct.ac.in"
-        ],
-      },
-    ],
+   
     theme: ["Integration of Mechanics and Electronics"],
     rules: [
-      "Team size: 2-3 members",
-      "Poster size: A1 or A0 (portrait orientation preferred)",
-      "Content must be original and well-researched",
-      "Participants must be present at their poster for judging",
-      "No plagiarism will be tolerated",
-      "Poster should be self-explanatory",
-      "Use high-quality graphics and readable fonts",
-      "Include title, authors, and institution details",
-      "Balance text and visuals effectively",
-      "Bring pins/tape for mounting",
-      "Be prepared to explain your poster to judges and visitors",
-      "Setup time: 30 minutes before event"
+      "Poster must clearly explain the problem, idea, and outcome.",
+
+      "Standard poster size and format should be followed.",
+
+      "Individual or team participation is allowed (maximum 2 members).",
+
+      "3–5 minutes will be given for explanation.",
+
+      "Evaluation is based on clarity, creativity, and presentation.",
+
+      "Judges' decision is final.",
     ],
     contact: {
       facultyCoordinator: [
         {
           name: "Dr. Faculty Name",
           designation: "Professor, Dept. of Mechatronics",
-          phone: "+91 XXXXXXXXXX",
           email: "",
         },
       ],
@@ -1119,12 +963,10 @@ export const exposAndShowsDetails = [
         {
           name: "Student Coordinator 1",
           department: "Mechatronics",
-          phone: "+91 XXXXXXXXXX",
         },
         {
           name: "Student Coordinator 2",
           department: "Mechatronics",
-          phone: "+91 XXXXXXXXXX",
         },
       ],
     },
@@ -1134,55 +976,47 @@ export const exposAndShowsDetails = [
     id: "poster-txt",
     img: txtposter,
     shortTitle: "Textile Poster",
-    title: "Textile Technology Poster Presentation",
-    description: "Showcase your textile technology innovations through poster presentations.",
+    title: "Sustainable Technical Textiles",
+    description: "This poster presentation highlights the concept of Sustainable Technical Textiles by focusing on sustainable high-performance fibers, resource-efficient textile engineering processes, circular design and end-of-life optimization, and reverse engineering in technical textiles. Together, these approaches aim to minimize environmental impact while maintaining the functional performance required for advanced technical and industrial textile applications.",
     date: "13 February 2026",
     venue: "Exhibition Hall M",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
-    postersubmission: [
-      {
-        description: [
-          "Poster details should be mailed to: txtposter@ksrct.ac.in"
-        ],
-      },
+    
+    theme: ["Sustainable High-Performance Fibers",
+      "Resource-Efficient Textile Engineering Processes",
+      "Circular Design and End-of-Life Optimization",
+      "Reverse Engineering in Technical Textiles Resource-Efficient Textile Engineering Processes Circular Design and End-of-Life Optimization",
     ],
-    theme: ["Textile Innovations for Sustainable Fashion"],
     rules: [
-      "Team size: 2-3 members",
-      "Poster size: A1 or A0 (portrait orientation preferred)",
-      "Content must be original and well-researched",
-      "Participants must be present at their poster for judging",
-      "No plagiarism will be tolerated",
-      "Poster should be self-explanatory",
-      "Use high-quality graphics and readable fonts",
-      "Include title, authors, and institution details",
-      "Balance text and visuals effectively",
-      "Bring pins/tape for mounting",
-      "Be prepared to explain your poster to judges and visitors",
-      "Setup time: 30 minutes before event"
+      "Poster must clearly explain the problem, idea, and outcome.",
+
+      "Standard poster size and format should be followed.",
+
+      "Individual or team participation is allowed (maximum 2 members).",
+
+      "3–5 minutes will be given for explanation.",
+
+      "Evaluation is based on clarity, creativity, and presentation.",
+
+      "Judges' decision is final.",
     ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of Textile Technology",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          name: "Dr.M.B.Sampath",
+
+          phone: "+91 9003920300",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "Textile Technology",
-          phone: "+91 XXXXXXXXXX",
+          name: "Mr.Bharath",
+          
+          phone: "+91 9042655010",
         },
-        {
-          name: "Student Coordinator 2",
-          department: "Textile Technology",
-          phone: "+91 XXXXXXXXXX",
-        },
+        
       ],
     },
   },
@@ -1196,35 +1030,33 @@ export const exposAndShowsDetails = [
     img: mechproject,
     shortTitle: "Mech Project",
     title: "Mechanical Engineering Project Exhibition",
-    description: "Exhibit your mechanical engineering projects and prototypes.",
-    date: "14 February 2026",
+    description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
+    date: "13 February 2026",
     venue: "Project Hall J",
     price: "₹150 per team",
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
-    rules: [
-      ""
-    ],
+   
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
+          name: "Dr.P. Sampath",
           designation: "Professor, Dept. of Mechanical Engineering",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          phone: "+91 9962116570",
+          
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
+          name: "Mr.R.Shivakumar",
           department: "Mechanical Engineering",
-          phone: "+91 XXXXXXXXXX",
+          phone: "+91 7418709075",
         },
         {
-          name: "Student Coordinator 2",
+          name: "Mr.G. Dharsan",
           department: "Mechanical Engineering",
-          phone: "+91 XXXXXXXXXX",
+          phone: "+91 9345003032",
         },
       ],
     },
