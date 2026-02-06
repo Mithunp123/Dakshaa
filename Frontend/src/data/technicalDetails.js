@@ -345,8 +345,8 @@ export const technicalDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. S. Sidhra",
-          phone: "+91 89256 06990",
+          name: "Mr.R.Arulvel",
+          phone: "+91 88709 21600",
         },
       ],
       studentCoordinator: [

@@ -826,7 +826,7 @@ export const hackathonEventDetails = {
       title: "Sustainathon – Hackathon for Sustainable Development Goals (SDG) ",
       date: "13 February 2026",
       venue: " ",
-      registrationFee:" ₹ 500 per head.",
+      registrationFee:" ₹ 300 per head.",
       registrationLink: "",
       description: "Sustainathon is a problem-solving hackathon focused on creating innovative, practical, and scalable solutions aligned with the United Nations Sustainable Development Goals (SDGs). Participants will work in teams to design technology-driven or social-impact solutions addressing real-world sustainability challenges.",
     
@@ -915,9 +915,13 @@ export const hackathonEventDetails = {
         ],
         studentCoordinator: [
           {
-            name: " ",
-            phone: "",
+            name: "Mr.S.K.Suje ",
+            phone: "+91 63741 26445",
           },
+          {
+            name: " Ms.A,Gayathri ",
+            phone :"+91 90431 70921",
+          }
         ],
       },
     },

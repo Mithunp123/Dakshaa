@@ -58,7 +58,7 @@ export const exposAndShowsDetails = [
     img: aidspaper,
     shortTitle: "AIDS Paper",
     title: "AIDS Paper Presentation",
-    description: "Present your innovative research papers in Artificial Intelligence and Data Science.",
+    description: "Explores how artificial intelligence leverages data to convert raw information into meaningful insights, intelligent decisions, and smart systems.",
     date: "12 February 2026",
     venue: "Conference Hall A",
     price: "₹150 per member",
@@ -71,7 +71,7 @@ export const exposAndShowsDetails = [
         ],
       },
     ],
-    theme: ["Innovations in AI & Data Science for Tomorrow"],
+    theme: ["Where Data Meets AI: Transforming Information into Intelligence"],
     rules: [
       "Papers must be original and submitted in PDF format before the deadline",
       "Participants may present individually or in teams (max 2–3 members)",
@@ -83,20 +83,16 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of AIDS",
-          email: "",
+          name: "Ms. J K Shalini ",
+          phone:"+91 9894970113",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "AIDS",
+          name: "M Bhargav Reddy",
+         phone:"+91 9345333979",
         },
-        {
-          name: "Student Coordinator 2",
-          department: "AIDS",
-        },
+        
       ],
     },
   },
@@ -105,9 +101,9 @@ export const exposAndShowsDetails = [
     id: "paper-aiml",
     img: aimlpaper,
     shortTitle: "AI/ML Paper",
-    title: "AI/ML Paper Presentation",
-    description: "Showcase your research in Artificial Intelligence and Machine Learning.",
-    date: "12 February 2026",
+    title: "Paper presentation ",
+    description: "Recent Trends in Machine Learning” explores the latest advancements shaping intelligent systems, including deep learning, generative AI, and self-supervised learning. It highlights how ML is transforming industries such as healthcare, finance, automation, and cybersecurity through data-driven decision-making. The theme emphasizes emerging techniques like explainable AI, federated learning, and AI-driven automation for real-world applications. It also reflects the growing focus on ethical AI, efficiency, and scalability in modern machine learning systems.",
+    date: "13 February 2026",
     venue: "Conference Hall B",
     price: "₹150 per member",
     registrationLink: "",
@@ -115,11 +111,11 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to:"
+          "Paper should be mailed to:aevaksrct@gmail.com"
         ],
       },
     ],
-    theme: ["Machine Learning: Shaping the Future"],
+    theme: ["Machine Learning: Shaping the future"],
     rules: [
       "Papers must be original and submitted in PDF format before the deadline",
       "Participants may present individually or in teams (max 2–3 members)",
@@ -301,7 +297,7 @@ export const exposAndShowsDetails = [
     img: biopaper,
     shortTitle: "Bio Paper",
     title: "Biotechnology Paper Presentation",
-    description: "Present your research in Biotechnology and Life Sciences.",
+    description: "Research innovation for environmental sustainability ",
     date: "12 February 2026",
     venue: "Conference Hall G",
     price: "₹150 per member",
@@ -310,11 +306,11 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to: "
+          "Paper should be mailed to:dharanyaatk@gmail.com "
         ],
       },
     ],
-    theme: ["Biotechnology for Sustainable Future"],
+    theme: ["Green Biotechnology "],
     rules: [
       "Papers must be original and submitted in PDF format before the deadline",
       "Participants may present individually or in teams (max 2–3 members)",
@@ -326,19 +322,14 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of Biotechnology",
-          email: "",
+          name: "Dr. M.Nithiya",
+          phone:"+91 7708844446 "
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "Biotechnology",
-        },
-        {
-          name: "Student Coordinator 2",
-          department: "Biotechnology",
+          name: "Dharanya T K",
+          phone:"+91 9360270094",
         },
       ],
     },
@@ -456,15 +447,21 @@ export const exposAndShowsDetails = [
     id: "poster-civil",
     img: civilposter,
     shortTitle: "Civil Poster",
-    title: "Civil Engineering Poster Presentation",
-    description: "Present your civil engineering innovations through visual poster displays.",
+    title: "GreenTech Construction",
+    description: "AI-Based Smart Sustainable Construction",
     date: "13 February 2026",
     venue: "Exhibition Hall C",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
    
-    theme: ["Building Tomorrow's Infrastructure"],
+    theme: [
+      " Smart construction waste segregation",
+        "AI for sustainable construction practices",
+        "AI Based Traffic Control to Reduce Pollution", 
+        "Green Concrete Using industrial waste material ",
+        "Carbon Deduced Cement and its impact",
+      ],
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
@@ -481,20 +478,16 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of Civil Engineering",
-          email: "",
+          name: "Dr.S.Ramesh",
+          phone:"+91 9976872912",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "Civil Engineering",
+          name: "Elango K",
+          phone:"+91 6381131677",
         },
-        {
-          name: "Student Coordinator 2",
-          department: "Civil Engineering",
-        },
+       
       ],
     },
   },
@@ -503,7 +496,7 @@ export const exposAndShowsDetails = [
     id: "poster-it",
     img: itposter,
     shortTitle: "IT Poster",
-    title: "Information Technology Poster Presentation",
+    title: "Next-Gen Technologies",
     description: "Display your innovative IT solutions through creative poster presentations.",
     date: "13 February 2026",
     venue: "Exhibition Hall D",
@@ -511,7 +504,12 @@ export const exposAndShowsDetails = [
     registrationLink: "",
     schedule: [],
    
-    theme: ["IT Innovations Visualized"],
+    theme: [
+      "Cloud Computing" ,
+       "Industrial Revolution",
+       "Ethical  challenge in Ai", 
+       "Metaverse Technology ",
+      ],
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 

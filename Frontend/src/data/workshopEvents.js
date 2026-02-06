@@ -259,9 +259,9 @@ export const workshopDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Rahul Chauhan",
+          name: "Ms.S.Sathviga",
           designation: "Assistant Professor",
-          phone: "",
+          phone: "+91 88702 76967",
         },
       ],
       studentCoordinator: [
