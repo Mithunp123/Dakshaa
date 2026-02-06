@@ -1536,6 +1536,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
             id: profile.id || r.user_id,
             full_name: profile.full_name || 'Unknown',
             email: profile.email || 'N/A',
+            mobile_number: profile.mobile_number || null,
             phone: profile.mobile_number || 'N/A',
             college_name: profile.college_name || 'N/A',
             department: profile.department || 'N/A',

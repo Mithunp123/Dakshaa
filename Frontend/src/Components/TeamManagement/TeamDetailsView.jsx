@@ -193,6 +193,9 @@ const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true, payme
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                 Created
               </th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Call Leader
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
@@ -276,6 +279,24 @@ const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true, payme
                       }).replace(',', '')}
                     </span>
                   </td>
+                  
+                  {/* Call Leader */}
+                  <td className="px-4 py-3">
+                    <div className="flex justify-center">
+                      {team.leader_mobile ? (
+                        <a 
+                          href={`tel:${team.leader_mobile}`}
+                          className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-md hover:shadow-green-500/50 transition-all duration-300 hover:scale-110 active:scale-95"
+                          title={`Call ${team.leader_name} - ${team.leader_mobile}`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Phone size={18} fill="currentColor" />
+                        </a>
+                      ) : (
+                        <span className="text-gray-500 text-xs">N/A</span>
+                      )}
+                    </div>
+                  </td>
                 </motion.tr>
               ))}
             </AnimatePresence>
@@ -348,7 +369,17 @@ const TeamDetailsView = ({ eventId, eventName, onClose, showHeader = true, payme
                         {member.mobile_number && (
                           <div className="flex items-center gap-2 text-gray-400">
                             <Phone className="w-3 h-3" />
-                            <span>{member.mobile_number}</span>
+                            <span className="flex items-center gap-2">
+                              <span>{member.mobile_number}</span>
+                              <a 
+                                href={`tel:${member.mobile_number}`}
+                                className="flex items-center justify-center w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-sm hover:shadow-green-500/50 transition-all duration-300 hover:scale-110 active:scale-95"
+                                title={`Call ${member.mobile_number}`}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <Phone size={12} fill="currentColor" />
+                              </a>
+                            </span>
                           </div>
                         )}
                         {member.college_name && (

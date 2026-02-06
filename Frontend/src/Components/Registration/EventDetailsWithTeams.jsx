@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Users, Eye, MoreVertical } from "lucide-react";
+import { Users, Eye, MoreVertical, Phone } from "lucide-react";
 import TeamDetailsView from "../TeamManagement/TeamDetailsView";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -139,9 +139,20 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm">Mobile Number</p>
-                  <p className="text-white font-medium">
-                    {selectedParticipant.profiles?.mobile_number || 'N/A'}
-                  </p>
+                  <div className="flex items-center gap-3">
+                    <p className="text-white font-medium">
+                      {selectedParticipant.profiles?.mobile_number || 'N/A'}
+                    </p>
+                    {selectedParticipant.profiles?.mobile_number && (
+                      <a 
+                        href={`tel:${selectedParticipant.profiles.mobile_number}`}
+                        className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-md hover:shadow-green-500/50 transition-all duration-300 hover:scale-110 active:scale-95"
+                        title={`Call ${selectedParticipant.profiles.mobile_number}`}
+                      >
+                        <Phone size={14} fill="currentColor" />
+                      </a>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm">College/Institution</p>
@@ -176,9 +187,20 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm">Registered On</p>
-                  <p className="text-white font-medium">
-                    {new Date(selectedParticipant.registered_at || selectedParticipant.created_at).toLocaleString()}
-                  </p>
+                  <div className="flex items-center gap-3">
+                    <p className="text-white font-medium">
+                      {new Date(selectedParticipant.registered_at || selectedParticipant.created_at).toLocaleString()}
+                    </p>
+                    {selectedParticipant.profiles?.mobile_number && (
+                      <a 
+                        href={`tel:${selectedParticipant.profiles.mobile_number}`}
+                        className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-md hover:shadow-green-500/50 transition-all duration-300 hover:scale-110 active:scale-95"
+                        title={`Call ${selectedParticipant.profiles.mobile_number}`}
+                      >
+                        <Phone size={16} fill="currentColor" />
+                      </a>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm">Payment Status</p>
@@ -262,6 +284,9 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
                   Registered
                 </th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-gray-300 uppercase">
+                  Call
+                </th>
                 {!hideActions && (
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
                     Actions
@@ -295,6 +320,22 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
                     </td>
                     <td className="px-4 py-3 text-gray-400 text-sm">
                       {new Date(registration.registered_at || registration.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-center">
+                        {registration.profiles?.mobile_number ? (
+                          <a 
+                            href={`tel:${registration.profiles.mobile_number}`}
+                            className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-md hover:shadow-green-500/50 transition-all duration-300 hover:scale-110 active:scale-95"
+                            title={`Call ${registration.profiles.mobile_number}`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Phone size={18} fill="currentColor" />
+                          </a>
+                        ) : (
+                          <span className="text-gray-500 text-xs">N/A</span>
+                        )}
+                      </div>
                     </td>
                     {!hideActions && (
                       <td className="px-4 py-3">
@@ -336,7 +377,7 @@ const EventDetailsWithTeams = ({ event, registrations, showTeamDetails = true, h
                 ))
               ) : (
                 <tr>
-                  <td colSpan={hideActions ? 4 : 5} className="px-4 py-8 text-center text-gray-400">
+                  <td colSpan={hideActions ? 5 : 6} className="px-4 py-8 text-center text-gray-400">
                     <div className="flex flex-col items-center gap-2">
                       <Eye className="w-8 h-8 opacity-50" />
                       <p>No registrations found for this event</p>
