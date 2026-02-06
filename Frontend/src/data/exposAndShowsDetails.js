@@ -59,7 +59,8 @@ export const exposAndShowsDetails = [
     shortTitle: "AIDS Paper",
     title: "AIDS Paper Presentation",
     description: "Explores how artificial intelligence leverages data to convert raw information into meaningful insights, intelligent decisions, and smart systems.",
-    date: "12 February 2026",
+    date: "13 February 2026",
+
     venue: "Conference Hall A",
     price: "₹150 per member",
     registrationLink: "",
@@ -154,7 +155,8 @@ export const exposAndShowsDetails = [
     shortTitle: "IT Paper",
     title: "Information Technology Paper Presentation",
     description: "Present your innovative ideas in Information Technology.",
-    date: "12 February 2026",
+    date: "13 February 2026",
+
     venue: "Conference Hall C",
     price: "₹150 per member",
     registrationLink: "",
@@ -200,7 +202,8 @@ export const exposAndShowsDetails = [
     shortTitle: "CSBS Paper",
     title: "CSBS Paper Presentation",
     description: "Present your research in Computer Science and Business Systems.",
-    date: "12 February 2026",
+    date: "13 February 2026",
+
     venue: "Conference Hall D",
     price: "₹150 per member",
     registrationLink: "",
@@ -250,7 +253,8 @@ export const exposAndShowsDetails = [
     shortTitle: "VLSI Paper",
     title: "VLSI Paper Presentation",
     description: "Present your research in VLSI Design and Technology.",
-    date: "12 February 2026",
+    date: "13 February 2026",
+
     venue: "Conference Hall F",
     price: "₹150 per member",
     registrationLink: "",
@@ -298,7 +302,8 @@ export const exposAndShowsDetails = [
     shortTitle: "Bio Paper",
     title: "Biotechnology Paper Presentation",
     description: "Research innovation for environmental sustainability ",
-    date: "12 February 2026",
+    date: "13 February 2026",
+
     venue: "Conference Hall G",
     price: "₹150 per member",
     registrationLink: "",
@@ -479,7 +484,7 @@ export const exposAndShowsDetails = [
       facultyCoordinator: [
         {
           name: "Dr.S.Ramesh",
-          phone:"+91 9976872912",
+          phone:"+91 99768729",
         },
       ],
       studentCoordinator: [
