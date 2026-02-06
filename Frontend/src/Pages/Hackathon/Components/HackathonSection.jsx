@@ -469,7 +469,7 @@ export const hackathonEventDetails = {
           amount: "₹1,000",
         },
       ],
-      rounds: [
+      challenge: [
         {
           title: "Round-1",
           description: [
@@ -668,11 +668,6 @@ export const hackathonEventDetails = {
        lunchannouncement:[
         "Lunch and accommodation are Free for all participants during the hackathon.",
       ],
-
-
-
-      
-
        eligibility: {
         categories: [
           "Students who want to pursue a career in Hardware Development, Electronics Engineers, and Tech enthusiasts.",
@@ -740,38 +735,33 @@ export const hackathonEventDetails = {
       venue: "Shine Lab (IT PARK)",
       registrationFee:" ₹ 500 per head.",
       registrationLink: "",
-      description: "CLOUDATHON is a high-energy, hands-on cloud hackathon where ideas turn into scalable, real-world solutions. Build, deploy, and optimize cloud-powered applications while tackling today’s most exciting tech challenges. ",
-      
-
-      
-      rounds: [
+      description: "CLOUDATHON is a high-energy, hands-on cloud hackathon where ideas turn into scalable, real-world solutions. Build, deploy, and optimize cloud-powered applications while tackling today’s most exciting tech challenges. ",  
+      challenge: [
         {
-          title: "Round 1 : : Idea Submission",
+          title: "Round 1 – Idea Submission",
           description: [
-            "Each team must submit the idea clearly outlining:",
-            "Problem statement",
-            "Proposed solution",
-            "Cloud technologies to be used",
-            "Feasibility and real-world impact",
-            "Innovation and uniqueness",
+            "Problem statement selection",
+            "Concept proposal (abstract + solution outline)",
+            "Screening by jury",
           ],
         },
         {
-          title: "Round 2 : Cloud Build & Demo Round",
+          title: "Round 2 – Hackathon Development",
           description: [
-
-            "In this round, teams are expected to design, implement, and demonstrate their proposed solution using cloud technologies.",
-            "Build a cloud-based prototype or working model",
-            "Use cloud services such as compute, storage, databases, APIs, serverless, etc.",
-            "Integrate supporting technologies (if applicable)",  
-            "AI/ML, IoT, Data Analytics, Automation, Security, etc.",
-              "Demonstrate scalability or cloud advantages",
-              "Auto-scaling, pay-as-you-go, remote access, performance, or availability"
+            "Prototype / model / simulation / app / design",
+            "Mentor interaction",
+            "Progress evaluation",
+          ]
+        },
+        {
+          title: "Final Round – Presentation",
+          description: [
+            "5–7 minute pitch",
+            "Demo or working model",
+            "Jury Q&A",
           ]
         }
       ], 
-
-
       eligibility: {
         categories: [
           "Each team must consist of maximum 2 members",
@@ -831,6 +821,108 @@ export const hackathonEventDetails = {
         ],
       },
     },
+    "hackathon-9": {
+      id: "hackathon-9",
+      title: "Sustainathon – Hackathon for Sustainable Development Goals (SDG) ",
+      date: "13 February 2026",
+      venue: " ",
+      registrationFee:" ₹ 500 per head.",
+      registrationLink: "",
+      description: "Sustainathon is a problem-solving hackathon focused on creating innovative, practical, and scalable solutions aligned with the United Nations Sustainable Development Goals (SDGs). Participants will work in teams to design technology-driven or social-impact solutions addressing real-world sustainability challenges.",
+    
+      challenge: [
+        {
+          title: "Round 1 : : Idea Submission",
+          description: [
+            "Each team must submit the idea clearly outlining:",
+            "Problem statement",
+            "Proposed solution",
+            "Cloud technologies to be used",
+            "Feasibility and real-world impact",
+            "Innovation and uniqueness",
+          ],
+        },
+        {
+          title: "Round 2 : Cloud Build & Demo Round",
+          description: [
+            "In this round, teams are expected to design, implement, and demonstrate their proposed solution using cloud technologies.",
+            "Build a cloud-based prototype or working model",
+            "Use cloud services such as compute, storage, databases, APIs, serverless, etc.",
+            "Integrate supporting technologies (if applicable)",  
+            "AI/ML, IoT, Data Analytics, Automation, Security, etc.",
+            "Demonstrate scalability or cloud advantages",
+            "Auto-scaling, pay-as-you-go, remote access, performance, or availability"
+          ]
+        }
+      ],
+      eligibility: {
+        categories: [
+          "Each team must consist of exactly 2 members",
+          "Interdisciplinary teams are encouraged",
+          "One member will act as the team lead",
+          "A participant can join only one team",
+        ],
+      },
+
+      theme: {
+        details: [
+          "Clean Water and Sanitation",
+          "Affordable and Clean Energy",
+          "Sustainable Cities and Communities",
+          "Climate Action",
+          "Life on Land / Life Below Water",
+          "Quality Education",
+          "Good Health and Well-being",
+          "Industry, Innovation & Infrastructure",
+          "No Poverty",
+          "Any SDG-aligned sustainability challenge"
+        ]
+      },
+
+      rules: [
+        "Teams must work only on SDG-related problems",
+        "Ideas must be original and not previously published",
+        "Plagiarism will lead to disqualification",
+        "Teams must submit all deliverables within deadlines",
+        "Use of open-source tools is allowed",
+        "Internet access allowed for research only",
+        "Judges' decision will be final",
+        "Teams must maintain ethical and respectful conduct",
+        "Late submissions will not be accepted",
+        "Any hardware/software must be arranged by the team"
+            ],
+      schedule: [
+        {
+          date: "13 February 2026",
+          time: "9:00 AM to 4:00 PM",
+          location: "",
+        },
+      ],
+      contact: {
+        facultyCoordinator: [
+          {
+            name: "Dr. K Mahalakshmi",
+            phone: "+91 9944286457",
+          },
+          {
+            name: "Ms. S. Jaividhya",
+            phone: "+91 9585304763",
+          },
+          {
+            name: "Dr. K. Balasubramani",
+            phone: "+91 9789252952",
+          }
+        ],
+        studentCoordinator: [
+          {
+            name: " ",
+            phone: "",
+          },
+        ],
+      },
+    },
+
+
   };
 
 const HackathonSection = () => {

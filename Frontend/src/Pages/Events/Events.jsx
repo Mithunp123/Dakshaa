@@ -123,7 +123,7 @@ const Events = () => {
     {
       id: 7,
       image: NonTechnicalImage,
-      name: "Project/Paper/Poster",
+      name: "Paper & Poster  Presentation",
       descriptionImages: exposAndShowsEvents,
     },
   ];
@@ -218,8 +218,8 @@ const Events = () => {
       if (workshop) {
         setSelectedWorkshop(workshop);
       }
-    } else if (eventId && eventId.startsWith("expo")) {
-      // Expos & Shows - open modal instead of navigating
+    } else if (eventId && (eventId.startsWith("paper-") || eventId.startsWith("poster-") || eventId.startsWith("project-") || eventId === "auto-show")) {
+      // Expos & Shows - open modal instead of navigating (paper, poster, project presentations and auto show)
       const expo = exposAndShowsDetails.find(e => e.id === eventId);
       if (expo) {
         setSelectedExpo(expo);
@@ -1977,7 +1977,7 @@ const Events = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-slate-900 border-2 border-primary/50 relative max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-slate-900 border-2 border-primary/50 rounded-lg relative max-w-6xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -1987,7 +1987,7 @@ const Events = () => {
               <X size={24} />
             </button>
 
-            <div className="p-6 md:p-8">
+            <div className="p-6 md:p-10">
               <div className="flex flex-col md:flex-row gap-8 mb-8">
                 <div className="w-full md:w-1/3">
                   <img
@@ -2010,7 +2010,8 @@ const Events = () => {
                     {selectedExpo.description}
                   </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                  {/* Event Details */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div className="flex items-center gap-2 text-gray-300">
                       <Calendar className="w-5 h-5 text-primary" />
                       <span className="text-sm">{selectedExpo.date}</span>
@@ -2025,18 +2026,74 @@ const Events = () => {
                     </div>
                   </div>
 
-                  <div className="mb-4">
-                    <div className="inline-block px-4 py-2 bg-green-600/10 border border-green-600 text-green-300 rounded-md text-sm font-medium">
-                      Free Event — No Registration Required
-                    </div>
-                  </div>
+                  {/* Register Button */}
+                  <button
+                    className="w-full md:w-auto px-8 py-3 bg-primary hover:bg-primary/90 text-white font-bold text-lg tracking-widest transition-all shadow-lg shadow-primary/20 border-2 border-primary"
+                    onClick={() => {
+                      if (!user) {
+                        setSelectedExpo(null);
+                        navigate('/login', { state: { returnTo: '/register-events' } });
+                      } else {
+                        setSelectedExpo(null);
+                        navigate('/register-events', { state: { skipToEventSelection: true } });
+                      }
+                    }}
+                  >
+                    REGISTER NOW
+                  </button>
                 </div>  
               </div>
+
+              {/* Theme Section */}
+              {selectedExpo.theme && selectedExpo.theme.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Theme
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {selectedExpo.theme.map((item, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="flex items-start gap-2 text-gray-300"
+                      >
+                        <span className="text-primary mt-1">▸</span>
+                        <span className="text-sm">{item}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Rules & Guidelines Section */}
+              {selectedExpo.rules && selectedExpo.rules.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Rules & Guidelines
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {selectedExpo.rules.map((rule, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="flex items-start gap-2 text-gray-300"
+                      >
+                        <span className="text-primary mt-1">▸</span>
+                        <span className="text-sm">{rule}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {selectedExpo.schedule && selectedExpo.schedule.length > 0 && (
                 <div className="mb-8">
                   <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
-                    Schedule
+                    Event Schedule
                   </h3>
                   <div className="space-y-3">
                     {selectedExpo.schedule.map((event, idx) => (
@@ -2048,7 +2105,7 @@ const Events = () => {
                         className="bg-gradient-to-r from-secondary/10 to-transparent p-4 rounded-lg"
                       >
                         <div className="flex flex-wrap gap-4 text-sm text-gray-300">
-                          {event.round && <div><span className="text-primary font-semibold">Session:</span> {event.round}</div>}
+                          {event.round && <div><span className="text-primary font-semibold">Round:</span> {event.round}</div>}
                           {event.date && <div><span className="text-primary font-semibold">Date:</span> {event.date}</div>}
                           {event.time && <div><span className="text-primary font-semibold">Time:</span> {event.time}</div>}
                           {event.duration && <div><span className="text-primary font-semibold">Duration:</span> {event.duration}</div>}
@@ -2061,40 +2118,98 @@ const Events = () => {
                 </div>
               )}
 
+              {/* Submission Details Section */}
+              {((selectedExpo.papersubmission && selectedExpo.papersubmission.length > 0) || 
+                (selectedExpo.postersubmission && selectedExpo.postersubmission.length > 0)) && (
+                <div className="mb-8">
+                  <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
+                      <span className="text-yellow-400 font-semibold text-sm">Submission Details:</span>
+                    </div>
+                    <div className="ml-7 space-y-2">
+                      {selectedExpo.papersubmission?.length > 0 && (
+                        <div className="text-yellow-300 text-sm break-words space-y-1">
+                          {selectedExpo.papersubmission.map((item, idx) => (
+                            <div key={`paper-submission-${idx}`} className="space-y-1">
+                              {Array.isArray(item.description)
+                                ? item.description.map((line, lineIdx) => (
+                                    <p key={`paper-submission-${idx}-${lineIdx}`}>{line}</p>
+                                  ))
+                                : item.description && <p>{item.description}</p>}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {selectedExpo.postersubmission?.length > 0 && (
+                        <div className="text-yellow-300 text-sm break-words space-y-1">
+                          {selectedExpo.postersubmission.map((item, idx) => (
+                            <div key={`poster-submission-${idx}`} className="space-y-1">
+                              {Array.isArray(item.description)
+                                ? item.description.map((line, lineIdx) => (
+                                    <p key={`poster-submission-${idx}-${lineIdx}`}>{line}</p>
+                                  ))
+                                : item.description && <p>{item.description}</p>}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Contact Section */}
               {selectedExpo.contact && (
                 <div className="mb-8">
                   <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
                     Contact Information
                   </h3>
-
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Faculty Coordinators */}
                     {selectedExpo.contact.facultyCoordinator && selectedExpo.contact.facultyCoordinator.length > 0 && (
                       <div>
-                        <h4 className="text-lg font-semibold text-secondary mb-3">Faculty Coordinators</h4>
+                        <h4 className="text-lg font-semibold text-secondary mb-3">
+                          Faculty Coordinators
+                        </h4>
                         <div className="space-y-4">
                           {selectedExpo.contact.facultyCoordinator.map((faculty, idx) => (
-                            <div key={idx} className="bg-primary/5 border border-primary/20 p-4">
+                            <div
+                              key={idx}
+                              className="bg-primary/5 border border-primary/20 p-4"
+                            >
                               <p className="text-gray-200 font-medium mb-2">{faculty.name}</p>
-                              {faculty.designation && <p className="text-gray-400 text-sm mb-1">{faculty.designation}</p>}
-                              {faculty.phone && <p className="text-gray-400 text-sm">📞 {faculty.phone}</p>}
-                              {faculty.email && <p className="text-gray-400 text-sm break-all">✉️ {faculty.email}</p>}
+                              {faculty.phone && (
+                                <p className="text-gray-400 text-sm">📞 {faculty.phone}</p>
+                              )}
+                              {faculty.email && (
+                                <p className="text-gray-400 text-sm break-all">✉️ {faculty.email}</p>
+                              )}
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
 
+                    {/* Student Coordinators */}
                     {selectedExpo.contact.studentCoordinator && selectedExpo.contact.studentCoordinator.length > 0 && (
                       <div>
-                        <h4 className="text-lg font-semibold text-secondary mb-3">Student Coordinators</h4>
+                        <h4 className="text-lg font-semibold text-secondary mb-3">
+                          Student Coordinators
+                        </h4>
                         <div className="space-y-4">
                           {selectedExpo.contact.studentCoordinator.map((student, idx) => (
-                            <div key={idx} className="bg-primary/5 border border-primary/20 p-4">
+                            <div
+                              key={idx}
+                              className="bg-primary/5 border border-primary/20 p-4"
+                            >
                               <p className="text-gray-200 font-medium mb-2">{student.name}</p>
-                              {student.year && <p className="text-gray-400 text-sm mb-1">{student.year}</p>}
-                              {student.department && <p className="text-gray-400 text-sm mb-1">{student.department}</p>}
-                              {student.phone && <p className="text-gray-400 text-sm">📞 {student.phone}</p>}
-                              {student.email && <p className="text-gray-400 text-sm break-all">✉️ {student.email}</p>}
+                              {student.phone && (
+                                <p className="text-gray-400 text-sm">📞 {student.phone}</p>
+                              )}
+                              {student.email && (
+                                <p className="text-gray-400 text-sm break-all">✉️ {student.email}</p>
+                              )}
                             </div>
                           ))}
                         </div>
