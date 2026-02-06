@@ -2944,7 +2944,8 @@ const RegistrationForm = () => {
                           , including the <strong className="text-red-400">no refund policy</strong>.
                           <br />
                           <strong className="text-orange-400 block mt-2">
-                             ⚠️ Warning: Do not change the payment amount. Any modification will be detected.
+                             Please wait while your payment is being processed.
+                             This may take a few seconds. <span className="text-red-400">Do not close or refresh this page</span> — you will be redirected automatically to the Dashboard once the process is complete.
                           </strong>
                         </p>
                         {!termsAccepted && (
