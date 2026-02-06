@@ -12,8 +12,8 @@ import txtasso from "../assest/tafeta_txt_logo.webp";
 import csbsasso from "../assest/Techragonz_csbs_logo.webp";
 import vlsiasso from "../assest/vlsi-logo.webp";
 import itasso from "../assest/zita_it_logo.webp";
-import cseasso from "../assest/ascilogo.png";
-import cisso from "../assest/zion.jpeg";
+import cseasso from "../assest/ascilogo.webp";
+import cisso from "../assest/zion.webp";
 
 
 import kavinesh from "../../../assets/team_members/kavinesh.webp";

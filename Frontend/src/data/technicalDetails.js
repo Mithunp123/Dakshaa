@@ -431,7 +431,7 @@ export const technicalDetails = [
   {
     id: "tech-civil-1",
     shortTitle: "Paper Presentation",
-    title: "Paper Presentation",
+    title: "Department of Civil Engineering",
     description: "This presentation provides a clear and structured explanation of the selected concept, covering its basic principles, system design, and real-world relevance. It highlights how the idea can be applied practically, discusses current developments, and points out key challenges and future scope, helping the audience understand both theory and application.",
     img: Tech8,
     date: "February 13, 2026",
@@ -514,8 +514,8 @@ export const technicalDetails = [
   },
   {
     id: "tech-cse-1",
-    shortTitle: "BotXhibit",
-    title: "BOTXHIBIT",
+    shortTitle: "BotXhibit (Paper Presentation",
+    title: "Department of Computer Science and Engineering",
     description: "A technical paper presentation event focused on innovative concepts and research in software and hardware bot technologies. Participants must present the problem statement, proposed solution, system architecture, working methodology, and applications. Prototype is not mandatory. Evaluation will be based on originality, technical content, feasibility, and presentation quality.",
     img: Tech10,
     date: "February 13, 2026",
@@ -692,7 +692,7 @@ export const technicalDetails = [
   {
     id: "tech-eee-1",
     shortTitle: "Paper presentation",
-    title: "Paper presentation",
+    title: "Department of Electrical and Electronics Engineering",
     description: "Paper Presentation is a technical event that provides a platform for students and researchers to present their innovative ideas, research findings, and technical knowledge in front of an expert panel. Participants are required to prepare and present a research or review paper related to engineering, science, technology, or management domains.",
     img: Tech13,
     date: "February 13, 2026",
@@ -787,7 +787,7 @@ export const technicalDetails = [
   {
     id: "tech-ft",
     shortTitle: "Poster Presentation",
-    title: "POSTER PRESENTATION",
+    title: "Department of FOOD TECHNOLOGY",
     description: "This poster presentation provides students a platform to showcase innovative ideas and research on emerging food processing technologies. Participants will visually present advanced techniques, applications, and benefits that enhance food quality, safety, and sustainability. The session encourages knowledge sharing, creativity, and scientific discussion among students and experts.",
     img: Tech14,
     date: "February 13, 2026",
@@ -984,7 +984,7 @@ export const technicalDetails = [
   {
     id: "tech-mct",
     shortTitle: "Paper Presentation",
-    title: "Paper Presentation",
+    title: "Department of Mechatronics Engineering",
     description: "This presentation provides a clear and structured explanation of the selected concept, covering its basic principles, system design, and real-world relevance. It highlights how the idea can be applied practically, discusses current developments, and points out key challenges and future scope, helping the audience understand both theory and application.",
     img: Tech16,
     date: "February 13, 2026",
@@ -1071,7 +1071,7 @@ export const technicalDetails = [
   {
     id: "tech-mech",
     shortTitle: "Paper Presentation",
-    title: "PAPER PRESENTATION",
+    title: "Department of Mechanical Engineering",
     description: "This event allows students to present technical ideas and research in engineering fields. Participants showcase innovation, analysis, and problem-solving through structured presentations. A Q&A session helps evaluate technical depth and communication skills.",
     img: Tech17,
     date: "February 13, 2026",
@@ -1229,7 +1229,7 @@ export const technicalDetails = [
   {
     id: "tech-txt-1",
     shortTitle: "Paper Presentation",
-    title: "PAPER PRESENTATION",
+    title: "Department of Textile Technology",
     description: "The paper presentation focuses on providing an overview of sustainability and its growing importance in the textile industry, along with recent trends and innovations in textile technology and manufacturing. It addresses key issues related to textile waste and discusses methods such as recycling, reuse, and upcycling to promote sustainable practices. Participants will also be introduced to smart textiles and their basic applications in daily life.",
     img: Tech20,
     date: "February 13, 2026",
@@ -1314,8 +1314,8 @@ export const technicalDetails = [
   },
   {
     id: "tech-vlsi",
-    shortTitle: "CoreX",
-    title: "CoreX (Project Presentation)",
+    shortTitle: "CoreX (Project Presentation)",
+    title: "Department of Electronics Engineering (VLSI Design and Technology)",
     description: "A technical project presentation competition where teams (1-3 members) showcase innovative projects in engineering, technology, or innovation. Each team gets 10 minutes to present and 5 minutes for Q&A, with originality being crucial. A Q&A session helps evaluate technical depth and communication skills. The winning team will be awarded with cash prize, and attendance is mandatory for certification.",
     img: Tech21,
     date: "February 13, 2026",
@@ -1406,7 +1406,7 @@ export const technicalDetails = [
   {
     id: "tech-ft-1",
     shortTitle: "Paper Presentation",
-    title: "PAPER PRESENTATION",
+    title: "Department of Food Technology",
     description: "Green Innovation in Food Processing Techniques is a platform that celebrates ideas and innovations shaping the future of food. The conference brings together students, researchers, academicians, and industry professionals to explore eco-friendly solutions, safe food practices, and sustainable technologies in food processing. This event encourages creative thinking, knowledge sharing, and meaningful discussions on building a greener, healthier, and more sustainable food system.",
     img: Tech22,
     date: "February 13, 2026",
@@ -1451,11 +1451,10 @@ export const technicalDetails = [
         },
       ],
     rules: [
-      "Individual or team (up to 3 members) participation allowed",
+      "Team (up to 3 members) participation allowed",
       "Paper must be original and plagiarism-free",
       "Abstract (max 250 words) and full paper must be submitted before the deadline",
-      "Abstract Submission Date:7 February",
-      "Full Paper Submission Date:10 February",
+      "Abstract Submission Date:10 February",
       "8–10 minutes presentation + Q&A",
       "Judges' decision is final",
     ],
@@ -1490,7 +1489,7 @@ export const technicalDetails = [
   {
     id: "tech-ece1",
     shortTitle: "Paper Presentation",
-    title: "PAPER PRESENTATION",
+    title: "Department of Electronics & Communication Engineering",
     description: "The field of Electronics and Communication Engineering is rapidly evolving with revolutionary trends such as 5G and upcoming 6G communication, Internet of Things (IoT), Artificial Intelligence in communication systems, and advanced embedded technologies. These innovations are transforming the way in high-speed connectivity, smart automation, and intelligent decision-making. Applications like smart cities, autonomous vehicles, healthcare monitoring, industrial automation, and next-generation wireless networks.",
     img: Tech23,
     date: "February 13, 2026",

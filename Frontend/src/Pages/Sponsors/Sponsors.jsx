@@ -10,7 +10,7 @@ import csbswk from "./assets/csbswk.webp";
 import csewk from "./assets/csewk.webp";
 import ecewk from "./assets/ecewk.webp";
 import eeewk from "./assets/eeewk.webp";
-import ftwk from "./assets/ftwknew.jpeg";
+import ftwk from "./assets/ftwknew.webp";
 import iprwk from "./assets/iprwk.webp";
 import itwk from "./assets/itwk.webp";
 import mcawk from "./assets/mcawk.webp";

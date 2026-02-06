@@ -56,8 +56,8 @@ export const exposAndShowsDetails = [
   {
     id: "paper-aids",
     img: aidspaper,
-    shortTitle: "AIDS Paper",
-    title: "AIDS Paper Presentation",
+    shortTitle: "Paper Presentation",
+    title: "Department of Artifical Intelligence and Data Science ",
     description: "Explores how artificial intelligence leverages data to convert raw information into meaningful insights, intelligent decisions, and smart systems.",
     date: "13 February 2026",
 
@@ -68,7 +68,7 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to: "
+          "Paper should be mailed to: bhargavc127@gmail.com"
         ],
       },
     ],
@@ -101,8 +101,8 @@ export const exposAndShowsDetails = [
   {
     id: "paper-aiml",
     img: aimlpaper,
-    shortTitle: "AI/ML Paper",
-    title: "Paper presentation ",
+    shortTitle: "Paper Presentation ",
+    title: "Department of Artificial Intelligence and Machine Learning",
     description: "Recent Trends in Machine Learning” explores the latest advancements shaping intelligent systems, including deep learning, generative AI, and self-supervised learning. It highlights how ML is transforming industries such as healthcare, finance, automation, and cybersecurity through data-driven decision-making. The theme emphasizes emerging techniques like explainable AI, federated learning, and AI-driven automation for real-world applications. It also reflects the growing focus on ethical AI, efficiency, and scalability in modern machine learning systems.",
     date: "13 February 2026",
     venue: "Conference Hall B",
@@ -112,7 +112,7 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to:aevaksrct@gmail.com"
+          "Paper should be mailed to: aevaksrct@gmail.com"
         ],
       },
     ],
@@ -152,8 +152,8 @@ export const exposAndShowsDetails = [
   {
     id: "paper-it",
     img: itpaper,
-    shortTitle: "IT Paper",
-    title: "Information Technology Paper Presentation",
+    shortTitle: "Paper Presentation",
+    title: "Department of Information Technology Paper Presentation",
     description: "Present your innovative ideas in Information Technology.",
     date: "13 February 2026",
 
@@ -199,23 +199,23 @@ export const exposAndShowsDetails = [
   {
     id: "paper-csbs",
     img: csbspaper,
-    shortTitle: "CSBS Paper",
-    title: "CSBS Paper Presentation",
-    description: "Present your research in Computer Science and Business Systems.",
+    shortTitle: "Paper Presentation",
+    title: "Department of Computer Science and Business Systems",
+    description: "How AI technologies are improving industries and shaping the future of society",
     date: "13 February 2026",
 
-    venue: "Conference Hall D",
+    venue: "",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to: "
+          "Paper should be mailed to: thulasisambath2@gmail.com"
         ],
       },
     ],
-    theme: ["Bridging Technology and Business"],
+    theme: ["Artificial Intelligence: Innovations, Applications, and Future Impact"],
     rules: [
       "Papers must be original and submitted in PDF format before the deadline",
       "Participants may present individually or in teams (max 2–3 members)",
@@ -227,20 +227,16 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of CSBS",
-          email: "",
+          name: "Mrs K Geetha ",
+          phone: "+91 74024 61799",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "CSBS",
+          name: "Thulasidevi S",
+          phone:"+91 73580 21626"
         },
-        {
-          name: "Student Coordinator 2",
-          department: "CSBS",
-        },
+      
       ],
     },
   },
@@ -250,8 +246,8 @@ export const exposAndShowsDetails = [
   {
     id: "paper-vlsi",
     img: vlsipaper,
-    shortTitle: "VLSI Paper",
-    title: "VLSI Paper Presentation",
+    shortTitle: "Paper Presentation",
+    title: "Department of Electronics Engineering (VLSI Design and Technology)",
     description: "Present your research in VLSI Design and Technology.",
     date: "13 February 2026",
 
@@ -299,8 +295,8 @@ export const exposAndShowsDetails = [
   {
     id: "paper-bio",
     img: biopaper,
-    shortTitle: "Bio Paper",
-    title: "Biotechnology Paper Presentation",
+    shortTitle: "Paper Presentation",
+    title: "Department of Biotechnology",
     description: "Research innovation for environmental sustainability ",
     date: "13 February 2026",
 
@@ -344,9 +340,9 @@ export const exposAndShowsDetails = [
   {
     id: "poster-aids",
     img: aidsposter,
-    shortTitle: "AIDS Poster",
-    title: "MindMatrix",
-    description: "Our event provides a platform for students to present innovative ideas and solutions to real-world problems.Participants will showcase their concepts visually through posters and explain them to the judges. The event encourages creativity, problem-solving, and effective communication skills.",
+    shortTitle: "Department of Artificial Intelligence and Data Science",
+    title: "Thinking Smart: AI in Action",
+    description: "Our event provides a platform for students to present innovative ideas and solutions to real-world problems.Participants will showcase their concepts visually through posters and explain them to the judges.The event encourages creativity, problem-solving, and effective communication skills.",
     date: "13 February 2026",
     venue: "Exhibition Hall A",
     price: "₹150 per member",
@@ -400,16 +396,26 @@ export const exposAndShowsDetails = [
   {
     id: "poster-aiml",
     img: aimlposter,
-    shortTitle: "AI/ML Poster",
-    title: "AI/ML Poster Presentation",
-    description: "Showcase your AI and Machine Learning research through creative poster displays.",
+    shortTitle: "Department of Artificial Intelligence and Machine Learning",
+    title: "Teaching Machines to Learn and Decide ",
+    description: "Teaching Machines to Learn and Decide this poster presentation explores how machines learn from data, recognize patterns, improve through mistakes, and make intelligent decisions, highlighting the core principles of Machine Learning and its resemblance to human thinking",
     date: "13 February 2026",
     venue: "Exhibition Hall B",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
    
-    theme: ["Machine Learning Visualized"],
+    theme: [
+
+"How Machines Learn From Mistakes",
+
+"Data to Decisions: The Journey of Machine Learning",
+
+"Can Machines Think Like Humans?",
+
+"Learning From Patterns: The Secret Behind Smart AI",
+
+"When Data Teaches Machines What to Do"],
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
@@ -451,7 +457,7 @@ export const exposAndShowsDetails = [
   {
     id: "poster-civil",
     img: civilposter,
-    shortTitle: "Civil Poster",
+    shortTitle: "Deparment of Civil Engineering",
     title: "GreenTech Construction",
     description: "AI-Based Smart Sustainable Construction",
     date: "13 February 2026",
@@ -500,7 +506,7 @@ export const exposAndShowsDetails = [
   {
     id: "poster-it",
     img: itposter,
-    shortTitle: "IT Poster",
+    shortTitle: "Department of Information Technology",
     title: "Next-Gen Technologies",
     description: "Display your innovative IT solutions through creative poster presentations.",
     date: "13 February 2026",
@@ -531,18 +537,18 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
+          name: "",
           designation: "Professor, Dept. of IT",
           email: "",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
+          name: "",
           department: "IT",
         },
         {
-          name: "Student Coordinator 2",
+          name: "",
           department: "IT",
         },
       ],
@@ -552,7 +558,7 @@ export const exposAndShowsDetails = [
   {
     id: "poster-cse",
     img: cseposter,
-    shortTitle: "CSE Poster",
+    shortTitle: "Department of Computer Science and Engineering",
     title: "NEURO LEARN ",
     description: "AI helps detect cyber threats, prevent attacks, and improve digital security through smart data analysis.AI chatbots support learning by providing instant help, personalized content, and interactive education.",
     date: "13 February 2026",
@@ -588,7 +594,7 @@ export const exposAndShowsDetails = [
       ],
       studentCoordinator: [
         {
-          name: "SHARAN ",
+          name: "sharan ",
           department: "CSE",
           phone: "+91 9363906022",
         },
@@ -600,7 +606,7 @@ export const exposAndShowsDetails = [
   {
     id: "poster-ece",
     img: eceposter,
-    shortTitle: "ECE Poster",
+    shortTitle: "Department of Electronics and Communication Engineering",
     title: "Innovations in AI, Embedded Systems, and Next-Generation Wireless Communication",
     description: "This poster presentation provides students with a platform to showcase innovative ideas and research in Electronics and Communication Engineering. Participants will visually present emerging technologies, system designs, applications, and advancements in areas such as electronics, communication systems, embedded systems, VLSI, IoT, and signal processing. The session promotes technical knowledge sharing, creativity, and meaningful scientific discussions among students, faculty members, and industry experts.",
     date: "13 February 2026",
@@ -650,16 +656,19 @@ export const exposAndShowsDetails = [
   {
     id: "poster-eee",
     img: eeeposter,
-    shortTitle: "EEE Poster",
+    shortTitle: "Department of Electrical and Electronics Engineering",
     title: "Electro Nexus",
-    description: "Showcase your electrical engineering innovations through poster displays.",
+    description: "This poster presentation explores four key domains of Electrical and Electronics Engineering .It highlights how intelligent grids enhance power monitoring,renewables enable clean energy generation, electric vehicle transform transportation,and protection systems ensure network safety and stability.Together,these technologies form the backbone of modern electrical infrastructure,supporting efficient,reliable and sustainable power systems.",
     date: "13 February 2026",
     venue: "Exhibition Hall G",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     
-    theme: ["1.Smart Grid Technology.",
+    theme: ["Smart Grid Technology ",
+      "Renewable Energy Systems",
+      "Electric Vehicles and Charging Infrastructure  ",
+    "Power System Protection and Relays",
 
     ],
     rules: [
@@ -678,19 +687,14 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of EEE",
-          email: "",
+          name: "Dr.P.ARAVINDAN",
+          phone :"+91 99524 25269",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "EEE",
-        },
-        {
-          name: "Student Coordinator 2",
-          department: "EEE",
+          name: "THIRUSELVAM S",
+          phone :"+91 993454 94080",
         },
       ],
     },
@@ -699,7 +703,7 @@ export const exposAndShowsDetails = [
   {
     id: "poster-csbs",
     img: csbsposter,
-    shortTitle: "CSBS Poster",
+    shortTitle: "Department of Computer Science and Business Systems",
     title: "Where Humanity Meets the Future ",
     description: "Mental Health in the Age of Social Media: Shows the difference between fake online happiness and real emotions, promoting awareness and support.From Classroom to Corporate: Explains the journey from student learning to industry skills and careers.Human-Centered Automation: Highlights how technology supports humans instead of replacing them.",
     date: "13 February 2026",
@@ -747,7 +751,7 @@ export const exposAndShowsDetails = [
   {
     id: "poster-vlsi",
     img: vlsiposter,
-    shortTitle: "VLSI Poster",
+    shortTitle: "Department of Electronics Engineering (VLSI Design and Technology)",
     title: "Beyond silicon - intelligent and emerging technologies ",
     description: "This theme highlights how modern VLSI is evolving beyond traditional silicon to enable intelligent and emerging technologies like AI hardware, edge devices, wearable health systems, autonomous vehicles, and quantum computing. It focuses on smart, efficient chips that power the future of real-time, decision-making systems.",
     date: "13 February 2026",
@@ -790,7 +794,7 @@ export const exposAndShowsDetails = [
   {
     id: "poster-bio",
     img: bioposter,
-    shortTitle: "Bio Poster",
+    shortTitle: "Department of Biotechnology",
     title: "Biotechnology Poster Presentation",
     description: "Showcase your biotechnology research through creative visual posters.",
     date: "13 February 2026",
@@ -832,7 +836,7 @@ export const exposAndShowsDetails = [
   {
     id: "poster-mech",
     img: mechposter,
-    shortTitle: "Mech Poster",
+    shortTitle: "Department of Mechanical Engineering",
     title: "Smart and Sustainable Engineering Solutions for the Future",
     description: "This theme focuses on advanced mechanical engineering innovations that promote smart automation, sustainability, and efficiency across industries. It covers Industry 4.0 technologies, zero-emission systems, and smart agricultural solutions that integrate digital intelligence, energy efficiency, and eco-friendly design to address future industrial, environmental, and societal challenges.",
     date: "13 February 2026",
@@ -867,7 +871,6 @@ export const exposAndShowsDetails = [
       facultyCoordinator: [
         {
           name: "Mr.P.Tamilrasu",
-          designation: "Assistant Professor, Dept. of Mechanical Engineering",
           phone: "+91 9600792888",
           
         },
@@ -875,15 +878,11 @@ export const exposAndShowsDetails = [
       studentCoordinator: [
         {
           name: "Ms.A.Harini",
-          department: "Mechanical Engineering",
           phone: "+91 6379414177",
-          email:"amalrajharini@gmail.com",
         },
         {
           name: "Mr.G.S.Priyan",
-          department: "Mechanical Engineering",
           phone: "+91 8668057985",
-          email:"Gspriyan6661@gmail.com",
         },
       ],
     },
@@ -892,7 +891,7 @@ export const exposAndShowsDetails = [
   {
     id: "poster-mct",
     img: mctposter,
-    shortTitle: "MCT Poster",
+    shortTitle: "Department of Mechatronics Engineering",
     title: "Mechatronics Poster Presentation",
     description: "Display your mechatronics innovations through creative poster displays.",
     date: "13 February 2026",
@@ -901,7 +900,7 @@ export const exposAndShowsDetails = [
     registrationLink: "",
     schedule: [],
    
-    theme: ["Integration of Mechanics and Electronics"],
+    theme: [""],
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
@@ -939,7 +938,7 @@ export const exposAndShowsDetails = [
   {
     id: "poster-txt",
     img: txtposter,
-    shortTitle: "Textile Poster",
+    shortTitle: "Department of Textile Technology",
     title: "Sustainable Technical Textiles",
     description: "This poster presentation highlights the concept of Sustainable Technical Textiles by focusing on sustainable high-performance fibers, resource-efficient textile engineering processes, circular design and end-of-life optimization, and reverse engineering in technical textiles. Together, these approaches aim to minimize environmental impact while maintaining the functional performance required for advanced technical and industrial textile applications.",
     date: "13 February 2026",
