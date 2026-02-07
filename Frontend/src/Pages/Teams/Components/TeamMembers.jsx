@@ -83,7 +83,7 @@ const eventCoordinators = [
   //{ id: 105, name: "Vignesh", department: "Department of IT", img: ec5, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
   { id: 106, name: "Shanmugeshwara A", department: "ASCI", img: ec6, role: "Event Coordinator", phone: "+91 94871 19381", associationLogo: cseasso },
   { id: 107, name: "Karmuhilan V ", department: "SPICEE", img: kari, role: "Event Coordinator", phone: "+91 90252 44374", associationLogo: eeeasso },
-  {id : 117 , name:"Kanya S", department:"Neomutant Association", img:kanya, role: "Event Coordinator", phone: "+91 63834 53787", associationLogo: btasso},
+  {id : 117 , name:"Kanya P", department:"Neomutant Association", img:kanya, role: "Event Coordinator", phone: "+91 63834 53787", associationLogo: btasso},
   { id: 108, name: "Niranjana Devi S", department: "Veda", img: ec8, role: "Event Coordinator", phone: "+91 82485 88418", associationLogo: vlsiasso},
   { id: 109, name: "Chandra Mohan G", department: "Techragonz", img: ec9, role: "Event Coordinator", phone: "+91 88709 25956", associationLogo: csbsasso },
   { id: 110, name: "Mujamil S", department: "SPICEE", img: ec10, role: "Event Coordinator", phone: "+91 75029 68410", associationLogo: eeeasso },

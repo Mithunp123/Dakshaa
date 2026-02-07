@@ -183,8 +183,8 @@ const conferences = [
         ],
         studentCoordinator: [
           {
-            name: "Ms.S. Muthaal ",
-            phone: "+91 80565 88925",
+            name: "Mr.S.Sabareesh ",
+            phone: "+91 63856 52095",
             email: "",
           },
           {

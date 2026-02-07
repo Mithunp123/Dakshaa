@@ -694,7 +694,7 @@ export const exposAndShowsDetails = [
       studentCoordinator: [
         {
           name: "THIRUSELVAM S",
-          phone :"+91 993454 94080",
+          phone :"+91 93454 94080",
         },
       ],
     },
@@ -795,15 +795,28 @@ export const exposAndShowsDetails = [
     id: "poster-bio",
     img: bioposter,
     shortTitle: "Department of Biotechnology",
-    title: "Biotechnology Poster Presentation",
-    description: "Showcase your biotechnology research through creative visual posters.",
+    title: "Bio-Revolution From Lab To Life",
+    description: "Showcase innovative ideas and research in biotechnology & life sciences through visual scientific posters",
     date: "13 February 2026",
     venue: "",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     
-    theme: ["Biotech Innovations for Life"],
+    theme: [
+      "Human Health & Medicine",
+      "Food & Nutrition Innovation",
+      "Environment & Sustainability",
+      "Microbes & Their Applications",
+      "Biotechnology in Daily Life",
+      "Drug Discovery & Therapeutics",
+      "Agriculture & Plant Science",
+      "Technology Meets Biology",
+      "From Research to Real-World Application",
+      "Emerging Biological Innovations",
+      "Public Health & Global Challenges",
+      "Interdisciplinary Biological Solutions",
+    ],
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
       "Standard poster size and format should be followed.",
@@ -815,19 +828,14 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of Biotechnology",
-          email: "",
+          name: "Dr M Nithya",
+          phone: "+91 77088 44446",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "Biotechnology",
-        },
-        {
-          name: "Student Coordinator 2",
-          department: "Biotechnology",
+          name: "Madhannath S",
+          phone :"+91 93420 80097",
         },
       ],
     },
