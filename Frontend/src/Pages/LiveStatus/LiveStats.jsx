@@ -53,6 +53,15 @@ const getDeptFromId = (rawId) => {
     return null; 
 };
 
+const fetchPaidRegistrationsByEventIds = async (eventIds) => {
+    if (!eventIds || eventIds.length === 0) return { data: [] };
+    return supabase
+        .from('event_registrations_config')
+        .select('event_id')
+        .in('event_id', eventIds)
+        .ilike('payment_status', 'paid');
+};
+
 // Flip Card Component removed
 // const FlipUnit = ...
 
@@ -180,48 +189,46 @@ const LiveStats = () => {
         // Fetch ALL active events to categorize them locally (skipping RPC due to inconsistencies)
         const { data: events, error: eventsError } = await supabase
             .from('events')
-            .select('id, event_id')
+            .select('id, event_id, name')
             .eq('is_active', true);
 
         if (eventsError) throw eventsError;
 
-        // Map uuid -> dept name using global helper
-        const eventDeptMap = {};
+        // Group events by department
+        const deptEventMap = {};
         events.forEach(e => {
             const dept = getDeptFromId(e.event_id);
             if (dept) {
-                eventDeptMap[e.id] = dept;
+                if (!deptEventMap[dept]) {
+                    deptEventMap[dept] = [];
+                }
+                deptEventMap[dept].push(e.id);
             }
         });
 
-        const targetEventIds = Object.keys(eventDeptMap);
+        const deptCounts = {};
 
-        if (targetEventIds.length === 0) {
-            setDeptStats([]);
-            return;
+        // Calculate totals for each department by summing individual event counts
+        for (const [dept, eventIds] of Object.entries(deptEventMap)) {
+            if (eventIds.length === 0) {
+                deptCounts[dept] = 0;
+                continue;
+            }
+
+            // Fetch paid registrations for this department's events
+            const { data: registrations } = await fetchPaidRegistrationsByEventIds(eventIds);
+
+            // Count registrations per event, then sum them
+            const eventCounts = {};
+            (registrations || []).forEach(reg => {
+                eventCounts[reg.event_id] = (eventCounts[reg.event_id] || 0) + 1;
+            });
+
+            // Sum all event counts for this department
+            deptCounts[dept] = Object.values(eventCounts).reduce((sum, count) => sum + count, 0);
         }
 
-        // 2. Fetch paid registrations for these events
-        const { data: paidRegs } = await supabase
-            .from('event_registrations_config')
-            .select('event_id')
-            .eq('payment_status', 'PAID')
-            .in('event_id', targetEventIds); 
-
-        const counts = {};
-        // Initialize with 0 for all departments that have active events
-        Object.values(eventDeptMap).forEach(dept => {
-            counts[dept] = 0;
-        });
-        
-        (paidRegs || []).forEach(reg => {
-            const dept = eventDeptMap[reg.event_id];
-            if (dept) {
-                counts[dept] = (counts[dept] || 0) + 1;
-            }
-        });
-
-        const formatted = Object.entries(counts)
+        const formatted = Object.entries(deptCounts)
             .map(([dept, count]) => ({ dept, count }))
             .sort((a, b) => b.count - a.count);
             
@@ -232,10 +239,10 @@ const LiveStats = () => {
   };
 
 
-  const fetchDeptEventDetails = async (deptName) => {
+    const fetchDeptEventDetails = async (deptName, forceRefresh = false) => {
     try {
         // Check if we already have this data cached
-        if (deptEventDetails[deptName]) {
+                if (deptEventDetails[deptName] && !forceRefresh) {
             return;
         }
 
@@ -261,11 +268,7 @@ const LiveStats = () => {
         }
 
         // Fetch registration counts for each event
-        const { data: registrations } = await supabase
-            .from('event_registrations_config')
-            .select('event_id')
-            .eq('payment_status', 'PAID')
-            .in('event_id', eventIds);
+        const { data: registrations } = await fetchPaidRegistrationsByEventIds(eventIds);
 
         // Count registrations per event
         const eventCounts = {};
@@ -290,14 +293,12 @@ const LiveStats = () => {
     }
   };
 
-  const toggleDeptExpansion = (deptName) => {
+    const toggleDeptExpansion = (deptName) => {
     if (expandedDept === deptName) {
         setExpandedDept(null);
     } else {
         setExpandedDept(deptName);
-        if (!deptEventDetails[deptName]) {
-            fetchDeptEventDetails(deptName);
-        }
+                fetchDeptEventDetails(deptName, true);
     }
   };
 
@@ -336,11 +337,7 @@ const LiveStats = () => {
         }
 
         // Fetch registration counts for each event
-        const { data: registrations } = await supabase
-            .from('event_registrations_config')
-            .select('event_id')
-            .eq('payment_status', 'PAID')
-            .in('event_id', eventIds);
+        const { data: registrations } = await fetchPaidRegistrationsByEventIds(eventIds);
 
         // Count registrations per event
         const eventCounts = {};
@@ -417,11 +414,7 @@ const LiveStats = () => {
             }
 
             // Fetch registration counts
-            const { data: registrations } = await supabase
-                .from('event_registrations_config')
-                .select('event_id')
-                .eq('payment_status', 'PAID')
-                .in('event_id', allEventIds);
+            const { data: registrations } = await fetchPaidRegistrationsByEventIds(allEventIds);
 
             // Count registrations per conference
             const conferenceCounts = {};
@@ -484,11 +477,7 @@ const LiveStats = () => {
         }
 
         // Fetch registration counts for each event
-        const { data: registrations } = await supabase
-            .from('event_registrations_config')
-            .select('event_id')
-            .eq('payment_status', 'PAID')
-            .in('event_id', eventIds);
+        const { data: registrations } = await fetchPaidRegistrationsByEventIds(eventIds);
 
         // Count registrations per event
         const eventCounts = {};
@@ -524,60 +513,13 @@ const LiveStats = () => {
     }
   };
 
-  const fetchCategoryStats = async () => {
-    try {
-      const { data, error } = await supabase.rpc("get_live_category_stats");
-      
-      const processCategoryData = (rawData) => {
-        // Initialize counts for required categories
-        const finalStats = [
-            { category: 'Workshop', count: 0, dbKey: 'workshop' },
-            { category: 'Non Tech', count: 0, dbKey: 'non-technical' },
-            { category: 'Tech', count: 0, dbKey: 'technical' },
-            { category: 'Culturals', count: 0, dbKey: 'cultural' },
-            { category: 'Sports', count: 0, dbKey: 'sports' },
-            { category: 'Hackathon', count: 0, dbKey: 'hackathon' },
-            { category: 'Conference', count: 0, dbKey: 'conference' }
-        ];
-
-        // Map DB data to our structure with case-insensitive matching
-        if (rawData && Array.isArray(rawData)) {
-            rawData.forEach(item => {
-                const category = (item.category || '').toLowerCase().trim();
-                const count = item.count || 0;
-                
-                // Case-insensitive category matching
-                if (category.includes('workshop') || category === 'workshops') {
-                    finalStats[0].count += count;
-                } else if (category.includes('non-technical') || category === 'non-tech' || category === 'nontech' || category === 'non tech') {
-                    finalStats[1].count += count;
-                } else if (category === 'technical' || (category.includes('tech') && !category.includes('non'))) {
-                    finalStats[2].count += count;
-                } else if (category.includes('cultural') || category === 'culturals') {
-                    finalStats[3].count += count;
-                } else if (category.includes('sport') || category === 'sports') {
-                    finalStats[4].count += count;
-                } else if (category.includes('hackathon') || category === 'hack') {
-                    finalStats[5].count += count;
-                } else if (category === 'conference') {
-                    finalStats[6].count += count;
-                }
-            });
+    const fetchCategoryStats = async () => {
+        try {
+            await fetchCategoryStatsFallback();
+        } catch (error) {
+            console.error("Error fetching category stats:", error);
         }
-        
-        return finalStats;
-      };
-
-      if (!error && data) {
-        setCategoryStats(processCategoryData(data));
-      } else {
-        await fetchCategoryStatsFallback();
-      }
-    } catch (error) {
-      console.error("Error calling get_live_category_stats:", error);
-      await fetchCategoryStatsFallback();
-    }
-  };
+    };
 
   const fetchCategoryStatsFallback = async () => {
     try {
@@ -598,29 +540,12 @@ const LiveStats = () => {
       // 2. Fetch all paid registrations that belong to students
       /* ... same fallback logic ... */
       
-      const { data: joinData, error: joinError } = await supabase
-         .from('event_registrations_config')
-         .select(`
-            event_id,
-            profiles!inner ( role )
-         `)
-         .eq('payment_status', 'PAID')
-         .filter('profiles.role', 'eq', 'student');
-
-      let validRegs = [];
-
-      if (!joinError && joinData) {
-        validRegs = joinData;
-      } else {
-         const { data: paidRegs } = await supabase
+        const { data: paidRegs } = await supabase
             .from('event_registrations_config')
-            .select('event_id, user_id')
-            .eq('payment_status', 'PAID');
-            
-         // Without profiles join, we can't filter role easily in fallback
-         // We'll just take them
-         validRegs = paidRegs || [];
-      }
+            .select('event_id')
+            .ilike('payment_status', 'paid');
+
+        const validRegs = paidRegs || [];
 
       // 4. Aggregate counts
       const counts = {};
