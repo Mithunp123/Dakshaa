@@ -1090,7 +1090,7 @@ export const technicalDetails = [
     papersubmission: [
       {
         description: [
-          "Paper Should be mailed to :  sparkassociationksrct@gmail.com"
+          "Paper Should be mailed to :  bathrisurya4@gmail.com"
         ],
       },
     ],

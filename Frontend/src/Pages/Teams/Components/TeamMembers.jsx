@@ -37,7 +37,7 @@ import saran from "../../../assets/team_members/saran.webp";
 
 //event coordinators
 import ec1 from "../../../assets/team_members/ec1.webp";
-import ec2 from "../../../assets/team_members/ec2.webp";
+import ec4 from "../../../assets/team_members/ec4.webp";
 import ec3 from "../../../assets/team_members/ec3.webp";
 import monika from "../../../assets/team_members/monika.webp";
 import Yaswanth from "../../../assets/team_members/Yaswanth.webp";
@@ -50,6 +50,9 @@ import ec10 from "../../../assets/team_members/ec10.webp";
 import ec12 from "../../../assets/team_members/ec12.webp";
 import ec13 from "../../../assets/team_members/ec13.webp";
 import ec14 from "../../../assets/team_members/ec14.webp";
+import kanya from "../../../assets/team_members/kanya.webp";
+import bala from "../../../assets/team_members/bala.webp";
+import nitin from "../../../assets/team_members/nitin.webp";
 
 const chiefCoordinator = [
    { id: 14, name: "Kavinesh", department: "AEVA", img: kavinesh, role: "Chief Coordinator", phone: "+91 94892 43775", associationLogo: aevaLogo },
@@ -68,17 +71,19 @@ const jointCoordinators = [
   { id : 205, name : "Aathavan G", department : "Zita" , img: aathavan,role:"Hackathon, Codeathon & Flagship Challenges ",phone: "++91 96008 02107",associationLogo:itasso},
   {id :24, name:"Tharun Kumar R ", department:"AIML", img:tharun, role:"EDC & Accommodation & Lunch ", phone:"+91 77084 13624", associationLogo:aevaLogo},
   
+  
 ];
 
 
 
 const eventCoordinators = [
   { id: 101, name: "Elavarasan S", department: "Zion", img: ec1, role: "Event Coordinator", phone: "+91 70108 76905", associationLogo: cisso },
-  { id: 102, name: "Harini S K", department: "Techragonz", img: ec2, role: "Event Coordinator", phone: "+91 88384 01078", associationLogo:  csbsasso },
+  { id: 102, name: "Mohanakumaran K", department: "Techragonz", img: ec4, role: "Event Coordinator", phone: "+91 88384 01078", associationLogo:  csbsasso },
   { id: 103, name: "Peranandha K L", department: "ASCI", img: ec3, role: "Event Coordinator", phone: "+91 81485 37603", associationLogo: cseasso},
   //{ id: 105, name: "Vignesh", department: "Department of IT", img: ec5, role: "Event Coordinator", phone: "+91 63836 34583", associationLogo: aevaLogo },
   { id: 106, name: "Shanmugeshwara A", department: "ASCI", img: ec6, role: "Event Coordinator", phone: "+91 94871 19381", associationLogo: cseasso },
-  { id: 107, name: "KARMUHILAN V ", department: "SPICEE", img: kari, role: "Event Coordinator", phone: "+91 90252 44374", associationLogo: eeeasso },
+  { id: 107, name: "Karmuhilan V ", department: "SPICEE", img: kari, role: "Event Coordinator", phone: "+91 90252 44374", associationLogo: eeeasso },
+  {id : 117 , name:"Kanya S", department:"Neomutant Association", img:kanya, role: "Event Coordinator", phone: "+91 63834 53787", associationLogo: btasso},
   { id: 108, name: "Niranjana Devi S", department: "Veda", img: ec8, role: "Event Coordinator", phone: "+91 82485 88418", associationLogo: vlsiasso},
   { id: 109, name: "Chandra Mohan G", department: "Techragonz", img: ec9, role: "Event Coordinator", phone: "+91 88709 25956", associationLogo: csbsasso },
   { id: 110, name: "Mujamil S", department: "SPICEE", img: ec10, role: "Event Coordinator", phone: "+91 75029 68410", associationLogo: eeeasso },
@@ -87,7 +92,9 @@ const eventCoordinators = [
   { id: 113, name: "Hari Kesavaraj", department: "Veda", img: ec13, role: "Event Coordinator", phone: "+91 82702 78279", associationLogo: vlsiasso },
   { id: 114, name: "Priyan G S", department: "Sparks Association", img: ec14, role: "Event Coordinator", phone: "+91 86680 57985", associationLogo: mechasso },
   {id:115,name:"Monika R",department:"AEVA",img: monika, role: "Event Coordinator", phone: "+91 93636 07816", associationLogo:aevaLogo },
-  {id:116,name:"Yaswanth J",department:"AEVA",img: Yaswanth, role: "Event Coordinator", phone: "+91 94814 08075", associationLogo:aevaLogo}
+  {id:116,name:"Yaswanth J",department:"AEVA",img: Yaswanth, role: "Event Coordinator", phone: "+91 94814 08075", associationLogo:aevaLogo},
+  {id : 119 , name:"Balamurugan S ", department:"Artificix", img:bala, role: "Event Coordinator", phone: "+91 94877 07552", associationLogo: aidsasso},
+  {id: 118, name: "Nithin R", department: "AEVA", img: nitin, role: "Event Coordinator", phone: "+91 90254 96002", associationLogo: aevaLogo },
 ];
 
 const developers = [
