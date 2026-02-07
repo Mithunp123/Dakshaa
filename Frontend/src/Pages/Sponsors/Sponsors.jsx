@@ -22,6 +22,8 @@ import comingsoon from "./assets/comingsoon.webp";
 import startuptn from "./assets/startuptn.webp";
 import lovable from "./assets/lovable.webp";
 import titlesp from "./assets/atum.webp";
+import finestcoder from "./assets/finestcoder.webp";
+import eduskill from "./assets/eduskill.webp";
 
 
 
@@ -33,7 +35,7 @@ function Sponsors() {
   const cosponser=[comingsoon];
   const ecosystem=[startuptn];
 
-  const eventSponsors = [lovable,aidswk,aimlwk,btwk,civilwk,csbswk,csewk,ecewk,eeewk,ftwk,iprwk,itwk,mcawk,mctwk,mechwk,txtwk,vlsiwk ];
+  const eventSponsors = [lovable,aidswk,aimlwk,btwk,civilwk,csbswk,csewk,ecewk,eeewk,ftwk,iprwk,itwk,mcawk,mctwk,mechwk,txtwk,vlsiwk,eduskill,finestcoder ];
   const stallsponsors = [comingsoon];
 
   const letter = "Sponsors";

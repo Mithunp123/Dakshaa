@@ -1376,8 +1376,8 @@ export const nonTechnicalDetails = [
     shortTitle: "TALK SHOW",
     title: "TALK SHOW",
     department: "Non-Technical Events",
-    date: "February 13, 2026",
-    venue: "Language Enrichment Center",
+    date: "February 14, 2026",
+    venue: " Fin tech lab , MBA Block ",
     price: "₹ 150 per Member",
     description:
       "The Talk Show aims to identify and nurture young individuals who possess strong communication abilities and leadership potential.",
@@ -1393,9 +1393,9 @@ export const nonTechnicalDetails = [
     ],
     schedule: [
       {
-        date: "February 13, 2026",
+        date: "February 14, 2026",
         time: "9.00 AM to 01.00 PM",
-        location: "Language Enrichment Center",
+        location: " Fin tech lab , MBA Block",
       },
     ],
     contact: {

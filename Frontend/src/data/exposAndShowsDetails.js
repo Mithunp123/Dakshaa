@@ -211,7 +211,7 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to: thulasisambath2@gmail.com"
+          "Paper should be mailed to: thulasisampath2@gmail.com"
         ],
       },
     ],
@@ -444,7 +444,7 @@ export const exposAndShowsDetails = [
       studentCoordinator: [
         {
           name: "Nissanth S P",
-          phone:"+91 6385643934",
+          phone:"+91  80729 60028",
         },
         {
           name: "Divya prabha Shree N S",
