@@ -46,7 +46,7 @@ const Referral = () => {
   // Referral coin constants for clarity
   const COINS_PER_MOBILE_REFERRAL = 2;  // Mobile number referrals earn 2 coins
   const COINS_PER_CODE_REFERRAL = 4;    // Dakshaa ID referrals earn 4 coins
-  const MAX_REFERRAL_COINS = 100;        // Maximum coins per referral ID
+  const MAX_REFERRAL_COINS = 200;        // Maximum coins per referral ID
 
   // Calculate coins: Mobile numbers (10 digits) get 2 coins per referral, others get 4
   const isMobileNumber = searchResult && /^\d{10}$/.test(searchResult.referral_id);
@@ -179,8 +179,8 @@ const Referral = () => {
 
                   <p className="text-xs text-gray-500 mt-4">
                     {isMobileNumber 
-                      ? "Mobile referrals earn 2 DakshaaCoins per registration (max 100 coins)"
-                      : "Each registration earns 4 DakshaaCoins (max 100 coins)"
+                      ? "Mobile referrals earn 2 DakshaaCoins per registration (max 200 coins)"
+                      : "Each registration earns 4 DakshaaCoins (max 200 coins)"
                     }
                   </p>
                 </div>
@@ -249,7 +249,7 @@ const Referral = () => {
               <ul className="space-y-1 text-xs">
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-secondary rounded-full"></span>
-                  <span>Maximum <span className="text-secondary font-bold">100 coins</span> per referral ID</span>
+                  <span>Maximum <span className="text-secondary font-bold">200 coins</span> per referral ID</span>
                 </li>
               </ul>
             </div>
