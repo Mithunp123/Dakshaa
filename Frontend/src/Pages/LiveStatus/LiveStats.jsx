@@ -614,10 +614,15 @@ const LiveStats = () => {
         if (eventsError) throw eventsError;
 
         // Filter events by category (case-insensitive)
-        const categoryEvents = events.filter(e => {
+        let categoryEvents = events.filter(e => {
             const eventCategory = (e.category || '').toLowerCase().trim();
             return categoryVariants.some(variant => eventCategory.includes(variant));
         });
+
+        // For Tech category, exclude Paper/Poster/Project Presentations (they have separate cards)
+        if (categoryName === 'Tech') {
+            categoryEvents = categoryEvents.filter(e => !getSpecialBaseFromEventName(e.name));
+        }
 
         const eventIds = categoryEvents.map(e => e.id);
 
@@ -766,10 +771,12 @@ const LiveStats = () => {
       // 1. Fetch all active events with their categories
     const events = await fetchAllData('events', 'id, category, name, event_id', q => q.eq('is_active', true));
 
-      // Map event_id(uuid) -> category
+      // Map event_id(uuid) -> category and name
       const eventCategoryMap = {};
+      const eventNameMap = {};
       events.forEach(e => {
         eventCategoryMap[e.id] = (e.category || '').toLowerCase().trim();
+        eventNameMap[e.id] = e.name || '';
       });
 
       // 2. Fetch all paid registrations
@@ -812,6 +819,7 @@ const LiveStats = () => {
 
       validRegs.forEach(reg => {
          const category = eventCategoryMap[reg.event_id];
+         const eventName = eventNameMap[reg.event_id];
          if (category) {
             const val = category.toLowerCase().trim();
             
@@ -820,7 +828,10 @@ const LiveStats = () => {
             } else if (val.includes('non-technical') || val.includes('non-tech') || val.includes('nontech') || val.includes('non tech')) {
                 nonTechCount++;
             } else if (val.includes('technical') || val === 'tech') {
-                techCount++;
+                // Exclude Paper/Poster/Project Presentations from Tech count (they have separate cards)
+                if (!getSpecialBaseFromEventName(eventName)) {
+                    techCount++;
+                }
             } else if (val.includes('cultural')) {
                 culturalCount++;
             } else if (val.includes('sport')) {
