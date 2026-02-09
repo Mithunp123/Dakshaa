@@ -118,6 +118,31 @@ const AdminDashboard = () => {
     try {
       if (!loading) setRefreshing(true);
 
+      // First try to use the backend API which handles pagination properly
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const response = await fetch(`${apiUrl}/api/admin/overview-stats`);
+        const data = await response.json();
+
+        if (data.success) {
+          console.log('Using backend API stats (bypasses 1000 limit):', data.stats);
+          setStats({
+            totalRegistrations: data.stats.totalRegistrations || 0,
+            totalRevenue: data.stats.totalRevenue || 0,
+            totalCheckins: data.stats.totalCheckins || 0,
+            totalUsers: data.stats.totalUsers || 0,
+            morningCheckins: 0, // These will need additional backend support
+            eveningCheckins: 0,
+            totalEvents: data.stats.totalEvents || 0,
+            openEvents: data.stats.activeEvents || 0,
+          });
+          setLastUpdated(new Date());
+          return; // Exit early if backend API succeeds
+        }
+      } catch (backendError) {
+        console.log('Backend API failed, trying RPC:', backendError);
+      }
+
       // Try to use RPC function for comprehensive stats
       const { data: rpcStats, error: rpcError } = await supabase.rpc('get_admin_dashboard_stats');
       
@@ -137,14 +162,15 @@ const AdminDashboard = () => {
         });
         setLastUpdated(new Date());
       } else {
-        console.log('RPC failed, using fallback queries. Error:', rpcError);
-        // Fallback to direct queries
+        console.log('RPC failed, using fallback queries (WARNING: may hit 1000 limit). Error:', rpcError);
+        // Fallback to direct queries - WARNING: limited to 1000 records for revenue!
         const { count: regCount } = await supabase
           .from("registrations")
           .select("*", { count: "exact", head: true })
           .eq("payment_status", "PAID");
 
         // Fetch Total Revenue from events joined with registrations
+        // WARNING: This is limited to 1000 records!
         const { data: regWithEvents } = await supabase
           .from("registrations")
           .select("event_id, events(price)")
@@ -153,6 +179,10 @@ const AdminDashboard = () => {
         const revenue = regWithEvents?.reduce((acc, curr) => {
           return acc + (curr.events?.price || 0);
         }, 0) || 0;
+        
+        if (regWithEvents && regWithEvents.length >= 1000) {
+          console.warn('⚠️ Revenue calculation may be incomplete - 1000 record limit reached!');
+        }
 
         // Fetch Morning Check-ins (using column-based session tracking)
         const { count: morningCount } = await supabase

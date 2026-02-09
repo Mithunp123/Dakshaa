@@ -14,7 +14,10 @@ import {
   X,
   Download,
   FileSpreadsheet,
-  FileText
+  FileText,
+  Home,
+  Clock,
+  Package
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
 import * as XLSX from 'xlsx';
@@ -30,6 +33,9 @@ const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
   const [stats, setStats] = useState({
     totalRegistrations: 0,
     totalRevenue: 0,
+    accommodationRevenue: 0,
+    comboRevenue: 0,
+    pendingAmount: 0,
     totalCheckins: 0,
     activeEvents: 0,
     totalEvents: 0,
@@ -210,7 +216,7 @@ const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
 
   const fetchStats = async () => {
     try {
-      console.log('📊 SuperAdmin Overview: Fetching stats...');
+      console.log('📊 SuperAdmin Overview: Fetching stats from backend API (bypassing 1000 limit)...');
       if (!loading) setRefreshing(true);
 
       // Coordinator Filter
@@ -220,148 +226,144 @@ const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
       console.log('🔍 Overview - hasCoordinatorFilter:', hasCoordinatorFilter);
       console.log('🎯 Overview - allowedEventIds:', allowedEventIds);
 
-      const applyFilter = (query, column = 'event_id') => {
-        if (hasCoordinatorFilter && allowedEventIds) {
-          return query.in(column, allowedEventIds);
-        }
-        return query;
-      };
-
-      // Fetch Total Registrations (PAID only)
-      console.log('👥 Fetching total paid registrations...');
-      let regQuery = supabase
-        .from('event_registrations_config')
-        .select('*', { count: 'exact', head: true })
-        .in('payment_status', ['PAID', 'completed']);
+      // Use backend API to fetch stats with pagination (bypasses Supabase 1000 limit)
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const queryParams = allowedEventIds ? `?event_ids=${allowedEventIds.join(',')}` : '';
       
-      regQuery = applyFilter(regQuery);
-      const { count: regCount, error: regError } = await regQuery;
+      const response = await fetch(`${apiUrl}/api/admin/overview-stats${queryParams}`);
+      const data = await response.json();
 
-      if (regError) {
-        console.error('❌ Error fetching registrations:', regError);
-      } else {
-        console.log('✅ Total paid registrations:', regCount);
-      }
-
-      // Fetch Total Revenue - get registrations with payment
-      console.log('💰 Fetching paid registrations...');
-      let paidQuery = supabase
-        .from('event_registrations_config')
-        .select('payment_amount')
-        .in('payment_status', ['PAID', 'completed']);
-      
-      paidQuery = applyFilter(paidQuery);
-      const { data: paidRegistrations, error: paidError } = await paidQuery;
-
-      if (paidError) {
-        console.error('❌ Error fetching paid registrations:', paidError);
-      } else {
-        console.log('✅ Paid registrations count:', paidRegistrations?.length || 0);
-      }
-
-      // Calculate revenue direct from payment_amount
-      let revenue = 0;
-      if (paidRegistrations && paidRegistrations.length > 0) {
-        revenue = paidRegistrations.reduce((sum, r) => sum + (Number(r.payment_amount) || 0), 0);
-      }
-
-      // Fetch Total Check-ins
-      console.log('✓ Fetching check-ins...');
-      let checkinQuery = supabase
-        .from('attendance')
-        .select('*', { count: 'exact', head: true });
+      if (data.success) {
+        console.log('✅ Stats fetched from backend API:', data.stats);
+        console.log(`📊 Paid records count for revenue calculation: ${data.stats.paidRecordsCount}`);
+        console.log(`📊 Total Revenue: ₹${data.stats.totalRevenue}, Accommodation: ₹${data.stats.accommodationRevenue}, Combo: ₹${data.stats.comboRevenue}, Pending: ₹${data.stats.pendingAmount}`);
         
-      checkinQuery = applyFilter(checkinQuery);
-      const { count: checkinCount, error: checkinError } = await checkinQuery;
+        const finalStats = {
+          totalRegistrations: data.stats.totalRegistrations || 0,
+          totalRevenue: data.stats.totalRevenue || 0,
+          accommodationRevenue: data.stats.accommodationRevenue || 0,
+          comboRevenue: data.stats.comboRevenue || 0,
+          pendingAmount: data.stats.pendingAmount || 0,
+          totalCheckins: data.stats.totalCheckins || 0,
+          activeEvents: data.stats.activeEvents || 0,
+          totalEvents: data.stats.totalEvents || 0,
+          recentRegistrations: data.recentRegistrations || []
+        };
 
-      if (checkinError) {
-        console.error('❌ Error fetching check-ins:', checkinError);
+        console.log('📊 Final stats:', finalStats);
+        setStats(finalStats);
       } else {
-        console.log('✅ Total check-ins:', checkinCount);
+        console.error('❌ Backend API error:', data.error);
+        // Fallback to direct queries if backend fails (but this will have 1000 limit)
+        await fetchStatsFallback(allowedEventIds);
       }
-
-      // Fetch Active Events
-      console.log('📅 Fetching active events...');
-      let activeQuery = supabase
-        .from('events')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_open', true);
-        
-      activeQuery = applyFilter(activeQuery, 'id');
-      const { count: activeEventCount, error: activeError } = await activeQuery;
-
-      if (activeError) {
-        console.error('❌ Error fetching active events:', activeError);
-      } else {
-        console.log('✅ Active events:', activeEventCount);
-      }
-
-      // Fetch Total Events
-      console.log('📅 Fetching total events...');
-      let totalQuery = supabase
-        .from('events')
-        .select('*', { count: 'exact', head: true });
-        
-      totalQuery = applyFilter(totalQuery, 'id');
-      const { count: totalEventCount, error: totalError } = await totalQuery;
-
-      if (totalError) {
-        console.error('❌ Error fetching total events:', totalError);
-      } else {
-        console.log('✅ Total events:', totalEventCount);
-      }
-
-      // Fetch Recent Registrations (PAID only, with proper FK reference)
-      console.log('📋 Fetching recent paid registrations...');
-      let recentQuery = supabase
-        .from('event_registrations_config')
-        .select('*')
-        .eq('payment_status', 'PAID')
-        .order('registered_at', { ascending: false })
-        .limit(5);
-
-      recentQuery = applyFilter(recentQuery);
-      const { data: recent, error: recentError } = await recentQuery;
-
-      // Fetch user profiles separately for recent registrations
-      let recentWithProfiles = [];
-      if (recent && recent.length > 0) {
-        const userIds = [...new Set(recent.map(r => r.user_id))];
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('id, full_name, email')
-          .in('id', userIds);
-        
-        const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
-        recentWithProfiles = recent.map(reg => ({
-          ...reg,
-          profiles: profileMap.get(reg.user_id) || { full_name: 'Unknown', email: '' }
-        }));
-      }
-
-      if (recentError) {
-        console.error('❌ Error fetching recent registrations:', recentError);
-      } else {
-        console.log('✅ Recent registrations fetched:', recentWithProfiles?.length || 0);
-      }
-
-      const finalStats = {
-        totalRegistrations: regCount || 0,
-        totalRevenue: revenue || 0,
-        totalCheckins: checkinCount || 0,
-        activeEvents: activeEventCount || 0,
-        totalEvents: totalEventCount || 0,
-        recentRegistrations: recentWithProfiles || []
-      };
-
-      console.log('📊 Final stats:', finalStats);
-      setStats(finalStats);
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error('Error fetching stats from backend:', error);
+      // Fallback to direct queries
+      const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
+      const allowedEventIds = hasCoordinatorFilter ? coordinatorEvents.map(e => (e.id || e.event_id)) : null;
+      await fetchStatsFallback(allowedEventIds);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
+  };
+
+  // Fallback function using direct Supabase queries (WARNING: limited to 1000 records)
+  const fetchStatsFallback = async (allowedEventIds) => {
+    console.log('⚠️ Using fallback stats (may be limited to 1000 records)...');
+    
+    const applyFilter = (query, column = 'event_id') => {
+      if (allowedEventIds && allowedEventIds.length > 0) {
+        return query.in(column, allowedEventIds);
+      }
+      return query;
+    };
+
+    // Fetch Total Registrations (PAID only)
+    let regQuery = supabase
+      .from('event_registrations_config')
+      .select('*', { count: 'exact', head: true })
+      .in('payment_status', ['PAID', 'completed']);
+    
+    regQuery = applyFilter(regQuery);
+    const { count: regCount } = await regQuery;
+
+    // Fetch Total Revenue - WARNING: limited to 1000 records without pagination!
+    let paidQuery = supabase
+      .from('event_registrations_config')
+      .select('payment_amount')
+      .in('payment_status', ['PAID', 'completed']);
+    
+    paidQuery = applyFilter(paidQuery);
+    const { data: paidRegistrations } = await paidQuery;
+
+    let revenue = 0;
+    if (paidRegistrations && paidRegistrations.length > 0) {
+      revenue = paidRegistrations.reduce((sum, r) => sum + (Number(r.payment_amount) || 0), 0);
+      if (paidRegistrations.length >= 1000) {
+        console.warn('⚠️ Revenue may be incomplete - 1000 record limit reached!');
+      }
+    }
+
+    // Fetch Check-ins
+    let checkinQuery = supabase
+      .from('attendance')
+      .select('*', { count: 'exact', head: true });
+    checkinQuery = applyFilter(checkinQuery);
+    const { count: checkinCount } = await checkinQuery;
+
+    // Fetch Active Events
+    let activeQuery = supabase
+      .from('events')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_open', true);
+    activeQuery = applyFilter(activeQuery, 'id');
+    const { count: activeEventCount } = await activeQuery;
+
+    // Fetch Total Events
+    let totalQuery = supabase
+      .from('events')
+      .select('*', { count: 'exact', head: true });
+    totalQuery = applyFilter(totalQuery, 'id');
+    const { count: totalEventCount } = await totalQuery;
+
+    // Fetch Recent Registrations
+    let recentQuery = supabase
+      .from('event_registrations_config')
+      .select('*')
+      .eq('payment_status', 'PAID')
+      .order('registered_at', { ascending: false })
+      .limit(5);
+    recentQuery = applyFilter(recentQuery);
+    const { data: recent } = await recentQuery;
+
+    let recentWithProfiles = [];
+    if (recent && recent.length > 0) {
+      const userIds = [...new Set(recent.map(r => r.user_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .in('id', userIds);
+      
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+      recentWithProfiles = recent.map(reg => ({
+        ...reg,
+        profiles: profileMap.get(reg.user_id) || { full_name: 'Unknown', email: '' }
+      }));
+    }
+
+    setStats({
+      totalRegistrations: regCount || 0,
+      totalRevenue: revenue || 0,
+      accommodationRevenue: 0, // Not available in fallback
+      comboRevenue: 0, // Not available in fallback
+      pendingAmount: 0, // Not available in fallback
+      totalCheckins: checkinCount || 0,
+      activeEvents: activeEventCount || 0,
+      totalEvents: totalEventCount || 0,
+      recentRegistrations: recentWithProfiles || []
+    });
   };
 
   // Fetch events for report modal
@@ -672,16 +674,45 @@ const Overview = ({ coordinatorEvents, hideFinancials = false }) => {
       trend: '+12%',
       isUp: true
     },
-    // Only show Revenue if NOT hiding financials
-    ...(!hideFinancials ? [{
-      label: 'Total Revenue',
-      value: `₹${stats.totalRevenue.toLocaleString()}`,
-      icon: CreditCard,
-      color: 'text-green-400',
-      bg: 'bg-green-400/10',
-      trend: '+8%',
-      isUp: true
-    }] : []),
+    // Only show Revenue cards if NOT hiding financials
+    ...(!hideFinancials ? [
+      {
+        label: 'Total Amount',
+        value: `₹${stats.totalRevenue.toLocaleString()}`,
+        icon: CreditCard,
+        color: 'text-green-400',
+        bg: 'bg-green-400/10',
+        trend: 'Events + Accom + Combo',
+        isUp: true
+      },
+      {
+        label: 'Accommodation',
+        value: `₹${stats.accommodationRevenue.toLocaleString()}`,
+        icon: Home,
+        color: 'text-cyan-400',
+        bg: 'bg-cyan-400/10',
+        trend: 'Bookings',
+        isUp: true
+      },
+      {
+        label: 'Combo Revenue',
+        value: `₹${stats.comboRevenue.toLocaleString()}`,
+        icon: Package,
+        color: 'text-pink-400',
+        bg: 'bg-pink-400/10',
+        trend: 'Packages',
+        isUp: true
+      },
+      {
+        label: 'Pending Amount',
+        value: `₹${stats.pendingAmount.toLocaleString()}`,
+        icon: Clock,
+        color: 'text-yellow-400',
+        bg: 'bg-yellow-400/10',
+        trend: 'Awaiting',
+        isUp: false
+      }
+    ] : []),
     {
       label: 'Live Check-ins',
       value: stats.totalCheckins,
