@@ -50,20 +50,36 @@ const AttendancePage = () => {
           return;
         }
         
-        // Fetch the actual event details
-        const { data: eventData, error: eventError } = await supabase
+        // Fetch the actual event details (event_id is stored as TEXT in event_coordinators)
+        const { data: eventDataByText, error: eventErrorByText } = await supabase
           .from('events')
           .select('id, name, event_id, event_key, category')
-          .in('id', assignedEventIds);
-        
-        if (eventError) {
-          console.error('❌ Error fetching event details:', eventError);
-          setAssignedEvents([]);
-          setLoading(false);
-          return;
+          .in('event_id', assignedEventIds)
+          .eq('is_active', true);
+
+        if (eventErrorByText) {
+          console.error('❌ Error fetching event details by event_id:', eventErrorByText);
         }
-        
-        events = eventData || [];
+
+        if (eventDataByText && eventDataByText.length > 0) {
+          events = eventDataByText;
+        } else {
+          // Fallback: in case assigned IDs are UUIDs
+          const { data: eventDataById, error: eventErrorById } = await supabase
+            .from('events')
+            .select('id, name, event_id, event_key, category')
+            .in('id', assignedEventIds)
+            .eq('is_active', true);
+
+          if (eventErrorById) {
+            console.error('❌ Error fetching event details by id:', eventErrorById);
+            setAssignedEvents([]);
+            setLoading(false);
+            return;
+          }
+
+          events = eventDataById || [];
+        }
         console.log('✅ Fetched coordinator events for attendance:', events.length);
       } else {
         // For super_admin, don't pass coordinator events (null = show all)
