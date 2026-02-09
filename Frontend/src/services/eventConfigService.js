@@ -340,21 +340,45 @@ export const checkEventAvailability = async (eventId) => {
  */
 export const createEvent = async (eventData) => {
   try {
-    const { data, error } = await supabase.rpc("create_event_config", {
-      p_event_key: eventData.event_key,
-      p_name: eventData.name,
-      p_description: eventData.description || null,
-      p_price: eventData.price || 0,
-      p_type: eventData.type,
-      p_capacity: eventData.capacity,
-      p_is_open: eventData.is_open !== undefined ? eventData.is_open : true
-    });
+    // Generate a unique event_id
+    const eventId = eventData.event_key || `event-${Date.now()}`;
+    
+    // Determine if it's a team event based on type
+    const isTeamEvent = eventData.type && eventData.type.toUpperCase() !== 'SOLO';
+    
+    // Build the insert data matching the events table schema
+    const insertData = {
+      event_id: eventId,
+      event_key: eventData.event_key,
+      name: eventData.name,
+      title: eventData.name,
+      event_name: eventData.name,
+      description: eventData.description || null,
+      category: eventData.category || 'Technical',
+      event_type: eventData.type,
+      type: eventData.type,
+      price: parseFloat(eventData.price) || 0,
+      capacity: parseInt(eventData.capacity) || 100,
+      current_registrations: 0,
+      max_registrations: parseInt(eventData.capacity) || 100,
+      is_team_event: isTeamEvent,
+      min_team_size: parseInt(eventData.min_team_size) || 1,
+      max_team_size: parseInt(eventData.max_team_size) || 4,
+      is_open: eventData.is_open !== undefined ? eventData.is_open : true,
+      is_active: true,
+      current_status: 'upcoming'
+    };
+
+    const { data, error } = await supabase
+      .from('events')
+      .insert(insertData)
+      .select()
+      .single();
 
     if (error) throw error;
 
-    if (!data.success) {
-      throw new Error(data.message);
-    }
+    // Clear cache after creating event
+    clearEventsCache();
 
     return {
       success: true,
