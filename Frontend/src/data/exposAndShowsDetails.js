@@ -67,7 +67,7 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to: bhargavc127@gmail.com"
+          "Paper should be mailed to: artificixaids@gmail.com "
         ],
       },
     ],
@@ -402,7 +402,7 @@ export const exposAndShowsDetails = [
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
-      "Standard poster size and format should be followed.",
+      "The poster must be prepared in the standard A3 size and format using a color printout.",
 
       "Individual or team participation is allowed (maximum 2 members).",
 
@@ -458,7 +458,7 @@ export const exposAndShowsDetails = [
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
-      "Standard poster size and format should be followed.",
+      "The poster must be prepared in the standard A3 size and format using a color printout.",
 
       "Individual or team participation is allowed (maximum 2 members).",
 
@@ -515,7 +515,7 @@ export const exposAndShowsDetails = [
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
-      "Standard poster size and format should be followed.",
+      "The poster must be prepared in the standard A3 size and format using a color printout.",
 
       "Individual or team participation is allowed (maximum 2 members).",
 
@@ -563,7 +563,7 @@ export const exposAndShowsDetails = [
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
-      "Standard poster size and format should be followed.",
+      "The poster must be prepared in the standard A3 size and format using a color printout.",
 
       "Individual or team participation is allowed (maximum 2 members).",
 
@@ -610,7 +610,7 @@ export const exposAndShowsDetails = [
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
-      "Standard poster size and format should be followed.",
+      "The poster must be prepared in the standard A3 size and format using a color printout.",
 
       "Individual or team participation is allowed (maximum 2 members).",
 
@@ -661,7 +661,7 @@ export const exposAndShowsDetails = [
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
-      "Standard poster size and format should be followed.",
+      "The poster must be prepared in the standard A3 size and format using a color printout.",
 
       "Individual or team participation is allowed (maximum 2 members).",
 
@@ -712,7 +712,7 @@ export const exposAndShowsDetails = [
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
-      "Standard poster size and format should be followed.",
+      "The poster must be prepared in the standard A3 size and format using a color printout.",
 
       "Individual or team participation is allowed (maximum 2 members).",
 
@@ -758,7 +758,7 @@ export const exposAndShowsDetails = [
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
-      "Standard poster size and format should be followed.",
+      "The poster must be prepared in the standard A3 size and format using a color printout.",
 
       "Individual or team participation is allowed (maximum 2 members).",
 
@@ -805,7 +805,7 @@ export const exposAndShowsDetails = [
           ],
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
-      "Standard poster size and format should be followed.",
+      "The poster must be prepared in the standard A3 size and format using a color printout.",
       "Individual or team participation is allowed (maximum 2 members).",
       "3–5 minutes will be given for explanation.",
       "Evaluation is based on clarity, creativity, and presentation.",
@@ -857,7 +857,7 @@ export const exposAndShowsDetails = [
     ],
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
-      "Standard poster size and format should be followed.",
+      "The poster must be prepared in the standard A3 size and format using a color printout.",
       "Individual or team participation is allowed (maximum 2 members).",
       "3–5 minutes will be given for explanation.",
       "Evaluation is based on clarity, creativity, and presentation.",
@@ -899,7 +899,7 @@ export const exposAndShowsDetails = [
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
-      "Standard poster size and format should be followed.",
+      "The poster must be prepared in the standard A3 size and format using a color printout.",
 
       "Individual or team participation is allowed (maximum 2 members).",
 
@@ -948,7 +948,7 @@ export const exposAndShowsDetails = [
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
-      "Standard poster size and format should be followed.",
+      "The poster must be prepared in the standard A3 size and format using a color printout.",
 
       "Individual or team participation is allowed (maximum 2 members).",
 
@@ -997,7 +997,7 @@ export const exposAndShowsDetails = [
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
-      "Standard poster size and format should be followed.",
+      "The poster must be prepared in the standard A3 size and format using a color printout.",
 
       "Individual or team participation is allowed (maximum 2 members).",
 
@@ -1038,7 +1038,7 @@ export const exposAndShowsDetails = [
     description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
     date: "13 February 2026",
     venue: "",
-    price: "₹150 per team",
+    price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
@@ -1104,7 +1104,7 @@ export const exposAndShowsDetails = [
     description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
     date: "13 February 2026",
     venue: "",
-    price: "₹150 per team",
+    price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
@@ -1164,7 +1164,7 @@ export const exposAndShowsDetails = [
     description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
     date: "13 February 2026",
     venue: "",
-    price: "₹150 per team",
+    price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
@@ -1231,7 +1231,7 @@ export const exposAndShowsDetails = [
     description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
     date: "13 February 2026",
     venue: "",
-    price: "₹150 per team",
+    price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
@@ -1292,7 +1292,7 @@ export const exposAndShowsDetails = [
     description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
     date: "13 February 2026",
     venue: "",
-    price: "₹150 per team",
+    price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
@@ -1359,7 +1359,7 @@ export const exposAndShowsDetails = [
     description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
     date: "13 February 2026",
     venue: "",
-    price: "₹150 per team",
+    price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
@@ -1418,7 +1418,7 @@ export const exposAndShowsDetails = [
     description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
     date: "13 February 2026",
     venue: "",
-    price: "₹150 per team",
+    price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
@@ -1485,7 +1485,7 @@ export const exposAndShowsDetails = [
     description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
     date: "13 February 2026",
     venue: "",
-    price: "₹150 per team",
+    price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
@@ -1544,7 +1544,7 @@ export const exposAndShowsDetails = [
     description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
     date: "13 February 2026",
     venue: "",
-    price: "₹150 per team",
+    price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
@@ -1604,7 +1604,7 @@ export const exposAndShowsDetails = [
     description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
     date: "13 February 2026",
     venue: "",
-    price: "₹150 per team",
+    price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
@@ -1673,7 +1673,7 @@ export const exposAndShowsDetails = [
     description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
     date: "13 February 2026",
     venue: "",
-    price: "₹150 per team",
+    price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
@@ -1711,22 +1711,14 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of Mechatronics",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          name: "Dr. A. Ramesh Kumar",
+          phone: "+91 93900 63776",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "Mechatronics",
-          phone: "+91 XXXXXXXXXX",
-        },
-        {
-          name: "Student Coordinator 2",
-          department: "Mechatronics",
-          phone: "+91 XXXXXXXXXX",
+          name: "Mr. V. Vasanthakumar",
+          phone: "+91 93610 49375",
         },
       ],
     },
@@ -1740,7 +1732,7 @@ export const exposAndShowsDetails = [
     description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
     date: "13 February 2026",
     venue: "",
-    price: "₹150 per team",
+    price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
@@ -1778,22 +1770,14 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of Textile Technology",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          name: "Dr. C. Premalatha",
+          phone: "+91 97502 06161",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "Textile Technology",
-          phone: "+91 XXXXXXXXXX",
-        },
-        {
-          name: "Student Coordinator 2",
-          department: "Textile Technology",
-          phone: "+91 XXXXXXXXXX",
+          name: "Mr. R. Hiruthik",
+          phone: "+91 99652 27394",
         },
       ],
     },
@@ -1807,7 +1791,7 @@ export const exposAndShowsDetails = [
     description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
     date: "13 February 2026",
     venue: "",
-    price: "₹150 per team",
+    price: "₹150 per member",
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
