@@ -1082,37 +1082,37 @@ const LiveStats = () => {
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-5 gap-6 w-full flex-grow min-h-0 pb-4">
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 xl:gap-6 w-full flex-grow min-h-0 pb-4 overflow-y-auto xl:overflow-visible">
             {/* Left Column: Big Stats & Categories */}
-            <div className="xl:col-span-3 flex flex-col gap-6 h-full min-h-0">
+            <div className="xl:col-span-3 flex flex-col gap-4 xl:gap-6 h-full min-h-0">
                 
-                {/* Big Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 flex-grow min-h-0">
+                {/* Big Cards - Horizontal on mobile, larger on desktop */}
+                <div className="grid grid-cols-2 gap-3 md:gap-8 shrink-0">
                     {/* Students Onboarded Card */}
                     <motion.div
                         initial={{ x: -100, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.2 }}
-                        className="relative group h-full"
+                        className="relative group"
                     >
-                        <div className="absolute -inset-1 bg-gradient-to-r from-secondary to-orange-600 rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
+                        <div className="absolute -inset-1 bg-gradient-to-r from-secondary to-orange-600 rounded-2xl md:rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
                         
-                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-orange-500/30 rounded-3xl p-8 h-full flex flex-col justify-center min-h-[260px]">
+                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-orange-500/30 rounded-2xl md:rounded-3xl p-3 md:p-8 h-full flex flex-col justify-center min-h-[140px] md:min-h-[260px]">
                         {/* Icon */}
-                        <div className="flex justify-center mb-4">
-                            <div className="w-16 h-16 bg-secondary/20 rounded-2xl flex items-center justify-center">
-                            <Users className="w-8 h-8 text-secondary" />
+                        <div className="flex justify-center mb-2 md:mb-4">
+                            <div className="w-10 h-10 md:w-16 md:h-16 bg-secondary/20 rounded-xl md:rounded-2xl flex items-center justify-center">
+                            <Users className="w-5 h-5 md:w-8 md:h-8 text-secondary" />
                             </div>
                         </div>
 
                         {/* Label */}
-                        <h2 className="text-xl font-bold text-gray-300 text-center mb-3 uppercase tracking-wider">
+                        <h2 className="text-xs md:text-xl font-bold text-gray-300 text-center mb-1 md:mb-3 uppercase tracking-wider">
                             Students Joined
                         </h2>
 
                         {/* Counter */}
                         <div className="text-center">
-                            <div className="text-6xl md:text-7xl font-black text-secondary mb-2 tabular-nums">
+                            <div className="text-2xl md:text-6xl lg:text-7xl font-black text-secondary mb-1 md:mb-2 tabular-nums">
                             <CountUp 
                                 end={stats.users} 
                                 duration={2}
@@ -1120,9 +1120,9 @@ const LiveStats = () => {
                                 preserveValue
                             />
                             </div>
-                            <div className="flex items-center justify-center gap-2 text-green-400">
-                            <TrendingUp className="w-4 h-4" />
-                            <span className="text-base font-semibold">Total Onboarded</span>
+                            <div className="flex items-center justify-center gap-1 md:gap-2 text-green-400">
+                            <TrendingUp className="w-3 h-3 md:w-4 md:h-4" />
+                            <span className="text-[10px] md:text-base font-semibold">Total Onboarded</span>
                             </div>
                         </div>
                         </div>
@@ -1133,26 +1133,26 @@ const LiveStats = () => {
                         initial={{ x: 100, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="relative group h-full"
+                        className="relative group"
                     >
-                        <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
+                        <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-2xl md:rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
                         
-                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-3xl p-8 h-full flex flex-col justify-center min-h-[260px]">
+                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-2xl md:rounded-3xl p-3 md:p-8 h-full flex flex-col justify-center min-h-[140px] md:min-h-[260px]">
                         {/* Icon */}
-                        <div className="flex justify-center mb-4">
-                            <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center">
-                            <TicketCheck className="w-8 h-8 text-primary" />
+                        <div className="flex justify-center mb-2 md:mb-4">
+                            <div className="w-10 h-10 md:w-16 md:h-16 bg-primary/20 rounded-xl md:rounded-2xl flex items-center justify-center">
+                            <TicketCheck className="w-5 h-5 md:w-8 md:h-8 text-primary" />
                             </div>
                         </div>
 
                         {/* Label */}
-                        <h2 className="text-xl font-bold text-gray-300 text-center mb-3 uppercase tracking-wider">
-                            Event Registrations
+                        <h2 className="text-xs md:text-xl font-bold text-gray-300 text-center mb-1 md:mb-3 uppercase tracking-wider">
+                            Registrations
                         </h2>
 
                         {/* Counter */}
                         <div className="text-center flex flex-col items-center justify-center">
-                            <div className="text-6xl md:text-7xl font-black text-primary mb-2 tabular-nums tracking-tight">
+                            <div className="text-2xl md:text-6xl lg:text-7xl font-black text-primary mb-1 md:mb-2 tabular-nums tracking-tight">
                             <CountUp 
                                 end={stats.registrations} 
                                 duration={2}
@@ -1160,15 +1160,15 @@ const LiveStats = () => {
                                 preserveValue
                             />
                             </div>
-                            <div className="flex items-center justify-center gap-2 text-green-400">
-                            <TrendingUp className="w-4 h-4" />
-                            <span className="text-base font-semibold">Total Seats Filled</span>
+                            <div className="flex items-center justify-center gap-1 md:gap-2 text-green-400">
+                            <TrendingUp className="w-3 h-3 md:w-4 md:h-4" />
+                            <span className="text-[10px] md:text-base font-semibold">Total Seats Filled</span>
                             </div>
                         </div>
 
                         {/* Glow Effect */}
                         <motion.div
-                            className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                            className="absolute inset-0 rounded-2xl md:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                             style={{
                             background: 'radial-gradient(circle at center, rgba(147,51,234,0.1), transparent 70%)'
                             }}
@@ -1177,12 +1177,12 @@ const LiveStats = () => {
                     </motion.div>
                 </div>
 
-                {/* Category Stats Grid */}
+                {/* Category Stats Grid - Show on all screens */}
                 <motion.div
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="hidden xl:grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-4 shrink-0"
+                    className="grid grid-cols-4 md:grid-cols-7 gap-2 md:gap-4 shrink-0"
                 >
                     {categoryStats.map((stat, index) => (
                     <motion.div 
@@ -1190,14 +1190,14 @@ const LiveStats = () => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.6 + (index * 0.1) }}
-                        className="relative bg-gray-900 border border-gray-700/50 rounded-2xl p-3 hover:border-primary/30 transition-all group overflow-hidden cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-primary/20"
+                        className="relative bg-gray-900 border border-gray-700/50 rounded-xl md:rounded-2xl p-2 md:p-3 hover:border-primary/30 transition-all group overflow-hidden cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-primary/20"
                         onClick={() => toggleCategoryExpansion(stat.category)}
                     >
-                        <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-40 transition-opacity">
+                        <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-40 transition-opacity hidden md:block">
                         <TicketCheck className="w-6 h-6 rotate-[-15deg]" />
                         </div>
-                        <div className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1 h-4 flex items-end group-hover:text-primary transition-colors">{stat.category}</div>
-                        <div className="text-xl md:text-3xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent font-mono">
+                        <div className="text-gray-400 text-[8px] md:text-[10px] font-bold uppercase tracking-widest mb-0.5 md:mb-1 h-3 md:h-4 flex items-end group-hover:text-primary transition-colors truncate">{stat.category}</div>
+                        <div className="text-base md:text-xl lg:text-3xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent font-mono">
                             <CountUp end={stat.count} duration={2} separator="," />
                         </div>
                     </motion.div>
@@ -1205,26 +1205,26 @@ const LiveStats = () => {
                 </motion.div>
             </div>
 
-            {/* Right Column: Department Leaderboard */}
+            {/* Right Column: Department Leaderboard - Below on mobile */}
             <motion.div
                 initial={{ x: 100, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.7 }}
-                className="xl:col-span-2 h-full min-h-0 flex flex-col pl-4"
+                className="xl:col-span-2 min-h-0 flex flex-col pl-0 xl:pl-4 mt-2 xl:mt-0"
             >
-                 <div className="flex items-center justify-between mb-4 px-2 shrink-0">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-gradient-to-r from-yellow-500 to-amber-600 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/20">
-                            <TrendingUp className="text-white w-5 h-5" />
+                 <div className="flex items-center justify-between mb-3 md:mb-4 px-2 shrink-0">
+                    <div className="flex items-center gap-2 md:gap-3">
+                        <div className="bg-gradient-to-r from-yellow-500 to-amber-600 w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/20">
+                            <TrendingUp className="text-white w-4 h-4 md:w-5 md:h-5" />
                         </div>
                         <div>
-                            <h3 className="text-white font-black text-xl uppercase tracking-wider italic">Leaderboard</h3>
-                            <p className="text-xs text-yellow-500 font-bold tracking-widest uppercase">Live Rankings</p>
+                            <h3 className="text-white font-black text-base md:text-xl uppercase tracking-wider italic">Leaderboard</h3>
+                            <p className="text-[10px] md:text-xs text-yellow-500 font-bold tracking-widest uppercase">Live Rankings</p>
                         </div>
                     </div>
                  </div>
                  
-                 <div className="grid grid-cols-2 gap-2 overflow-y-auto xl:overflow-visible overflow-x-hidden content-start pr-1 max-h-[calc(100vh-250px)] xl:max-h-none scrollbar-hide">
+                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-2 gap-2 overflow-y-auto xl:overflow-visible overflow-x-hidden content-start pr-1 max-h-[250px] md:max-h-[calc(100vh-450px)] xl:max-h-none scrollbar-hide">
                     <AnimatePresence mode="popLayout">
                         {deptStats.map((stat, index) => (
                             <motion.div
