@@ -7,6 +7,7 @@ import hackathon6 from "../assets/EventsImages/EventDetails/HackathonImages/hack
 import hackathon7 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon7.webp";
 import hackathon8 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon8.webp";
 import hackathon9 from "../assets/EventsImages/EventDetails/HackathonImages/hackathon9.webp";
+import codyImage from "../assets/EventsImages/EventDetails/TechnicalImages/cody.webp";
 
 import { hackathonEventDetails } from "../Pages/Hackathon/Components/HackathonSection";
 /*
@@ -64,7 +65,13 @@ export const hackathonEvents = [
     image:hackathon9,
     eventId:"hackathon9",
     title:"Sustainathon",
-  }
+  },
+  {
+    image: codyImage,
+    eventId: "tech-cody",
+    title: "Cody",
+    price: 250,
+  },
 
 
 ];
@@ -127,5 +134,6 @@ export const hackathonDetails = [
     img: hackathon9,
     shortTitle: hackathonEventDetails["hackathon-9"]?.title || "Sustainathon",
   },
+
 
 ];

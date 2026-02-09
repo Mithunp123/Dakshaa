@@ -54,7 +54,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "10:00 AM to 12:00 PM",
-        location: "AB 409",
+        location: "AB 409 (Academic Block)",
       },
     ],
     contact: {
@@ -354,7 +354,7 @@ export const nonTechnicalDetails = [
     title: "Battle Arena",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "IT PARK (CLOUD LAB)",
+    venue: "CLOUD LAB (IT Park)",
     price: "₹150 per Member",
     description:
       "Battle Arena is a high-intensity eSports competition designed to bring together skilled gamers in a professional and competitive environment. Participants compete in popular gaming titles such as EA Sports FC and Free Fire, showcasing precision, strategy, reflexes, and real-time decision-making. The event follows a structured knockout tournament format to identify and crown the ultimate champions of the arena.",
@@ -375,7 +375,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "9.00 AM to 4.00 PM",
-        location: "IT PARK (CLOUD LAB)",
+        location: "CLOUD LAB (IT Park)",
       },
     ],
     contact: {
@@ -572,7 +572,7 @@ export const nonTechnicalDetails = [
     title: "Twisted Tiles",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "EE 301",
+    venue: "EE 301 (Academic Block)",
     price: "₹150 per Member",
     description:
       "Twisted Tiles is a puzzle-based non-technical event designed to challenge participants' logical thinking and problem-solving abilities. Participants must analyze patterns, think critically, and solve puzzles within a limited time, making it an engaging test of focus, reasoning, and mental agility.",
@@ -595,7 +595,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "2 Hours",
-        location: "EE 301",
+        location: "EE 301(Academic Block)",
       },
     ],
     contact: {
@@ -633,7 +633,7 @@ export const nonTechnicalDetails = [
     title: "Logo Quiz",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "EE 302",
+    venue: "EE 302 (Academic Block)",
     price: "₹150 per Member",
     description:
       "Logo Quiz is a non-technical event that tests participants' ability to identify logos related to brands, technology companies, and general knowledge. The event challenges visual recognition, memory, and quick recall skills in a fun and engaging quiz-based format.",
@@ -656,7 +656,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "2 Hours",
-        location: "EE 302",
+        location: "EE 302 (Academic Block)",
       },
     ],
     contact: {
@@ -694,7 +694,7 @@ export const nonTechnicalDetails = [
     title: "Unit Wars",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "EE 304",
+    venue: "EE 304 (Academic Block)",
     price: "₹150 per Member",
     description:
       "Unit Wars is an educational quiz-based non-technical event focusing on fundamental and derived SI units used in science and engineering. The event challenges participants' conceptual understanding, memory, and speed, making it both informative and competitive.",
@@ -717,7 +717,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "2 Hours",
-        location: "EE 304",
+        location: "EE 304 (Academic Block)",
       },
     ],
     contact: {
@@ -876,7 +876,7 @@ export const nonTechnicalDetails = [
     title: "Face Painting",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "MCA 103 (MBA Department)",
+    venue: "MCA F103 (F Block)",
     price: "₹150 per Member",
     description:
       "Face Painting is a fun, creative, and engaging non-technical event that brings out the artistic talents of participants. This event offers a platform for students to express their imagination through colors, designs, and meaningful themes painted on faces. Participants can showcase styles such as cartoons, abstract art, nature-inspired patterns, cultural motifs, and message-driven creativity.",
@@ -894,7 +894,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "1 Hour",
-        location: "MCA 103 (MBA Department)",
+        location: "MCA F103 (F Block)",
       },
     ],
     contact: {
@@ -945,7 +945,7 @@ export const nonTechnicalDetails = [
     title: "Mind Spark",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "MC 306 (MBA Block)",
+    venue: "MC 306 (Academic Block)",
     price: "₹150 per Member",
     description:
       "Mind Spark Arena is a three-round knowledge-based non-technical event designed to test participants' intelligence, observation skills, and brand awareness. Teams compete through a general quiz, a visual picture connection round, and a logo & brand tagline identification challenge. Participants must think fast, connect ideas smartly, and demonstrate their mental agility to win.",
@@ -982,7 +982,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "10:30 AM to 12.30PM",
-        location: "MC 306 (MBA Block)",
+        location: "MC 306 (Academic Block)",
       },
     ],
     contact: {
@@ -1019,7 +1019,7 @@ export const nonTechnicalDetails = [
     title: "Tech Without Tech",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "Robotics Laboratory(MCT Block)",
+    venue: "Robotics Laboratory(Academic Block)",
     price: "₹150 per Member",
     description:
       "Tech Without Tech is a non-technical team event where participants are given a common technology or everyday system and must explain how it works without using any technical terms. Using simple language, real-life examples, gestures, or storytelling, participants make complex concepts understandable to a non-technical audience. The event tests creativity, communication skills, and the ability to simplify ideas effectively.",
@@ -1043,7 +1043,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "10:00 AM to 12.30PM",
-        location: "Robotics Laboratory (MCT Block)",
+        location: "Robotics Laboratory (Academic Block)",
       },
     ],
     contact: {
@@ -1080,7 +1080,7 @@ export const nonTechnicalDetails = [
     title: "Freezeframe",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "CLASS C107 (MECHANICAL)",
+    venue: "CLASS C107 (MECHANICAL BLOCK)",
     price: "₹150 per Member",
     description:
       "Freezeframe is a creative photography contest focused on visual storytelling and awareness. Participants capture meaningful moments within the college campus without any editing or filters. The event promotes observational skills, creativity, and the ability to convey a message through a single photograph.",
@@ -1105,7 +1105,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "1 Hour",
-        location: "CLASS C107 (MECHANICAL)",
+        location: "CLASS C107 (MECHANICAL BLOCK)",
       },
     ],
     contact: {
@@ -1157,7 +1157,7 @@ export const nonTechnicalDetails = [
     title: "T2T – Trash 2 Textile",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "Textile Chemical Processing Lab",
+    venue: "Textile Chemical Processing Lab (Textile Block)",
     price: "₹150 per Member",
     description:
       "T2T – Trash 2 Textile is a creative non-technical event that focuses on transforming textile waste into innovative and useful products. Participants explore techniques for recycling, upcycling, and repurposing discarded fabrics, old garments, and textile scraps. The event encourages sustainability, hands-on creativity, and understanding how to turn waste into value in an eco-friendly manner.",
@@ -1183,7 +1183,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "1 Hour",
-        location: "Textile Chemical Processing Lab",
+        location: "Textile Chemical Processing Lab (Textile Block)",
       },
     ],
     contact: {
@@ -1221,7 +1221,7 @@ export const nonTechnicalDetails = [
     title: "BlindBites: Taste It. Find It.",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "Electronic Devices Laboratory, J Block 4th Floor",
+    venue: "Electronic Devices Laboratory, J Block 4th Floor (Academic Block)",
     price: "₹150 per Member",
     description:
       "BlindBites is a fun and interactive team-based non-technical event where participants work in pairs to identify mystery food items. One member tastes the food while the other listens to hints and guesses the item. The event tests teamwork, communication, and sensory observation. The winning team is determined by the least time taken to correctly identify all items.",
@@ -1247,7 +1247,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "9.00 AM to 01.00 PM",
-        location: "Electronic Devices Laboratory, J Block 4th Floor",
+        location: "Electronic Devices Laboratory, J Block 4th Floor (Academic Block)",
       },
     ],
     contact: {
@@ -1292,7 +1292,7 @@ export const nonTechnicalDetails = [
     department: "Non-Technical Events",
     date: "February 14, 2026",
     venue: "KSRCT Hostel Turf",
-    price: "₹ 700 per Member",
+    price: "₹ 700 per Team with 7 Players",
     description:
       "Powerhouse Champion Trophy is a fast-paced cricket tournament focused on skill, discipline, and team strength. With strict rules and limited overs, it promises intense competition and fair play",
     img: NonTech21,

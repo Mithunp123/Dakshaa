@@ -11,7 +11,7 @@ export const hackathonEventDetails = {
       id: "hackathon-1",
       title: "Neura-Hack 2.0 (36 Hours Hackathon)",
       date: "12th Feb - 13th Feb, 2026",
-      venue: "IT LAB 1 (IT PARK)",
+      venue: "Bhumi Lab (IT PARK)",
       registrationFee:" ₹ 500 per head.",
       registrationLink: "",
       description: "NeuraHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, Defend, and Secure technology to shape the future of digital innovation.",
@@ -64,21 +64,24 @@ export const hackathonEventDetails = {
         {
           date: "12th Feb - 13th Feb, 2026",
           time: "9:00 AM to 9:00 PM",
-          location: "IT LAB 1 (IT PARK)",
+          location: "Bhumi Lab (IT PARK)",
         },
       ],
 
       contact: {
         facultyCoordinator: [
           {
-            name: "Mr.S.VADIVEL",
-            phone: "+91 97906 32171",
-            email: "vadivels@ksrct.ac.in",
+            name: "Dr. K.Poongodi",
+            phone: "+91 97886 80616",
           },
+          {
+            name : "Dr. P.Senthilraja",
+            phone: "+91 99940 49209",
+          }
         ],
         studentCoordinator: [
           {
-            name: "Mr.A.SHANMUGESHWARA",
+            name: "Mr. A. Shanmugeshwara",
             phone: "+91 94871 19381",
           },
         ],
@@ -89,7 +92,7 @@ export const hackathonEventDetails = {
       title: "BioNexathon 2026 (24 Hours Hackathon)",
       date: "February 13 2026 to February 14, 2026",
       registrationFee : " ₹ 500 per head.",
-      venue: "Dr. M.S. Swaminathan Biotech Seminar Hall",
+      venue: "Dr. M.S. Swaminathan Biotech Seminar Hall (Bio Technology Department)",
       description: "A platform for students, researchers, and professionals to present and discuss recent advancements in biotechnology. Includes keynote lectures, panel discussions, and interactive sessions. Focus on innovation, research impact, and interdisciplinary collaboration. Encourages networking and knowledge exchange among participants.",
       eligibility: {
         categories: [
@@ -209,7 +212,7 @@ export const hackathonEventDetails = {
           round: "Venue",
           date: "February 13 2026 to February 14, 2026",
           time: "24 hours",
-          location: "Dr. M.S. Swaminathan Biotech Seminar Hall",
+          location: "Dr. M.S. Swaminathan Biotech Seminar Hall (Bio Technology Department)",
         },
       ],
       contact: {
@@ -238,12 +241,12 @@ export const hackathonEventDetails = {
     },
     "hackathon-3": {
       id: "hackathon-3",
-      title: "Neura Code 2.O - Relay Edition",
+      title: "Neura Code 2.O",
       date: "February 13 2026 ",
-      venue: "Bhumi Lab (IT PARK)",
+      venue: "IT LAB 1 (IT Park)",
       registrationFee:" ₹ 300 per head.",
       registrationLink: " ",
-      description: "Relay Edition is a solo-based web design challenge where a reference website design is provided. Team members take turns recreating the design, building upon the previous member’s work without restarting. Creativity, accuracy, and teamwork determine the final output.",
+      description: "NeuraCode 2.0 is a 5-hour competitive programming event designed to test participants’ logical thinking, problem-solving skills, and programming expertise. The event challenges students across multiple difficulty levels, ensuring a fair and engaging experience for both beginners and advanced coders.The competition is conducted in two structured rounds, with cumulative scoring determining the final rankings.",
       rewards: [
         {
           position: "1st Prize",
@@ -262,55 +265,53 @@ export const hackathonEventDetails = {
         },
       ],
       challenge: [
+          {
+    title: "Round-1: Basics & Logic Challenge",
+    description: [
+      "This round evaluates participants’ core programming knowledge and logical reasoning abilities.",
+      "Total Questions: 8 (6 MCQs and 2 Coding Questions).",
+      "Each MCQ carries 5 marks and each coding question carries 10 marks.",
+      "Key focus areas include programming fundamentals, logical reasoning, algorithmic thinking, and basic problem-solving skills.",
+      "Internet access is strictly prohibited; participants must rely solely on their own knowledge.",
+      "There is no elimination in this round; all participants advance to Round 2, and scores are carried forward for final evaluation."
+    ]
+  },
         {
-          title: "Round-1",
-          description: [
-            "Teams are given a faulty front-end codebase containing intentional logical, syntactical, and UI errors.",
-            "The goal is to debug and make the website functionally correct and visually accurate within the time limit. ",
-            
-
-          ],
-        },
+    title: "Round-2: Open Coding Challenge",
+    description: [
+      "This round tests participants’ ability to solve complex, real-world problems using advanced programming techniques.",
+      "The round consists of hard-level coding challenges.",
+      "Participants can choose open-domain problem statements or solve predefined problems provided by the organizers.",
+      "Internet access is allowed strictly for reference purposes.",
+      "Evaluation is based on logical approach, problem understanding, code efficiency, optimization, correctness, and completeness of the solution.",
+      "Final rankings are determined using the combined scores of Round 1 and Round 2, with consistent performance across both rounds required for top positions."
+    ]
+  },
+     
         {
-          title: "Round-2",
+          title: "Programming Languages Allowed",
           description: [
-            "“See once. Build from memory.”",
-            "A live website is shown for 120 seconds",
-            "No screenshots / no notes",
-            
-          ],
-        },
-        {
-          title: "Round-3",
-          description: [
-            "Total time: 45 minutes",
-            "Coding happens one after another",
-           
-
-          ],
-        },
-        {
-          title: "Task Details",
-          description: [
-            "A surprise website design is provided",
-          "Teams must recreate the design as accurately as possible",
+            "Participants may code in any one of the following languages:",
+                        "C Language",
+                        "Python Language",
+                        "Java Language",
           ],
         }
       ],
-      rules: [
-        "Mandatory CSS Grid",
-        "Semantic tags required (header, main, section, footer)",
-        "No frameworks (Bootstrap, Tailwind )",
-        "All members must be present during all rounds",
-        "Participants must bring their own laptop",
-        "Required software must be pre-installed (VS Code / browser)",
-        "Plagiarism or copying from other teams will result in immediate disqualification"
-      ],
+     rules: [
+  "Participants must bring their own laptops",
+  "Attendance and completion of both rounds is mandatory",
+  "Internet usage is permitted only during Round 2",
+  "Any form of misconduct, plagiarism, or rule violation will result in immediate disqualification",
+  "Failure to adhere to time limits or technical instructions may lead to disqualification",
+  "The decision of the judges will be final and binding"
+],
+
       schedule: [
         {
           date: "February 13, 2026",
           time: "09:00 AM",
-          location: "Bhumi Lab (IT PARK)",
+          location: "IT LAB 1 (IT Park)",
         },
       ],
       contact: {
@@ -415,14 +416,18 @@ export const hackathonEventDetails = {
       contact: {
         facultyCoordinator: [
           {
-            name: "Mr. S.Insol Rajasekar",
-            phone: "+91 82205 12436",
+            name: "Ms.G.Suthi",
+            phone: "+91 9786666941",
             
           },
           {
-            name: "Mr.K.Praveen",
-            phone: "+91 95009 18101",
+            name: "Mrs.V.Thivya",
+            phone: "+91 7373027227",
            
+          },
+          {
+            name:"Mr.K.Surendar",
+            PHONE:"+91 9342558918",
           },
         ],
         studentCoordinator: [
@@ -449,7 +454,7 @@ export const hackathonEventDetails = {
       id: "hackathon-5",
       title: "Startup Pitch 2026",
       date: "13.02.2026",
-      venue: "PTC Seminar Hall ",
+      venue: "PTC Seminar Hall (KSRCT Innovation Technology Park)",
       registrationFee : " ₹ 250 per head.(Without Food)",
       description: "The StartUp Pitch Event, organized by the Entrepreneurship Development Cell (EDC), aims to encourage students to ideate, innovate, and present impactful startup solutions in emerging technology domains such as automation, robotics, artificial intelligence, smart manufacturing, and intelligent systems. The event provides a platform for participants to showcase how modern development principles integrated with AI-driven technologies can be applied to solve real-world industrial and societal challenges. Students are expected to focus on innovation, technical feasibility, scalability, and real-time impact, while demonstrating entrepreneurial thinking and problem-solving skills. ",
       rewards: [
@@ -511,7 +516,7 @@ export const hackathonEventDetails = {
          
           date: "13.02.2026",
           time: "9:00 AM to 4:00PM",
-          location: "PTC Seminar Hall ",
+          location: "PTC Seminar Hall (KSRCT Innovation Technology Park)",
         },
       ],
       contact: {
@@ -825,7 +830,7 @@ export const hackathonEventDetails = {
       id: "hackathon-9",
       title: "Sustainathon – Hackathon for Sustainable Development Goals (SDG) ",
       date: "13 February 2026",
-      venue: " ",
+      venue: "NICE Lab (Academic Block) ",
       registrationFee:" ₹ 300 per head.",
       registrationLink: "",
       description: "Sustainathon is a problem-solving hackathon focused on creating innovative, practical, and scalable solutions aligned with the United Nations Sustainable Development Goals (SDGs). Participants will work in teams to design technology-driven or social-impact solutions addressing real-world sustainability challenges.",
@@ -895,7 +900,7 @@ export const hackathonEventDetails = {
         {
           date: "13 February 2026",
           time: "9:00 AM to 4:00 PM",
-          location: "",
+          location: "NICE Lab (Academic Block)",
         },
       ],
       contact: {

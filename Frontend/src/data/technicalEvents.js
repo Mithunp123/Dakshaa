@@ -95,12 +95,6 @@ export const technicalEvents = [
     eventId: "tech-vlsi",
     price: 250,
   },
-  
-  {
-    image: Tech24,
-    eventId: "tech-cody",
-    price: 250,
-  },
   {
     image: Tech25,
     eventId: "tech-rcrace",

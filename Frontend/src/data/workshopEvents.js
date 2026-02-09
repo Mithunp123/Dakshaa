@@ -135,7 +135,7 @@ export const workshopDetails = [
     description: "A one-day workshop on \"Agentic AI\" will introduce participants to intelligent AI agents capable of autonomous decision-making, planning, and real-world problem solving. The session will be led by Mr. Dineshkumar Shanmugam, Founder & CEO of Wildrise, Korclub Consumer Private Limited, who brings strong industry expertise in AI-driven product development. Through expert talks and real-world use cases, participants will explore the architecture, applications, and future scope of Agentic AI across industries such as automation, robotics, and smart systems.",
     img: workshop1,
     date: "February 12, 2026",
-    venue: "AB Lab 2",
+    venue: "AB Lab 2(Academic Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
@@ -143,7 +143,7 @@ export const workshopDetails = [
         
         date: "February 12, 2026",
         time: "1 day",
-        location: "AB Lab 2",
+        location: "AB Lab 2(Academic Block)",
       },
     ],
     contact: {
@@ -185,14 +185,14 @@ export const workshopDetails = [
     description: "Step into the AI Arcade and discover how AI tools can supercharge game development — build smarter, faster, and more creative games using cutting-edge AI tools.",
     img: workshop2,
     date: "February 12, 2026",
-    venue: "UIPath Laboratory",
+    venue: "UIPath Laboratory (IT Park)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
        
         time: "1 Day",
-        venue: "UIPath Laboratory",
+        venue: "UIPath Laboratory (IT Park)",
         registrationFee: "₹300",
       },
     ],
@@ -204,9 +204,9 @@ export const workshopDetails = [
           phone: "+91 97152 47992",
         },
         {
-          name: "Mr. S. Vinothkumar",
+          name: "Ms.R.P.Harshini",
           designation: "Assistant Professor",
-          phone: "+91 75488 98727",
+          phone: "+91 9361446506",
         },
       ],
       studentCoordinator: [
@@ -245,7 +245,7 @@ export const workshopDetails = [
     description: "This workshop introduces Next-Generation Sequencing (NGS) technologies used in modern and future genomic and biomedical research. Participants gain industry-oriented knowledge on advanced sequencing platforms, workflows, and data analysis trends. The session connects molecular biology and genomics theory with real-time clinical, agricultural, and research applications.",
     img: workshop3,
     date: "February 12, 2026",
-    venue: "AB LAB-1",
+    venue: "AB LAB-1(Academic Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
@@ -253,7 +253,7 @@ export const workshopDetails = [
        
         date: "February 12, 2026",
         time: "1 Day",
-        location: "AB LAB-1",
+        location: "AB LAB-1(Academic Block)",
       },
     ],
     contact: {
@@ -294,12 +294,12 @@ export const workshopDetails = [
     description: "Master the future of construction in this BIM workshop, where 3D design meets intelligent data integration to streamline project lifecycles, improve collaboration, minimize structural errors, and build expertise using industry-standard tools for the digital transformation of the Architecture, Engineering, and Construction (ACE) industry.",
     img: workshop4,
     date: "February 12, 2026",
-    venue: "Civil CADD Laboratory",
+    venue: "Civil CADD Laboratory (Civil Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
-        location: "Civil CADD Laboratory",
+        location: "Civil CADD Laboratory (Civil Block)",
         time: "1 Day",
         date: "February 12, 2026",
       },
@@ -331,13 +331,13 @@ export const workshopDetails = [
     description: "This workshop introduces blockchain technology beyond cryptocurrencies, focusing on real-world applications across industries such as supply chain management, healthcare, finance, governance, digital identity, and data security, while exploring how decentralization, transparency, and trust solve challenges in traditional systems through practical examples and discussions.",
     img: workshop5,
     date: "February 12, 2026",
-    venue: "AB LAB-4",
+    venue: "AB LAB-4 (Academic Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "AB LAB-4",
+        location: "AB LAB-4 (Academic Block)",
         time: "1 Day",
         date: "February 12, 2026",
       },
@@ -374,13 +374,13 @@ export const workshopDetails = [
     description: "CyberStrike is a high-impact hands-on cybersecurity workshop designed to introduce participants to the fundamentals of cybersecurity and real-world web application security. The event covers career insights, essential security concepts, and practical exposure to OWASP Top 10 vulnerabilities through live demonstrations and guided activities. Participants will learn how attacks happen, how to defend systems, and how to build secure applications with industry-relevant knowledge and techniques.",
     img: workshop6,
     date: "February 12, 2026",
-    venue: "IT PARK (CSE LAB 1)",
+    venue: "CSE LAB 1 (IT Park)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
        
-        location: "IT PARK(CSE LAB 1)",
+        location: "CSE LAB 1 (IT Park)",
         time: "9:30 AM to 4:00 PM",
         date: "February 12, 2026",
       },
@@ -443,13 +443,13 @@ export const workshopDetails = [
     description: "The Workshop on EV Retrofitting is designed to provide participants with comprehensive knowledge of converting conventional internal combustion engine (ICE) vehicles into electric vehicles. This workshop focuses on fundamental principles, design considerations, and practical aspects involved in EV retrofitting, including motor selection, battery systems, power electronics, motor controllers, charging infrastructure, and safety standards.",
     img: workshop8,
     date: "February 12, 2026",
-    venue: "EEE Project Lab",
+    venue: "EEE Project Lab (Academic Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "EEE Project Lab",
+        location: "EEE Project Lab (Academic Block)",
         time: "2 Days",
         date: "February 12, 2026",
       },
@@ -481,13 +481,13 @@ export const workshopDetails = [
     description: "Students will actively engage in hands-on sessions to explore innovative and sustainable food processing techniques, focusing on waste reduction, energy efficiency, and value addition. Through live demonstrations and guided activities, participants will design, analyze, and improve food processing methods using eco-friendly practices, while collaborating to develop practical solutions for real-world food sustainability challenges.",
     img: workshop9,
     date: "February 12, 2026",
-    venue: "Baking and Confectionery Laboratory",
+    venue: "Baking and Confectionery Laboratory (Food Technology Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
        
-        location: "Baking and Confectionery Laboratory",
+        location: "Baking and Confectionery Laboratory (Food Technology Block)",
         time: "1 Day",
         date: "February 12, 2026",
       },
@@ -519,7 +519,7 @@ export const workshopDetails = [
     description: "This one-day workshop on \"Monetizing Your Idea through Intellectual Property Rights (IPR)\" focuses on helping students, innovators, and early-stage entrepreneurs understand how ideas can be converted into protected intellectual assets and commercially leveraged. The session covers the practical use of patents, copyrights, trademarks, and designs, explaining what can be protected, when to file, and how IPR directly supports revenue generation through licensing, technology transfer, product commercialization, and startup valuation.",
     img: workshop10,
     date: "February 12, 2026",
-    venue: "PTC Conference Hal",
+    venue: "NICE Lab (Academic Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
@@ -527,7 +527,7 @@ export const workshopDetails = [
        
         date: "12 February 2026",
         time: "9:00 AM to 4:00 PM",
-        location: "PTC Conference Hal",
+        location: "NICE Lab (Academic Block)",
       },
     ],
     contact: {
@@ -540,9 +540,13 @@ export const workshopDetails = [
       ],
       studentCoordinator: [
         {
-          name: "Mr. A.Harish",
-          phone: "+91 63642 32959",
+          name: "Abinav S",
+          phone: "+91 9342651164",
         },
+        {
+          name:"Nithin santhosh R",
+          phone:"+91 7010273909",
+        }
       ],
     },
     registrationLink: "",
@@ -554,13 +558,13 @@ export const workshopDetails = [
     description: "This hands-on workshop introduces college students to Git and GitHub for efficient version control and team-based development, covering repositories, commits, branching, merging, and conflict resolution through live demos and practice, while engaging participants in real-world workflows like collaboration and code reviews, ultimately preparing them to confidently use Git and GitHub for academic, internship, hackathon, and industry-level projects.",
     img: workshop11,
     date: "February 12, 2026",
-    venue: "IT LAB 1",
+    venue: "IT LAB 1 (IT Park)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "IT LAB 1",
+        location: "IT LAB 1 (IT Park)",
         time: "1 Day",
         date: "February 12, 2026",
       },
@@ -593,13 +597,13 @@ export const workshopDetails = [
     description: "Flight modes help control how a drone flies, making it safer and easier to operate. This workshop also includes simple drone assembly, covering basic parts, motor fixing, wiring, and controller setup.",
     img: workshop12,
     date: "February 12, 2026",
-    venue: "PLC Laboratory",
+    venue: "PLC Laboratory (Academic Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
       
-        location: "PLC Laboratory",
+        location: "PLC Laboratory (Academic Block)",
         time: "1 Day",
         date: "February 12, 2026",
       },
@@ -631,13 +635,13 @@ export const workshopDetails = [
     description: "This workshop introduces emerging technologies used in modern and future vehicles. Participants gain industry-oriented knowledge on advanced vehicle systems and design trends. The session connects engineering theory with real-time automotive applications.",
     img: workshop13,
     date: "February 12, 2026",
-    venue: "Design Centre",
+    venue: "Design Centre (Mechanical Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "Design Centre",
+        location: "Design Centre (Mechanical Block)",
         time: "1 Day",
         date: "February 12, 2026",
       },
@@ -673,13 +677,13 @@ export const workshopDetails = [
     description: "The workshop provides an introduction to AI concepts and their role in smart medical and healthcare technologies, along with an overview of medical textiles, smart fabrics, and sensor-integrated textile systems. Participants will gain exposure to AI-enabled health monitoring, diagnostics, and wearable medical applications through demonstrations and real-world case studies. The program also offers insights into emerging trends, innovations, and career opportunities in AI-driven medical textiles and healthcare technology.",
     img: workshop14,
     date: "February 12, 2026",
-    venue: "MBA Seminar Hall",
+    venue: "MBA Seminar Hall (MBA Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "MBA Seminar Hall",
+        location: "MBA Seminar Hall (MBA Block)",
         time: "1 Day",
         date: "February 12, 2026",
       },
@@ -717,13 +721,13 @@ export const workshopDetails = [
     description: "This hands-on workshop will guide students through the journey of VLSI design, from logic design to the implementation of test patterns using DFT techniques. Participants will gain practical experience in identifying faults, creating test strategies, and understanding how DFT ensures reliability and efficiency in modern chip design. By the end of the session, students will have a clear understanding of the role of DFT in bridging design and verification in real-world VLSI circuits.",
     img: workshop15,
     date: "February 12, 2026",
-    venue: "VLSI Lab, J Block 1st Floor",
+    venue: "VLSI Lab (Main Building)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
        
-        location: "VLSI Lab, J Block 1st Floor",
+        location: "VLSI Lab (Main Building)",
         time: "9.00 AM to 4.00 PM",
         date: "February 12, 2026",
       },
@@ -770,13 +774,13 @@ export const workshopDetails = [
     description: "Code, Click, Done is a hands-on mobile app development workshop designed to introduce participants to the fundamentals of building functional mobile applications in just one day. This tech event focuses on transforming ideas into real mobile apps through guided coding, interactive demonstrations, and practical exercises.",
     img: workshop16,
     date: "February 12, 2026",
-    venue: "MCA Laboratory",
+    venue: "MCA Laboratory (MBA Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "MCA Laboratory",
+        location: "MCA Laboratory (MBA Block)",
         time: "9:30 AM to 4:00 PM",
         date: "February 12, 2026",
       },
@@ -832,7 +836,7 @@ export const workshopDetails = [
       {
         
         location: "AB LAB-3",
-        time: "1:00PM to 4:30PM ",
+        time: "1:00 PM to 4:30PM ",
         date: "February 12, 2026",
       },
     ],

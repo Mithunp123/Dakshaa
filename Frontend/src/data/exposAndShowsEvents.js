@@ -28,7 +28,7 @@ import txtposter from "../assets/EventsImages/EventDetails/poster/txt_poster.web
 //project
 import mechproject from "../assets/EventsImages/EventDetails/project/mech_project.webp";
 
-/*()
+
 import aidsproject from "../assets/EventsImages/EventDetails/project/aids_project.webp";
 import aimlproject from "../assets/EventsImages/EventDetails/project/aiml_project.webp";
 import civilproject from "../assets/EventsImages/EventDetails/project/civil_project.webp";
@@ -42,7 +42,6 @@ import mctproject from "../assets/EventsImages/EventDetails/project/mct_project.
 import txtproject from "../assets/EventsImages/EventDetails/project/txt_project.webp";
 import ftproject from "../assets/EventsImages/EventDetails/project/ft_project.webp";
 
-*/
 
 // move from technical to here
 
@@ -78,6 +77,98 @@ import Tech23 from "../assets/EventsImages/EventDetails/TechnicalImages/ece_tech
 
 // Paper,poster,project - simple tiles
 export const exposAndShowsEvents = [
+
+
+
+
+  //project
+
+  {
+    image: mechproject,
+    eventId: "project-mech",
+  },
+
+  
+  {
+    image: aidsproject,
+    eventId: "project-aids",
+  },
+  {
+    image: aimlproject,
+    eventId: "project-aiml",
+  },
+  {
+    image: civilproject,
+    eventId: "project-civil",
+  },
+  {
+    image: itproject,
+    eventId: "project-it",
+  },
+
+  {
+    image: cseproject,
+    eventId: "project-cse",
+  },
+  {
+    image: eceproject,
+
+    eventId: "project-ece",
+  },
+  {
+    image: eeproject,
+    eventId: "project-eee",
+  },
+  {
+    image: csbsproject,
+    eventId: "project-csbs",
+  },
+  {
+    image: bioproject,
+    eventId: "project-bio",
+  },
+  
+  {
+    image: mctproject,
+    eventId: "project-mct",
+  },
+  {
+    image: txtproject,
+    eventId: "project-txt",
+  },
+  {
+    image: ftproject,
+    eventId: "project-ft",
+  },
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   //paper
   {
     image: aidspaper,
@@ -212,67 +303,7 @@ export const exposAndShowsEvents = [
     image: txtposter,
     eventId: "poster-txt",
   },
-  //project
-
-  {
-    image: mechproject,
-    eventId: "project-mech",
-  },
-
-  /*
-  {
-    image: aidsproject,
-    eventId: "project-aids",
-  },
-  {
-    image: aimlproject,
-    eventId: "project-aiml",
-  },
-  {
-    image: civilproject,
-    eventId: "project-civil",
-  },
-  {
-    image: itproject,
-    eventId: "project-it",
-  },
-
-  {
-    image: cseproject,
-    eventId: "project-cse",
-  },
-  {
-    image: eceproject,
-
-    eventId: "project-ece",
-  },
-  {
-    image: eeproject,
-    eventId: "project-eee",
-  },
-  {
-    image: csbsproject,
-    eventId: "project-csbs",
-  },
-  {
-    image: bioproject,
-    eventId: "project-bio",
-  },
   
-  {
-    image: mctproject,
-    eventId: "project-mct",
-  },
-  {
-    image: txtproject,
-    eventId: "project-txt",
-  },
-  {
-    image: ftproject,
-    eventId: "project-ft",
-  },
-
-  */
  
         
 
