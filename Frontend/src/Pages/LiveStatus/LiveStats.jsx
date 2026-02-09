@@ -69,6 +69,8 @@ const LiveStats = () => {
   const [stats, setStats] = useState({
     users: 0,
     registrations: 0,
+    totalParticipants: 0,
+    teamMembersCount: 0,
     uniquePaidUsers: 0,
     last_updated: null
   });
@@ -209,10 +211,10 @@ const LiveStats = () => {
 
         const deptCounts = {};
 
-        // Calculate totals for each department by summing individual event counts
+        // Calculate totals for each department by summing individual event counts + team members
         for (const [dept, eventIds] of Object.entries(deptEventMap)) {
             if (eventIds.length === 0) {
-                deptCounts[dept] = 0;
+                deptCounts[dept] = { registrations: 0, teamMembers: 0, total: 0 };
                 continue;
             }
 
@@ -226,11 +228,37 @@ const LiveStats = () => {
             });
 
             // Sum all event counts for this department
-            deptCounts[dept] = Object.values(eventCounts).reduce((sum, count) => sum + count, 0);
+            const regCount = Object.values(eventCounts).reduce((sum, count) => sum + count, 0);
+
+            // Fetch team members for teams associated with these events (non-leaders)
+            const { data: teamMembers, error: teamMembersError } = await supabase
+                .from('team_members')
+                .select('id, role, status, teams!inner(event_id, is_active)')
+                .in('teams.event_id', eventIds)
+                .eq('teams.is_active', true)
+                .neq('role', 'leader')
+                .eq('status', 'joined');
+            
+            if (teamMembersError) {
+                console.error('Error fetching team members for dept stats:', teamMembersError);
+            }
+
+            const teamMembersCount = teamMembers?.length || 0;
+
+            deptCounts[dept] = {
+                registrations: regCount,
+                teamMembers: teamMembersCount,
+                total: regCount + teamMembersCount
+            };
         }
 
         const formatted = Object.entries(deptCounts)
-            .map(([dept, count]) => ({ dept, count }))
+            .map(([dept, counts]) => ({ 
+                dept, 
+                count: counts.total,
+                registrations: counts.registrations,
+                teamMembers: counts.teamMembers
+            }))
             .sort((a, b) => b.count - a.count);
             
         setDeptStats(formatted);
@@ -277,13 +305,41 @@ const LiveStats = () => {
             eventCounts[reg.event_id] = (eventCounts[reg.event_id] || 0) + 1;
         });
 
-        // Format the data
+        // Fetch team members for each event (non-leaders only)
+        const { data: teamMembers, error: teamMembersError } = await supabase
+            .from('team_members')
+            .select('id, team_id, role, status, teams!inner(event_id, is_active)')
+            .in('teams.event_id', eventIds)
+            .eq('teams.is_active', true)
+            .neq('role', 'leader')
+            .eq('status', 'joined');
+        
+        if (teamMembersError) {
+            console.error('Error fetching team members for dept event details:', teamMembersError);
+        }
+
+        // Count team members per event
+        const teamMemberCounts = {};
+        (teamMembers || []).forEach(tm => {
+            const eventId = tm.teams?.event_id;
+            if (eventId) {
+                teamMemberCounts[eventId] = (teamMemberCounts[eventId] || 0) + 1;
+            }
+        });
+
+        // Format the data with both registrations and team members
         const eventDetails = deptEvents
-            .map(event => ({
-                id: event.id,
-                name: event.name,
-                count: eventCounts[event.id] || 0
-            }))
+            .map(event => {
+                const regCount = eventCounts[event.id] || 0;
+                const tmCount = teamMemberCounts[event.id] || 0;
+                return {
+                    id: event.id,
+                    name: event.name,
+                    registrations: regCount,
+                    teamMembers: tmCount,
+                    count: regCount + tmCount
+                };
+            })
             .sort((a, b) => b.count - a.count);
 
         setDeptEventDetails(prev => ({ ...prev, [deptName]: eventDetails }));
@@ -346,13 +402,41 @@ const LiveStats = () => {
             eventCounts[reg.event_id] = (eventCounts[reg.event_id] || 0) + 1;
         });
 
-        // Format the data
+        // Fetch team members for each event (non-leaders only)
+        const { data: teamMembers, error: teamMembersError } = await supabase
+            .from('team_members')
+            .select('id, team_id, role, status, teams!inner(event_id, is_active)')
+            .in('teams.event_id', eventIds)
+            .eq('teams.is_active', true)
+            .neq('role', 'leader')
+            .eq('status', 'joined');
+        
+        if (teamMembersError) {
+            console.error('Error fetching team members for conference event details:', teamMembersError);
+        }
+
+        // Count team members per event
+        const teamMemberCounts = {};
+        (teamMembers || []).forEach(tm => {
+            const eventId = tm.teams?.event_id;
+            if (eventId) {
+                teamMemberCounts[eventId] = (teamMemberCounts[eventId] || 0) + 1;
+            }
+        });
+
+        // Format the data with both registrations and team members
         const eventDetails = conferenceEvents
-            .map(event => ({
-                id: event.id,
-                name: event.name,
-                count: eventCounts[event.id] || 0
-            }))
+            .map(event => {
+                const regCount = eventCounts[event.id] || 0;
+                const tmCount = teamMemberCounts[event.id] || 0;
+                return {
+                    id: event.id,
+                    name: event.name,
+                    registrations: regCount,
+                    teamMembers: tmCount,
+                    count: regCount + tmCount
+                };
+            })
             .sort((a, b) => b.count - a.count);
 
         console.log('✅ Conference event details ready:', eventDetails);
@@ -429,14 +513,48 @@ const LiveStats = () => {
                 }
             });
 
-            // Format as event-like data for display
+            // Fetch team members for conference events (non-leaders only)
+            const { data: teamMembers, error: teamMembersError } = await supabase
+                .from('team_members')
+                .select('id, team_id, role, status, teams!inner(event_id, is_active)')
+                .in('teams.event_id', allEventIds)
+                .eq('teams.is_active', true)
+                .neq('role', 'leader')
+                .eq('status', 'joined');
+            
+            if (teamMembersError) {
+                console.error('Error fetching team members for conference category:', teamMembersError);
+            }
+
+            // Count team members per conference
+            const conferenceTeamMemberCounts = {};
+            (teamMembers || []).forEach(tm => {
+                const eventId = tm.teams?.event_id;
+                if (eventId) {
+                    // Find which conference this event belongs to
+                    for (const [confName, eventIds] of Object.entries(conferenceMap)) {
+                        if (eventIds.includes(eventId)) {
+                            conferenceTeamMemberCounts[confName] = (conferenceTeamMemberCounts[confName] || 0) + 1;
+                            break;
+                        }
+                    }
+                }
+            });
+
+            // Format as event-like data for display with team members
             const conferenceDetails = Object.entries(conferenceMap)
-                .map(([confName]) => ({
-                    id: confName,
-                    name: confName,
-                    count: conferenceCounts[confName] || 0,
-                    isConference: true // Flag to identify this as a conference group
-                }))
+                .map(([confName]) => {
+                    const regCount = conferenceCounts[confName] || 0;
+                    const tmCount = conferenceTeamMemberCounts[confName] || 0;
+                    return {
+                        id: confName,
+                        name: confName,
+                        registrations: regCount,
+                        teamMembers: tmCount,
+                        count: regCount + tmCount,
+                        isConference: true // Flag to identify this as a conference group
+                    };
+                })
                 .sort((a, b) => b.count - a.count);
 
             console.log('✅ Conference details formatted:', conferenceDetails);
@@ -486,13 +604,41 @@ const LiveStats = () => {
             eventCounts[reg.event_id] = (eventCounts[reg.event_id] || 0) + 1;
         });
 
-        // Format the data
+        // Fetch team members for each event (non-leaders only)
+        const { data: teamMembers, error: teamMembersError } = await supabase
+            .from('team_members')
+            .select('id, team_id, role, status, teams!inner(event_id, is_active)')
+            .in('teams.event_id', eventIds)
+            .eq('teams.is_active', true)
+            .neq('role', 'leader')
+            .eq('status', 'joined');
+        
+        if (teamMembersError) {
+            console.error('Error fetching team members for category event details:', teamMembersError);
+        }
+
+        // Count team members per event
+        const teamMemberCounts = {};
+        (teamMembers || []).forEach(tm => {
+            const eventId = tm.teams?.event_id;
+            if (eventId) {
+                teamMemberCounts[eventId] = (teamMemberCounts[eventId] || 0) + 1;
+            }
+        });
+
+        // Format the data with both registrations and team members
         const eventDetails = categoryEvents
-            .map(event => ({
-                id: event.id,
-                name: event.name,
-                count: eventCounts[event.id] || 0
-            }))
+            .map(event => {
+                const regCount = eventCounts[event.id] || 0;
+                const tmCount = teamMemberCounts[event.id] || 0;
+                return {
+                    id: event.id,
+                    name: event.name,
+                    registrations: regCount,
+                    teamMembers: tmCount,
+                    count: regCount + tmCount
+                };
+            })
             .sort((a, b) => b.count - a.count);
 
         setCategoryEventDetails(prev => ({ ...prev, [categoryName]: eventDetails }));
@@ -513,6 +659,34 @@ const LiveStats = () => {
         }
     }
   };
+
+    const fetchTeamParticipantStats = async () => {
+        try {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+            const response = await fetch(`${apiUrl}/api/live/participant-stats`);
+            if (!response.ok) {
+                throw new Error(`Team stats API failed: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (!data?.success) {
+                throw new Error('Team stats API returned no success flag');
+            }
+
+            return {
+                extraPaidMembers: Number(data.extraPaidMembers) || 0,
+                activeTeamCount: Number(data.activeTeamCount) || 0,
+                totalPaidMembers: Number(data.totalPaidMembers) || 0
+            };
+        } catch (error) {
+            console.error('❌ Error fetching team participant stats:', error);
+            return {
+                extraPaidMembers: 0,
+                activeTeamCount: 0,
+                totalPaidMembers: 0
+            };
+        }
+    };
 
     const fetchCategoryStats = async () => {
         try {
@@ -540,7 +714,7 @@ const LiveStats = () => {
               if (queryModifier) query = queryModifier(query);
               
               query = query.range(page * pageSize, (page + 1) * pageSize - 1);
-              
+
               const { data, error } = await query;
               if (error) {
                   console.error(`fetchAllData error for ${table}:`, error);
@@ -575,23 +749,10 @@ const LiveStats = () => {
       // Formula: Total Paid Participants = (PAID Registrations) + (Total Team Paid Members - Active Team Count)
       // Note: If (Sum(paid_members) - Count(active_teams)) is negative, use 0.
       
-      const activeTeams = await fetchAllData('teams', 'paid_members', q => q.eq('is_active', true));
-      
-      let totalTeamPaidMembers = 0;
-      let activeTeamCount = activeTeams.length;
-      
-      activeTeams.forEach(team => {
-        // Force number conversion to avoid string concatenation issues
-        const pMembers = Number(team.paid_members);
-        const val = isNaN(pMembers) ? 0 : pMembers;
-        totalTeamPaidMembers += val;
-      });
-      
-      // Subtraction logic: Sum(paid_members) - Count(active_teams)
-      let extraPaidMembers = totalTeamPaidMembers - activeTeamCount;
-      if (extraPaidMembers < 0) {
-          extraPaidMembers = 0;
-      }
+            const teamStats = await fetchTeamParticipantStats();
+            const totalTeamPaidMembers = teamStats.totalPaidMembers;
+            const activeTeamCount = teamStats.activeTeamCount;
+            const extraPaidMembers = teamStats.extraPaidMembers;
       
       const totalParticipants = validRegs.length + extraPaidMembers;
       console.log('👥 Participant Calculation (Python Logic Match):', {
@@ -699,28 +860,42 @@ const LiveStats = () => {
     try {
         console.log("🔍 Using fallback counting method...");
         
-        // Multiple counting approaches to find the accurate count
+        // Execute queries in parallel with manual join for teams to ensure accuracy
         const [
-          standardPaidCount,
-          caseInsensitivePaidCount,
-          allStatusesCount,
-          studentCount
+            regStats,
+            studentStats,
+            teamMemberCount
         ] = await Promise.all([
-          // Standard PAID count
-          supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).eq('payment_status', 'PAID'),
-          // Case-insensitive PAID count using ilike
-          supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).ilike('payment_status', 'paid'),
-          // All registrations to see total
-          supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }),
-          // Student count
-          supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student')
+            // 1. Registrations stats (various payment status checks)
+            Promise.all([
+                supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).eq('payment_status', 'PAID'),
+                supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).ilike('payment_status', 'paid'),
+                supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }) // Total
+            ]),
+            // 2. Student profiles
+            supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+            // 3. Team Members (Use backend API to bypass RLS)
+            (async () => {
+                const teamStats = await fetchTeamParticipantStats();
+                console.log(
+                  `👥 Team Stats Debug (API): Active Teams=${teamStats.activeTeamCount}, ` +
+                  `Total Paid Members Sum=${teamStats.totalPaidMembers}, Additional Members=${teamStats.extraPaidMembers}`
+                );
+                return teamStats.extraPaidMembers;
+            })()
         ]);
+
+        const [standardPaidCount, caseInsensitivePaidCount, allStatusesCount] = regStats;
+        const studentCount = studentStats;
+        const teamMembersCount = teamMemberCount;
 
         console.log("📊 Comprehensive Count Results:");
         console.log("- Standard 'PAID' count:", standardPaidCount.count);
         console.log("- Case-insensitive 'paid' count:", caseInsensitivePaidCount.count);
         console.log("- Total registrations (all statuses):", allStatusesCount.count);
         console.log("- Student profiles:", studentCount.count);
+        console.log("- Team Members (calculated):", teamMembersCount);
+
         
         // Get a sample of payment statuses to debug
         const statusSample = await supabase
@@ -780,10 +955,14 @@ const LiveStats = () => {
             // Use manual count if it's different
             if (manualCount !== maxCount) {
               console.log("⚡ Using manual count as it differs from DB count");
+              const totalParticipants = manualCount + teamMembersCount;
+              console.log("📊 Total Participants (registrations + team members):", totalParticipants);
               setStats(prev => ({
                 ...prev,
                 users: studentCount.count || 0,
                 registrations: manualCount,
+                teamMembersCount: teamMembersCount,
+                totalParticipants: totalParticipants,
                 last_updated: new Date().toISOString()
               }));
               return;
@@ -791,10 +970,15 @@ const LiveStats = () => {
           }
         }
 
+        const totalParticipants = maxCount + teamMembersCount;
+        console.log("📊 Total Participants (registrations + team members):", totalParticipants);
+        
         setStats(prev => ({
           ...prev,
           users: studentCount.count || 0,
           registrations: maxCount,
+          teamMembersCount: teamMembersCount,
+          totalParticipants: totalParticipants,
           last_updated: new Date().toISOString()
         }));
         
@@ -927,6 +1111,35 @@ const LiveStats = () => {
           } catch (error) {
             console.error('❌ Error processing registration update:', error);
           }
+        }
+      );
+
+      // Listen for team member changes (Joining/Leaving)
+      channel.on(
+        'postgres_changes',
+        {
+            event: '*',
+            schema: 'public',
+            table: 'team_members'
+        },
+        async (payload) => {
+            console.log('👥 Team member change detected:', payload);
+            // Re-run stats to get accurate participants count
+            await fetchStatsFallback();
+        }
+      );
+
+      // Listen for team changes (specifically paid_members count updates)
+      channel.on(
+        'postgres_changes',
+        {
+            event: '*',
+            schema: 'public',
+            table: 'teams'
+        },
+        async (payload) => {
+             console.log('🛡️ Team data changed:', payload);
+             await fetchStatsFallback();
         }
       );
 
@@ -1087,7 +1300,7 @@ const LiveStats = () => {
             <div className="xl:col-span-3 flex flex-col gap-4 xl:gap-6 h-full min-h-0">
                 
                 {/* Big Cards - Horizontal on mobile, larger on desktop */}
-                <div className="grid grid-cols-2 gap-3 md:gap-8 shrink-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 shrink-0">
                     {/* Students Onboarded Card */}
                     <motion.div
                         initial={{ x: -100, opacity: 0 }}
@@ -1097,22 +1310,22 @@ const LiveStats = () => {
                     >
                         <div className="absolute -inset-1 bg-gradient-to-r from-secondary to-orange-600 rounded-2xl md:rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
                         
-                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-orange-500/30 rounded-2xl md:rounded-3xl p-3 md:p-8 h-full flex flex-col justify-center min-h-[140px] md:min-h-[260px]">
+                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-orange-500/30 rounded-2xl md:rounded-3xl p-3 md:p-6 h-full flex flex-col justify-center min-h-[140px] md:min-h-[220px]">
                         {/* Icon */}
                         <div className="flex justify-center mb-2 md:mb-4">
-                            <div className="w-10 h-10 md:w-16 md:h-16 bg-secondary/20 rounded-xl md:rounded-2xl flex items-center justify-center">
-                            <Users className="w-5 h-5 md:w-8 md:h-8 text-secondary" />
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-secondary/20 rounded-xl md:rounded-2xl flex items-center justify-center">
+                            <Users className="w-5 h-5 md:w-6 md:h-6 text-secondary" />
                             </div>
                         </div>
 
                         {/* Label */}
-                        <h2 className="text-xs md:text-xl font-bold text-gray-300 text-center mb-1 md:mb-3 uppercase tracking-wider">
+                        <h2 className="text-xs md:text-sm lg:text-lg font-bold text-gray-300 text-center mb-1 md:mb-3 uppercase tracking-wider">
                             Students Joined
                         </h2>
 
                         {/* Counter */}
                         <div className="text-center">
-                            <div className="text-2xl md:text-6xl lg:text-7xl font-black text-secondary mb-1 md:mb-2 tabular-nums">
+                            <div className="text-2xl md:text-5xl lg:text-6xl font-black text-secondary mb-1 md:mb-2 tabular-nums">
                             <CountUp 
                                 end={stats.users} 
                                 duration={2}
@@ -1122,37 +1335,37 @@ const LiveStats = () => {
                             </div>
                             <div className="flex items-center justify-center gap-1 md:gap-2 text-green-400">
                             <TrendingUp className="w-3 h-3 md:w-4 md:h-4" />
-                            <span className="text-[10px] md:text-base font-semibold">Total Onboarded</span>
+                            <span className="text-[10px] md:text-xs font-semibold">Total Onboarded</span>
                             </div>
                         </div>
                         </div>
                     </motion.div>
 
-                    {/* Total Registrations Card */}
+                    {/* Total Registrations Card (Original) */}
                     <motion.div
-                        initial={{ x: 100, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.4 }}
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
                         className="relative group"
                     >
-                        <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-2xl md:rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
+                        <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl md:rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
                         
-                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-2xl md:rounded-3xl p-3 md:p-8 h-full flex flex-col justify-center min-h-[140px] md:min-h-[260px]">
+                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-blue-500/30 rounded-2xl md:rounded-3xl p-3 md:p-6 h-full flex flex-col justify-center min-h-[140px] md:min-h-[220px]">
                         {/* Icon */}
                         <div className="flex justify-center mb-2 md:mb-4">
-                            <div className="w-10 h-10 md:w-16 md:h-16 bg-primary/20 rounded-xl md:rounded-2xl flex items-center justify-center">
-                            <TicketCheck className="w-5 h-5 md:w-8 md:h-8 text-primary" />
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-500/20 rounded-xl md:rounded-2xl flex items-center justify-center">
+                            <TicketCheck className="w-5 h-5 md:w-6 md:h-6 text-blue-500" />
                             </div>
                         </div>
 
                         {/* Label */}
-                        <h2 className="text-xs md:text-xl font-bold text-gray-300 text-center mb-1 md:mb-3 uppercase tracking-wider">
+                        <h2 className="text-xs md:text-sm lg:text-lg font-bold text-gray-300 text-center mb-1 md:mb-3 uppercase tracking-wider">
                             Registrations
                         </h2>
 
                         {/* Counter */}
                         <div className="text-center flex flex-col items-center justify-center">
-                            <div className="text-2xl md:text-6xl lg:text-7xl font-black text-primary mb-1 md:mb-2 tabular-nums tracking-tight">
+                            <div className="text-2xl md:text-5xl lg:text-6xl font-black text-blue-500 mb-1 md:mb-2 tabular-nums tracking-tight">
                             <CountUp 
                                 end={stats.registrations} 
                                 duration={2}
@@ -1162,7 +1375,43 @@ const LiveStats = () => {
                             </div>
                             <div className="flex items-center justify-center gap-1 md:gap-2 text-green-400">
                             <TrendingUp className="w-3 h-3 md:w-4 md:h-4" />
-                            <span className="text-[10px] md:text-base font-semibold">Total Seats Filled</span>
+                            <span className="text-[10px] md:text-xs font-semibold">Confirmed Seats</span>
+                            </div>
+                        </div>
+                        </div>
+                    </motion.div>
+
+                    {/* Total Participants Card (New) */}
+                    <motion.div
+                        initial={{ x: 100, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                        className="relative group col-span-2 md:col-span-1"
+                    >
+                        <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-2xl md:rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
+                        
+                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-2xl md:rounded-3xl p-3 md:p-6 h-full flex flex-col justify-center min-h-[140px] md:min-h-[220px]">
+                        {/* Icon */}
+                        <div className="flex justify-center mb-2 md:mb-4">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/20 rounded-xl md:rounded-2xl flex items-center justify-center">
+                            <Users className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                            </div>
+                        </div>
+
+                        {/* Label */}
+                        <h2 className="text-xs md:text-sm lg:text-lg font-bold text-gray-300 text-center mb-1 md:mb-3 uppercase tracking-wider">
+                            Total Participants
+                        </h2>
+
+                        {/* Counter - Total Participants */}
+                        <div className="text-center flex flex-col items-center justify-center">
+                            <div className="text-2xl md:text-5xl lg:text-6xl font-black text-primary mb-1 md:mb-2 tabular-nums tracking-tight">
+                            <CountUp 
+                                end={stats.totalParticipants} 
+                                duration={2}
+                                separator=","
+                                preserveValue
+                            />
                             </div>
                         </div>
 
@@ -1182,7 +1431,7 @@ const LiveStats = () => {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="grid grid-cols-4 md:grid-cols-7 gap-2 md:gap-4 shrink-0"
+                    className="flex md:grid md:grid-cols-7 gap-2 md:gap-4 shrink-0 overflow-x-auto md:overflow-visible pb-1 md:pb-0 mb-4 md:mb-0"
                 >
                     {categoryStats.map((stat, index) => (
                     <motion.div 
@@ -1190,7 +1439,7 @@ const LiveStats = () => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.6 + (index * 0.1) }}
-                        className="relative bg-gray-900 border border-gray-700/50 rounded-xl md:rounded-2xl p-2 md:p-3 hover:border-primary/30 transition-all group overflow-hidden cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-primary/20"
+                        className="relative bg-gray-900 border border-gray-700/50 rounded-xl md:rounded-2xl p-2 md:p-3 hover:border-primary/30 transition-all group overflow-hidden cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-primary/20 shrink-0 w-20 md:w-auto"
                         onClick={() => toggleCategoryExpansion(stat.category)}
                     >
                         <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-40 transition-opacity hidden md:block">
@@ -1210,7 +1459,7 @@ const LiveStats = () => {
                 initial={{ x: 100, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.7 }}
-                className="xl:col-span-2 min-h-0 flex flex-col pl-0 xl:pl-4 mt-2 xl:mt-0"
+                className="xl:col-span-2 min-h-0 flex flex-col pl-0 xl:pl-4 mt-6 md:mt-4 xl:mt-0"
             >
                  <div className="flex items-center justify-between mb-3 md:mb-4 px-2 shrink-0">
                     <div className="flex items-center gap-2 md:gap-3">
@@ -1347,7 +1596,9 @@ const LiveStats = () => {
                                                                 <h4 className="text-white font-semibold text-sm group-hover:text-primary transition-colors truncate">
                                                                     {event.name}
                                                                 </h4>
-                                                                <p className="text-xs text-gray-400">Registrations</p>
+                                                                <p className="text-xs text-gray-400">
+                                                                    {event.registrations || 0} Regs + {event.teamMembers || 0} Team Members
+                                                                </p>
                                                             </div>
                                                         </div>
                                                         <div className={`bg-gradient-to-r rounded-lg px-4 py-2 shrink-0 ${
@@ -1372,7 +1623,12 @@ const LiveStats = () => {
                                 {deptEventDetails[expandedDept]?.length > 0 && (
                                     <div className="mt-4 pt-4 border-t border-gray-700/30">
                                         <div className="flex items-center justify-between bg-gradient-to-r from-primary/10 to-purple-600/10 rounded-lg p-3">
-                                            <span className="text-gray-300 font-semibold">Total Registrations</span>
+                                            <div className="flex flex-col">
+                                                <span className="text-gray-300 font-semibold">Total Participants</span>
+                                                <span className="text-xs text-gray-500">
+                                                    {deptEventDetails[expandedDept]?.reduce((sum, e) => sum + (e.registrations || 0), 0)} Registrations + {deptEventDetails[expandedDept]?.reduce((sum, e) => sum + (e.teamMembers || 0), 0)} Team Members
+                                                </span>
+                                            </div>
                                             <span className="text-3xl font-black text-primary font-mono">
                                                 {deptEventDetails[expandedDept]?.reduce((sum, e) => sum + e.count, 0)}
                                             </span>
@@ -1465,7 +1721,8 @@ const LiveStats = () => {
                                                                     {event.name}
                                                                 </h4>
                                                                 <p className="text-xs text-gray-400">
-                                                                    {event.isConference ? 'Conference • Click for Events' : 'Registrations'}
+                                                                    {event.isConference ? 'Conference • Click for Events' : 
+                                                                     `${event.registrations || 0} Regs + ${event.teamMembers || 0} Team Members`}
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -1491,7 +1748,12 @@ const LiveStats = () => {
                                 {categoryEventDetails[expandedCategory]?.length > 0 && (
                                     <div className="mt-4 pt-4 border-t border-gray-700/30">
                                         <div className="flex items-center justify-between bg-gradient-to-r from-secondary/10 to-orange-600/10 rounded-lg p-3">
-                                            <span className="text-gray-300 font-semibold">Total Registrations</span>
+                                            <div className="flex flex-col">
+                                                <span className="text-gray-300 font-semibold">Total Participants</span>
+                                                <span className="text-xs text-gray-500">
+                                                    {categoryEventDetails[expandedCategory]?.reduce((sum, e) => sum + (e.registrations || 0), 0)} Registrations + {categoryEventDetails[expandedCategory]?.reduce((sum, e) => sum + (e.teamMembers || 0), 0)} Team Members
+                                                </span>
+                                            </div>
                                             <span className="text-3xl font-black text-secondary font-mono">
                                                 {categoryEventDetails[expandedCategory]?.reduce((sum, e) => sum + e.count, 0)}
                                             </span>
@@ -1576,7 +1838,9 @@ const LiveStats = () => {
                                                                 <h4 className="text-white font-semibold text-sm group-hover:text-primary transition-colors truncate">
                                                                     {event.name}
                                                                 </h4>
-                                                                <p className="text-xs text-gray-400">Registrations</p>
+                                                                <p className="text-xs text-gray-400">
+                                                                    {event.registrations || 0} Regs + {event.teamMembers || 0} Team Members
+                                                                </p>
                                                             </div>
                                                         </div>
                                                         <div className={`bg-gradient-to-r rounded-lg px-4 py-2 shrink-0 ${
@@ -1601,7 +1865,12 @@ const LiveStats = () => {
                                 {conferenceEventDetails[expandedConference]?.length > 0 && (
                                     <div className="mt-4 pt-4 border-t border-gray-700/30">
                                         <div className="flex items-center justify-between bg-gradient-to-r from-primary/10 to-purple-600/10 rounded-lg p-3">
-                                            <span className="text-gray-300 font-semibold">Total Registrations</span>
+                                            <div className="flex flex-col">
+                                                <span className="text-gray-300 font-semibold">Total Participants</span>
+                                                <span className="text-xs text-gray-500">
+                                                    {conferenceEventDetails[expandedConference]?.reduce((sum, e) => sum + (e.registrations || 0), 0)} Registrations + {conferenceEventDetails[expandedConference]?.reduce((sum, e) => sum + (e.teamMembers || 0), 0)} Team Members
+                                                </span>
+                                            </div>
                                             <span className="text-3xl font-black text-primary font-mono">
                                                 {conferenceEventDetails[expandedConference]?.reduce((sum, e) => sum + e.count, 0)}
                                             </span>

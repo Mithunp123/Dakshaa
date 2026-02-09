@@ -2152,6 +2152,37 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
 });
 
 /* 🟢 Admin Dashboard - Overview Stats (Bypasses 1000 record limit) */
+app.get("/api/live/participant-stats", async (req, res) => {
+  try {
+    const { data: teams, error } = await supabase
+      .from('teams')
+      .select('id, paid_members')
+      .eq('is_active', true);
+
+    if (error) {
+      throw error;
+    }
+
+    const activeTeamCount = teams?.length || 0;
+    const totalPaidMembers = (teams || []).reduce((sum, team) => {
+      return sum + (Number(team.paid_members) || 0);
+    }, 0);
+
+    const extraPaidMembers = Math.max(0, totalPaidMembers - activeTeamCount);
+
+    res.json({
+      success: true,
+      activeTeamCount,
+      totalPaidMembers,
+      extraPaidMembers
+    });
+  } catch (error) {
+    console.error('Live participant stats API error:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch participant stats' });
+  }
+});
+
+/* 🟢 Admin Dashboard - Overview Stats (Bypasses 1000 record limit) */
 app.get("/api/admin/overview-stats", async (req, res) => {
   try {
     console.log('📊 Fetching overview stats with pagination (bypassing 1000 limit)...');
