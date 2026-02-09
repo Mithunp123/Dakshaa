@@ -2150,6 +2150,278 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+/* 🟢 Admin Dashboard - Overview Stats (Bypasses 1000 record limit) */
+app.get("/api/admin/overview-stats", async (req, res) => {
+  try {
+    console.log('📊 Fetching overview stats with pagination (bypassing 1000 limit)...');
+    
+    const { event_ids } = req.query; // Optional: filter by specific event IDs for coordinators
+    const allowedEventIds = event_ids ? event_ids.split(',') : null;
+
+    // Fetch ALL paid registrations using pagination
+    let paidFilters = [
+      { column: 'payment_status', operator: 'in', value: ['PAID', 'completed'] }
+    ];
+    
+    if (allowedEventIds && allowedEventIds.length > 0) {
+      paidFilters.push({ column: 'event_id', operator: 'in', value: allowedEventIds });
+    }
+
+    const { data: paidRegistrations, error: paidError } = await fetchAllRecords(
+      'event_registrations_config',
+      'id, payment_amount, payment_status, registered_at, event_id',
+      { filters: paidFilters }
+    );
+
+    if (paidError) throw paidError;
+
+    // Calculate total revenue from ALL paid registrations (event registrations only)
+    let eventRevenue = 0;
+    if (paidRegistrations && paidRegistrations.length > 0) {
+      eventRevenue = paidRegistrations.reduce((sum, r) => sum + (Number(r.payment_amount) || 0), 0);
+    }
+
+    console.log(`✅ Total paid registrations: ${paidRegistrations?.length || 0}, Event Revenue: ₹${eventRevenue}`);
+
+    // Fetch ALL PENDING registrations for pending amount calculation
+    let pendingFilters = [
+      { column: 'payment_status', operator: 'in', value: ['PENDING', 'pending', 'initiated'] }
+    ];
+    
+    if (allowedEventIds && allowedEventIds.length > 0) {
+      pendingFilters.push({ column: 'event_id', operator: 'in', value: allowedEventIds });
+    }
+
+    const { data: pendingRegistrations, error: pendingError } = await fetchAllRecords(
+      'event_registrations_config',
+      'id, payment_amount, payment_status',
+      { filters: pendingFilters }
+    );
+
+    let pendingAmount = 0;
+    if (!pendingError && pendingRegistrations && pendingRegistrations.length > 0) {
+      pendingAmount = pendingRegistrations.reduce((sum, r) => sum + (Number(r.payment_amount) || 0), 0);
+    }
+    console.log(`✅ Pending registrations: ${pendingRegistrations?.length || 0}, Pending Amount: ₹${pendingAmount}`);
+
+    // Fetch ALL paid accommodation requests using pagination
+    const { data: paidAccommodations, error: accomError } = await fetchAllRecords(
+      'accommodation_requests',
+      'id, total_price, payment_status',
+      {
+        filters: [
+          { column: 'payment_status', operator: 'in', value: ['PAID', 'paid', 'completed'] }
+        ]
+      }
+    );
+
+    let accommodationRevenue = 0;
+    if (!accomError && paidAccommodations && paidAccommodations.length > 0) {
+      accommodationRevenue = paidAccommodations.reduce((sum, r) => sum + (Number(r.total_price) || 0), 0);
+    }
+    console.log(`✅ Paid accommodations: ${paidAccommodations?.length || 0}, Accommodation Revenue: ₹${accommodationRevenue}`);
+
+    // Fetch pending accommodation requests
+    const { data: pendingAccommodations, error: pendingAccomError } = await fetchAllRecords(
+      'accommodation_requests',
+      'id, total_price, payment_status',
+      {
+        filters: [
+          { column: 'payment_status', operator: 'in', value: ['PENDING', 'pending', 'initiated'] }
+        ]
+      }
+    );
+
+    let pendingAccommodationAmount = 0;
+    if (!pendingAccomError && pendingAccommodations && pendingAccommodations.length > 0) {
+      pendingAccommodationAmount = pendingAccommodations.reduce((sum, r) => sum + (Number(r.total_price) || 0), 0);
+    }
+    console.log(`✅ Pending accommodations: ${pendingAccommodations?.length || 0}, Pending Accommodation: ₹${pendingAccommodationAmount}`);
+
+    // Fetch ALL paid combo purchases using pagination
+    const { data: paidCombos, error: comboError } = await fetchAllRecords(
+      'combo_purchases',
+      'id, combo_id, payment_status',
+      {
+        filters: [
+          { column: 'payment_status', operator: 'in', value: ['PAID', 'paid', 'completed'] }
+        ]
+      }
+    );
+
+    let comboRevenue = 0;
+    if (!comboError && paidCombos && paidCombos.length > 0) {
+      // Fetch combo prices from combos table
+      const comboIds = [...new Set(paidCombos.map(c => c.combo_id).filter(id => id))];
+      if (comboIds.length > 0) {
+        const { data: combosData, error: combosError } = await supabase
+          .from('combos')
+          .select('id, price')
+          .in('id', comboIds);
+        
+        if (!combosError && combosData) {
+          const comboPriceMap = new Map(combosData.map(c => [c.id, Number(c.price) || 0]));
+          comboRevenue = paidCombos.reduce((sum, purchase) => {
+            return sum + (comboPriceMap.get(purchase.combo_id) || 0);
+          }, 0);
+        }
+      }
+    }
+    console.log(`✅ Paid combos: ${paidCombos?.length || 0}, Combo Revenue: ₹${comboRevenue}`);
+
+    // Fetch pending combo purchases
+    const { data: pendingCombos, error: pendingComboError } = await fetchAllRecords(
+      'combo_purchases',
+      'id, combo_id, payment_status',
+      {
+        filters: [
+          { column: 'payment_status', operator: 'in', value: ['PENDING', 'pending', 'initiated'] }
+        ]
+      }
+    );
+
+    let pendingComboAmount = 0;
+    if (!pendingComboError && pendingCombos && pendingCombos.length > 0) {
+      const comboIds = [...new Set(pendingCombos.map(c => c.combo_id).filter(id => id))];
+      if (comboIds.length > 0) {
+        const { data: combosData, error: combosError } = await supabase
+          .from('combos')
+          .select('id, price')
+          .in('id', comboIds);
+        
+        if (!combosError && combosData) {
+          const comboPriceMap = new Map(combosData.map(c => [c.id, Number(c.price) || 0]));
+          pendingComboAmount = pendingCombos.reduce((sum, purchase) => {
+            return sum + (comboPriceMap.get(purchase.combo_id) || 0);
+          }, 0);
+        }
+      }
+    }
+    console.log(`✅ Pending combos: ${pendingCombos?.length || 0}, Pending Combo Amount: ₹${pendingComboAmount}`);
+
+    // Calculate combined totals (including combo revenue)
+    const totalRevenue = eventRevenue + accommodationRevenue + comboRevenue;
+    const totalPendingAmount = pendingAmount + pendingAccommodationAmount + pendingComboAmount;
+
+    console.log(`📊 TOTAL REVENUE: ₹${totalRevenue} (Events: ₹${eventRevenue} + Accommodation: ₹${accommodationRevenue} + Combos: ₹${comboRevenue})`);
+    console.log(`📊 TOTAL PENDING: ₹${totalPendingAmount} (Events: ₹${pendingAmount} + Accommodation: ₹${pendingAccommodationAmount} + Combos: ₹${pendingComboAmount})`);
+
+    // Fetch total registrations count
+    let regCountQuery = supabase
+      .from('event_registrations_config')
+      .select('id', { count: 'exact', head: true })
+      .in('payment_status', ['PAID', 'completed']);
+    
+    if (allowedEventIds && allowedEventIds.length > 0) {
+      regCountQuery = regCountQuery.in('event_id', allowedEventIds);
+    }
+    
+    const { count: totalRegistrations, error: regCountError } = await regCountQuery;
+    if (regCountError) console.error('Error counting registrations:', regCountError);
+
+    // Fetch check-ins count
+    let checkinQuery = supabase
+      .from('attendance')
+      .select('id', { count: 'exact', head: true });
+    
+    if (allowedEventIds && allowedEventIds.length > 0) {
+      checkinQuery = checkinQuery.in('event_id', allowedEventIds);
+    }
+    
+    const { count: totalCheckins, error: checkinError } = await checkinQuery;
+    if (checkinError) console.error('Error counting check-ins:', checkinError);
+
+    // Fetch events counts
+    let eventsQuery = supabase
+      .from('events')
+      .select('id', { count: 'exact', head: true });
+    
+    if (allowedEventIds && allowedEventIds.length > 0) {
+      eventsQuery = eventsQuery.in('id', allowedEventIds);
+    }
+    
+    const { count: totalEvents, error: eventsError } = await eventsQuery;
+    if (eventsError) console.error('Error counting events:', eventsError);
+
+    // Fetch active/open events
+    let activeQuery = supabase
+      .from('events')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_open', true);
+    
+    if (allowedEventIds && allowedEventIds.length > 0) {
+      activeQuery = activeQuery.in('id', allowedEventIds);
+    }
+    
+    const { count: activeEvents, error: activeError } = await activeQuery;
+    if (activeError) console.error('Error counting active events:', activeError);
+
+    // Fetch users count
+    const { count: totalUsers, error: usersError } = await supabase
+      .from('profiles')
+      .select('id', { count: 'exact', head: true });
+    if (usersError) console.error('Error counting users:', usersError);
+
+    // Fetch recent paid registrations (last 5)
+    let recentQuery = supabase
+      .from('event_registrations_config')
+      .select('id, user_id, event_id, event_name, payment_amount, payment_status, registered_at, transaction_id')
+      .in('payment_status', ['PAID', 'completed'])
+      .order('registered_at', { ascending: false })
+      .limit(5);
+    
+    if (allowedEventIds && allowedEventIds.length > 0) {
+      recentQuery = recentQuery.in('event_id', allowedEventIds);
+    }
+    
+    const { data: recentRegistrations, error: recentError } = await recentQuery;
+    
+    // Fetch profiles for recent registrations
+    let recentWithProfiles = [];
+    if (recentRegistrations && recentRegistrations.length > 0) {
+      const userIds = [...new Set(recentRegistrations.map(r => r.user_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .in('id', userIds);
+      
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+      recentWithProfiles = recentRegistrations.map(reg => ({
+        ...reg,
+        profiles: profileMap.get(reg.user_id) || { full_name: 'Unknown', email: '' }
+      }));
+    }
+
+    res.json({
+      success: true,
+      stats: {
+        totalRegistrations: totalRegistrations || 0,
+        totalRevenue: totalRevenue || 0,
+        eventRevenue: eventRevenue || 0,
+        accommodationRevenue: accommodationRevenue || 0,
+        comboRevenue: comboRevenue || 0,
+        pendingAmount: totalPendingAmount || 0,
+        pendingEventAmount: pendingAmount || 0,
+        pendingAccommodationAmount: pendingAccommodationAmount || 0,
+        pendingComboAmount: pendingComboAmount || 0,
+        totalCheckins: totalCheckins || 0,
+        totalUsers: totalUsers || 0,
+        totalEvents: totalEvents || 0,
+        activeEvents: activeEvents || 0,
+        paidRecordsCount: paidRegistrations?.length || 0,
+        paidAccommodationsCount: paidAccommodations?.length || 0,
+        paidCombosCount: paidCombos?.length || 0
+      },
+      recentRegistrations: recentWithProfiles
+    });
+
+  } catch (error) {
+    console.error('Overview Stats API Error:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch overview stats' });
+  }
+});
+
 /* 🟢 Admin Dashboard - Registration Stats */
 app.get("/api/admin/registration-stats", async (req, res) => {
   try {
@@ -2160,11 +2432,16 @@ app.get("/api/admin/registration-stats", async (req, res) => {
 
     if (eventsError) throw eventsError;
 
-    // Get all PAID registrations
-    const { data: registrations, error: regError } = await supabase
-      .from('event_registrations_config')
-      .select('event_id, event_name, payment_status')
-      .eq('payment_status', 'PAID');
+    // Get all PAID registrations using pagination to bypass 1000 limit
+    const { data: registrations, error: regError } = await fetchAllRecords(
+      'event_registrations_config',
+      'event_id, event_name, payment_status',
+      {
+        filters: [
+          { column: 'payment_status', operator: 'eq', value: 'PAID' }
+        ]
+      }
+    );
 
     if (regError) throw regError;
 
@@ -2204,15 +2481,19 @@ app.get("/api/admin/finance", async (req, res) => {
     // In a production app, verify the Authorization header JWT here
     // For now, we assume the frontend protects the route via ProtectedRoute
     
-    // Fetch registrations
-    const { data: regs, error } = await supabase
-      .from('event_registrations_config')
-      .select(`
+    // Fetch registrations using pagination to bypass 1000 limit
+    const { data: regs, error } = await fetchAllRecords(
+      'event_registrations_config',
+      `
         *,
         profiles (full_name, college_name),
         events (event_id, category, price)
-      `)
-      .order('registered_at', { ascending: false });
+      `,
+      {
+        orderBy: 'registered_at',
+        orderAscending: false
+      }
+    );
 
     if (error) throw error;
 
@@ -2469,28 +2750,28 @@ app.get("/api/admin/teams/statistics", async (req, res) => {
       .select('id', { count: 'exact', head: true })
       .eq('is_active', true);
     
-    let revenueQuery = supabase
-      .from('teams')
-      .select('total_paid_amount')
-      .eq('is_active', true);
-
+    // Prepare filters for revenue query with pagination
+    let revenueFilters = [
+      { column: 'is_active', operator: 'eq', value: true }
+    ];
+    
     if (event_id) {
       teamsQuery = teamsQuery.eq('event_id', event_id);
       membersQuery = membersQuery.eq('teams.event_id', event_id);
       paidTeamsQuery = paidTeamsQuery.eq('event_id', event_id);
-      revenueQuery = revenueQuery.eq('event_id', event_id);
+      revenueFilters.push({ column: 'event_id', operator: 'eq', value: event_id });
     } else if (userRole === 'event_coordinator' && accessibleEvents.length > 0) {
       teamsQuery = teamsQuery.in('event_id', accessibleEvents);
       membersQuery = membersQuery.in('teams.event_id', accessibleEvents);
       paidTeamsQuery = paidTeamsQuery.in('event_id', accessibleEvents);
-      revenueQuery = revenueQuery.in('event_id', accessibleEvents);
+      revenueFilters.push({ column: 'event_id', operator: 'in', value: accessibleEvents });
     }
 
     const [teamsRes, membersRes, paidRes, revRes] = await Promise.all([
       teamsQuery,
       membersQuery,
       paidTeamsQuery,
-      revenueQuery
+      fetchAllRecords('teams', 'total_paid_amount', { filters: revenueFilters })
     ]);
 
     if (teamsRes.error) throw teamsRes.error;
