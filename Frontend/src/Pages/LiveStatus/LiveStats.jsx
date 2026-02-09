@@ -53,6 +53,31 @@ const getDeptFromId = (rawId) => {
     return null; 
 };
 
+const SPECIAL_EVENT_BASES = [
+    'Paper Presentation',
+    'Poster Presentation',
+    'Project Presentation'
+];
+
+const normalizeName = (value) => (value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+
+const getSpecialBaseFromEventName = (name) => {
+    if (!name) return null;
+    const normalized = normalizeName(name);
+    return SPECIAL_EVENT_BASES.find(base => normalized.startsWith(normalizeName(base))) || null;
+};
+
+const getDeptFromEventName = (name) => {
+    if (!name) return null;
+    const match = name.match(/\(([^)]+)\)/);
+    if (match && match[1]) {
+        return match[1].trim().toUpperCase();
+    }
+    return null;
+};
+
 const fetchPaidRegistrationsByEventIds = async (eventIds) => {
     if (!eventIds || eventIds.length === 0) return { data: [] };
     return supabase
@@ -75,6 +100,7 @@ const LiveStats = () => {
     last_updated: null
   });
   const [categoryStats, setCategoryStats] = useState([]);
+    const [specialCategoryStats, setSpecialCategoryStats] = useState([]);
   const [deptStats, setDeptStats] = useState([]);
   const [isLive, setIsLive] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -466,6 +492,11 @@ const LiveStats = () => {
             return;
         }
 
+        if (SPECIAL_EVENT_BASES.some(base => normalizeName(base) === normalizeName(categoryName))) {
+            await fetchSpecialCategoryDetails(categoryName);
+            return;
+        }
+
         // Special handling for Conference - show conference names instead of events
         if (categoryName === 'Conference') {
             console.log('🎯 Fetching Conference events...');
@@ -733,7 +764,7 @@ const LiveStats = () => {
       };
 
       // 1. Fetch all active events with their categories
-      const events = await fetchAllData('events', 'id, category', q => q.eq('is_active', true));
+    const events = await fetchAllData('events', 'id, category, name, event_id', q => q.eq('is_active', true));
 
       // Map event_id(uuid) -> category
       const eventCategoryMap = {};
@@ -802,6 +833,97 @@ const LiveStats = () => {
          }
       });
       
+      const buildSpecialCategoryStats = async () => {
+        const specialEvents = events.filter(e => getSpecialBaseFromEventName(e.name));
+        const specialEventIds = specialEvents.map(e => e.id);
+
+        if (specialEventIds.length === 0) {
+            setSpecialCategoryStats([]);
+            return;
+        }
+
+        const specialEventIdSet = new Set(specialEventIds);
+        const regCounts = {};
+        validRegs.forEach(reg => {
+            if (specialEventIdSet.has(reg.event_id)) {
+                regCounts[reg.event_id] = (regCounts[reg.event_id] || 0) + 1;
+            }
+        });
+
+        const { data: teamMembers, error: teamMembersError } = await supabase
+            .from('team_members')
+            .select('id, role, status, teams!inner(event_id, is_active)')
+            .in('teams.event_id', specialEventIds)
+            .eq('teams.is_active', true)
+            .neq('role', 'leader')
+            .eq('status', 'joined');
+
+        if (teamMembersError) {
+            console.error('Error fetching team members for special categories:', teamMembersError);
+        }
+
+        const teamMemberCounts = {};
+        (teamMembers || []).forEach(tm => {
+            const eventId = tm.teams?.event_id;
+            if (eventId) {
+                teamMemberCounts[eventId] = (teamMemberCounts[eventId] || 0) + 1;
+            }
+        });
+
+        const deptTotalsByBase = {};
+        specialEvents.forEach(event => {
+            const base = getSpecialBaseFromEventName(event.name);
+            if (!base) return;
+
+            const regCount = regCounts[event.id] || 0;
+            const tmCount = teamMemberCounts[event.id] || 0;
+            const dept = getDeptFromEventName(event.name) || getDeptFromId(event.event_id) || 'OTHER';
+
+            if (!deptTotalsByBase[base]) {
+                deptTotalsByBase[base] = {};
+            }
+
+            if (!deptTotalsByBase[base][dept]) {
+                deptTotalsByBase[base][dept] = { registrations: 0, teamMembers: 0, count: 0 };
+            }
+
+            deptTotalsByBase[base][dept].registrations += regCount;
+            deptTotalsByBase[base][dept].teamMembers += tmCount;
+            deptTotalsByBase[base][dept].count += regCount + tmCount;
+        });
+
+        const specialStats = SPECIAL_EVENT_BASES.map(base => {
+            const deptMap = deptTotalsByBase[base] || {};
+            const details = Object.entries(deptMap)
+                .map(([dept, counts]) => ({
+                    id: `${base}-${dept}`,
+                    name: dept,
+                    registrations: counts.registrations,
+                    teamMembers: counts.teamMembers,
+                    count: counts.count
+                }))
+                .sort((a, b) => b.count - a.count);
+
+            const total = details.reduce((sum, item) => sum + item.count, 0);
+
+            return {
+                category: base,
+                count: total,
+                details
+            };
+        });
+
+        setSpecialCategoryStats(specialStats.map(({ category, count }) => ({ category, count })));
+
+        setCategoryEventDetails(prev => {
+            const next = { ...prev };
+            specialStats.forEach(stat => {
+                next[stat.category] = stat.details;
+            });
+            return next;
+        });
+      };
+
        const finalStats = [
             { category: 'Workshop', count: workshopCount },
             { category: 'Non Tech', count: nonTechCount },
@@ -813,6 +935,7 @@ const LiveStats = () => {
         ];
 
       setCategoryStats(finalStats);
+      await buildSpecialCategoryStats();
       
     } catch (err) {
       console.error("Category stats fallback failed:", err);
@@ -985,6 +1108,85 @@ const LiveStats = () => {
     } catch (error) {
          console.error("❌ Error in fallback:", error);
          setStats(prev => ({ ...prev, users: 0, registrations: 0, last_updated: new Date().toISOString() }));
+    }
+  };
+
+  const fetchSpecialCategoryDetails = async (categoryName) => {
+    try {
+        const { data: events, error: eventsError } = await supabase
+            .from('events')
+            .select('id, event_id, name')
+            .eq('is_active', true);
+
+        if (eventsError) throw eventsError;
+
+        const matchingEvents = events.filter(e => {
+            const base = getSpecialBaseFromEventName(e.name);
+            return base && normalizeName(base) === normalizeName(categoryName);
+        });
+
+        const eventIds = matchingEvents.map(e => e.id);
+        if (eventIds.length === 0) {
+            setCategoryEventDetails(prev => ({ ...prev, [categoryName]: [] }));
+            return;
+        }
+
+        const { data: registrations } = await fetchPaidRegistrationsByEventIds(eventIds);
+
+        const eventCounts = {};
+        (registrations || []).forEach(reg => {
+            eventCounts[reg.event_id] = (eventCounts[reg.event_id] || 0) + 1;
+        });
+
+        const { data: teamMembers, error: teamMembersError } = await supabase
+            .from('team_members')
+            .select('id, role, status, teams!inner(event_id, is_active)')
+            .in('teams.event_id', eventIds)
+            .eq('teams.is_active', true)
+            .neq('role', 'leader')
+            .eq('status', 'joined');
+
+        if (teamMembersError) {
+            console.error('Error fetching team members for special category details:', teamMembersError);
+        }
+
+        const teamMemberCounts = {};
+        (teamMembers || []).forEach(tm => {
+            const eventId = tm.teams?.event_id;
+            if (eventId) {
+                teamMemberCounts[eventId] = (teamMemberCounts[eventId] || 0) + 1;
+            }
+        });
+
+        const deptTotals = {};
+        matchingEvents.forEach(event => {
+            const dept = getDeptFromEventName(event.name) || getDeptFromId(event.event_id) || 'OTHER';
+            if (!deptTotals[dept]) {
+                deptTotals[dept] = { registrations: 0, teamMembers: 0, count: 0 };
+            }
+
+            const regCount = eventCounts[event.id] || 0;
+            const tmCount = teamMemberCounts[event.id] || 0;
+
+            deptTotals[dept].registrations += regCount;
+            deptTotals[dept].teamMembers += tmCount;
+            deptTotals[dept].count += regCount + tmCount;
+        });
+
+        const details = Object.entries(deptTotals)
+            .map(([dept, counts]) => ({
+                id: `${categoryName}-${dept}`,
+                name: dept,
+                registrations: counts.registrations,
+                teamMembers: counts.teamMembers,
+                count: counts.count
+            }))
+            .sort((a, b) => b.count - a.count);
+
+        setCategoryEventDetails(prev => ({ ...prev, [categoryName]: details }));
+    } catch (err) {
+        console.error('Error fetching special category details:', err);
+        setCategoryEventDetails(prev => ({ ...prev, [categoryName]: [] }));
     }
   };
 
@@ -1431,7 +1633,7 @@ const LiveStats = () => {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="flex md:grid md:grid-cols-7 gap-2 md:gap-4 shrink-0 overflow-x-auto md:overflow-visible pb-3 md:pb-0 mb-8 md:mb-0"
+                    className="flex md:grid md:grid-cols-7 gap-2 md:gap-4 shrink-0 overflow-x-auto md:overflow-visible pb-3 md:pb-0 mb-4 md:mb-3"
                 >
                     {categoryStats.map((stat, index) => (
                     <motion.div 
@@ -1452,6 +1654,37 @@ const LiveStats = () => {
                     </motion.div>
                     ))}
                 </motion.div>
+
+                {/* Special Category Stats Row - Desktop only */}
+                {specialCategoryStats.length > 0 && (
+                    <motion.div
+                        initial={{ y: 30, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.65 }}
+                        className="hidden md:grid md:grid-cols-3 gap-4 shrink-0"
+                    >
+                        {specialCategoryStats.map((stat, index) => (
+                        <motion.div 
+                            key={stat.category}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.7 + (index * 0.1) }}
+                            className="relative bg-gray-900 border border-gray-700/50 rounded-2xl p-3 hover:border-primary/30 transition-all group overflow-hidden cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-primary/20"
+                            onClick={() => toggleCategoryExpansion(stat.category)}
+                        >
+                            <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-40 transition-opacity">
+                            <TicketCheck className="w-6 h-6 rotate-[-15deg]" />
+                            </div>
+                            <div className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1 h-4 flex items-end group-hover:text-primary transition-colors truncate">
+                                {stat.category}
+                            </div>
+                            <div className="text-xl lg:text-3xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent font-mono">
+                                <CountUp end={stat.count} duration={2} separator="," />
+                            </div>
+                        </motion.div>
+                        ))}
+                    </motion.div>
+                )}
             </div>
 
             {/* Right Column: Department Leaderboard - Below on mobile */}
