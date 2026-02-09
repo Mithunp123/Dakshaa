@@ -16,6 +16,7 @@ import workshop14 from "../assets/EventsImages/EventDetails/Workshop/txt_wk.webp
 import workshop15 from "../assets/EventsImages/EventDetails/Workshop/vlsi_wk.webp";
 import workshop16 from "../assets/EventsImages/EventDetails/Workshop/mca_wk.webp";
 import workshop17 from "../assets/EventsImages/EventDetails/Workshop/math.webp";
+import workshop18 from "../assets/EventsImages/EventDetails/Workshop/eee1.jpeg"; 
 
 
 /* Workshop Events List
@@ -122,6 +123,11 @@ export const workshopEvents = [
   {
     image: workshop17,
     eventId: "workshop-math",
+    price: 300,
+  },
+  {
+    image: workshop18,
+    eventId: "workshop-eee-1",
     price: 300,
   },
   
@@ -871,10 +877,41 @@ export const workshopDetails = [
     },
     registrationLink: "",
   },
-
-
-  
-
-
+   {
+    id: "workshop-eee-1",
+    shortTitle: "IoT in System Engineering",
+    title: "IoT in System Engineering",
+    description: "The IoT System Engineering is a 1-day hands-on workshop conducted in collaboration with C-DAC Bangalore under the NASSCOM FutureSkills PRIME initiative. It provides practical exposure to IoT architecture, sensors, microcontrollers, communication protocols, and cloud integration using C-DAC's Ubimote IoT Laboratory Kits. The workshop equips participants with industry-relevant skills to develop real-time IoT applications and supports innovation for final-year projects and research.",
+    img: workshop18,
+    date: "February 12, 2026",
+    venue: "EEE Project Lab (Academic Block)",
+    department: "Workshop",
+    price: "₹300 per member",
+    schedule: [
+      {
+        location: "EEE Project Lab (Academic Block)",
+        time: "9:00 AM to 4:00 PM",
+        date: "February 12, 2026",
+      },
+    ],
+    contact: {
+      facultyCoordinator: [
+        {
+          name: "Mr Lt.E Chandra Kumar",
+          department: "Electrical and Electronics Engineering",
+          phone: "+91 93608 50480",
+        },
+      ],
+      studentCoordinator: [
+        {
+          name: "Mr. Prithvirajan",
+          year: "III Year",
+          department: "EEE",
+          phone: "+91 96291 60573",
+        },
+      ],
+    },
+    registrationLink: "",
+  },
 
 ];
