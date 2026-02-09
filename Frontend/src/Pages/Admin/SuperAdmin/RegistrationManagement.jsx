@@ -641,6 +641,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           *,
           events (
              id,
+             event_id,
              name,
              price,
              event_key
@@ -705,13 +706,17 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
     // 'reg.events' might be array or object depending on relationship. 
     // Assuming object based on select.
     const currentPrice = reg.events?.price || 0;
-    const currentEventKey = reg.events?.event_key; // Using event_key for comparison if used in 'events' table
+    const currentEventUuid = reg.sourceTable === 'event_registrations_config' ? reg.event_id : null;
+    const currentEventText = reg.events?.event_id || reg.event_id || null;
 
-    const compatibleEvents = eventStats.filter(ev => 
-      ev.price === currentPrice && 
-      ev.event_key !== currentEventKey && 
-      ev.is_open
-    );
+    const compatibleEvents = eventStats.filter(ev => {
+      if (ev.price !== currentPrice || !ev.is_open) return false;
+
+      const sameByUuid = currentEventUuid && ev.id === currentEventUuid;
+      const sameByText = currentEventText && ev.event_id === currentEventText;
+
+      return !(sameByUuid || sameByText);
+    });
     
     setAvailableTargetEvents(compatibleEvents);
   };

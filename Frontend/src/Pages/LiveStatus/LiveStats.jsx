@@ -1720,10 +1720,9 @@ const LiveStats = () => {
                                                                 <h4 className="text-white font-semibold text-sm group-hover:text-secondary transition-colors truncate">
                                                                     {event.name}
                                                                 </h4>
-                                                                <p className="text-xs text-gray-400">
-                                                                    {event.isConference ? 'Conference • Click for Events' : 
-                                                                     `${event.registrations || 0} Regs + ${event.teamMembers || 0} Team Members`}
-                                                                </p>
+                                                                {event.isConference && (
+                                                                    <p className="text-xs text-gray-400">Conference • Click for Events</p>
+                                                                )}
                                                             </div>
                                                         </div>
                                                         <div className={`bg-gradient-to-r rounded-lg px-4 py-2 shrink-0 ${
