@@ -1297,10 +1297,10 @@ const LiveStats = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 xl:gap-6 w-full flex-grow min-h-0 pb-4 overflow-y-auto xl:overflow-visible">
             {/* Left Column: Big Stats & Categories */}
-            <div className="xl:col-span-3 flex flex-col gap-4 xl:gap-6 h-full min-h-0">
+            <div className="xl:col-span-3 flex flex-col gap-4 xl:gap-6 h-full min-h-0 order-1 xl:order-none">
                 
                 {/* Big Cards - Horizontal on mobile, larger on desktop */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 shrink-0">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 shrink-0">
                     {/* Students Onboarded Card */}
                     <motion.div
                         initial={{ x: -100, opacity: 0 }}
@@ -1310,11 +1310,11 @@ const LiveStats = () => {
                     >
                         <div className="absolute -inset-1 bg-gradient-to-r from-secondary to-orange-600 rounded-2xl md:rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
                         
-                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-orange-500/30 rounded-2xl md:rounded-3xl p-3 md:p-6 h-full flex flex-col justify-center min-h-[140px] md:min-h-[220px]">
+                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-orange-500/30 rounded-2xl md:rounded-3xl p-2.5 md:p-6 h-full flex flex-col justify-center min-h-[110px] md:min-h-[200px]">
                         {/* Icon */}
                         <div className="flex justify-center mb-2 md:mb-4">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-secondary/20 rounded-xl md:rounded-2xl flex items-center justify-center">
-                            <Users className="w-5 h-5 md:w-6 md:h-6 text-secondary" />
+                            <div className="w-9 h-9 md:w-12 md:h-12 bg-secondary/20 rounded-xl md:rounded-2xl flex items-center justify-center">
+                            <Users className="w-4 h-4 md:w-6 md:h-6 text-secondary" />
                             </div>
                         </div>
 
@@ -1325,7 +1325,7 @@ const LiveStats = () => {
 
                         {/* Counter */}
                         <div className="text-center">
-                            <div className="text-2xl md:text-5xl lg:text-6xl font-black text-secondary mb-1 md:mb-2 tabular-nums">
+                            <div className="text-xl md:text-5xl lg:text-6xl font-black text-secondary mb-1 md:mb-2 tabular-nums">
                             <CountUp 
                                 end={stats.users} 
                                 duration={2}
@@ -1350,11 +1350,11 @@ const LiveStats = () => {
                     >
                         <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl md:rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
                         
-                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-blue-500/30 rounded-2xl md:rounded-3xl p-3 md:p-6 h-full flex flex-col justify-center min-h-[140px] md:min-h-[220px]">
+                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-blue-500/30 rounded-2xl md:rounded-3xl p-2.5 md:p-6 h-full flex flex-col justify-center min-h-[110px] md:min-h-[200px]">
                         {/* Icon */}
                         <div className="flex justify-center mb-2 md:mb-4">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-500/20 rounded-xl md:rounded-2xl flex items-center justify-center">
-                            <TicketCheck className="w-5 h-5 md:w-6 md:h-6 text-blue-500" />
+                            <div className="w-9 h-9 md:w-12 md:h-12 bg-blue-500/20 rounded-xl md:rounded-2xl flex items-center justify-center">
+                            <TicketCheck className="w-4 h-4 md:w-6 md:h-6 text-blue-500" />
                             </div>
                         </div>
 
@@ -1365,7 +1365,7 @@ const LiveStats = () => {
 
                         {/* Counter */}
                         <div className="text-center flex flex-col items-center justify-center">
-                            <div className="text-2xl md:text-5xl lg:text-6xl font-black text-blue-500 mb-1 md:mb-2 tabular-nums tracking-tight">
+                            <div className="text-xl md:text-5xl lg:text-6xl font-black text-blue-500 mb-1 md:mb-2 tabular-nums tracking-tight">
                             <CountUp 
                                 end={stats.registrations} 
                                 duration={2}
@@ -1390,11 +1390,11 @@ const LiveStats = () => {
                     >
                         <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-2xl md:rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
                         
-                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-2xl md:rounded-3xl p-3 md:p-6 h-full flex flex-col justify-center min-h-[140px] md:min-h-[220px]">
+                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-2xl md:rounded-3xl p-2.5 md:p-6 h-full flex flex-col justify-center min-h-[110px] md:min-h-[200px]">
                         {/* Icon */}
                         <div className="flex justify-center mb-2 md:mb-4">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/20 rounded-xl md:rounded-2xl flex items-center justify-center">
-                            <Users className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                            <div className="w-9 h-9 md:w-12 md:h-12 bg-primary/20 rounded-xl md:rounded-2xl flex items-center justify-center">
+                            <Users className="w-4 h-4 md:w-6 md:h-6 text-primary" />
                             </div>
                         </div>
 
@@ -1405,7 +1405,7 @@ const LiveStats = () => {
 
                         {/* Counter - Total Participants */}
                         <div className="text-center flex flex-col items-center justify-center">
-                            <div className="text-2xl md:text-5xl lg:text-6xl font-black text-primary mb-1 md:mb-2 tabular-nums tracking-tight">
+                            <div className="text-xl md:text-5xl lg:text-6xl font-black text-primary mb-1 md:mb-2 tabular-nums tracking-tight">
                             <CountUp 
                                 end={stats.totalParticipants} 
                                 duration={2}
@@ -1431,7 +1431,7 @@ const LiveStats = () => {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="flex md:grid md:grid-cols-7 gap-2 md:gap-4 shrink-0 overflow-x-auto md:overflow-visible pb-1 md:pb-0 mb-4 md:mb-0"
+                    className="flex md:grid md:grid-cols-7 gap-2 md:gap-4 shrink-0 overflow-x-auto md:overflow-visible pb-3 md:pb-0 mb-8 md:mb-0"
                 >
                     {categoryStats.map((stat, index) => (
                     <motion.div 
@@ -1459,7 +1459,7 @@ const LiveStats = () => {
                 initial={{ x: 100, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.7 }}
-                className="xl:col-span-2 min-h-0 flex flex-col pl-0 xl:pl-4 mt-6 md:mt-4 xl:mt-0"
+                className="xl:col-span-2 min-h-0 flex flex-col pl-0 xl:pl-4 mt-20 md:mt-6 xl:mt-0 order-2 xl:order-none"
             >
                  <div className="flex items-center justify-between mb-3 md:mb-4 px-2 shrink-0">
                     <div className="flex items-center gap-2 md:gap-3">
@@ -1468,7 +1468,7 @@ const LiveStats = () => {
                         </div>
                         <div>
                             <h3 className="text-white font-black text-base md:text-xl uppercase tracking-wider italic">Leaderboard</h3>
-                            <p className="text-[10px] md:text-xs text-yellow-500 font-bold tracking-widest uppercase">Live Rankings</p>
+                            <p className="text-[10px] md:text-xs text-yellow-500 font-bold tracking-widest uppercase hidden md:block">Live Rankings</p>
                         </div>
                     </div>
                  </div>
