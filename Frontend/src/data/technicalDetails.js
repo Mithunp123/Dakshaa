@@ -28,7 +28,7 @@ export const technicalDetails = [
     description: "The AI Mystery Box Challenge is a one-day technical event designed to test participants’ analytical thinking, creativity, and practical skills in Artificial Intelligence and Machine Learning. This event offers a unique, problem-solving experience where teams are challenged with an unknown AI task revealed only at the start of the competition. Participants will receive a mystery box containing a real-world dataset and a problem statement. Once the box is opened upon official announcement, teams must quickly analyze the problem, design an appropriate machine learning solution, and develop a working model within the given time. To enhance practical applicability, teams are also required to integrate their model with a functional web interface, simulating industry-level AI deployment.The event encourages collaborative teamwork, effective time management, and hands- on implementation of AI concepts such as data preprocessing, model selection, training, evaluation, and deployment. With internet access permitted, participants can explore libraries, frameworks, and documentation to refine their solutions.The AI Mystery Box Challenge will be conducted at AI Lab 2 with a registration fee of ₹250 per head. This event is ideal for students who are passionate about AI, Data Science, and real-time problem solving, and who wish to showcase their technical expertise in a competitive environment.",
     img: Tech1,
     date: "February 13, 2026",
-    venue: "AB Lab 2",
+    venue: "AB Lab 2 (Academic Block)",
     department: "Technical Events",
     price: "₹250",
     rules: [
@@ -64,7 +64,7 @@ export const technicalDetails = [
       {
         date: "February 13, 2026",
         time: "9:00 AM - 4:00 PM",
-        location: "AB Lab 2",
+        location: "AB Lab 2 (Academic Block)",
       },
     ],
     contact: {
@@ -405,7 +405,7 @@ export const technicalDetails = [
       {
         date: "February 13, 2026",
         time: "9:00 AM to 12:00 PM",
-        location: "Civil CADD Laboratory",
+        location: "Civil CADD Laboratory (Civil Block)",
       },
     ],
     contact: {
@@ -484,6 +484,12 @@ export const technicalDetails = [
       "Only registered participants are allowed to be present",
       "The team with the best innovative and creative presentation will be selected as the winner",
     ],
+    awards: [
+      {
+        title: "Best Paper Award",
+        description: "The Best Paper Award will be given to the author(s) of the best paper.",
+      },
+    ],
     schedule: [
       {
         
@@ -519,7 +525,7 @@ export const technicalDetails = [
     description: "A technical paper presentation event focused on innovative concepts and research in software and hardware bot technologies. Participants must present the problem statement, proposed solution, system architecture, working methodology, and applications. Prototype is not mandatory. Evaluation will be based on originality, technical content, feasibility, and presentation quality.",
     img: Tech10,
     date: "February 13, 2026",
-    venue: "IT Park (Smart ClassRoom)",
+    venue: "Smart ClassRoom (IT Park)",
     department: "Technical Events",
     price: "₹150 Per Participant",
     rules: [
@@ -534,6 +540,12 @@ export const technicalDetails = [
       "Participants must adhere strictly to the time limit.",
       "Evaluation will be based on originality, technical depth, clarity, feasibility, innovation, and presentation skills.",
       "The decision of the jury shall be final and binding."
+    ],
+    awards: [
+      {
+        title: "Best Paper Award",
+        description: "The Best Paper Award will be given to the author(s) of the best paper.",
+      },
     ],
     rewards: [
          {
@@ -566,7 +578,7 @@ export const technicalDetails = [
         
         date: "February 13, 2026",
         time: "10.00AM to 3.30PM",
-        location: "IT Park (Smart ClassRoom)",
+        location: "Smart ClassRoom (IT Park)",
       },
     ],
     contact: {
@@ -737,6 +749,12 @@ export const technicalDetails = [
       "A maximum of 2–3 participants per team is allowed; individual participation is also permitted",
       "Each team will be given 8–10 minutes for presentation followed by a short Q&A session",
       "Judges' decision will be final, and any form of malpractice will lead to disqualification",
+    ],
+    awards: [
+      {
+        title: "Best Paper Award",
+        description: "The Best Paper Award will be given to the author(s) of the best paper.",
+      },
     ],
     rewards: [
          {
@@ -1605,8 +1623,8 @@ export const technicalDetails = [
 
 
     slot: [
-      "Slot 1 : 9:00 AM to 10.30 AM ",
-      "Slot 2 : 11:00 AM to 12.30 PM ",
+      "Slot 1 : 9:30 AM to 10.30 AM ",
+      "Slot 2 : 11:00 AM to 12.00 PM ",
       "Slot 3 : 12:30 PM to 1:30 PM ",
     ],
 

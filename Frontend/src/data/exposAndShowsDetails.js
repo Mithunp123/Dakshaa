@@ -30,7 +30,6 @@ import txtposter from "../assets/EventsImages/EventDetails/poster/txt_poster.web
 import mechproject from "../assets/EventsImages/EventDetails/project/mech_project.webp";
 
 
-/*
 import aidsproject from "../assets/EventsImages/EventDetails/project/aids_project.webp";
 import aimlproject from "../assets/EventsImages/EventDetails/project/aiml_project.webp";
 import civilproject from "../assets/EventsImages/EventDetails/project/civil_project.webp";
@@ -43,7 +42,7 @@ import bioproject from "../assets/EventsImages/EventDetails/project/bio_project.
 import mctproject from "../assets/EventsImages/EventDetails/project/mct_project.webp";
 import txtproject from "../assets/EventsImages/EventDetails/project/txt_project.webp";
 import ftproject from "../assets/EventsImages/EventDetails/project/ft_project.webp";
-*/
+
 
 
 
@@ -80,6 +79,12 @@ export const exposAndShowsDetails = [
       "Presentations should be prepared in PPT or PDF format",
       "Papers will be evaluated based on innovation, technical content, and clarity",
       "Judges' decisions are final, and certificates will be provided to participants"
+    ],
+    awards: [
+      {
+        title: "Best Paper Award",
+        description: "The Best Paper Award will be given to the author(s) of the best paper."
+      }
     ],
     contact: {
       facultyCoordinator: [
@@ -125,6 +130,12 @@ export const exposAndShowsDetails = [
       "Papers will be evaluated based on innovation, technical content, and clarity",
       "Judges' decisions are final, and certificates will be provided to participants"
     ],
+    awards: [
+      {
+        title: "Best Paper Award",
+        description: "The Best Paper Award will be given to the author(s) of the best paper."
+      }
+    ],
     contact: {
       facultyCoordinator: [
         {
@@ -153,8 +164,8 @@ export const exposAndShowsDetails = [
     id: "paper-it",
     img: itpaper,
     shortTitle: "Paper Presentation",
-    title: "Department of Information Technology Paper Presentation",
-    description: "Present your innovative ideas in Information Technology.",
+    title: "Next-Gen  Technology ",
+    description: "Next-Generation Technologies are transforming the digital world through intelligent, immersive, and scalable innovations.Technologies like Cloud Computing, Artificial Intelligence, Industry 5.0, and the Metaverse enhance efficiency, human collaboration, and connectivity.These advancements aim to create a smarter, ethical, and sustainable future.",
     date: "13 February 2026",
 
     venue: "",
@@ -164,11 +175,14 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to: "
+          "Paper should be mailed to:nivarithika@gmail.com "
         ],
       },
     ],
-    theme: ["IT Solutions for Digital Transformation"],
+    theme: ["Cloud computing",  
+       "Ethical challenge in Ai ",
+      "Industrial revolution 5.0", 
+      "Metaverse technology ",],
     rules: [
       "Papers must be original and submitted in PDF format before the deadline",
       "Participants may present individually or in teams (max 2–3 members)",
@@ -177,21 +191,26 @@ export const exposAndShowsDetails = [
       "Papers will be evaluated based on innovation, technical content, and clarity",
       "Judges' decisions are final, and certificates will be provided to participants"
     ],
+    awards: [
+      {
+        title: "Best Paper Award",
+        description: "The Best Paper Award will be given to the author(s) of the best paper."
+      }
+    ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
+          name: "Dr. P.Dineshkumar",
+          phone:"+91 9688837873",
                 },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
+          name: "Nivarithika",
+          phone:"+91 7604950610",
           department: "IT",
         },
-        {
-          name: "Student Coordinator 2",
-          department: "IT",
-        },
+       
       ],
     },
   },
@@ -224,6 +243,12 @@ export const exposAndShowsDetails = [
       "Papers will be evaluated based on innovation, technical content, and clarity",
       "Judges' decisions are final, and certificates will be provided to participants"
     ],
+    awards: [
+      {
+        title: "Best Paper Award",
+        description: "The Best Paper Award will be given to the author(s) of the best paper."
+      }
+    ],
     contact: {
       facultyCoordinator: [
         {
@@ -248,7 +273,7 @@ export const exposAndShowsDetails = [
     img: vlsipaper,
     shortTitle: "Paper Presentation",
     title: "Department of Electronics Engineering (VLSI Design and Technology)",
-    description: "Present your research in VLSI Design and Technology.",
+    description: "This papers discusses key concepts in VLSI system design, focusing on CMOS technology, VLSI design flow, power consumption, and logic gate implementation. It explains how these elements contribute to the development of efficient and low-power digital integrated circuits used in modern electronic systems.",
     date: "13 February 2026",
 
     venue: "",
@@ -258,11 +283,15 @@ export const exposAndShowsDetails = [
     papersubmission: [
       {
         description: [
-          "Paper should be mailed to: "
+          "Paper should be mailed to:s.b.tamilraja@gmail.com "
         ],
       },
     ],
-    theme: ["Advances in VLSI and Semiconductor Technology"],
+    theme: ["Applications of VLSI in Modern Electronic Systems",
+          "Power Consumption in VLSI Circuits",
+          "CMOS Technology in Digital IC Design",
+          "VLSI Design Flow for Digital Integrated Circuits",
+          "Logic Gate Implementation Using CMOS Technology",],
     rules: [
       "Papers must be original and submitted in PDF format before the deadline",
       "Participants may present individually or in teams (max 2–3 members)",
@@ -271,23 +300,27 @@ export const exposAndShowsDetails = [
       "Papers will be evaluated based on innovation, technical content, and clarity",
       "Judges' decisions are final, and certificates will be provided to participants"
     ],
+    awards: [
+      {
+        title: "Best Paper Award",
+        description: "The Best Paper Award will be given to the author(s) of the best paper."
+      }
+    ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
+          name: "Dr. P. Suthanthira Kumar",
           designation: "Professor, Dept. of VLSI",
-          email: "",
+          phone: "+91 9500825738",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
+          name: "Mr. S.B. Tamil Raja",
           department: "VLSI",
+          phone:"+91 7339009888",
         },
-        {
-          name: "Student Coordinator 2",
-          department: "VLSI",
-        },
+       
       ],
     },
   },
@@ -319,6 +352,12 @@ export const exposAndShowsDetails = [
       "Presentations should be prepared in PPT or PDF format",
       "Papers will be evaluated based on innovation, technical content, and clarity",
       "Judges' decisions are final, and certificates will be provided to participants"
+    ],
+    awards: [
+      {
+        title: "Best Paper Award",
+        description: "The Best Paper Award will be given to the author(s) of the best paper."
+      }
     ],
     contact: {
       facultyCoordinator: [
@@ -376,17 +415,17 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Ms.A P Janani",
+          name: "Mrs.N Bhuvaneshwari",
          
-          phone: "+91 8838942548",
+          phone: "+91 9843264285",
           
         },
       ],
       studentCoordinator: [
         {
-          name: "Hemalatha M ",
+          name: "Aarthi M V ",
          
-          phone: "+91 9150786483",
+          phone: "+91 9150878030",
         },
        
       ],
@@ -508,7 +547,7 @@ export const exposAndShowsDetails = [
     img: itposter,
     shortTitle: "Department of Information Technology",
     title: "Next-Gen Technologies",
-    description: "Display your innovative IT solutions through creative poster presentations.",
+    description: "Next-Generation Technologies are reshaping the future through intelligent, connected, and immersive solutions.Cloud Computing, Ethical AI, Industry 5.0, and the Metaverse drive innovation with a human-centric approach.Together, they enable a smarter, sustainable, and digitally empowered world.",
     date: "13 February 2026",
     venue: "",
     price: "₹150 per member",
@@ -537,20 +576,18 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "",
+          name: "Ms.S.Pavithra",
           designation: "Professor, Dept. of IT",
-          email: "",
+          phone:"+91 6382480391",
         },
       ],
       studentCoordinator: [
         {
-          name: "",
+          name: "Ms. Boomika",
           department: "IT",
+          phone: "+91 9360274589",
         },
-        {
-          name: "",
-          department: "IT",
-        },
+       
       ],
     },
   },
@@ -586,9 +623,8 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Mangaiyarkarasi R",
-        
-          phone: "+91 8807401541",
+          name: "Ms.Mangaiyarkarasi",
+          phone: "+91 88074 01541 ",
           email: "",
         },
       ],
@@ -615,10 +651,12 @@ export const exposAndShowsDetails = [
     registrationLink: "",
     schedule: [],
    
-    theme: [" Emerging Trends in Embedded Systems and Intelligent Automation",
-      " Role of AI in Next-Generation Wireless Communication (6G)",
-      "Edge Computing in IoT Systems",
-      "Revolutionary Applications of AI in Electronics and Communication Engineering",
+    theme: [
+      
+      " AI-Powered Smart Embedded Systems",
+      "6G & Intelligent Wireless Networks",
+      "Edge AI for Real-Time IoT",
+      "Autonomous Communication Technologies",
     ],
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
@@ -760,7 +798,7 @@ export const exposAndShowsDetails = [
     registrationLink: "",
     schedule: [],
    
-    theme: ["1.AI Chips: How Hardware Accelerates Machine Learning",
+    theme: ["AI Chips: How Hardware Accelerates Machine Learning",
             "Edge AI Hardware for Smart Devices",
             "Wearable Health Monitoring Chips",
             "VLSI in Autonomous Vehicles"
@@ -896,15 +934,17 @@ export const exposAndShowsDetails = [
     id: "poster-mct",
     img: mctposter,
     shortTitle: "Department of Mechatronics Engineering",
-    title: "Mechatronics Poster Presentation",
-    description: "Display your mechatronics innovations through creative poster displays.",
+    title: "Innovations in Smart and Green Intelligent Engineering Systems",
+    description: "The Poster Presentation event provides a platform for Mechatronics Engineering students to showcase innovative ideas and technical concepts through visual presentations. The event promotes creativity, technical communication, and interdisciplinary learning in areas such as automation, robotics, control systems, and smart technologies.",
     date: "13 February 2026",
     venue: "",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
    
-    theme: [""],
+    theme: ["Automation, Robotics, and Smart Manufacturing",
+        "Mechatronics Solutions for Sustainable Development",
+        "Future Technologies Driven by Mechatronics",],
     rules: [
       "Poster must clearly explain the problem, idea, and outcome.",
 
@@ -921,20 +961,18 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
+          name: "Mr.M. Baskaran",
           designation: "Professor, Dept. of Mechatronics",
-          email: "",
+          phone: "+91 9698999756",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
+          name: "Mr. S. Aravindhakrishnan",
           department: "Mechatronics",
+          phone: "+91 9361878689",
         },
-        {
-          name: "Student Coordinator 2",
-          department: "Mechatronics",
-        },
+        
       ],
     },
   },
@@ -995,8 +1033,8 @@ export const exposAndShowsDetails = [
   {
     id: "project-mech",
     img: mechproject,
-    shortTitle: "Mech Project",
-    title: "Mechanical Engineering Project Exhibition",
+    shortTitle: "Project Presentation",
+    title: "Department of Mechanical Engineering",
     description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
     date: "13 February 2026",
     venue: "",
@@ -1004,79 +1042,115 @@ export const exposAndShowsDetails = [
     registrationLink: "",
     schedule: [],
     theme: ["It should match minimum any one of the United Nations STGs (17)"],
-   
+    projectRequirements: [
+      {
+        title: "Project Report Should Include:",
+        details: [
+          "1. Introduction",
+          "2. Objectives",
+          "3. Methodology",
+          "4. Work Plan",
+          "5. Budget",
+          "6. Outcome of Project",
+          "7. Reference"
+        ]
+      },
+      {
+        title: "Important Note:",
+        details: [
+          "During presentation you should bring the prototype/working model/schematic working model"
+        ]
+      }
+    ],
+    rules: [
+      "Each team must consist of 1 to 3 members",
+      "All team members must be present at the venue during the event",
+      "Presentation time is strictly limited to 10 minutes",
+      "An additional 5 minutes will be allocated for the Q&A session",
+      "Projects must be based on engineering, technology, or innovation",
+      "Plagiarism or copied work will lead to immediate disqualification",
+      "Teams must have a well-defined project plan with a unique solution",
+      "Attendance in all sessions is mandatory to receive the certificate",
+      "The winner team will be awarded the announced prize amount"
+    ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr.P. Sampath",
-          designation: "Professor, Dept. of Mechanical Engineering",
-          phone: "+91 9962116570",
+          name: "Mr.S.Karthick",
+          phone: "+91 97906 67321",
           
         },
       ],
       studentCoordinator: [
         {
           name: "Mr.R.Shivakumar",
-          department: "Mechanical Engineering",
           phone: "+91 7418709075",
         },
         {
           name: "Mr.G. Dharsan",
-          department: "Mechanical Engineering",
           phone: "+91 9345003032",
         },
       ],
     },
   },
 
-/*
+
 
   {
     id: "project-aids",
     img: aidsproject,
-    shortTitle: "AIDS Project",
-    title: "AIDS Project Exhibition",
-    description: "Exhibit your innovative AI & Data Science projects and prototypes.",
-    date: "14 February 2026",
+    shortTitle: "Project Presentation",
+    title: "Department of Artificial Intelligence and Data Science",
+    description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
+    date: "13 February 2026",
     venue: "",
     price: "₹150 per team",
     registrationLink: "",
     schedule: [],
-    theme: "AI-Driven Solutions for Real-World Problems",
+    theme: ["It should match minimum any one of the United Nations STGs (17)"],
+    projectRequirements: [
+      {
+        title: "Project Report Should Include:",
+        details: [
+          "1. Introduction",
+          "2. Objectives",
+          "3. Methodology",
+          "4. Work Plan",
+          "5. Budget",
+          "6. Outcome of Project",
+          "7. Reference"
+        ]
+      },
+      {
+        title: "Important Note:",
+        details: [
+          "During presentation you should bring the prototype/working model/schematic working model"
+        ]
+      }
+    ],
     rules: [
-      "Team size: 3-5 members",
-      "Project must be functional and demonstrable",
-      "Working prototype is mandatory",
-      "All team members must be involved in the project",
-      "Project should address a real-world problem",
-      "Code and documentation must be submitted",
-      "Plagiarism will lead to immediate disqualification",
-      "Setup your project 1 hour before judging",
-      "Ensure all equipment and power requirements are communicated beforehand",
-      "Prepare a 5-minute demo and be ready for Q&A",
-      "Bring backup of all code and data",
-      "Display board should include project title, team details, and abstract",
-      "Internet connectivity will be your responsibility"
+      "Each team must consist of 1 to 3 members",
+      "All team members must be present at the venue during the event",
+      "Presentation time is strictly limited to 10 minutes",
+      "An additional 5 minutes will be allocated for the Q&A session",
+      "Projects must be based on engineering, technology, or innovation",
+      "Plagiarism or copied work will lead to immediate disqualification",
+      "Teams must have a well-defined project plan with a unique solution",
+      "Attendance in all sessions is mandatory to receive the certificate",
+      "The winner team will be awarded the announced prize amount"
     ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of AIDS",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          name: "Eswari A",
+          phone: "+91 94431 81818",
+         
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "AIDS",
-          phone: "+91 XXXXXXXXXX",
-        },
-        {
-          name: "Student Coordinator 2",
-          department: "AIDS",
-          phone: "+91 XXXXXXXXXX",
+          name: "Subithra S S",
+          phone: "+91 99527 34197",
         },
       ],
     },
@@ -1085,29 +1159,45 @@ export const exposAndShowsDetails = [
   {
     id: "project-aiml",
     img: aimlproject,
-    shortTitle: "AI/ML Project",
-    title: "AI/ML Project Exhibition",
-    description: "Showcase your machine learning and AI projects with live demonstrations.",
-    date: "14 February 2026",
+    shortTitle: "Project Presentation",
+    title: "Department of Artificial Intelligence and Machine Learning",
+    description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
+    date: "13 February 2026",
     venue: "",
     price: "₹150 per team",
     registrationLink: "",
     schedule: [],
-    theme: "Machine Learning Applications",
+    theme: ["It should match minimum any one of the United Nations STGs (17)"],
+    projectRequirements: [
+      {
+        title: "Project Report Should Include:",
+        details: [
+          "1. Introduction",
+          "2. Objectives",
+          "3. Methodology",
+          "4. Work Plan",
+          "5. Budget",
+          "6. Outcome of Project",
+          "7. Reference"
+        ]
+      },
+      {
+        title: "Important Note:",
+        details: [
+          "During presentation you should bring the prototype/working model/schematic working model"
+        ]
+      }
+    ],
     rules: [
-      "Team size: 3-5 members",
-      "Project must be functional and demonstrable",
-      "Working prototype is mandatory",
-      "All team members must be involved in the project",
-      "Project should address a real-world problem",
-      "Code and documentation must be submitted",
-      "Plagiarism will lead to immediate disqualification",
-      "Setup your project 1 hour before judging",
-      "Ensure all equipment and power requirements are communicated beforehand",
-      "Prepare a 5-minute demo and be ready for Q&A",
-      "Bring backup of all code and data",
-      "Display board should include project title, team details, and abstract",
-      "Internet connectivity will be your responsibility"
+      "Each team must consist of 1 to 3 members",
+      "All team members must be present at the venue during the event",
+      "Presentation time is strictly limited to 10 minutes",
+      "An additional 5 minutes will be allocated for the Q&A session",
+      "Projects must be based on engineering, technology, or innovation",
+      "Plagiarism or copied work will lead to immediate disqualification",
+      "Teams must have a well-defined project plan with a unique solution",
+      "Attendance in all sessions is mandatory to receive the certificate",
+      "The winner team will be awarded the announced prize amount"
     ],
     contact: {
       facultyCoordinator: [
@@ -1136,50 +1226,60 @@ export const exposAndShowsDetails = [
   {
     id: "project-civil",
     img: civilproject,
-    shortTitle: "Civil Project",
-    title: "Civil Engineering Project Exhibition",
-    description: "Display your civil engineering projects, models, and innovative designs.",
-    date: "14 February 2026",
+    shortTitle: "Project Presentation",
+    title: "Department of Civil Engineering",
+    description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
+    date: "13 February 2026",
     venue: "",
     price: "₹150 per team",
     registrationLink: "",
     schedule: [],
-    theme: "Infrastructure and Sustainable Construction",
+    theme: ["It should match minimum any one of the United Nations STGs (17)"],
+    projectRequirements: [
+      {
+        title: "Project Report Should Include:",
+        details: [
+          "1. Introduction",
+          "2. Objectives",
+          "3. Methodology",
+          "4. Work Plan",
+          "5. Budget",
+          "6. Outcome of Project",
+          "7. Reference"
+        ]
+      },
+      {
+        title: "Important Note:",
+        details: [
+          "During presentation you should bring the prototype/working model/schematic working model"
+        ]
+      }
+    ],
     rules: [
-      "Team size: 3-5 members",
-      "Project must be functional and demonstrable",
-      "Working model/prototype is mandatory",
-      "All team members must be involved in the project",
-      "Project should address a real-world problem",
-      "Detailed documentation must be submitted",
-      "Plagiarism will lead to immediate disqualification",
-      "Setup your project 1 hour before judging",
-      "Ensure all equipment requirements are communicated beforehand",
-      "Prepare a 5-minute presentation and be ready for Q&A",
-      "Models should be sturdy and well-constructed",
-      "Display board should include project title, team details, and abstract",
-      "Bring all necessary tools for setup"
+      "Each team must consist of 1 to 3 members",
+      "All team members must be present at the venue during the event",
+      "Presentation time is strictly limited to 10 minutes",
+      "An additional 5 minutes will be allocated for the Q&A session",
+      "Projects must be based on engineering, technology, or innovation",
+      "Plagiarism or copied work will lead to immediate disqualification",
+      "Teams must have a well-defined project plan with a unique solution",
+      "Attendance in all sessions is mandatory to receive the certificate",
+      "The winner team will be awarded the announced prize amount"
     ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of Civil Engineering",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          name: "Dr. K. Yuvaraj",
+          phone: "+91 63697 16179",
+          
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "Civil Engineering",
-          phone: "+91 XXXXXXXXXX",
+          name: "Kaviya M",
+          phone: "+91 99944 57046",
         },
-        {
-          name: "Student Coordinator 2",
-          department: "Civil Engineering",
-          phone: "+91 XXXXXXXXXX",
-        },
+       
       ],
     },
   },
@@ -1187,29 +1287,45 @@ export const exposAndShowsDetails = [
   {
     id: "project-it",
     img: itproject,
-    shortTitle: "IT Project",
-    title: "Information Technology Project Exhibition",
-    description: "Present your innovative IT projects and software solutions.",
-    date: "14 February 2026",
+    shortTitle: "Project Presentation",
+    title: "Department of Information Technology",
+    description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
+    date: "13 February 2026",
     venue: "",
     price: "₹150 per team",
     registrationLink: "",
     schedule: [],
-    theme: "Digital Solutions for Tomorrow",
+    theme: ["It should match minimum any one of the United Nations STGs (17)"],
+    projectRequirements: [
+      {
+        title: "Project Report Should Include:",
+        details: [
+          "1. Introduction",
+          "2. Objectives",
+          "3. Methodology",
+          "4. Work Plan",
+          "5. Budget",
+          "6. Outcome of Project",
+          "7. Reference"
+        ]
+      },
+      {
+        title: "Important Note:",
+        details: [
+          "During presentation you should bring the prototype/working model/schematic working model"
+        ]
+      }
+    ],
     rules: [
-      "Team size: 3-5 members",
-      "Project must be functional and demonstrable",
-      "Working prototype is mandatory",
-      "All team members must be involved in the project",
-      "Project should address a real-world problem",
-      "Code and documentation must be submitted",
-      "Plagiarism will lead to immediate disqualification",
-      "Setup your project 1 hour before judging",
-      "Ensure all equipment and power requirements are communicated beforehand",
-      "Prepare a 5-minute demo and be ready for Q&A",
-      "Bring backup of all code and data",
-      "Display board should include project title, team details, and abstract",
-      "Internet connectivity will be your responsibility"
+      "Each team must consist of 1 to 3 members",
+      "All team members must be present at the venue during the event",
+      "Presentation time is strictly limited to 10 minutes",
+      "An additional 5 minutes will be allocated for the Q&A session",
+      "Projects must be based on engineering, technology, or innovation",
+      "Plagiarism or copied work will lead to immediate disqualification",
+      "Teams must have a well-defined project plan with a unique solution",
+      "Attendance in all sessions is mandatory to receive the certificate",
+      "The winner team will be awarded the announced prize amount"
     ],
     contact: {
       facultyCoordinator: [
@@ -1238,49 +1354,57 @@ export const exposAndShowsDetails = [
   {
     id: "project-cse",
     img: cseproject,
-    shortTitle: "CSE Project",
-    title: "Computer Science Project Exhibition",
-    description: "Showcase your computer science projects and innovative applications.",
-    date: "14 February 2026",
+    shortTitle: "Project Presentation",
+    title: "Department of Computer Science and Engineering",
+    description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
+    date: "13 February 2026",
     venue: "",
     price: "₹150 per team",
     registrationLink: "",
     schedule: [],
-    theme: "Computing for Innovation",
+    theme: ["It should match minimum any one of the United Nations STGs (17)"],
+    projectRequirements: [
+      {
+        title: "Project Report Should Include:",
+        details: [
+          "1. Introduction",
+          "2. Objectives",
+          "3. Methodology",
+          "4. Work Plan",
+          "5. Budget",
+          "6. Outcome of Project",
+          "7. Reference"
+        ]
+      },
+      {
+        title: "Important Note:",
+        details: [
+          "During presentation you should bring the prototype/working model/schematic working model"
+        ]
+      }
+    ],
     rules: [
-      "Team size: 3-5 members",
-      "Project must be functional and demonstrable",
-      "Working prototype is mandatory",
-      "All team members must be involved in the project",
-      "Project should address a real-world problem",
-      "Code and documentation must be submitted",
-      "Plagiarism will lead to immediate disqualification",
-      "Setup your project 1 hour before judging",
-      "Ensure all equipment and power requirements are communicated beforehand",
-      "Prepare a 5-minute demo and be ready for Q&A",
-      "Bring backup of all code and data",
-      "Display board should include project title, team details, and abstract",
-      "Internet connectivity will be your responsibility"
+      "Each team must consist of 1 to 3 members",
+      "All team members must be present at the venue during the event",
+      "Presentation time is strictly limited to 10 minutes",
+      "An additional 5 minutes will be allocated for the Q&A session",
+      "Projects must be based on engineering, technology, or innovation",
+      "Plagiarism or copied work will lead to immediate disqualification",
+      "Teams must have a well-defined project plan with a unique solution",
+      "Attendance in all sessions is mandatory to receive the certificate",
+      "The winner team will be awarded the announced prize amount"
     ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of CSE",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          name: "Vadivel S",
+          phone: "+91 97906 32171",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "CSE",
-          phone: "+91 XXXXXXXXXX",
-        },
-        {
-          name: "Student Coordinator 2",
-          department: "CSE",
-          phone: "+91 XXXXXXXXXX",
+          name: "Afrin S",
+          phone: "+91 82203 24338",
         },
       ],
     },
@@ -1289,29 +1413,45 @@ export const exposAndShowsDetails = [
   {
     id: "project-ece",
     img: eceproject,
-    shortTitle: "ECE Project",
-    title: "ECE Project Exhibition",
-    description: "Display your electronics and communication engineering projects.",
-    date: "14 February 2026",
+    shortTitle: "Project Presentation",
+    title: "Department of Electronics and Communication Engineering",
+    description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
+    date: "13 February 2026",
     venue: "",
     price: "₹150 per team",
     registrationLink: "",
     schedule: [],
-    theme: "Electronic Innovations for Communication",
+    theme: ["It should match minimum any one of the United Nations STGs (17)"],
+    projectRequirements: [
+      {
+        title: "Project Report Should Include:",
+        details: [
+          "1. Introduction",
+          "2. Objectives",
+          "3. Methodology",
+          "4. Work Plan",
+          "5. Budget",
+          "6. Outcome of Project",
+          "7. Reference"
+        ]
+      },
+      {
+        title: "Important Note:",
+        details: [
+          "During presentation you should bring the prototype/working model/schematic working model"
+        ]
+      }
+    ],
     rules: [
-      "Team size: 3-5 members",
-      "Project must be functional and demonstrable",
-      "Working prototype is mandatory",
-      "All team members must be involved in the project",
-      "Project should address a real-world problem",
-      "Detailed documentation must be submitted",
-      "Plagiarism will lead to immediate disqualification",
-      "Setup your project 1 hour before judging",
-      "Ensure all equipment and power requirements are communicated beforehand",
-      "Prepare a 5-minute demo and be ready for Q&A",
-      "Bring necessary components and backup circuits",
-      "Display board should include project title, team details, and abstract",
-      "Safety measures must be followed for all electronic circuits"
+      "Each team must consist of 1 to 3 members",
+      "All team members must be present at the venue during the event",
+      "Presentation time is strictly limited to 10 minutes",
+      "An additional 5 minutes will be allocated for the Q&A session",
+      "Projects must be based on engineering, technology, or innovation",
+      "Plagiarism or copied work will lead to immediate disqualification",
+      "Teams must have a well-defined project plan with a unique solution",
+      "Attendance in all sessions is mandatory to receive the certificate",
+      "The winner team will be awarded the announced prize amount"
     ],
     contact: {
       facultyCoordinator: [
@@ -1340,49 +1480,57 @@ export const exposAndShowsDetails = [
   {
     id: "project-eee",
     img: eeproject,
-    shortTitle: "EEE Project",
-    title: "EEE Project Exhibition",
-    description: "Exhibit your electrical and electronics engineering innovations.",
-    date: "14 February 2026",
+    shortTitle: "Project Presentation",
+    title: "Department of Electrical and Electronics Engineering",
+    description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
+    date: "13 February 2026",
     venue: "",
     price: "₹150 per team",
     registrationLink: "",
     schedule: [],
-    theme: "Electrical Innovations for Sustainable Energy",
+    theme: ["It should match minimum any one of the United Nations STGs (17)"],
+    projectRequirements: [
+      {
+        title: "Project Report Should Include:",
+        details: [
+          "1. Introduction",
+          "2. Objectives",
+          "3. Methodology",
+          "4. Work Plan",
+          "5. Budget",
+          "6. Outcome of Project",
+          "7. Reference"
+        ]
+      },
+      {
+        title: "Important Note:",
+        details: [
+          "During presentation you should bring the prototype/working model/schematic working model"
+        ]
+      }
+    ],
     rules: [
-      "Team size: 3-5 members",
-      "Project must be functional and demonstrable",
-      "Working prototype is mandatory",
-      "All team members must be involved in the project",
-      "Project should address a real-world problem",
-      "Detailed documentation must be submitted",
-      "Plagiarism will lead to immediate disqualification",
-      "Setup your project 1 hour before judging",
-      "Ensure all equipment and power requirements are communicated beforehand",
-      "Prepare a 5-minute demo and be ready for Q&A",
-      "Bring necessary components and backup circuits",
-      "Display board should include project title, team details, and abstract",
-      "Safety measures must be followed for all electrical connections"
+      "Each team must consist of 1 to 3 members",
+      "All team members must be present at the venue during the event",
+      "Presentation time is strictly limited to 10 minutes",
+      "An additional 5 minutes will be allocated for the Q&A session",
+      "Projects must be based on engineering, technology, or innovation",
+      "Plagiarism or copied work will lead to immediate disqualification",
+      "Teams must have a well-defined project plan with a unique solution",
+      "Attendance in all sessions is mandatory to receive the certificate",
+      "The winner team will be awarded the announced prize amount"
     ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of EEE",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          name: "Mr. S. Srinivasan",
+          phone: "+91 99941 43687",
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "EEE",
-          phone: "+91 XXXXXXXXXX",
-        },
-        {
-          name: "Student Coordinator 2",
-          department: "EEE",
-          phone: "+91 XXXXXXXXXX",
+          name: "Vishwanathan",
+          phone: "+91 90250 81987",
         },
       ],
     },
@@ -1391,49 +1539,58 @@ export const exposAndShowsDetails = [
   {
     id: "project-csbs",
     img: csbsproject,
-    shortTitle: "CSBS Project",
-    title: "CSBS Project Exhibition",
-    description: "Showcase your computer science and business systems projects.",
-    date: "14 February 2026",
+    shortTitle: "Project Presentation",
+    title: "Department of Computer Science and Business Systems",
+    description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
+    date: "13 February 2026",
     venue: "",
     price: "₹150 per team",
     registrationLink: "",
     schedule: [],
-    theme: "Technology-Driven Business Solutions",
+    theme: ["It should match minimum any one of the United Nations STGs (17)"],
+    projectRequirements: [
+      {
+        title: "Project Report Should Include:",
+        details: [
+          "1. Introduction",
+          "2. Objectives",
+          "3. Methodology",
+          "4. Work Plan",
+          "5. Budget",
+          "6. Outcome of Project",
+          "7. Reference"
+        ]
+      },
+      {
+        title: "Important Note:",
+        details: [
+          "During presentation you should bring the prototype/working model/schematic working model"
+        ]
+      }
+    ],
     rules: [
-      "Team size: 3-5 members",
-      "Project must be functional and demonstrable",
-      "Working prototype is mandatory",
-      "All team members must be involved in the project",
-      "Project should address a real-world problem",
-      "Code and documentation must be submitted",
-      "Plagiarism will lead to immediate disqualification",
-      "Setup your project 1 hour before judging",
-      "Ensure all equipment and power requirements are communicated beforehand",
-      "Prepare a 5-minute demo and be ready for Q&A",
-      "Bring backup of all code and data",
-      "Display board should include project title, team details, and abstract",
-      "Internet connectivity will be your responsibility"
+      "Each team must consist of 1 to 3 members",
+      "All team members must be present at the venue during the event",
+      "Presentation time is strictly limited to 10 minutes",
+      "An additional 5 minutes will be allocated for the Q&A session",
+      "Projects must be based on engineering, technology, or innovation",
+      "Plagiarism or copied work will lead to immediate disqualification",
+      "Teams must have a well-defined project plan with a unique solution",
+      "Attendance in all sessions is mandatory to receive the certificate",
+      "The winner team will be awarded the announced prize amount"
     ],
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of CSBS",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          name: "Mrs. T. Udhaya",
+          phone: "+91 86755 87180",
+         
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "CSBS",
-          phone: "+91 XXXXXXXXXX",
-        },
-        {
-          name: "Student Coordinator 2",
-          department: "CSBS",
-          phone: "+91 XXXXXXXXXX",
+          name: "Sedhuraman S",
+          phone: "+91 82480 72103",
         },
       ],
     },
@@ -1442,29 +1599,45 @@ export const exposAndShowsDetails = [
   {
     id: "project-bio",
     img: bioproject,
-    shortTitle: "Bio Project",
-    title: "Biotechnology Project Exhibition",
-    description: "Display your biotechnology projects and research innovations.",
-    date: "14 February 2026",
+    shortTitle: "Project Presentation",
+    title: "Department of Biotechnology",
+    description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
+    date: "13 February 2026",
     venue: "",
     price: "₹150 per team",
     registrationLink: "",
     schedule: [],
-    theme: "Biotech Solutions for Healthcare and Environment",
+    theme: ["It should match minimum any one of the United Nations STGs (17)"],
+    projectRequirements: [
+      {
+        title: "Project Report Should Include:",
+        details: [
+          "1. Introduction",
+          "2. Objectives",
+          "3. Methodology",
+          "4. Work Plan",
+          "5. Budget",
+          "6. Outcome of Project",
+          "7. Reference"
+        ]
+      },
+      {
+        title: "Important Note:",
+        details: [
+          "During presentation you should bring the prototype/working model/schematic working model"
+        ]
+      }
+    ],
     rules: [
-      "Team size: 3-5 members",
-      "Project must be functional and demonstrable",
-      "Working model/prototype is mandatory",
-      "All team members must be involved in the project",
-      "Project should address a real-world problem",
-      "Detailed documentation must be submitted",
-      "Plagiarism will lead to immediate disqualification",
-      "Setup your project 1 hour before judging",
-      "Ensure all equipment requirements are communicated beforehand",
-      "Prepare a 5-minute presentation and be ready for Q&A",
-      "Follow all safety protocols for biological samples",
-      "Display board should include project title, team details, and abstract",
-      "Proper disposal of biological materials is mandatory"
+      "Each team must consist of 1 to 3 members",
+      "All team members must be present at the venue during the event",
+      "Presentation time is strictly limited to 10 minutes",
+      "An additional 5 minutes will be allocated for the Q&A session",
+      "Projects must be based on engineering, technology, or innovation",
+      "Plagiarism or copied work will lead to immediate disqualification",
+      "Teams must have a well-defined project plan with a unique solution",
+      "Attendance in all sessions is mandatory to receive the certificate",
+      "The winner team will be awarded the announced prize amount"
     ],
     contact: {
       facultyCoordinator: [
@@ -1495,29 +1668,45 @@ export const exposAndShowsDetails = [
   {
     id: "project-mct",
     img: mctproject,
-    shortTitle: "MCT Project",
-    title: "Mechatronics Project Exhibition",
-    description: "Showcase your mechatronics projects integrating mechanics and electronics.",
-    date: "14 February 2026",
+    shortTitle: "Project Presentation",
+    title: "Department of Mechatronics Engineering",
+    description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
+    date: "13 February 2026",
     venue: "",
     price: "₹150 per team",
     registrationLink: "",
     schedule: [],
-    theme: "Intelligent Mechatronic Systems",
+    theme: ["It should match minimum any one of the United Nations STGs (17)"],
+    projectRequirements: [
+      {
+        title: "Project Report Should Include:",
+        details: [
+          "1. Introduction",
+          "2. Objectives",
+          "3. Methodology",
+          "4. Work Plan",
+          "5. Budget",
+          "6. Outcome of Project",
+          "7. Reference"
+        ]
+      },
+      {
+        title: "Important Note:",
+        details: [
+          "During presentation you should bring the prototype/working model/schematic working model"
+        ]
+      }
+    ],
     rules: [
-      "Team size: 3-5 members",
-      "Project must be functional and demonstrable",
-      "Working prototype is mandatory",
-      "All team members must be involved in the project",
-      "Project should address a real-world problem",
-      "Detailed documentation must be submitted",
-      "Plagiarism will lead to immediate disqualification",
-      "Setup your project 1 hour before judging",
-      "Ensure all equipment and power requirements are communicated beforehand",
-      "Prepare a 5-minute demo and be ready for Q&A",
-      "Bring necessary components and backup circuits",
-      "Display board should include project title, team details, and abstract",
-      "Safety measures must be followed for all systems"
+      "Each team must consist of 1 to 3 members",
+      "All team members must be present at the venue during the event",
+      "Presentation time is strictly limited to 10 minutes",
+      "An additional 5 minutes will be allocated for the Q&A session",
+      "Projects must be based on engineering, technology, or innovation",
+      "Plagiarism or copied work will lead to immediate disqualification",
+      "Teams must have a well-defined project plan with a unique solution",
+      "Attendance in all sessions is mandatory to receive the certificate",
+      "The winner team will be awarded the announced prize amount"
     ],
     contact: {
       facultyCoordinator: [
@@ -1546,29 +1735,45 @@ export const exposAndShowsDetails = [
   {
     id: "project-txt",
     img: txtproject,
-    shortTitle: "Textile Project",
-    title: "Textile Technology Project Exhibition",
-    description: "Display your textile technology innovations and sustainable solutions.",
-    date: "14 February 2026",
+    shortTitle: "Project Presentation",
+    title: "Department of Textile Technology",
+    description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
+    date: "13 February 2026",
     venue: "",
     price: "₹150 per team",
     registrationLink: "",
     schedule: [],
-    theme: "Sustainable Textile Innovations",
+    theme: ["It should match minimum any one of the United Nations STGs (17)"],
+    projectRequirements: [
+      {
+        title: "Project Report Should Include:",
+        details: [
+          "1. Introduction",
+          "2. Objectives",
+          "3. Methodology",
+          "4. Work Plan",
+          "5. Budget",
+          "6. Outcome of Project",
+          "7. Reference"
+        ]
+      },
+      {
+        title: "Important Note:",
+        details: [
+          "During presentation you should bring the prototype/working model/schematic working model"
+        ]
+      }
+    ],
     rules: [
-      "Team size: 3-5 members",
-      "Project must be functional and demonstrable",
-      "Working model/prototype is mandatory",
-      "All team members must be involved in the project",
-      "Project should address a real-world problem",
-      "Detailed documentation must be submitted",
-      "Plagiarism will lead to immediate disqualification",
-      "Setup your project 1 hour before judging",
-      "Ensure all material requirements are communicated beforehand",
-      "Prepare a 5-minute presentation and be ready for Q&A",
-      "Bring samples and prototypes of your work",
-      "Display board should include project title, team details, and abstract",
-      "Handle all chemicals and materials safely"
+      "Each team must consist of 1 to 3 members",
+      "All team members must be present at the venue during the event",
+      "Presentation time is strictly limited to 10 minutes",
+      "An additional 5 minutes will be allocated for the Q&A session",
+      "Projects must be based on engineering, technology, or innovation",
+      "Plagiarism or copied work will lead to immediate disqualification",
+      "Teams must have a well-defined project plan with a unique solution",
+      "Attendance in all sessions is mandatory to receive the certificate",
+      "The winner team will be awarded the announced prize amount"
     ],
     contact: {
       facultyCoordinator: [
@@ -1597,29 +1802,45 @@ export const exposAndShowsDetails = [
   {
     id: "project-ft",
     img: ftproject,
-    shortTitle: "FT Project",
-    title: "Fashion Technology Project Exhibition",
-    description: "Showcase your fashion technology innovations and creative designs.",
-    date: "14 February 2026",
+    shortTitle: "Project Presentation",
+    title: "Department of Food Technology",
+    description: "This project presentation demonstrates the practical implementation of an innovative idea, focusing on problem identification, system design, and functional execution. It explains how the proposed solution addresses real-world challenges, showcases results, and discusses limitations and future enhancements.",
+    date: "13 February 2026",
     venue: "",
     price: "₹150 per team",
     registrationLink: "",
     schedule: [],
-    theme: "Fashion Meets Technology",
+    theme: ["It should match minimum any one of the United Nations STGs (17)"],
+    projectRequirements: [
+      {
+        title: "Project Report Should Include:",
+        details: [
+          "1. Introduction",
+          "2. Objectives",
+          "3. Methodology",
+          "4. Work Plan",
+          "5. Budget",
+          "6. Outcome of Project",
+          "7. Reference"
+        ]
+      },
+      {
+        title: "Important Note:",
+        details: [
+          "During presentation you should bring the prototype/working model/schematic working model"
+        ]
+      }
+    ],
     rules: [
-      "Team size: 3-5 members",
-      "Project must be functional and demonstrable",
-      "Working model/prototype is mandatory",
-      "All team members must be involved in the project",
-      "Project should showcase innovation in fashion technology",
-      "Detailed documentation must be submitted",
-      "Plagiarism will lead to immediate disqualification",
-      "Setup your project 1 hour before judging",
-      "Ensure all material and equipment requirements are communicated beforehand",
-      "Prepare a 5-minute presentation and be ready for Q&A",
-      "Bring samples and prototypes of your designs",
-      "Display board should include project title, team details, and abstract",
-      "Handle all materials and equipment with care"
+      "Each team must consist of 1 to 3 members",
+      "All team members must be present at the venue during the event",
+      "Presentation time is strictly limited to 10 minutes",
+      "An additional 5 minutes will be allocated for the Q&A session",
+      "Projects must be based on engineering, technology, or innovation",
+      "Plagiarism or copied work will lead to immediate disqualification",
+      "Teams must have a well-defined project plan with a unique solution",
+      "Attendance in all sessions is mandatory to receive the certificate",
+      "The winner team will be awarded the announced prize amount"
     ],
     contact: {
       facultyCoordinator: [
@@ -1644,7 +1865,7 @@ export const exposAndShowsDetails = [
       ],
     },
   },
-  \*/
+  
 
 
 

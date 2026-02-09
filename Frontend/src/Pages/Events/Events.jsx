@@ -123,7 +123,7 @@ const Events = () => {
     {
       id: 7,
       image: NonTechnicalImage,
-      name: "Paper & Poster  Presentation",
+      name: "Paper ,Poster & Project Presentation",
       descriptionImages: exposAndShowsEvents,
     },
   ];
@@ -2067,6 +2067,68 @@ const Events = () => {
                 </div>
               )}
 
+              {/* Project Requirements Section */}
+              {selectedExpo.projectRequirements && selectedExpo.projectRequirements.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Project Requirements
+                  </h3>
+                  <div className="space-y-6">
+                    {selectedExpo.projectRequirements.map((requirement, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="bg-gradient-to-r from-secondary/10 to-transparent p-4 rounded-lg"
+                      >
+                        <h4 className="text-lg font-semibold text-primary mb-3">
+                          {requirement.title}
+                        </h4>
+                        <div className="space-y-2">
+                          {requirement.details.map((detail, detailIdx) => (
+                            <div
+                              key={detailIdx}
+                              className="flex items-start gap-2 text-gray-300"
+                            >
+                              <span className="text-primary mt-1">▸</span>
+                              <span className="text-sm">{detail}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Awards Section */}
+              {selectedExpo.awards && selectedExpo.awards.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Awards
+                  </h3>
+                  <div className="space-y-4">
+                    {selectedExpo.awards.map((award, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="bg-gradient-to-r from-secondary/10 to-transparent p-4 rounded-lg"
+                      >
+                        <h4 className="text-lg font-semibold text-primary mb-2">
+                          {award.title}
+                        </h4>
+                        <p className="text-gray-300 text-sm">
+                          {award.description}
+                        </p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Rules & Guidelines Section */}
               {selectedExpo.rules && selectedExpo.rules.length > 0 && (
                 <div className="mb-8">
@@ -2411,6 +2473,33 @@ const Events = () => {
                       >
                         <span className="text-primary mt-1">▸</span>
                         <span className="text-sm">{rule}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Awards Section */}
+              {selectedTechnical.awards && selectedTechnical.awards.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-4 border-l-4 border-primary pl-4">
+                    Awards
+                  </h3>
+                  <div className="space-y-4">
+                    {selectedTechnical.awards.map((award, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="bg-gradient-to-r from-secondary/10 to-transparent p-4 rounded-lg"
+                      >
+                        <h4 className="text-lg font-semibold text-primary mb-2">
+                          {award.title}
+                        </h4>
+                        <p className="text-gray-300 text-sm">
+                          {award.description}
+                        </p>
                       </motion.div>
                     ))}
                   </div>
