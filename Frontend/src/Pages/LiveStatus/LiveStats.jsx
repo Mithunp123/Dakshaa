@@ -1087,17 +1087,17 @@ const LiveStats = () => {
             <div className="xl:col-span-3 flex flex-col gap-6 h-full min-h-0">
                 
                 {/* Big Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow min-h-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 flex-grow min-h-0">
                     {/* Students Onboarded Card */}
                     <motion.div
                         initial={{ x: -100, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.2 }}
-                        className="relative group h-full hidden lg:block"
+                        className="relative group h-full"
                     >
                         <div className="absolute -inset-1 bg-gradient-to-r from-secondary to-orange-600 rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
                         
-                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-orange-500/30 rounded-3xl p-6 h-full flex flex-col justify-center">
+                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-orange-500/30 rounded-3xl p-8 h-full flex flex-col justify-center min-h-[260px]">
                         {/* Icon */}
                         <div className="flex justify-center mb-4">
                             <div className="w-16 h-16 bg-secondary/20 rounded-2xl flex items-center justify-center">
@@ -1106,7 +1106,7 @@ const LiveStats = () => {
                         </div>
 
                         {/* Label */}
-                        <h2 className="text-xl font-bold text-gray-300 text-center mb-2 uppercase tracking-wider">
+                        <h2 className="text-xl font-bold text-gray-300 text-center mb-3 uppercase tracking-wider">
                             Students Joined
                         </h2>
 
@@ -1125,70 +1125,6 @@ const LiveStats = () => {
                             <span className="text-base font-semibold">Total Onboarded</span>
                             </div>
                         </div>
-
-                        {/* Glow Effect */}
-                        <motion.div
-                            className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                            style={{
-                            background: 'radial-gradient(circle at center, rgba(249,115,22,0.1), transparent 70%)'
-                            }}
-                        />
-                        </div>
-                    </motion.div>
-
-                    {/* New Card: Event Individual Registration */}
-                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="relative group h-full"
-                    >
-                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
-                        
-                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-blue-500/30 rounded-3xl p-6 h-full flex flex-col justify-center">
-                            {/* Icon */}
-                            <div className="flex justify-center mb-4">
-                                <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center">
-                                    <TicketCheck className="w-8 h-8 text-blue-500" />
-                                </div>
-                            </div>
-
-                            {/* Label */}
-                            <h2 className="text-xl font-bold text-gray-300 text-center mb-2 uppercase tracking-wider">
-                                Event Individual
-                            </h2>
-                            <p className="text-xs text-gray-500 text-center mb-3 font-semibold uppercase tracking-widest opacity-70">
-                                Total Participants
-                            </p>
-
-                            {/* Counter */}
-                            <div className="text-center">
-                                <div className="text-6xl md:text-7xl font-black text-blue-500 mb-2 tabular-nums">
-                                    <CountUp 
-                                        end={stats.uniquePaidUsers || 0} 
-                                        duration={2}
-                                        separator=","
-                                        preserveValue
-                                    />
-                                </div>
-                                <div className="flex flex-col items-center justify-center gap-1 text-blue-400">
-                                    <div className="flex items-center gap-2">
-                                        <Users className="w-4 h-4" />
-                                        <span className="text-base font-semibold">Total Paid Participants</span>
-                                    </div>
-                                    <span className="text-xs text-blue-400/60 font-mono">
-                                        (Inc. <CountUp end={stats.extraTeamMembers || 0} /> Team Members)
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Glow Effect */}
-                            <motion.div
-                                className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                                style={{
-                                    background: 'radial-gradient(circle at center, rgba(59,130,246,0.1), transparent 70%)'
-                                }}
-                            />
                         </div>
                     </motion.div>
 
@@ -1201,7 +1137,7 @@ const LiveStats = () => {
                     >
                         <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
                         
-                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-3xl p-6 h-full flex flex-col justify-center">
+                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-3xl p-8 h-full flex flex-col justify-center min-h-[260px]">
                         {/* Icon */}
                         <div className="flex justify-center mb-4">
                             <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center">
@@ -1210,7 +1146,7 @@ const LiveStats = () => {
                         </div>
 
                         {/* Label */}
-                        <h2 className="text-xl font-bold text-gray-300 text-center mb-2 uppercase tracking-wider">
+                        <h2 className="text-xl font-bold text-gray-300 text-center mb-3 uppercase tracking-wider">
                             Event Registrations
                         </h2>
 
