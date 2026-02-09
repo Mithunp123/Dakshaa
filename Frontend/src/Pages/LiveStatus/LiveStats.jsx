@@ -69,6 +69,7 @@ const LiveStats = () => {
   const [stats, setStats] = useState({
     users: 0,
     registrations: 0,
+    uniquePaidUsers: 0,
     last_updated: null
   });
   const [categoryStats, setCategoryStats] = useState([]);
@@ -523,13 +524,42 @@ const LiveStats = () => {
 
   const fetchCategoryStatsFallback = async () => {
     try {
+      // Helper to fetch all data with pagination to bypass 1000 row limit
+      const fetchAllData = async (table, select, queryModifier) => {
+          let allData = [];
+          let page = 0;
+          const pageSize = 1000;
+          let hasMore = true;
+
+          while (hasMore) {
+              let query = supabase
+                  .from(table)
+                  .select(select);
+              
+              // Apply filters BEFORE range
+              if (queryModifier) query = queryModifier(query);
+              
+              query = query.range(page * pageSize, (page + 1) * pageSize - 1);
+              
+              const { data, error } = await query;
+              if (error) {
+                  console.error(`fetchAllData error for ${table}:`, error);
+                  throw error;
+              }
+              
+              if (data && data.length > 0) {
+                  allData = [...allData, ...data];
+                  if (data.length < pageSize) hasMore = false;
+                  else page++;
+              } else {
+                  hasMore = false;
+              }
+          }
+          return allData;
+      };
+
       // 1. Fetch all active events with their categories
-      const { data: events, error: eventsError } = await supabase
-        .from('events')
-        .select('id, category')
-        .eq('is_active', true);
-        
-      if (eventsError) throw eventsError;
+      const events = await fetchAllData('events', 'id, category', q => q.eq('is_active', true));
 
       // Map event_id(uuid) -> category
       const eventCategoryMap = {};
@@ -537,35 +567,79 @@ const LiveStats = () => {
         eventCategoryMap[e.id] = (e.category || '').toLowerCase().trim();
       });
 
-      // 2. Fetch all paid registrations that belong to students
-      /* ... same fallback logic ... */
-      
-        const { data: paidRegs } = await supabase
-            .from('event_registrations_config')
-            .select('event_id')
-            .ilike('payment_status', 'paid');
+      // 2. Fetch all paid registrations
+      // Need user_id for unique count calculation
+      const validRegs = await fetchAllData('event_registrations_config', 'event_id, user_id', q => q.ilike('payment_status', 'paid'));
 
-        const validRegs = paidRegs || [];
+      // 3. Calculate Total Paid Participants (Matches Python Logic Exactly)
+      // Formula: Total Paid Participants = (PAID Registrations) + (Total Team Paid Members - Active Team Count)
+      // Note: If (Sum(paid_members) - Count(active_teams)) is negative, use 0.
+      
+      const activeTeams = await fetchAllData('teams', 'paid_members', q => q.eq('is_active', true));
+      
+      let totalTeamPaidMembers = 0;
+      let activeTeamCount = activeTeams.length;
+      
+      activeTeams.forEach(team => {
+        // Force number conversion to avoid string concatenation issues
+        const pMembers = Number(team.paid_members);
+        const val = isNaN(pMembers) ? 0 : pMembers;
+        totalTeamPaidMembers += val;
+      });
+      
+      // Subtraction logic: Sum(paid_members) - Count(active_teams)
+      let extraPaidMembers = totalTeamPaidMembers - activeTeamCount;
+      if (extraPaidMembers < 0) {
+          extraPaidMembers = 0;
+      }
+      
+      const totalParticipants = validRegs.length + extraPaidMembers;
+      console.log('👥 Participant Calculation (Python Logic Match):', {
+        baseRegs: validRegs.length,
+        teamMembersTotal: totalTeamPaidMembers,
+        activeTeamsCount: activeTeamCount,
+        CalculatedExtra: extraPaidMembers,
+        total: totalParticipants
+      });
+
+      // Update global stats with corrected count
+      setStats(prev => ({
+          ...prev,
+          uniquePaidUsers: totalParticipants,
+          extraTeamMembers: extraPaidMembers
+      }));
 
       // 4. Aggregate counts
-      const counts = {};
-      
+      let workshopCount = 0;
+      let nonTechCount = 0;
+      let techCount = 0;
+      let culturalCount = 0;
+      let sportsCount = 0;
+      let hackathonCount = 0;
+      let conferenceCount = 0;
+
       validRegs.forEach(reg => {
          const category = eventCategoryMap[reg.event_id];
          if (category) {
-            const normalized = category.toLowerCase().trim();
-            counts[normalized] = (counts[normalized] || 0) + 1;
+            const val = category.toLowerCase().trim();
+            
+            if (val.includes('workshop')) {
+                workshopCount++;
+            } else if (val.includes('non-technical') || val.includes('non-tech') || val.includes('nontech') || val.includes('non tech')) {
+                nonTechCount++;
+            } else if (val.includes('technical') || val === 'tech') {
+                techCount++;
+            } else if (val.includes('cultural')) {
+                culturalCount++;
+            } else if (val.includes('sport')) {
+                sportsCount++;
+            } else if (val.includes('hack')) {
+                hackathonCount++;
+            } else if (val.includes('conference')) {
+                conferenceCount++;
+            }
          }
       });
-      
-      // Construct final formatted array with case-insensitive matching
-      const workshopCount = (counts['workshop'] || 0) + (counts['workshops'] || 0);
-      const nonTechCount = (counts['non-technical'] || 0) + (counts['non-tech'] || 0) + (counts['nontech'] || 0) + (counts['non tech'] || 0);
-      const techCount = counts['technical'] || 0;
-      const culturalCount = (counts['cultural'] || 0) + (counts['culturals'] || 0);
-      const sportsCount = (counts['sports'] || 0) + (counts['sport'] || 0);
-      const hackathonCount = (counts['hackathon'] || 0) + (counts['hack'] || 0);
-      const conferenceCount = counts['conference'] || 0;
       
        const finalStats = [
             { category: 'Workshop', count: workshopCount },
@@ -706,25 +780,27 @@ const LiveStats = () => {
             // Use manual count if it's different
             if (manualCount !== maxCount) {
               console.log("⚡ Using manual count as it differs from DB count");
-              setStats({
+              setStats(prev => ({
+                ...prev,
                 users: studentCount.count || 0,
                 registrations: manualCount,
                 last_updated: new Date().toISOString()
-              });
+              }));
               return;
             }
           }
         }
 
-        setStats({
+        setStats(prev => ({
+          ...prev,
           users: studentCount.count || 0,
           registrations: maxCount,
           last_updated: new Date().toISOString()
-        });
+        }));
         
     } catch (error) {
          console.error("❌ Error in fallback:", error);
-         setStats({ users: 0, registrations: 0, last_updated: new Date().toISOString() });
+         setStats(prev => ({ ...prev, users: 0, registrations: 0, last_updated: new Date().toISOString() }));
     }
   };
 
@@ -817,6 +893,8 @@ const LiveStats = () => {
                        } else if ((catKey.includes('sport') || catKey === 'sports') && c.category === 'Sports') {
                            return { ...c, count: c.count + 1 };
                        } else if ((catKey.includes('hackathon') || catKey === 'hack') && c.category === 'Hackathon') {
+                           return { ...c, count: c.count + 1 };
+                       } else if (catKey.includes('conference') && c.category === 'Conference') {
                            return { ...c, count: c.count + 1 };
                        }
                        return c;
@@ -1009,7 +1087,7 @@ const LiveStats = () => {
             <div className="xl:col-span-3 flex flex-col gap-6 h-full min-h-0">
                 
                 {/* Big Cards */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-grow min-h-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow min-h-0">
                     {/* Students Onboarded Card */}
                     <motion.div
                         initial={{ x: -100, opacity: 0 }}
@@ -1055,6 +1133,62 @@ const LiveStats = () => {
                             background: 'radial-gradient(circle at center, rgba(249,115,22,0.1), transparent 70%)'
                             }}
                         />
+                        </div>
+                    </motion.div>
+
+                    {/* New Card: Event Individual Registration */}
+                     <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="relative group h-full"
+                    >
+                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
+                        
+                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-blue-500/30 rounded-3xl p-6 h-full flex flex-col justify-center">
+                            {/* Icon */}
+                            <div className="flex justify-center mb-4">
+                                <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center">
+                                    <TicketCheck className="w-8 h-8 text-blue-500" />
+                                </div>
+                            </div>
+
+                            {/* Label */}
+                            <h2 className="text-xl font-bold text-gray-300 text-center mb-2 uppercase tracking-wider">
+                                Event Individual
+                            </h2>
+                            <p className="text-xs text-gray-500 text-center mb-3 font-semibold uppercase tracking-widest opacity-70">
+                                Total Participants
+                            </p>
+
+                            {/* Counter */}
+                            <div className="text-center">
+                                <div className="text-6xl md:text-7xl font-black text-blue-500 mb-2 tabular-nums">
+                                    <CountUp 
+                                        end={stats.uniquePaidUsers || 0} 
+                                        duration={2}
+                                        separator=","
+                                        preserveValue
+                                    />
+                                </div>
+                                <div className="flex flex-col items-center justify-center gap-1 text-blue-400">
+                                    <div className="flex items-center gap-2">
+                                        <Users className="w-4 h-4" />
+                                        <span className="text-base font-semibold">Total Paid Participants</span>
+                                    </div>
+                                    <span className="text-xs text-blue-400/60 font-mono">
+                                        (Inc. <CountUp end={stats.extraTeamMembers || 0} /> Team Members)
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Glow Effect */}
+                            <motion.div
+                                className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                style={{
+                                    background: 'radial-gradient(circle at center, rgba(59,130,246,0.1), transparent 70%)'
+                                }}
+                            />
                         </div>
                     </motion.div>
 
