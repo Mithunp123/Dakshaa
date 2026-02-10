@@ -26,9 +26,6 @@ const InquiryCard = ({ inquiry }) => (
     <p>
       <FaUser className="inline mr-2 text-secondary" /> {inquiry.name}
     </p>
-    <p>
-      <FaPhone className="inline mr-2 text-secondary" /> {inquiry.mobile}
-    </p>
     {/* <p><FaEnvelope className="inline mr-2 text-red-400" /> {inquiry.email}</p> */}
     {inquiry.company && (
       <p>
