@@ -47,7 +47,7 @@ const Login = lazy(() => import("./Pages/Login/Login"));
 const ForgotPassword = lazy(() => import("./Pages/ForgotPassword/ForgotPassword"));
 const Leaderboard = lazy(() => import("./Pages/Leaderboard/Leaderboard"));
 const LiveStatusBoard = lazy(() => import("./Pages/LiveStatus/LiveStatusBoard"));
-const LiveStats = lazy(() => import("./Pages/LiveStatus/LiveStats"));
+{/*const LiveStats = lazy(() => import("./Pages/LiveStatus/LiveStats"));*/}
 const TestConnection = lazy(() => import("./Pages/TestConnection"));
 const MyRegistrations = lazy(() => import("./Pages/MyRegistrations/MyRegistrations"));
 const AdminDashboard = lazy(() => import("./Pages/Admin/AdminDashboard"));
@@ -225,7 +225,6 @@ function AppContent() {
             />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/live-status" element={<LiveStatusBoard />} />
-            <Route path="/live-stats" element={<LiveStats />} />
             <Route path="/test-connection" element={<TestConnection />} />
             <Route path="/my-registrations" element={<MyRegistrations />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
