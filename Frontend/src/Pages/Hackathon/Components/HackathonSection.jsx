@@ -318,6 +318,7 @@ export const hackathonEventDetails = {
         facultyCoordinator: [
           {
             name: "Mr.P.Dineshkumar",
+            phone:"+91 96888 37873",
             
           },
         ],
@@ -651,7 +652,7 @@ export const hackathonEventDetails = {
         },{
           title: "2nd Prize",
           description: [
-            " •	2nd Position – INR 2,000 Winning prize for the Team. Two month Internship without stipend at Mindnics Private Limited to develop the design as product. Product development cost will be borne by Mindnics Private Limited"
+            " 2nd Position – INR 2,000 Winning prize for the Team. Two month Internship without stipend at Mindnics Private Limited to develop the design as product. Product development cost will be borne by Mindnics Private Limited"
           ],
         },{
           title: "3rd Prize",

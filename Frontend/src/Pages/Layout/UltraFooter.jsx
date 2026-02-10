@@ -158,7 +158,7 @@ const UltraFooter = () => {
             <FooterTitle delay={0.1}>Student Coordinators</FooterTitle>
             <div className="space-y-3 mt-4">
               <ContactItem icon={FaPhone} delay={0.2}>
-                <p>9489243775 - Kavinesh K</p>
+                <p> Kavinesh K</p>
               </ContactItem>
               <ContactItem icon={FaEnvelope} delay={0.3}>
                 dakshaa@ksrct.ac.in
