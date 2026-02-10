@@ -331,17 +331,15 @@ export const nonTechnicalDetails = [
       ],
       studentCoordinator: [
         {
-          name: "Akash A",
-          department: "Computer Science and Business Systems",
-          year: "III Year",
-          phone: "+91 93632 83385",
+          name: "Mithuna S",
+          
+          phone: "+91 82482 02500",
           
         },
         {
-          name: "Guruchandhar D",
-          department: "Computer Science and Business Systems",
-          year: "III Year",
-          phone: "+91 95004 46351",
+          name: "Preethi R ",
+          
+          phone: "+91 89031 42933 ",
         
         },
       ],
@@ -665,7 +663,7 @@ export const nonTechnicalDetails = [
           name: "Mr. M. Dhanapal",
           designation: "Assistant Professor",
           department: "Electrical and Electronics Engineering",
-          phone: "",
+          
       
         },
       ],
@@ -989,7 +987,7 @@ export const nonTechnicalDetails = [
       facultyCoordinator: [
         {
           name: "Mrs. V. Indumathi",
-          department: "",
+          
           phone: "+91 99651 37001",
           email: "indumathi@ksrct.ac.in",
         },
@@ -997,15 +995,13 @@ export const nonTechnicalDetails = [
       studentCoordinator: [
         {
           name: "Mr. P. Sridhar",
-          department: "",
-          year: "",
+         
           phone: "+91 96779 96590",
           email: "sridharpalanisamy222@gmail.com ",
         },
         {
           name: "Mr. Bharath",
-          department: "",
-          year: "",
+          
           phone: "+91 80123 55633",
           email: "kumarbharath236@gmail.com ",
         },
@@ -1050,7 +1046,7 @@ export const nonTechnicalDetails = [
       facultyCoordinator: [
         {
           name: "Dr. M. Sasikumar",
-          department: "",
+          
           phone: "+91 99651 67895",
           email: "sasikumarm@ksrct.ac.in ",
         },
@@ -1058,15 +1054,13 @@ export const nonTechnicalDetails = [
       studentCoordinator: [
         {
           name: "Mr. K. M. Dharaneesh",
-          department: "",
-          year: "",
+          
           phone: "+91 99434 52438",
           
         },
         {
           name: "Mr. T. Bhuvanesh",
-          department: "",
-          year: "",
+        
           phone: "+91 63694 36709",
           
         },
@@ -1113,14 +1107,14 @@ export const nonTechnicalDetails = [
         {
           name: "Mr. P. Prakash",
           designation: "Assistant Professor",
-          department: "",
+          
           phone: "+91 80126 63913",
           
         },
         {
           name: "Mr. S. Karthick",
           designation: "Assistant Professor",
-          department: "",
+         
           phone: "+91 97906 67321",
           
         },
@@ -1255,7 +1249,7 @@ export const nonTechnicalDetails = [
         {
           name: "Dr. N. Lalithamani",
           designation: "Professor",
-          department: "",
+          
           phone: " +91 89255 68867",
           email: "lathithamani@ksrct.ac.in ",
         },
