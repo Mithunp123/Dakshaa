@@ -835,13 +835,13 @@ export const workshopDetails = [
     description: "This workshop provides an introduction to Artificial Intelligence, Machine Learning, Deep Learning, and Image Processing using MATLAB in a practical and easy-to-understand manner. Participants will learn how intelligent models are built, how neural networks are trained, and how images are processed and analysed. The session includes hands-on experience with real-time applications such as classification, prediction, object detection, along with applications in Electric Vehicles (EVs) and Robotics. ",
     img: workshop17,
     date: "February 12, 2026",
-    venue: "AB LAB-3",
+    venue: "AB LAB 3 (Academic Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "AB LAB-3",
+        location: "AB LAB-3 (Academic Block)",
         time: "1:00 PM to 4:30PM ",
         date: "February 12, 2026",
       },

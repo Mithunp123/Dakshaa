@@ -331,14 +331,12 @@ export const nonTechnicalDetails = [
       ],
       studentCoordinator: [
         {
-          name: "Mithuna S",
-          
+          name: "Mithuna P",
           phone: "+91 82482 02500",
           
         },
         {
           name: "Preethi R ",
-          
           phone: "+91 89031 42933 ",
         
         },
@@ -516,7 +514,7 @@ export const nonTechnicalDetails = [
     title: "Kahoot! Quiz",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "A103 Smart Class room ( Main Building)",
+    venue: " A103  ( Main Building)",
     price: "₹150 per Member",
     description:
       "The Kahoot! Quiz Challenge is an exciting and interactive quiz event designed to test participants' knowledge, speed, and teamwork. Using the Kahoot platform, participants answer multiple-choice questions in real time through their smartphones. The quiz includes a mix of technical topics, general knowledge, and fun questions, making it both competitive and engaging. Accuracy and quick thinking are the key factors for success.",
@@ -540,7 +538,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "9.00 AM to 11.00 AM",
-        location: "A103 Smart Class room ( Main Building)",
+        location: "A103 ( Main Building)",
       },
     ],
     contact: {
@@ -1074,7 +1072,7 @@ export const nonTechnicalDetails = [
     title: "Freezeframe",
     department: "Non-Technical Events",
     date: "February 14, 2026",
-    venue: "CLASS C107 (MECHANICAL BLOCK)",
+    venue: "C107 (MECHANICAL BLOCK)",
     price: "₹150 per Member",
     description:
       "Freezeframe is a creative photography contest focused on visual storytelling and awareness. Participants capture meaningful moments within the college campus without any editing or filters. The event promotes observational skills, creativity, and the ability to convey a message through a single photograph.",
@@ -1099,7 +1097,7 @@ export const nonTechnicalDetails = [
       {
         date: "February 14, 2026",
         time: "1 Hour",
-        location: "CLASS C107 (MECHANICAL BLOCK)",
+        location: "C107 (MECHANICAL BLOCK)",
       },
     ],
     contact: {

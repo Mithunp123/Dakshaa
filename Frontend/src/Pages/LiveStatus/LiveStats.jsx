@@ -822,7 +822,9 @@ const LiveStats = () => {
       // Update global stats with corrected count
       setStats(prev => ({
           ...prev,
-          uniquePaidUsers: totalParticipants,
+          uniquePaidUsers: validRegs.length, // Count of unique paid registrations
+          teamMembersCount: extraPaidMembers,
+          totalParticipants: totalParticipants,
           extraTeamMembers: extraPaidMembers
       }));
 
@@ -1287,12 +1289,20 @@ const LiveStats = () => {
               
               // Force state update with callback to ensure it happens
               setStats(prevStats => {
+                const newRegistrations = prevStats.registrations + 1;
+                const newTotalParticipants = newRegistrations + prevStats.teamMembersCount;
                 const newStats = {
                   ...prevStats,
-                  registrations: prevStats.registrations + 1,
+                  registrations: newRegistrations,
+                  totalParticipants: newTotalParticipants,
                   last_updated: new Date().toISOString()
                 };
-                console.log('📊 Stats updated:', { old: prevStats.registrations, new: newStats.registrations });
+                console.log('📊 Stats updated:', { 
+                  oldRegistrations: prevStats.registrations, 
+                  newRegistrations: newStats.registrations,
+                  oldTotalParticipants: prevStats.totalParticipants,
+                  newTotalParticipants: newStats.totalParticipants
+                });
                 return newStats;
               });
 
