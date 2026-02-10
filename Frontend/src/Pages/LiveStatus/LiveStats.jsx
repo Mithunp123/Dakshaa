@@ -59,6 +59,18 @@ const SPECIAL_EVENT_BASES = [
     'Project Presentation'
 ];
 
+// Allowed Technical Events for Tech Card display
+const ALLOWED_TECH_EVENTS = [
+    'AI Mystery Box Challenge',
+    'Bioblitz- Map (Bio Treasure Hunt)',
+    'Reel-O-Science',
+    '3D Arena',
+    'System Sense',
+    'Zero Component',
+    'DrapeX: Fabric Draping in Action',
+    'CoreX(Project Presentation)'
+];
+
 const normalizeName = (value) => (value || '')
     .toLowerCase()
     .replace(/[^a-z0-9]/g, '');
@@ -619,9 +631,15 @@ const LiveStats = () => {
             return categoryVariants.some(variant => eventCategory.includes(variant));
         });
 
-        // For Tech category, exclude Paper/Poster/Project Presentations (they have separate cards)
+        // For Tech category, only show allowed technical events (strict exact match)
         if (categoryName === 'Tech') {
-            categoryEvents = categoryEvents.filter(e => !getSpecialBaseFromEventName(e.name));
+            const normalizeForMatch = (str) => (str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            const allowedNormalized = ALLOWED_TECH_EVENTS.map(normalizeForMatch);
+            
+            categoryEvents = categoryEvents.filter(e => {
+                const eventNameNormalized = normalizeForMatch(e.name);
+                return allowedNormalized.includes(eventNameNormalized);
+            });
         }
 
         const eventIds = categoryEvents.map(e => e.id);
@@ -828,8 +846,13 @@ const LiveStats = () => {
             } else if (val.includes('non-technical') || val.includes('non-tech') || val.includes('nontech') || val.includes('non tech')) {
                 nonTechCount++;
             } else if (val.includes('technical') || val === 'tech') {
-                // Exclude Paper/Poster/Project Presentations from Tech count (they have separate cards)
-                if (!getSpecialBaseFromEventName(eventName)) {
+                // Only count allowed technical events in Tech category (strict exact match)
+                const normalizeForMatch = (str) => (str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                const eventNameNormalized = normalizeForMatch(eventName);
+                const isAllowedTechEvent = ALLOWED_TECH_EVENTS.some(allowedName => 
+                    normalizeForMatch(allowedName) === eventNameNormalized
+                );
+                if (isAllowedTechEvent) {
                     techCount++;
                 }
             } else if (val.includes('cultural')) {
