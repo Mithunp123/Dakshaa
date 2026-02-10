@@ -32,7 +32,7 @@ const Separator = memo(() => (
 Separator.displayName = 'Separator';
 
 const UltraCountdown = memo(() => {
-  const targetDate = new Date("2026-02-12T09:00:00").getTime();
+  const targetDate = new Date("2025-02-11T23:00:00").getTime();
   
   const [timeLeft, setTimeLeft] = useState(() => {
     const now = new Date().getTime();
