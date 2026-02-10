@@ -21,7 +21,8 @@ import {
   ShieldCheck,
   Package,
   Trophy,
-  ClipboardList
+  ClipboardList,
+  School
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../supabase';
@@ -155,6 +156,7 @@ const AdminLayout = () => {
         { label: 'Referrals', icon: Trophy, path: '/admin/referrals' },
         { label: 'Pending Registrations', icon: ClipboardList, path: '/admin/pending-registrations' },
         { label: 'Attendance Management', icon: Users, path: '/admin/attendance' },
+        { label: 'College Stats', icon: School, path: '/admin/college-stats' },
         { label: 'Event Controller', icon: Radio, path: '/admin/event-controller' }
       );
     }

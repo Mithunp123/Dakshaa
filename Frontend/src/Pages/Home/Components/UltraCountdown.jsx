@@ -135,8 +135,13 @@ const UltraCountdown = () => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+<<<<<<< HEAD
     // Event registration ends on February 11, 2025 at 11:00 PM
     const targetDate = new Date('February 11, 2025 23:00:00');
+=======
+    // Event registration ends on February 10, 2026
+    const targetDate = new Date('February 10, 2026 23:59:59');
+>>>>>>> bdd572e2fe9977820a2c72546fb29aa7ede88496
     const targetTime = targetDate.getTime();
 
     const interval = setInterval(() => {

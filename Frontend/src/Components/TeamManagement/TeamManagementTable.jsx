@@ -221,6 +221,7 @@ const TeamManagementTable = ({ eventId = null, onlyPaid = false }) => {
     const csvData = filteredTeams.map(team => ({
       'Team Name': team.name,
       'Leader': team.leader_name,
+      'Leader Email': team.leader_email || '',
       'Members': team.member_count,
       'Event': team.event_name,
       'Payment Status': team.payment_status,

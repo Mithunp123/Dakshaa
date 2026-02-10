@@ -641,6 +641,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           *,
           events (
              id,
+             event_id,
              name,
              price,
              event_key
@@ -705,13 +706,17 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
     // 'reg.events' might be array or object depending on relationship. 
     // Assuming object based on select.
     const currentPrice = reg.events?.price || 0;
-    const currentEventKey = reg.events?.event_key; // Using event_key for comparison if used in 'events' table
+    const currentEventUuid = reg.sourceTable === 'event_registrations_config' ? reg.event_id : null;
+    const currentEventText = reg.events?.event_id || reg.event_id || null;
 
-    const compatibleEvents = eventStats.filter(ev => 
-      ev.price === currentPrice && 
-      ev.event_key !== currentEventKey && 
-      ev.is_open
-    );
+    const compatibleEvents = eventStats.filter(ev => {
+      if (ev.price !== currentPrice || !ev.is_open) return false;
+
+      const sameByUuid = currentEventUuid && ev.id === currentEventUuid;
+      const sameByText = currentEventText && ev.event_id === currentEventText;
+
+      return !(sameByUuid || sameByText);
+    });
     
     setAvailableTargetEvents(compatibleEvents);
   };
@@ -929,10 +934,11 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
       let columns, tableData;
       
       if (isTeamEvent) {
-        columns = ['S.No', 'Name', 'Roll Number', 'Department', 'College', 'Team', 'Role', 'Mobile', 'Signature'];
+        columns = ['S.No', 'Name', 'Email', 'Roll Number', 'Department', 'College', 'Team', 'Role', 'Mobile', 'Signature'];
         tableData = registrations.map(row => [
           row.sno,
           row.name,
+          row.email,
           row.rollNumber,
           row.department,
           row.college,
@@ -942,10 +948,11 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           ''
         ]);
       } else {
-        columns = ['S.No', 'Name', 'Roll Number', 'Department', 'College', 'Mobile', 'Signature'];
+        columns = ['S.No', 'Name', 'Email', 'Roll Number', 'Department', 'College', 'Mobile', 'Signature'];
         tableData = registrations.map(row => [
           row.sno,
           row.name,
+          row.email,
           row.rollNumber,
           row.department,
           row.college,
@@ -974,22 +981,24 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         },
         columnStyles: isTeamEvent ? {
           0: { cellWidth: 16, halign: 'center' }, // S.No
-          1: { cellWidth: 40 }, // Name
-          2: { cellWidth: 32 }, // Roll Number
-          3: { cellWidth: 32 }, // Department
-          4: { cellWidth: 50 }, // College
-          5: { cellWidth: 32 }, // Team
-          6: { cellWidth: 20, halign: 'center' }, // Role
-          7: { cellWidth: 28 }, // Mobile
-          8: { cellWidth: 32 }, // Signature
+          1: { cellWidth: 36 }, // Name
+          2: { cellWidth: 48 }, // Email
+          3: { cellWidth: 30 }, // Roll Number
+          4: { cellWidth: 28 }, // Department
+          5: { cellWidth: 46 }, // College
+          6: { cellWidth: 28 }, // Team
+          7: { cellWidth: 18, halign: 'center' }, // Role
+          8: { cellWidth: 26 }, // Mobile
+          9: { cellWidth: 28 }, // Signature
         } : {
           0: { cellWidth: 16, halign: 'center' }, // S.No
-          1: { cellWidth: 44 }, // Name
-          2: { cellWidth: 38 }, // Roll Number
-          3: { cellWidth: 38 }, // Department
-          4: { cellWidth: 60 }, // College
-          5: { cellWidth: 32 }, // Mobile
-          6: { cellWidth: 32 }, // Signature
+          1: { cellWidth: 40 }, // Name
+          2: { cellWidth: 52 }, // Email
+          3: { cellWidth: 34 }, // Roll Number
+          4: { cellWidth: 34 }, // Department
+          5: { cellWidth: 56 }, // College
+          6: { cellWidth: 30 }, // Mobile
+          7: { cellWidth: 30 }, // Signature
         },
         margin: { left: 14, right: 14 },
         tableWidth: 'auto',
@@ -1311,47 +1320,50 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
 
       console.log('✅ Events loaded:', data?.length, 'events found');
 
-      // Get registration counts for each event with payment status breakdown
-      const statsPromises = data.map(async (event) => {
-        // Get all registration counts by payment status
-        const [paidResult, pendingResult, partialResult, totalResult] = await Promise.all([
-          supabase
-            .from('event_registrations_config')
-            .select('*', { count: 'exact', head: true })
-            .eq('event_id', event.id)
-            .in('payment_status', ['PAID', 'completed']),
-          supabase
-            .from('event_registrations_config')
-            .select('*', { count: 'exact', head: true })
-            .eq('event_id', event.id)
-            .eq('payment_status', 'PENDING'),
-          supabase
-            .from('event_registrations_config')
-            .select('*', { count: 'exact', head: true })
-            .eq('event_id', event.id)
-            .eq('payment_status', 'PARTIAL'),
-          supabase
-            .from('event_registrations_config')
-            .select('*', { count: 'exact', head: true })
-            .eq('event_id', event.id)
-        ]);
+      const eventIds = data.map(event => event.id);
+      const registrationStats = new Map();
 
-        const paidCount = paidResult.count || 0;
-        const pendingCount = pendingResult.count || 0;
-        const partialCount = partialResult.count || 0;
-        const totalCount = totalResult.count || 0;
+      if (eventIds.length > 0) {
+        console.log('📊 Fetching registrations in bulk for stats...');
+        const { data: registrations, error: registrationsError } = await fetchAllRecords(
+          supabase,
+          'event_registrations_config',
+          'event_id, payment_status',
+          {
+            filters: [{ column: 'event_id', operator: 'in', value: eventIds }]
+          }
+        );
 
+        if (registrationsError) throw registrationsError;
+
+        registrations?.forEach(reg => {
+          if (!registrationStats.has(reg.event_id)) {
+            registrationStats.set(reg.event_id, { paid: 0, pending: 0, partial: 0, total: 0 });
+          }
+          const stats = registrationStats.get(reg.event_id);
+          stats.total += 1;
+
+          if (reg.payment_status === 'PENDING') {
+            stats.pending += 1;
+          } else if (reg.payment_status === 'PARTIAL') {
+            stats.partial += 1;
+          } else if (reg.payment_status === 'PAID' || reg.payment_status === 'completed') {
+            stats.paid += 1;
+          }
+        });
+      }
+
+      const eventStatsData = data.map((event) => {
+        const stats = registrationStats.get(event.id) || { paid: 0, pending: 0, partial: 0, total: 0 };
         return {
           ...event,
-          totalRegistrations: totalCount,
-          paidRegistrations: paidCount,
-          pendingRegistrations: pendingCount,
-          partialRegistrations: partialCount,
-          fillRate: event.capacity > 0 ? (paidCount / event.capacity * 100).toFixed(1) : 0
+          totalRegistrations: stats.total,
+          paidRegistrations: stats.paid,
+          pendingRegistrations: stats.pending,
+          partialRegistrations: stats.partial,
+          fillRate: event.capacity > 0 ? (stats.paid / event.capacity * 100).toFixed(1) : 0
         };
       });
-
-      const eventStatsData = await Promise.all(statsPromises);
       console.log('✅ Event stats calculated for', eventStatsData.length, 'events');
       setEventStats(eventStatsData);
       setEventStatsCache(eventStatsData); // Cache the data
@@ -1370,93 +1382,77 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
       const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
       const allowedEventIds = hasCoordinatorFilter ? coordinatorEvents.map(e => (e.id || e.event_id)) : null;
       console.log('📊 Registration Counts - Coordinator Filter:', hasCoordinatorFilter, 'Allowed Event IDs:', allowedEventIds);
-      
-      // 1. Count individual PAID registrations
-      let individualQuery = supabase
-        .from('event_registrations_config')
-        .select('*', { count: 'exact', head: true })
-        .eq('payment_status', 'PAID');
 
+      // 1. Count individual PAID registrations using bulk fetch
+      const registrationFilters = [{ column: 'payment_status', operator: 'in', value: ['PAID', 'completed'] }];
       if (hasCoordinatorFilter && allowedEventIds) {
-        individualQuery = individualQuery.in('event_id', allowedEventIds);
+        registrationFilters.push({ column: 'event_id', operator: 'in', value: allowedEventIds });
       }
-      
-      const { count: individualCount, error: individualError } = await individualQuery;
 
-      if (individualError) {
-        console.error('❌ Error loading individual registrations:', individualError);
+      const { data: paidRegistrations, error: registrationsError } = await fetchAllRecords(
+        supabase,
+        'event_registrations_config',
+        'id',
+        { filters: registrationFilters }
+      );
+
+      if (registrationsError) {
+        console.error('❌ Error loading individual registrations:', registrationsError);
       } else {
-        console.log('✅ Individual PAID registrations:', individualCount);
+        console.log('✅ Individual PAID registrations:', paidRegistrations?.length || 0);
       }
 
-      // 2. Count total active teams
-      let teamQuery = supabase
-        .from('teams')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_active', true);
-
+      // 2. Fetch teams once and compute counts
+      const teamFilters = [{ column: 'is_active', operator: 'eq', value: true }];
       if (hasCoordinatorFilter && allowedEventIds) {
-        teamQuery = teamQuery.in('event_id', allowedEventIds);
+        teamFilters.push({ column: 'event_id', operator: 'in', value: allowedEventIds });
       }
-        
-      const { count: teamCount, error: teamError } = await teamQuery;
+
+      const { data: teamsData, error: teamError } = await fetchAllRecords(
+        supabase,
+        'teams',
+        'id, leader_id',
+        { filters: teamFilters }
+      );
 
       if (teamError) {
         console.error('❌ Error loading teams:', teamError);
       } else {
-        console.log('✅ Total active teams:', teamCount);
+        console.log('✅ Total active teams:', teamsData?.length || 0);
       }
 
-      // Fetch team IDs if filtered, to filter members
-      let allowedTeamIds = null;
-      if (hasCoordinatorFilter && allowedEventIds) {
-          const { data: teamsData } = await supabase.from('teams').select('id').in('event_id', allowedEventIds);
-          if (teamsData) allowedTeamIds = teamsData.map(t => t.id);
-      }
+      const allowedTeamIds = teamsData?.map(t => t.id) || [];
+      const teamLeaderCount = teamsData?.filter(t => t.leader_id).length || 0;
 
-      // 3. Count team leaders (teams with leader_id are active teams)
-      let leaderQuery = supabase
-        .from('teams')
-        .select('*', { count: 'exact', head: true })
-        .not('leader_id', 'is', null)
-        .eq('is_active', true);
+      // 3. Count team members (role='member' in team_members) using bulk fetch
+      let teamMemberCount = 0;
+      if (allowedTeamIds.length > 0) {
+        const { data: membersData, error: memberError } = await fetchAllRecords(
+          supabase,
+          'team_members',
+          'id',
+          {
+            filters: [
+              { column: 'team_id', operator: 'in', value: allowedTeamIds },
+              { column: 'role', operator: 'eq', value: 'member' },
+              { column: 'status', operator: 'in', value: ['joined', 'active'] }
+            ]
+          }
+        );
 
-      if (hasCoordinatorFilter && allowedEventIds) {
-          leaderQuery = leaderQuery.in('event_id', allowedEventIds);
-      }
-        
-      const { count: teamLeaderCount, error: leaderError } = await leaderQuery;
-
-      if (leaderError) {
-        console.error('❌ Error loading team leaders:', leaderError);
-      } else {
-        console.log('✅ Team leaders:', teamLeaderCount);
-      }
-
-      // 4. Count team members (role='member' in team_members)
-      let memberQuery = supabase
-        .from('team_members')
-        .select('*', { count: 'exact', head: true })
-        .eq('role', 'member')
-        .in('status', ['joined', 'active']);
-
-      if (allowedTeamIds) {
-          memberQuery = memberQuery.in('team_id', allowedTeamIds);
-      }
-        
-      const { count: teamMemberCount, error: memberError } = await memberQuery;
-
-      if (memberError) {
-        console.error('❌ Error loading team members:', memberError);
-      } else {
-        console.log('✅ Team members:', teamMemberCount);
+        if (memberError) {
+          console.error('❌ Error loading team members:', memberError);
+        } else {
+          teamMemberCount = membersData?.length || 0;
+          console.log('✅ Team members:', teamMemberCount);
+        }
       }
 
       const counts = {
-        individual: individualCount || 0,
-        team: teamCount || 0,
-        teamLeader: teamLeaderCount || 0,
-        teamMember: teamMemberCount || 0
+        individual: paidRegistrations?.length || 0,
+        team: teamsData?.length || 0,
+        teamLeader: teamLeaderCount,
+        teamMember: teamMemberCount
       };
 
       console.log('📊 Final registration counts:', counts);
@@ -1942,7 +1938,10 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
                       )}
                     </td>
                     <td className="p-4 text-right">
-                      <button className="flex items-center gap-2 ml-auto px-4 py-2 bg-secondary/20 text-secondary rounded-xl hover:bg-secondary/30 transition-colors">
+                      <button
+                        className="flex items-center gap-2 ml-auto px-4 py-2 bg-secondary/20 text-secondary rounded-xl hover:bg-secondary/30 transition-colors"
+                        onClick={() => handleEventClick(event)}
+                      >
                         View Details
                         <ChevronRight size={16} />
                       </button>

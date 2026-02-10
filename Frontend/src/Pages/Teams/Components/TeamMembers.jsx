@@ -55,7 +55,7 @@ import bala from "../../../assets/team_members/bala.webp";
 import nitin from "../../../assets/team_members/nitin.webp";
 
 const chiefCoordinator = [
-   { id: 14, name: "Kavinesh", department: "AEVA", img: kavinesh, role: "Chief Coordinator", phone: "+91 94892 43775", associationLogo: aevaLogo },
+   { id: 14, name: "Kavinesh", department: "AEVA", img: kavinesh, role: "Chief Coordinator", phone: "", associationLogo: aevaLogo },
 ];
 
 const jointCoordinators = [

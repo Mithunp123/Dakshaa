@@ -200,14 +200,14 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. P.Dineshkumar",
-          phone:"+91 9688837873",
+          name: "Ms.E.Hemalatha",
+          phone:"+91 99948 16698",
                 },
       ],
       studentCoordinator: [
         {
-          name: "Nivarithika",
-          phone:"+91 7604950610",
+          name: "M.Boomika",
+          phone:"+91 93602 74589",
           department: "IT",
         },
        
@@ -583,9 +583,9 @@ export const exposAndShowsDetails = [
       ],
       studentCoordinator: [
         {
-          name: "Ms. Boomika",
+          name: "M.Nivarithika",
           department: "IT",
-          phone: "+91 9360274589",
+          phone: "+91 76049 50610",
         },
        
       ],
@@ -1202,23 +1202,17 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of AI/ML",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          name: "Eswari A",
+          phone: "+91 9443181818 ",
+         
         },
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "AI/ML",
-          phone: "+91 XXXXXXXXXX",
+          name: "Sandhya Verma M",
+          phone: "+91 9360958174",
         },
-        {
-          name: "Student Coordinator 2",
-          department: "AI/ML",
-          phone: "+91 XXXXXXXXXX",
-        },
+        
       ],
     },
   },
@@ -1589,7 +1583,7 @@ export const exposAndShowsDetails = [
       ],
       studentCoordinator: [
         {
-          name: "Sedhuraman S",
+          name: "Sedhuram S",
           phone: "+91 82480 72103",
         },
       ],
@@ -1642,22 +1636,22 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of Biotechnology",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+          name: "",
+         
+          phone: "+91 ",
+         
         },
       ],
       studentCoordinator: [
         {
           name: "Student Coordinator 1",
-          department: "Biotechnology",
-          phone: "+91 XXXXXXXXXX",
+          
+          phone: "+91 ",
         },
         {
           name: "Student Coordinator 2",
-          department: "Biotechnology",
-          phone: "+91 XXXXXXXXXX",
+         
+          phone: "+91 ",
         },
       ],
     },
@@ -1830,21 +1824,21 @@ export const exposAndShowsDetails = [
       facultyCoordinator: [
         {
           name: "Dr. Faculty Name",
-          designation: "Professor, Dept. of Fashion Technology",
-          phone: "+91 XXXXXXXXXX",
-          email: "",
+         
+          phone: "+91 ",
+          
         },
       ],
       studentCoordinator: [
         {
           name: "Student Coordinator 1",
           department: "Fashion Technology",
-          phone: "+91 XXXXXXXXXX",
+          phone: "+91 ",
         },
         {
           name: "Student Coordinator 2",
           department: "Fashion Technology",
-          phone: "+91 XXXXXXXXXX",
+          phone: "+91 XXXXX",
         },
       ],
     },

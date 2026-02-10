@@ -97,7 +97,7 @@ const conferences = [
           {
             name: "Dr. S Poornima",
             phone: "+91 99946 25815",
-            email: "",
+           
           },
         ],
         studentCoordinator: [

@@ -53,6 +53,43 @@ const getDeptFromId = (rawId) => {
     return null; 
 };
 
+const SPECIAL_EVENT_BASES = [
+    'Paper Presentation',
+    'Poster Presentation',
+    'Project Presentation'
+];
+
+// Allowed Technical Events for Tech Card display
+const ALLOWED_TECH_EVENTS = [
+    'AI Mystery Box Challenge',
+    'Bioblitz- Map (Bio Treasure Hunt)',
+    'Reel-O-Science',
+    '3D Arena',
+    'System Sense',
+    'Zero Component',
+    'DrapeX: Fabric Draping in Action',
+    'CoreX(Project Presentation)'
+];
+
+const normalizeName = (value) => (value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+
+const getSpecialBaseFromEventName = (name) => {
+    if (!name) return null;
+    const normalized = normalizeName(name);
+    return SPECIAL_EVENT_BASES.find(base => normalized.startsWith(normalizeName(base))) || null;
+};
+
+const getDeptFromEventName = (name) => {
+    if (!name) return null;
+    const match = name.match(/\(([^)]+)\)/);
+    if (match && match[1]) {
+        return match[1].trim().toUpperCase();
+    }
+    return null;
+};
+
 const fetchPaidRegistrationsByEventIds = async (eventIds) => {
     if (!eventIds || eventIds.length === 0) return { data: [] };
     return supabase
@@ -75,6 +112,7 @@ const LiveStats = () => {
     last_updated: null
   });
   const [categoryStats, setCategoryStats] = useState([]);
+    const [specialCategoryStats, setSpecialCategoryStats] = useState([]);
   const [deptStats, setDeptStats] = useState([]);
   const [isLive, setIsLive] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -466,6 +504,11 @@ const LiveStats = () => {
             return;
         }
 
+        if (SPECIAL_EVENT_BASES.some(base => normalizeName(base) === normalizeName(categoryName))) {
+            await fetchSpecialCategoryDetails(categoryName);
+            return;
+        }
+
         // Special handling for Conference - show conference names instead of events
         if (categoryName === 'Conference') {
             console.log('🎯 Fetching Conference events...');
@@ -583,10 +626,21 @@ const LiveStats = () => {
         if (eventsError) throw eventsError;
 
         // Filter events by category (case-insensitive)
-        const categoryEvents = events.filter(e => {
+        let categoryEvents = events.filter(e => {
             const eventCategory = (e.category || '').toLowerCase().trim();
             return categoryVariants.some(variant => eventCategory.includes(variant));
         });
+
+        // For Tech category, only show allowed technical events (strict exact match)
+        if (categoryName === 'Tech') {
+            const normalizeForMatch = (str) => (str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            const allowedNormalized = ALLOWED_TECH_EVENTS.map(normalizeForMatch);
+            
+            categoryEvents = categoryEvents.filter(e => {
+                const eventNameNormalized = normalizeForMatch(e.name);
+                return allowedNormalized.includes(eventNameNormalized);
+            });
+        }
 
         const eventIds = categoryEvents.map(e => e.id);
 
@@ -733,12 +787,14 @@ const LiveStats = () => {
       };
 
       // 1. Fetch all active events with their categories
-      const events = await fetchAllData('events', 'id, category', q => q.eq('is_active', true));
+    const events = await fetchAllData('events', 'id, category, name, event_id', q => q.eq('is_active', true));
 
-      // Map event_id(uuid) -> category
+      // Map event_id(uuid) -> category and name
       const eventCategoryMap = {};
+      const eventNameMap = {};
       events.forEach(e => {
         eventCategoryMap[e.id] = (e.category || '').toLowerCase().trim();
+        eventNameMap[e.id] = e.name || '';
       });
 
       // 2. Fetch all paid registrations
@@ -781,6 +837,7 @@ const LiveStats = () => {
 
       validRegs.forEach(reg => {
          const category = eventCategoryMap[reg.event_id];
+         const eventName = eventNameMap[reg.event_id];
          if (category) {
             const val = category.toLowerCase().trim();
             
@@ -789,7 +846,15 @@ const LiveStats = () => {
             } else if (val.includes('non-technical') || val.includes('non-tech') || val.includes('nontech') || val.includes('non tech')) {
                 nonTechCount++;
             } else if (val.includes('technical') || val === 'tech') {
-                techCount++;
+                // Only count allowed technical events in Tech category (strict exact match)
+                const normalizeForMatch = (str) => (str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                const eventNameNormalized = normalizeForMatch(eventName);
+                const isAllowedTechEvent = ALLOWED_TECH_EVENTS.some(allowedName => 
+                    normalizeForMatch(allowedName) === eventNameNormalized
+                );
+                if (isAllowedTechEvent) {
+                    techCount++;
+                }
             } else if (val.includes('cultural')) {
                 culturalCount++;
             } else if (val.includes('sport')) {
@@ -802,6 +867,97 @@ const LiveStats = () => {
          }
       });
       
+      const buildSpecialCategoryStats = async () => {
+        const specialEvents = events.filter(e => getSpecialBaseFromEventName(e.name));
+        const specialEventIds = specialEvents.map(e => e.id);
+
+        if (specialEventIds.length === 0) {
+            setSpecialCategoryStats([]);
+            return;
+        }
+
+        const specialEventIdSet = new Set(specialEventIds);
+        const regCounts = {};
+        validRegs.forEach(reg => {
+            if (specialEventIdSet.has(reg.event_id)) {
+                regCounts[reg.event_id] = (regCounts[reg.event_id] || 0) + 1;
+            }
+        });
+
+        const { data: teamMembers, error: teamMembersError } = await supabase
+            .from('team_members')
+            .select('id, role, status, teams!inner(event_id, is_active)')
+            .in('teams.event_id', specialEventIds)
+            .eq('teams.is_active', true)
+            .neq('role', 'leader')
+            .eq('status', 'joined');
+
+        if (teamMembersError) {
+            console.error('Error fetching team members for special categories:', teamMembersError);
+        }
+
+        const teamMemberCounts = {};
+        (teamMembers || []).forEach(tm => {
+            const eventId = tm.teams?.event_id;
+            if (eventId) {
+                teamMemberCounts[eventId] = (teamMemberCounts[eventId] || 0) + 1;
+            }
+        });
+
+        const deptTotalsByBase = {};
+        specialEvents.forEach(event => {
+            const base = getSpecialBaseFromEventName(event.name);
+            if (!base) return;
+
+            const regCount = regCounts[event.id] || 0;
+            const tmCount = teamMemberCounts[event.id] || 0;
+            const dept = getDeptFromEventName(event.name) || getDeptFromId(event.event_id) || 'OTHER';
+
+            if (!deptTotalsByBase[base]) {
+                deptTotalsByBase[base] = {};
+            }
+
+            if (!deptTotalsByBase[base][dept]) {
+                deptTotalsByBase[base][dept] = { registrations: 0, teamMembers: 0, count: 0 };
+            }
+
+            deptTotalsByBase[base][dept].registrations += regCount;
+            deptTotalsByBase[base][dept].teamMembers += tmCount;
+            deptTotalsByBase[base][dept].count += regCount + tmCount;
+        });
+
+        const specialStats = SPECIAL_EVENT_BASES.map(base => {
+            const deptMap = deptTotalsByBase[base] || {};
+            const details = Object.entries(deptMap)
+                .map(([dept, counts]) => ({
+                    id: `${base}-${dept}`,
+                    name: dept,
+                    registrations: counts.registrations,
+                    teamMembers: counts.teamMembers,
+                    count: counts.count
+                }))
+                .sort((a, b) => b.count - a.count);
+
+            const total = details.reduce((sum, item) => sum + item.count, 0);
+
+            return {
+                category: base,
+                count: total,
+                details
+            };
+        });
+
+        setSpecialCategoryStats(specialStats.map(({ category, count }) => ({ category, count })));
+
+        setCategoryEventDetails(prev => {
+            const next = { ...prev };
+            specialStats.forEach(stat => {
+                next[stat.category] = stat.details;
+            });
+            return next;
+        });
+      };
+
        const finalStats = [
             { category: 'Workshop', count: workshopCount },
             { category: 'Non Tech', count: nonTechCount },
@@ -813,6 +969,7 @@ const LiveStats = () => {
         ];
 
       setCategoryStats(finalStats);
+      await buildSpecialCategoryStats();
       
     } catch (err) {
       console.error("Category stats fallback failed:", err);
@@ -985,6 +1142,85 @@ const LiveStats = () => {
     } catch (error) {
          console.error("❌ Error in fallback:", error);
          setStats(prev => ({ ...prev, users: 0, registrations: 0, last_updated: new Date().toISOString() }));
+    }
+  };
+
+  const fetchSpecialCategoryDetails = async (categoryName) => {
+    try {
+        const { data: events, error: eventsError } = await supabase
+            .from('events')
+            .select('id, event_id, name')
+            .eq('is_active', true);
+
+        if (eventsError) throw eventsError;
+
+        const matchingEvents = events.filter(e => {
+            const base = getSpecialBaseFromEventName(e.name);
+            return base && normalizeName(base) === normalizeName(categoryName);
+        });
+
+        const eventIds = matchingEvents.map(e => e.id);
+        if (eventIds.length === 0) {
+            setCategoryEventDetails(prev => ({ ...prev, [categoryName]: [] }));
+            return;
+        }
+
+        const { data: registrations } = await fetchPaidRegistrationsByEventIds(eventIds);
+
+        const eventCounts = {};
+        (registrations || []).forEach(reg => {
+            eventCounts[reg.event_id] = (eventCounts[reg.event_id] || 0) + 1;
+        });
+
+        const { data: teamMembers, error: teamMembersError } = await supabase
+            .from('team_members')
+            .select('id, role, status, teams!inner(event_id, is_active)')
+            .in('teams.event_id', eventIds)
+            .eq('teams.is_active', true)
+            .neq('role', 'leader')
+            .eq('status', 'joined');
+
+        if (teamMembersError) {
+            console.error('Error fetching team members for special category details:', teamMembersError);
+        }
+
+        const teamMemberCounts = {};
+        (teamMembers || []).forEach(tm => {
+            const eventId = tm.teams?.event_id;
+            if (eventId) {
+                teamMemberCounts[eventId] = (teamMemberCounts[eventId] || 0) + 1;
+            }
+        });
+
+        const deptTotals = {};
+        matchingEvents.forEach(event => {
+            const dept = getDeptFromEventName(event.name) || getDeptFromId(event.event_id) || 'OTHER';
+            if (!deptTotals[dept]) {
+                deptTotals[dept] = { registrations: 0, teamMembers: 0, count: 0 };
+            }
+
+            const regCount = eventCounts[event.id] || 0;
+            const tmCount = teamMemberCounts[event.id] || 0;
+
+            deptTotals[dept].registrations += regCount;
+            deptTotals[dept].teamMembers += tmCount;
+            deptTotals[dept].count += regCount + tmCount;
+        });
+
+        const details = Object.entries(deptTotals)
+            .map(([dept, counts]) => ({
+                id: `${categoryName}-${dept}`,
+                name: dept,
+                registrations: counts.registrations,
+                teamMembers: counts.teamMembers,
+                count: counts.count
+            }))
+            .sort((a, b) => b.count - a.count);
+
+        setCategoryEventDetails(prev => ({ ...prev, [categoryName]: details }));
+    } catch (err) {
+        console.error('Error fetching special category details:', err);
+        setCategoryEventDetails(prev => ({ ...prev, [categoryName]: [] }));
     }
   };
 
@@ -1297,10 +1533,10 @@ const LiveStats = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 xl:gap-6 w-full flex-grow min-h-0 pb-4 overflow-y-auto xl:overflow-visible">
             {/* Left Column: Big Stats & Categories */}
-            <div className="xl:col-span-3 flex flex-col gap-4 xl:gap-6 h-full min-h-0">
+            <div className="xl:col-span-3 flex flex-col gap-4 xl:gap-6 h-full min-h-0 order-1 xl:order-none">
                 
                 {/* Big Cards - Horizontal on mobile, larger on desktop */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 shrink-0">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 shrink-0">
                     {/* Students Onboarded Card */}
                     <motion.div
                         initial={{ x: -100, opacity: 0 }}
@@ -1310,11 +1546,11 @@ const LiveStats = () => {
                     >
                         <div className="absolute -inset-1 bg-gradient-to-r from-secondary to-orange-600 rounded-2xl md:rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
                         
-                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-orange-500/30 rounded-2xl md:rounded-3xl p-3 md:p-6 h-full flex flex-col justify-center min-h-[140px] md:min-h-[220px]">
+                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-orange-500/30 rounded-2xl md:rounded-3xl p-2.5 md:p-6 h-full flex flex-col justify-center min-h-[110px] md:min-h-[200px]">
                         {/* Icon */}
                         <div className="flex justify-center mb-2 md:mb-4">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-secondary/20 rounded-xl md:rounded-2xl flex items-center justify-center">
-                            <Users className="w-5 h-5 md:w-6 md:h-6 text-secondary" />
+                            <div className="w-9 h-9 md:w-12 md:h-12 bg-secondary/20 rounded-xl md:rounded-2xl flex items-center justify-center">
+                            <Users className="w-4 h-4 md:w-6 md:h-6 text-secondary" />
                             </div>
                         </div>
 
@@ -1325,7 +1561,7 @@ const LiveStats = () => {
 
                         {/* Counter */}
                         <div className="text-center">
-                            <div className="text-2xl md:text-5xl lg:text-6xl font-black text-secondary mb-1 md:mb-2 tabular-nums">
+                            <div className="text-xl md:text-5xl lg:text-6xl font-black text-secondary mb-1 md:mb-2 tabular-nums">
                             <CountUp 
                                 end={stats.users} 
                                 duration={2}
@@ -1350,11 +1586,11 @@ const LiveStats = () => {
                     >
                         <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl md:rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
                         
-                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-blue-500/30 rounded-2xl md:rounded-3xl p-3 md:p-6 h-full flex flex-col justify-center min-h-[140px] md:min-h-[220px]">
+                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-blue-500/30 rounded-2xl md:rounded-3xl p-2.5 md:p-6 h-full flex flex-col justify-center min-h-[110px] md:min-h-[200px]">
                         {/* Icon */}
                         <div className="flex justify-center mb-2 md:mb-4">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-500/20 rounded-xl md:rounded-2xl flex items-center justify-center">
-                            <TicketCheck className="w-5 h-5 md:w-6 md:h-6 text-blue-500" />
+                            <div className="w-9 h-9 md:w-12 md:h-12 bg-blue-500/20 rounded-xl md:rounded-2xl flex items-center justify-center">
+                            <TicketCheck className="w-4 h-4 md:w-6 md:h-6 text-blue-500" />
                             </div>
                         </div>
 
@@ -1365,7 +1601,7 @@ const LiveStats = () => {
 
                         {/* Counter */}
                         <div className="text-center flex flex-col items-center justify-center">
-                            <div className="text-2xl md:text-5xl lg:text-6xl font-black text-blue-500 mb-1 md:mb-2 tabular-nums tracking-tight">
+                            <div className="text-xl md:text-5xl lg:text-6xl font-black text-blue-500 mb-1 md:mb-2 tabular-nums tracking-tight">
                             <CountUp 
                                 end={stats.registrations} 
                                 duration={2}
@@ -1390,11 +1626,11 @@ const LiveStats = () => {
                     >
                         <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-2xl md:rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition duration-500"></div>
                         
-                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-2xl md:rounded-3xl p-3 md:p-6 h-full flex flex-col justify-center min-h-[140px] md:min-h-[220px]">
+                        <div className="relative bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-2xl md:rounded-3xl p-2.5 md:p-6 h-full flex flex-col justify-center min-h-[110px] md:min-h-[200px]">
                         {/* Icon */}
                         <div className="flex justify-center mb-2 md:mb-4">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/20 rounded-xl md:rounded-2xl flex items-center justify-center">
-                            <Users className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                            <div className="w-9 h-9 md:w-12 md:h-12 bg-primary/20 rounded-xl md:rounded-2xl flex items-center justify-center">
+                            <Users className="w-4 h-4 md:w-6 md:h-6 text-primary" />
                             </div>
                         </div>
 
@@ -1405,7 +1641,7 @@ const LiveStats = () => {
 
                         {/* Counter - Total Participants */}
                         <div className="text-center flex flex-col items-center justify-center">
-                            <div className="text-2xl md:text-5xl lg:text-6xl font-black text-primary mb-1 md:mb-2 tabular-nums tracking-tight">
+                            <div className="text-xl md:text-5xl lg:text-6xl font-black text-primary mb-1 md:mb-2 tabular-nums tracking-tight">
                             <CountUp 
                                 end={stats.totalParticipants} 
                                 duration={2}
@@ -1431,7 +1667,7 @@ const LiveStats = () => {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="flex md:grid md:grid-cols-7 gap-2 md:gap-4 shrink-0 overflow-x-auto md:overflow-visible pb-1 md:pb-0 mb-4 md:mb-0"
+                    className="flex md:grid md:grid-cols-7 gap-2 md:gap-4 shrink-0 overflow-x-auto md:overflow-visible pb-3 md:pb-0 mb-4 md:mb-3"
                 >
                     {categoryStats.map((stat, index) => (
                     <motion.div 
@@ -1439,19 +1675,56 @@ const LiveStats = () => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.6 + (index * 0.1) }}
-                        className="relative bg-gray-900 border border-gray-700/50 rounded-xl md:rounded-2xl p-2 md:p-3 hover:border-primary/30 transition-all group overflow-hidden cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-primary/20 shrink-0 w-20 md:w-auto"
+                        className={`relative bg-gray-900 border border-gray-700/50 rounded-xl md:rounded-2xl p-2 md:p-3 hover:border-primary/30 transition-all group overflow-hidden cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-primary/20 shrink-0 ${
+                            stat.category === 'Workshop' ? 'w-32 md:w-auto md:col-span-2 md:scale-110 md:z-10' : 'w-20 md:w-auto'
+                        }`}
                         onClick={() => toggleCategoryExpansion(stat.category)}
                     >
                         <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-40 transition-opacity hidden md:block">
                         <TicketCheck className="w-6 h-6 rotate-[-15deg]" />
                         </div>
-                        <div className="text-gray-400 text-[8px] md:text-[10px] font-bold uppercase tracking-widest mb-0.5 md:mb-1 h-3 md:h-4 flex items-end group-hover:text-primary transition-colors truncate">{stat.category}</div>
-                        <div className="text-base md:text-xl lg:text-3xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent font-mono">
+                        <div className={`text-gray-400 font-bold uppercase tracking-widest mb-0.5 md:mb-1 h-3 md:h-4 flex items-end group-hover:text-primary transition-colors truncate ${
+                            stat.category === 'Workshop' ? 'text-[9px] md:text-xs' : 'text-[8px] md:text-[10px]'
+                        }`}>{stat.category}</div>
+                        <div className={`font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent font-mono ${
+                            stat.category === 'Workshop' ? 'text-lg md:text-2xl lg:text-4xl' : 'text-base md:text-xl lg:text-3xl'
+                        }`}>
                             <CountUp end={stat.count} duration={2} separator="," />
                         </div>
                     </motion.div>
                     ))}
                 </motion.div>
+
+                {/* Special Category Stats Row - Desktop only */}
+                {specialCategoryStats.length > 0 && (
+                    <motion.div
+                        initial={{ y: 30, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.65 }}
+                        className="hidden md:grid md:grid-cols-3 gap-4 shrink-0"
+                    >
+                        {specialCategoryStats.map((stat, index) => (
+                        <motion.div 
+                            key={stat.category}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.7 + (index * 0.1) }}
+                            className="relative bg-gray-900 border border-gray-700/50 rounded-2xl p-3 hover:border-primary/30 transition-all group overflow-hidden cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-primary/20"
+                            onClick={() => toggleCategoryExpansion(stat.category)}
+                        >
+                            <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-40 transition-opacity">
+                            <TicketCheck className="w-6 h-6 rotate-[-15deg]" />
+                            </div>
+                            <div className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1 h-4 flex items-end group-hover:text-primary transition-colors truncate">
+                                {stat.category}
+                            </div>
+                            <div className="text-xl lg:text-3xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent font-mono">
+                                <CountUp end={stat.count} duration={2} separator="," />
+                            </div>
+                        </motion.div>
+                        ))}
+                    </motion.div>
+                )}
             </div>
 
             {/* Right Column: Department Leaderboard - Below on mobile */}
@@ -1459,7 +1732,7 @@ const LiveStats = () => {
                 initial={{ x: 100, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.7 }}
-                className="xl:col-span-2 min-h-0 flex flex-col pl-0 xl:pl-4 mt-6 md:mt-4 xl:mt-0"
+                className="xl:col-span-2 min-h-0 flex flex-col pl-0 xl:pl-4 mt-20 md:mt-6 xl:mt-0 order-2 xl:order-none"
             >
                  <div className="flex items-center justify-between mb-3 md:mb-4 px-2 shrink-0">
                     <div className="flex items-center gap-2 md:gap-3">
@@ -1468,7 +1741,7 @@ const LiveStats = () => {
                         </div>
                         <div>
                             <h3 className="text-white font-black text-base md:text-xl uppercase tracking-wider italic">Leaderboard</h3>
-                            <p className="text-[10px] md:text-xs text-yellow-500 font-bold tracking-widest uppercase">Live Rankings</p>
+                            <p className="text-[10px] md:text-xs text-yellow-500 font-bold tracking-widest uppercase hidden md:block">Live Rankings</p>
                         </div>
                     </div>
                  </div>
@@ -1720,10 +1993,9 @@ const LiveStats = () => {
                                                                 <h4 className="text-white font-semibold text-sm group-hover:text-secondary transition-colors truncate">
                                                                     {event.name}
                                                                 </h4>
-                                                                <p className="text-xs text-gray-400">
-                                                                    {event.isConference ? 'Conference • Click for Events' : 
-                                                                     `${event.registrations || 0} Regs + ${event.teamMembers || 0} Team Members`}
-                                                                </p>
+                                                                {event.isConference && (
+                                                                    <p className="text-xs text-gray-400">Conference • Click for Events</p>
+                                                                )}
                                                             </div>
                                                         </div>
                                                         <div className={`bg-gradient-to-r rounded-lg px-4 py-2 shrink-0 ${
