@@ -77,7 +77,7 @@ const InquirySection = ({ title, inquiries }) => {
 
 const Contact = () => {
   const generalInquiries = [
-    { name: "Kavinesh", mobile: "+91 9489243775" },
+    { name: "Kavinesh", mobile: "+91 8891850995" },
   ];
 
   const [formData, setFormData] = useState({
