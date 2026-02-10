@@ -189,7 +189,7 @@ export const technicalDetails = [
         },
         {
           name: "Miss. K. Saimohana",
-          phone: "",
+          
         },
       ],
     },
@@ -520,7 +520,7 @@ export const technicalDetails = [
   },
   {
     id: "tech-cse-1",
-    shortTitle: "BotXhibit (Paper Presentation",
+    shortTitle: "BotXhibit (Paper Presentation)",
     title: "Department of Computer Science and Engineering",
     description: "A technical paper presentation event focused on innovative concepts and research in software and hardware bot technologies. Participants must present the problem statement, proposed solution, system architecture, working methodology, and applications. Prototype is not mandatory. Evaluation will be based on originality, technical content, feasibility, and presentation quality.",
     img: Tech10,

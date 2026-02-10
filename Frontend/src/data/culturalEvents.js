@@ -277,7 +277,7 @@ export const culturalDetails = [
     description: "A talented vocalist who mesmerizes the audience with a soulful performance, adding emotion and energy to the event.",
     img: hr4,
     date: "February 14, 2026",
-    venue: "Cyberdome (IT Block)",
+    venue: "Cyberdome (IT Park)",
     department: "Cultural Committee",
     price: "₹200",
     rules: [
@@ -309,7 +309,7 @@ export const culturalDetails = [
       {
         date: "February 14, 2026",
         time: "09:00 AM to 03:00 PM",
-        location: "Cyberdome (IT Block)",
+        location: "Cyberdome (IT Park)",
       },
     ],
     contact: {
@@ -347,7 +347,7 @@ export const culturalDetails = [
     description: "SPOTLIGHT is a special cultural event that celebrates unique and extraordinary talents of participants. This platform is open for performances such as magic shows, musical instrument performances, Silambam, martial arts, beatboxing, mimicry, and other creative skills. Participants will be judged based on originality, stage presence, skill level, and overall impact.",
     img: hr5,
     date: "February 14, 2026",
-    venue: "Cyberdome (IT Block)",
+    venue: "Cyberdome (IT Park)",
     department: "Cultural Committee",
     price: "₹200",
     rules: [
@@ -383,7 +383,7 @@ export const culturalDetails = [
       
         date: "February 14, 2026",
         time: "09:00 AM to 03:00 PM",
-        location: "Cyberdome (IT Block)",
+        location: "Cyberdome (IT Park)",
       },
     ],
     contact: {
