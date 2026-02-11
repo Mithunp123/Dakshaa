@@ -95,6 +95,7 @@ const ReferralManager = lazy(() => import("./Pages/Admin/SuperAdmin/ReferralMana
 const PendingRegistrations = lazy(() => import("./Pages/Admin/SuperAdmin/PendingRegistrations"));
 const AttendanceManagement = lazy(() => import("./Pages/Admin/SuperAdmin/AttendanceManagement"));
 const CollegeStats = lazy(() => import("./Pages/Admin/SuperAdmin/CollegeStats"));
+const TeamReport = lazy(() => import("./Pages/Admin/SuperAdmin/TeamReport"));
 const RegistrationAdminDashboard = lazy(() => import("./Pages/Admin/RegAdmin/RegistrationAdminDashboard"));
 const EventCoordinatorDashboard = lazy(() => import("./Pages/Admin/Coordinator/EventCoordinatorDashboard"));
 const CoordinatorOverviewPage = lazy(() => import("./Pages/Admin/Coordinator/OverviewPage"));
@@ -368,6 +369,14 @@ function AppContent() {
                 element={
                   <ProtectedRoute allowedRoles={["super_admin"]}>
                     <CollegeStats />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="team-reports"
+                element={
+                  <ProtectedRoute allowedRoles={["super_admin"]}>
+                    <TeamReport />
                   </ProtectedRoute>
                 }
               />

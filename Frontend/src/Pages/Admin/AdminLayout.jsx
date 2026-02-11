@@ -143,6 +143,7 @@ const AdminLayout = () => {
     if (userRole === 'super_admin') {
       items.push(
         { label: 'Overview', icon: LayoutDashboard, path: '/admin' },
+        { label: 'Team Reports', icon: Users, path: '/admin/team-reports' },
         { label: 'Role Management', icon: ShieldCheck, path: '/admin/roles' },
         { label: 'Event Config', icon: Settings, path: '/admin/events' },
         { label: 'Combo Packages', icon: Package, path: '/admin/combos' },
