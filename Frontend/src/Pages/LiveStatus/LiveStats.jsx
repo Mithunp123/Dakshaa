@@ -2182,6 +2182,7 @@ const LiveStats = () => {
               Real-time Updates Active
             </span>
           </div>
+          
         </motion.div>
       </div>
 

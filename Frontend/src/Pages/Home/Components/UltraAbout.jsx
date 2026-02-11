@@ -1,7 +1,16 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import college from "../../../assets/college.webp";
 import logo from "../../../assets/logo1.webp";
+
+// Chief Guest Images
+import guest1 from "../../../assets/chiefguest/Guest-1.webp";
+import guest2 from "../../../assets/chiefguest/Guest-2.webp";
+import guest3 from "../../../assets/chiefguest/Guest-3.webp";
+import guest4 from "../../../assets/chiefguest/Guest-4.webp";
+import guest5 from "../../../assets/chiefguest/Guest-5.webp";
+import guest6 from "../../../assets/chiefguest/Guest-6.webp";
 
 // Animated Card Component
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -311,6 +320,92 @@ function UltraAbout() {
             transition={{ duration: 4, repeat: Infinity }}
           />
           <div className="w-20 h-[2px] bg-gradient-to-l from-transparent to-sky-500" />
+        </div>
+      </motion.div>
+
+      {/* Chief Guests Section */}
+      <motion.div
+        className="mt-16"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.2 }}
+      >
+        <h2 className="text-2xl md:text-3xl font-orbitron font-bold text-center mb-4 bg-gradient-to-r from-cyan-400 to-sky-300 bg-clip-text text-transparent">
+          Chief Guests For Leaders Talk
+        </h2>
+        
+        <div className="text-center mb-12">
+          <p className="text-sky-300/90 text-lg md:text-xl font-semibold mb-4">
+            Free Registration
+          </p>
+          <Link to="/register">
+            <motion.button
+              className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-sky-500 text-slate-950 font-bold rounded-full hover:from-cyan-400 hover:to-sky-400 transition-all duration-300 shadow-lg hover:shadow-cyan-500/50"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Click Here to Register
+            </motion.button>
+          </Link>
+        </div>
+        
+        <div className="max-w-6xl mx-auto space-y-8">
+          {[
+            { image: guest1, name: "[Guest Name 1]", designation: "[Designation]", description: "[Brief description about the chief guest's achievements and expertise. This text can be updated with actual information about the guest speaker.]" },
+            { image: guest2, name: "[Guest Name 2]", designation: "[Designation]", description: "[Brief description about the chief guest's achievements and expertise. This text can be updated with actual information about the guest speaker.]" },
+            { image: guest3, name: "[Guest Name 3]", designation: "[Designation]", description: "[Brief description about the chief guest's achievements and expertise. This text can be updated with actual information about the guest speaker.]" },
+            { image: guest4, name: "[Guest Name 4]", designation: "[Designation]", description: "[Brief description about the chief guest's achievements and expertise. This text can be updated with actual information about the guest speaker.]" },
+            { image: guest5, name: "[Guest Name 5]", designation: "[Designation]", description: "[Brief description about the chief guest's achievements and expertise. This text can be updated with actual information about the guest speaker.]" },
+            { image: guest6, name: "[Guest Name 6]", designation: "[Designation]", description: "[Brief description about the chief guest's achievements and expertise. This text can be updated with actual information about the guest speaker.]" },
+          ].map((guest, index) => {
+            const isReversed = index % 2 === 1;
+            
+            return (
+              <motion.div
+                key={index}
+                className={`flex flex-col ${isReversed ? 'md:flex-row-reverse' : 'md:flex-row'} gap-6 items-center`}
+                initial={{ opacity: 0, x: isReversed ? 50 : -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                {/* Image Section */}
+                <div className="w-full md:w-1/3 flex justify-center">
+                  <div className="relative w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 overflow-hidden rounded-full border-4 border-sky-700/50 bg-slate-900 hover:border-cyan-400 transition-all duration-300 group shadow-lg shadow-sky-900/30">
+                    <img 
+                      src={guest.image} 
+                      alt={guest.name} 
+                      className="absolute inset-0 w-full h-full object-cover object-[center_20%]"
+                    />
+                    {/* Hover Glow */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-t from-cyan-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-full"
+                    />
+                  </div>
+                </div>
+
+                {/* Text Section */}
+                <div className="w-full md:w-2/3 text-center md:text-left">
+                  <motion.h3
+                    className="text-xl md:text-2xl font-bold text-cyan-400 mb-2"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.2 + index * 0.1 }}
+                  >
+                    {guest.name}
+                  </motion.h3>
+                  <p className="text-sky-300/80 text-sm md:text-base mb-3">
+                    {guest.designation}
+                  </p>
+                  <p className="text-sky-200/70 text-sm leading-relaxed">
+                    {guest.description}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </motion.div>
       </div>
