@@ -232,9 +232,9 @@ const PrintQRPage = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col print-page-root">
       {/* Header - Hidden when printing */}
-      <div className="bg-white shadow-sm p-4 print:hidden">
+      <div className="bg-white shadow-sm p-4 no-print">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-4">
              <button 
@@ -258,11 +258,11 @@ const PrintQRPage = () => {
         </div>
       </div>
 
-      <div className="flex-1 p-4 flex flex-col items-center justify-center">
+      <div className="flex-1 p-4 flex flex-col items-center justify-center no-print">
         
         {/* Scanner View */}
         {scanning && (
-            <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden print:hidden">
+            <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="p-4 bg-gray-800 text-white text-center">
                 <Camera className="w-8 h-8 mx-auto mb-2" />
                 <h2 className="text-lg font-medium">Scan User QR Code</h2>
@@ -280,18 +280,16 @@ const PrintQRPage = () => {
 
         {/* Loading State */}
         {loading && (
-             <div className="flex flex-col items-center justify-center py-12 print:hidden">
+             <div className="flex flex-col items-center justify-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                 <p className="mt-4 text-gray-500">Fetching user details...</p>
              </div>
         )}
 
-        {/* Printable Badge View */}
+        {/* Print Controls - Hidden on Print */}
         {!scanning && !loading && userData && (
             <div className="flex flex-col items-center gap-6 animate-fade-in">
-                
-                {/* Print Controls - Hidden on Print */}
-                <div className="print:hidden p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex gap-4 w-full max-w-lg">
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex gap-4 w-full max-w-lg">
                     <button
                         onClick={handlePrint}
                         className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-black transition shadow-lg"
@@ -300,56 +298,61 @@ const PrintQRPage = () => {
                         Print Badge
                     </button>
                 </div>
-
-                {/* The actual badge content */}
-                <div className="print-area bg-white p-8 rounded-xl shadow-2xl border border-gray-200 max-w-md w-full text-center relative overflow-hidden">
-                    {/* Left Column: QR Only */}
-                    <div className="left-col">
-                        <div className="qr-box p-2 border-2 border-gray-900 rounded-xl mb-2">
-                             <QRCodeSVG value={qrValue} size={250} level="H" />
-                        </div>
-                    </div>
-
-                    {/* Right Column: Name, ID and Events */}
-                    <div className="right-col text-left pl-4">
-                        <h3 className="user-name text-xl font-bold text-gray-900 leading-tight mb-1">
-                            {userData.full_name}
-                        </h3>
-                        
-                        <div className="user-id font-mono text-gray-800 font-bold mb-3 text-lg">
-                            ID: {userData.id.slice(0, 8)}
-                        </div>
-
-                        <div className="events-section space-y-1">
-                            {paidEvents.length > 0 ? (
-                                paidEvents.map((event, index) => (
-                                    <div key={index} className="event-item text-gray-900 font-medium truncate">
-                                        {event.name}
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="text-gray-400 italic text-sm">No events</p>
-                            )}
-                        </div>
-                    </div>
-                    
-                    {/* Hidden Elements preserved for structure if needed or removal */}
-                    <div className="hidden">
-                        Generated on {new Date().toLocaleDateString()}
-                    </div>
-                </div>
             </div>
         )}
       </div>
 
+      {/* Printable Badge - Always in DOM when data exists, hidden on screen, visible on print */}
+      {userData && (
+        <div className="print-area">
+            <div className="left-col">
+                <div className="qr-box">
+                     <QRCodeSVG value={qrValue} size={250} level="H" />
+                </div>
+            </div>
+            <div className="right-col">
+                <div className="user-name">{userData.full_name}</div>
+                <div className="user-id">ID: {userData.id.slice(0, 8)}</div>
+                <div className="events-section">
+                    {paidEvents.length > 0 ? (
+                        paidEvents.map((event, index) => (
+                            <div key={index} className="event-item">
+                                {event.name}
+                            </div>
+                        ))
+                    ) : (
+                        <div className="event-item" style={{color: '#999', fontStyle: 'italic'}}>No events</div>
+                    )}
+                </div>
+            </div>
+        </div>
+      )}
+
       <style>{`
+        /* Screen: hide the print-area on screen */
+        .print-area {
+          position: absolute;
+          left: -9999px;
+          top: -9999px;
+          width: 10cm;
+          height: 3.5cm;
+          overflow: hidden;
+        }
+
         @media print {
           @page {
              size: 10cm 3.5cm;
              margin: 0;
           }
 
-          /* Reset everything */
+          /* Hide everything that should not print */
+          .no-print,
+          .print-page-root > .no-print,
+          .print-page-root > div.no-print {
+            display: none !important;
+          }
+
+          /* Reset page */
           html, body {
             margin: 0 !important;
             padding: 0 !important;
@@ -357,22 +360,22 @@ const PrintQRPage = () => {
             height: 3.5cm !important;
             overflow: hidden !important;
             background: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
 
-          /* Hide ALL elements */
-          body * {
-            visibility: hidden !important;
-            position: absolute !important;
-            width: 0 !important;
-            height: 0 !important;
-            overflow: hidden !important;
+          .print-page-root {
             margin: 0 !important;
             padding: 0 !important;
+            min-height: unset !important;
+            height: 3.5cm !important;
+            width: 10cm !important;
+            background: white !important;
+            display: block !important;
           }
-          
-          /* Only show the print area and its children */
+
+          /* Show the print area */
           .print-area {
-            visibility: visible !important;
             position: fixed !important;
             left: 0 !important;
             top: 0 !important;
@@ -395,14 +398,6 @@ const PrintQRPage = () => {
             border-radius: 0 !important;
             page-break-after: avoid !important;
             break-after: avoid !important;
-          }
-          
-          .print-area * {
-            visibility: visible !important;
-            position: relative !important;
-            width: auto !important;
-            height: auto !important;
-            overflow: visible !important;
           }
 
           /* Left Column */
