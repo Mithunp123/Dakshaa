@@ -3,18 +3,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   QrCode, 
   Camera, 
-  Package, 
   MapPin, 
   Search, 
   CheckCircle2, 
   X, 
   AlertCircle,
   Loader2,
-  Coffee,
-  Gift,
   Utensils,
   ShieldCheck,
-  Info
+  Info,
+  Mail,
+  Phone,
+  Building
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -27,6 +27,31 @@ import {
   vibrate
 } from '../../../utils/scannerConfig';
 
+// Event dates for DaKshaa 2026
+const EVENT_DATES = {
+  day1: new Date('2026-02-12'),
+  day2: new Date('2026-02-13'),
+  day3: new Date('2026-02-14')
+};
+
+// Get current day based on today's date
+const getCurrentDay = () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // Compare with event dates
+  for (const [day, eventDate] of Object.entries(EVENT_DATES)) {
+    const compareDate = new Date(eventDate);
+    compareDate.setHours(0, 0, 0, 0);
+    if (today.getTime() === compareDate.getTime()) {
+      return day;
+    }
+  }
+  
+  // Default to day1 if not an event day
+  return 'day1';
+};
+
 const VolunteerDashboard = () => {
   const [activeTab, setActiveTab] = useState('gate');
   const [scanning, setScanning] = useState(false);
@@ -37,21 +62,21 @@ const VolunteerDashboard = () => {
   const [cameraError, setCameraError] = useState(null);
   const [cameraId, setCameraId] = useState(null);
   const [scanMode, setScanMode] = useState(null);
+  const [foodRecords, setFoodRecords] = useState([]);
+  const [loadingFoodRecords, setLoadingFoodRecords] = useState(false);
+  const [scannedUser, setScannedUser] = useState(null);
+  const [showUserConfirm, setShowUserConfirm] = useState(false);
+  const [deliveryResult, setDeliveryResult] = useState(null);
   
   const html5QrCodeRef = useRef(null);
-
-  const kitTypes = [
-    { id: 'welcome_kit', label: 'Welcome Kit', icon: Gift, color: 'purple' },
-    { id: 'lunch', label: 'Lunch', icon: Utensils, color: 'green' },
-    { id: 'snacks', label: 'Snacks', icon: Coffee, color: 'orange' },
-    { id: 'merchandise', label: 'Merchandise', icon: Package, color: 'blue' }
-  ];
-
-  const [selectedKitType, setSelectedKitType] = useState('welcome_kit');
+  
+  // Get current day automatically
+  const currentDay = getCurrentDay();
 
   useEffect(() => {
     fetchVenues();
     getCameras(); // Request camera permission on mount
+    fetchFoodRecords();
     
     // Cleanup on unmount
     return () => {
@@ -68,6 +93,17 @@ const VolunteerDashboard = () => {
     };
   }, []);
 
+  // Auto-dismiss delivery result modal after 3 seconds
+  useEffect(() => {
+    if (deliveryResult) {
+      const timer = setTimeout(() => {
+        resetLunchScanner();
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [deliveryResult]);
+
   const fetchVenues = async () => {
     try {
       const { data, error } = await supabase
@@ -80,6 +116,31 @@ const VolunteerDashboard = () => {
       console.error('Error fetching venues:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchFoodRecords = async () => {
+    try {
+      setLoadingFoodRecords(true);
+      const { data, error } = await supabase
+        .from('food_tracking')
+        .select(`
+          *,
+          profiles:user_id (
+            full_name,
+            email,
+            mobile_number,
+            college_name
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setFoodRecords(data || []);
+    } catch (error) {
+      console.error('Error fetching food records:', error);
+    } finally {
+      setLoadingFoodRecords(false);
     }
   };
 
@@ -272,14 +333,28 @@ const VolunteerDashboard = () => {
   };
 
   const onScanSuccess = async (decodedText, mode) => {
+    // Prevent duplicate scans if already processing
+    if (submitting) return;
+
     console.log('QR Scanned:', decodedText);
     vibrate(100);
-    await stopScanning();
 
     if (mode === 'gate') {
+      await stopScanning();
       await verifyGatePass(decodedText);
-    } else if (mode === 'kit') {
-      await deliverKit(decodedText);
+    } else if (mode === 'lunch') {
+      // Pause scanner to freeze frame instead of stopping it completely
+      try {
+        if (html5QrCodeRef.current) {
+          html5QrCodeRef.current.pause(true); 
+        }
+      } catch (e) { 
+        console.error('Pause error:', e); 
+      }
+
+      // Process plain UUID from QR code
+      const userId = decodedText.trim();
+      await processLunchDelivery(userId);
     }
   };
 
@@ -446,134 +521,189 @@ const VolunteerDashboard = () => {
     }
   };
 
-  const deliverKit = async (qrContent) => {
+  const processLunchDelivery = async (inputCode) => {
     try {
       setSubmitting(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      const volunteer = session?.user;
+      setScannedUser(null);
+      setDeliveryResult(null);
+      let userId = inputCode.trim();
+      
+      console.log('Processing lunch delivery for code:', userId);
+      
+      // Clean input - handle multi-line content if any
+      if (userId.includes('\n')) {
+        const lines = userId.split('\n');
+        userId = lines[1]?.trim() || lines[0]?.trim();
+      }
 
-      console.log('Kit QR Content:', qrContent);
-      
-      // Clean the QR content
-      const cleanedContent = qrContent.trim();
-      
-      // Check if it's a UUID format (user ID)
+      // Check if it's a DAK Registration ID (e.g. DAK26-XXXX)
+      const isDakRegId = /^DAK\d{2}-[A-Z0-9]+$/i.test(userId);
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      const isUUID = uuidRegex.test(cleanedContent);
-      
-      // Parse QR code content for multi-line format
-      let registrationCode = cleanedContent;
-      if (cleanedContent.includes('\n')) {
-        const lines = cleanedContent.split('\n');
-        registrationCode = lines[1]?.trim() || lines[0]?.trim();
-      }
-      
-      console.log('Is UUID:', isUUID, 'Registration Code:', registrationCode);
-      
-      let userId = null;
-      let profile = null;
-      
-      // Strategy 1: If UUID format, use as user_id directly
-      if (isUUID) {
-        console.log('🔍 Trying as user ID (UUID):', cleanedContent);
-        
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', cleanedContent)
-          .single();
-          
-        if (!profileError && profileData) {
-          userId = cleanedContent;
-          profile = profileData;
-          console.log('✅ Found profile by user ID:', profile.full_name);
-        }
-      }
-      
-      // Strategy 2: Try as registration_id
-      if (!userId) {
-        console.log('🔍 Trying as registration_id:', registrationCode);
-        
-        const { data: registration, error: regError } = await supabase
+      const isUUID = uuidRegex.test(userId);
+
+      // If it's a registration ID, resolve to User ID first
+      if (isDakRegId && !isUUID) {
+        console.log('🔍 Detected Registration ID. Resolving to User ID...');
+        const { data: regData, error: regError } = await supabase
           .from('registrations')
-          .select(`*, profiles!registrations_user_id_fkey(*)`)
-          .eq('registration_id', registrationCode)
+          .select('user_id')
+          .eq('registration_id', userId)
           .single();
 
-        if (!regError && registration) {
-          userId = registration.user_id;
-          profile = registration.profiles;
-          console.log('✅ Found via registration_id, user:', profile?.full_name);
+        if (regError || !regData) {
+          console.error('❌ Registration ID resolution failed:', regError);
+          playBuzzSound();
+          setDeliveryResult({
+            status: 'error',
+            message: 'Invalid Registration ID',
+            subtitle: `Could not find user for ${userId}`
+          });
+          return;
         }
-      }
-      
-      // Strategy 3: Final attempt - try as user_id
-      if (!userId) {
-        console.log('🔍 Final attempt - trying as user_id:', cleanedContent);
-        
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', cleanedContent)
-          .single();
-          
-        if (!profileError && profileData) {
-          userId = cleanedContent;
-          profile = profileData;
-          console.log('✅ Found on final attempt:', profile.full_name);
-        }
-      }
-
-      if (!userId || !profile) {
-        console.error('❌ User not found for QR:', qrContent);
+        userId = regData.user_id;
+        console.log('✅ Resolved to User ID:', userId);
+      } else if (!isUUID) {
+        // Neither UUID nor valid Reg ID
+        console.error('❌ Invalid format:', userId);
         playBuzzSound();
-        showFailureNotification('INVALID QR CODE', 'User not found');
+        setDeliveryResult({
+          status: 'error',
+          message: 'Invalid QR Format',
+          subtitle: 'Please scan a valid User UUID or Registration ID'
+        });
         return;
       }
 
-      // Check if kit already delivered
-      const { data: existingKit } = await supabase
-        .from('kit_distribution')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('kit_type', selectedKitType)
+      // Get user profile
+      console.log('🔍 Looking up user profile:', userId);
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, college_name, department, mobile_number, roll_number')
+        .eq('id', userId)
         .single();
 
-      if (existingKit) {
+      if (profileError || !profile) {
+        console.error('❌ User not found:', profileError);
         playBuzzSound();
-        showFailureNotification('ALREADY TAKEN', `${selectedKitType.replace('_', ' ')} already delivered`);
+        setDeliveryResult({
+          status: 'error',
+          message: 'Student Not Found',
+          subtitle: 'This user ID is not registered in the system'
+        });
         return;
       }
 
-      // Deliver kit
-      const { error: kitError } = await supabase
-        .from('kit_distribution')
-        .insert({
-          user_id: userId,
-          kit_type: selectedKitType,
-          delivered_by: volunteer.id
-        });
+      console.log('✅ Found user profile:', profile.full_name);
+      
+      // Show user confirmation modal
+      setScannedUser(profile);
+      setShowUserConfirm(true);
 
-      if (kitError) throw kitError;
-
-      // Update profile kit_delivered flag
-      await supabase
-        .from('profiles')
-        .update({ kit_delivered: true })
-        .eq('id', userId);
-
-      playTingSound();
-      showSuccessNotification(
-        'KIT DELIVERED',
-        profile.full_name,
-        selectedKitType.replace('_', ' ').toUpperCase()
-      );
     } catch (error) {
-      console.error('Error delivering kit:', error);
+      console.error('Error processing lunch delivery:', error);
       playBuzzSound();
-      showFailureNotification('ERROR', error.message);
+      setDeliveryResult({
+        status: 'error',
+        message: 'System Error',
+        subtitle: error.message || 'Please try again'
+      });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const confirmLunchDelivery = async () => {
+    try {
+      setSubmitting(true);
+      setShowUserConfirm(false);
+      
+      if (!scannedUser) return;
+      
+      console.log('📍 Confirming lunch delivery for:', scannedUser.full_name, 'Day:', currentDay);
+
+      // Call the database function to record food delivery
+      const { data: result, error: foodError } = await supabase
+        .rpc('record_food_delivery', {
+          p_user_id: scannedUser.id,
+          p_day: currentDay
+        });
+
+      console.log('📍 RPC Response:', { result, error: foodError });
+
+      if (foodError) {
+        console.error('❌ RPC Error:', foodError);
+        throw foodError;
+      }
+
+      if (!result) {
+        console.error('❌ No result returned from RPC');
+        throw new Error('No result returned from database function');
+      }
+
+      console.log('✅ Food delivery result:', result);
+
+      if (result.already_received) {
+        console.log('⚠️ Already received food');
+        playBuzzSound();
+        vibrate(500);
+        setDeliveryResult({
+          status: 'warning',
+          message: 'Already Received',
+          subtitle: result.message,
+          userName: scannedUser.full_name
+        });
+      } else if (result.success) {
+        console.log('✅ Food delivered successfully');
+        // Refresh food records
+        await fetchFoodRecords();
+        
+        playTingSound();
+        vibrate(200);
+        setDeliveryResult({
+          status: 'success',
+          message: 'Lunch Delivered',
+          subtitle: `${scannedUser.full_name} - ${currentDay.replace('day', 'Day ')}`,
+          userName: scannedUser.full_name
+        });
+      } else {
+        console.log('❌ Delivery failed:', result.message);
+        playBuzzSound();
+        setDeliveryResult({
+          status: 'error',
+          message: 'Delivery Failed',
+          subtitle: result.message || 'Failed to deliver food'
+        });
+      }
+
+    } catch (error) {
+      console.error('Error confirming lunch delivery:', error);
+      playBuzzSound();
+      setDeliveryResult({
+        status: 'error',
+        message: 'System Error',
+        subtitle: error.message || 'Please try again'
+      });
+    } finally {
+      setSubmitting(false);
+      setScannedUser(null);
+    }
+  };
+
+  const resetLunchScanner = () => {
+    setScannedUser(null);
+    setShowUserConfirm(false);
+    setDeliveryResult(null);
+    setSearchTerm('');
+    setSubmitting(false);
+    
+    // Resume scanning if it was paused
+    if (html5QrCodeRef.current && scanMode === 'lunch') {
+      try {
+        console.log('🔄 Resuming scanner...');
+        html5QrCodeRef.current.resume();
+      } catch (e) {
+        console.log('Scanner resume note:', e);
+      }
     }
   };
 
@@ -755,7 +885,7 @@ const VolunteerDashboard = () => {
       <div className="flex gap-2 p-1 bg-white/5 border-y border-white/10 overflow-x-auto">
         {[
           { id: 'gate', label: 'Registration Info', icon: ShieldCheck },
-          { id: 'kit', label: 'Kit Distribution', icon: Package },
+          { id: 'lunch', label: 'Lunch Distribution', icon: Utensils },
           { id: 'venue', label: 'Venue Guide', icon: MapPin }
         ].map(tab => (
           <button
@@ -845,80 +975,70 @@ const VolunteerDashboard = () => {
             </motion.div>
           )}
 
-          {/* KIT DISTRIBUTION */}
-          {activeTab === 'kit' && (
+          {/* LUNCH DISTRIBUTION */}
+          {activeTab === 'lunch' && (
             <motion.div
-              key="kit"
+              key="lunch"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               className="space-y-6"
             >
-              <div className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border border-purple-500/20 rounded-[2.5rem] p-8 text-center">
-                <Package className="mx-auto text-purple-500 mb-4" size={56} />
-                <h3 className="text-2xl font-bold mb-2">Kit Distribution</h3>
-                <p className="text-gray-400">Track and distribute welcome kits, lunch, etc.</p>
+              <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-[2.5rem] p-8 text-center">
+                <Utensils className="mx-auto text-green-500 mb-4" size={56} />
+                <h3 className="text-2xl font-bold mb-2">Lunch Distribution</h3>
+                <p className="text-gray-400">Scan QR to deliver lunch • Track daily distribution</p>
               </div>
 
-              {/* Kit Type Selection */}
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-                <h4 className="font-bold mb-4">Select Kit Type</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  {kitTypes.map(kit => (
-                    <button
-                      key={kit.id}
-                      onClick={() => setSelectedKitType(kit.id)}
-                      className={`p-4 rounded-xl border-2 transition-all ${
-                        selectedKitType === kit.id
-                          ? `border-${kit.color}-500 bg-${kit.color}-500/10`
-                          : 'border-white/10 bg-white/5'
-                      }`}
-                    >
-                      <kit.icon 
-                        className={`mx-auto mb-2 ${
-                          selectedKitType === kit.id ? `text-${kit.color}-500` : 'text-gray-400'
-                        }`} 
-                        size={32} 
-                      />
-                      <p className={`text-sm font-bold ${
-                        selectedKitType === kit.id ? `text-${kit.color}-500` : 'text-gray-400'
-                      }`}>
-                        {kit.label}
+              {/* Auto-Detected Day Display */}
+              <div className="bg-gradient-to-r from-green-500/20 to-green-600/20 border border-green-500/30 rounded-2xl p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                      <span className="text-2xl">📅</span>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-400">Auto-Detected Event Day</p>
+                      <p className="text-2xl font-bold text-green-500">
+                        {currentDay.replace('day', 'Day ')} - {EVENT_DATES[currentDay].toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </p>
-                    </button>
-                  ))}
+                    </div>
+                  </div>
+                  <CheckCircle2 className="text-green-500" size={32} />
                 </div>
               </div>
 
-              {/* Scanner */}
-              <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8">
-                {(!scanning || scanMode !== 'kit') ? (
+              {/* Scanner Section - LARGER */}
+              <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-6">
+                {(!scanning || scanMode !== 'lunch') ? (
                   <div className="space-y-6">
-                    <div className="w-32 h-32 mx-auto bg-purple-500/10 rounded-[2rem] flex items-center justify-center border-4 border-purple-500/20">
-                      <Camera className="text-purple-500" size={64} />
+                    <div className="w-40 h-40 mx-auto bg-green-500/10 rounded-[2rem] flex items-center justify-center border-4 border-green-500/20">
+                      <Camera className="text-green-500" size={80} />
                     </div>
                     <div className="text-center">
-                      <h3 className="text-xl font-bold mb-2">Ready to Distribute</h3>
-                      <p className="text-gray-400">
-                        Currently distributing: <span className="text-secondary font-bold">
-                          {kitTypes.find(k => k.id === selectedKitType)?.label}
-                        </span>
+                      <h3 className="text-2xl font-bold mb-3">Ready to Deliver Lunch</h3>
+                      <p className="text-lg text-gray-400 mb-2">
+                        Delivering for Today:
+                      </p>
+                      <p className="text-2xl font-bold text-green-500">
+                        {currentDay.replace('day', 'Day ')}
                       </p>
                     </div>
                     <button
-                      onClick={() => startScanning('kit')}
-                      className="w-full py-5 bg-purple-500 text-white font-bold text-lg rounded-2xl hover:bg-purple-600 transition-all shadow-lg shadow-purple-500/20 flex items-center justify-center gap-3"
+                      onClick={() => startScanning('lunch')}
+                      disabled={submitting}
+                      className="w-full py-6 bg-green-500 text-white font-bold text-xl rounded-2xl hover:bg-green-600 transition-all shadow-lg shadow-green-500/30 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Camera size={24} />
-                      Start Kit Scanner
+                      <Camera size={32} />
+                      {submitting ? 'Processing...' : 'Start Lunch Scanner'}
                     </button>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-3 text-center">
+                    <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 text-center">
                       <p className="text-sm text-gray-400">Scanning for</p>
-                      <p className="font-bold text-purple-500">
-                        {kitTypes.find(k => k.id === selectedKitType)?.label}
+                      <p className="font-bold text-green-500 text-xl">
+                        🍱 Lunch - {currentDay.replace('day', 'Day ')}
                       </p>
                     </div>
                     {cameraError ? (
@@ -926,7 +1046,7 @@ const VolunteerDashboard = () => {
                         <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
                         <p className="text-red-400 mb-4">{cameraError}</p>
                         <button
-                          onClick={() => startScanning('kit')}
+                          onClick={() => startScanning('lunch')}
                           className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
                         >
                           Retry Camera
@@ -935,18 +1055,138 @@ const VolunteerDashboard = () => {
                     ) : (
                       <div 
                         id="volunteer-qr-reader" 
-                        className="rounded-2xl overflow-hidden"
+                        className="rounded-2xl overflow-hidden bg-black relative"
+                        style={{ 
+                          width: '100%',
+                          minHeight: '500px',
+                        }}
                       />
                     )}
                     <button
                       onClick={stopScanning}
-                      className="w-full py-4 bg-red-500/10 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-2"
+                      className="w-full py-4 bg-red-500/10 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-2 text-lg"
                     >
-                      <X size={20} />
+                      <X size={24} />
                       Stop Scanner
                     </button>
                   </div>
                 )}
+              </div>
+
+              {/* Food Tracking Table */}
+              <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+                <div className="p-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
+                  <h3 className="font-bold text-lg flex items-center gap-2">
+                    <span className="text-green-500">📊</span> Lunch Distribution Records
+                  </h3>
+                  <button
+                    onClick={fetchFoodRecords}
+                    disabled={loadingFoodRecords}
+                    className="px-4 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-500 rounded-lg text-sm font-bold transition-all disabled:opacity-50"
+                  >
+                    {loadingFoodRecords ? 'Loading...' : 'Refresh'}
+                  </button>
+                </div>
+                
+                {/* Search/Filter */}
+                <div className="p-4 border-b border-white/10">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                    <input
+                      type="text"
+                      placeholder="Search by name, email..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-green-500 transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Table */}
+                <div className="overflow-x-auto">
+                  {loadingFoodRecords ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="animate-spin text-green-500" size={36} />
+                    </div>
+                  ) : foodRecords.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Utensils className="mx-auto text-gray-600 mb-3" size={48} />
+                      <p className="text-gray-400">No lunch distribution records yet</p>
+                      <p className="text-sm text-gray-500 mt-2">Start scanning to track lunches</p>
+                    </div>
+                  ) : (
+                    <table className="w-full">
+                      <thead className="bg-white/5 text-xs text-gray-400 uppercase">
+                        <tr>
+                          <th className="px-4 py-3 text-left">Student</th>
+                          <th className="px-4 py-3 text-center">Day 1</th>
+                          <th className="px-4 py-3 text-center">Day 2</th>
+                          <th className="px-4 py-3 text-center">Day 3</th>
+                          <th className="px-4 py-3 text-center">Total</th>
+                          <th className="px-4 py-3 text-left">Last Scanned</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {foodRecords
+                          .filter(record => {
+                            if (!searchTerm) return true;
+                            const search = searchTerm.toLowerCase();
+                            return (
+                              record.profiles?.full_name?.toLowerCase().includes(search) ||
+                              record.profiles?.email?.toLowerCase().includes(search) ||
+                              record.user_id?.toLowerCase().includes(search)
+                            );
+                          })
+                          .map(record => (
+                            <tr key={record.id} className="hover:bg-white/5 transition-colors">
+                              <td className="px-4 py-3">
+                                <div>
+                                  <p className="font-bold text-white">{record.profiles?.full_name || 'Unknown'}</p>
+                                  <p className="text-xs text-gray-400">{record.profiles?.email || ''}</p>
+                                  <p className="text-xs text-gray-500 font-mono">{record.user_id?.substring(0, 8)}...</p>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                {record.day1 ? (
+                                  <CheckCircle2 className="text-green-500 inline-block" size={20} />
+                                ) : (
+                                  <X className="text-gray-600 inline-block" size={20} />
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                {record.day2 ? (
+                                  <CheckCircle2 className="text-green-500 inline-block" size={20} />
+                                ) : (
+                                  <X className="text-gray-600 inline-block" size={20} />
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                {record.day3 ? (
+                                  <CheckCircle2 className="text-green-500 inline-block" size={20} />
+                                ) : (
+                                  <X className="text-gray-600 inline-block" size={20} />
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm font-bold">
+                                  {record.total_count}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-sm text-gray-400">
+                                {record.last_scanned_at 
+                                  ? new Date(record.last_scanned_at).toLocaleString('en-IN', {
+                                      dateStyle: 'short',
+                                      timeStyle: 'short'
+                                    })
+                                  : '-'
+                                }
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
               </div>
             </motion.div>
           )}
@@ -1021,6 +1261,190 @@ const VolunteerDashboard = () => {
                   ))}
                 </div>
               )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* User Confirmation Modal for Lunch */}
+        <AnimatePresence>
+          {showUserConfirm && scannedUser && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+              onClick={() => {
+                setShowUserConfirm(false);
+                setScannedUser(null);
+              }}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-md bg-gray-900 border border-green-500/30 rounded-3xl overflow-hidden"
+              >
+                {/* Header */}
+                <div className="bg-gradient-to-r from-green-500/20 to-green-600/20 p-6 border-b border-white/10">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center flex-shrink-0">
+                      <Utensils className="text-white" size={32} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-xl font-bold text-white truncate">
+                        {scannedUser.full_name}
+                      </h3>
+                      {scannedUser.department && (
+                        <p className="text-sm text-gray-400 truncate">
+                          {scannedUser.department}
+                        </p>
+                      )}
+                      {scannedUser.roll_number && (
+                        <p className="text-xs text-gray-500">
+                          Roll: {scannedUser.roll_number}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Body */}
+                <div className="p-6 space-y-4">
+                  <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 text-center">
+                    <p className="text-sm text-gray-400 mb-1">Delivering Lunch For</p>
+                    <p className="text-2xl font-bold text-green-500">
+                      {currentDay.replace('day', 'Day ')} - {EVENT_DATES[currentDay].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </p>
+                  </div>
+
+                  {scannedUser.email && (
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <Mail size={16} />
+                      <span className="truncate">{scannedUser.email}</span>
+                    </div>
+                  )}
+                  
+                  {scannedUser.mobile_number && (
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <Phone size={16} />
+                      <span>{scannedUser.mobile_number}</span>
+                    </div>
+                  )}
+                  
+                  {scannedUser.college_name && (
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <Building size={16} />
+                      <span className="truncate">{scannedUser.college_name}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer */}
+                <div className="p-4 border-t border-white/10 space-y-2">
+                  <button
+                    onClick={confirmLunchDelivery}
+                    disabled={submitting}
+                    className="w-full py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold text-lg rounded-xl hover:shadow-lg hover:shadow-green-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="animate-spin" size={20} />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 size={20} />
+                        Confirm Lunch Delivery
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={resetLunchScanner}
+                    disabled={submitting}
+                    className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors font-semibold disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Delivery Result Modal */}
+        <AnimatePresence>
+          {deliveryResult && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+              onClick={resetLunchScanner}
+            >
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                className={`max-w-md w-full rounded-3xl p-8 text-center space-y-5 ${
+                  deliveryResult.status === 'success'
+                    ? 'bg-gradient-to-br from-green-500/20 to-green-600/20 border-2 border-green-500'
+                    : deliveryResult.status === 'warning'
+                    ? 'bg-gradient-to-br from-orange-500/20 to-orange-600/20 border-2 border-orange-500'
+                    : 'bg-gradient-to-br from-red-500/20 to-red-600/20 border-2 border-red-500'
+                }`}
+              >
+                {/* Icon */}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                  className="flex justify-center"
+                >
+                  {deliveryResult.status === 'success' ? (
+                    <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center">
+                      <CheckCircle2 className="text-white" size={48} />
+                    </div>
+                  ) : deliveryResult.status === 'warning' ? (
+                    <div className="w-24 h-24 bg-orange-500 rounded-full flex items-center justify-center">
+                      <AlertCircle className="text-white" size={48} />
+                    </div>
+                  ) : (
+                    <div className="w-24 h-24 bg-red-500 rounded-full flex items-center justify-center">
+                      <X className="text-white" size={48} />
+                    </div>
+                  )}
+                </motion.div>
+
+                {/* Message */}
+                <div>
+                  <h3 className="text-3xl font-bold text-white mb-2">
+                    {deliveryResult.message}
+                  </h3>
+                  <p className="text-lg text-gray-300">
+                    {deliveryResult.subtitle}
+                  </p>
+                  {deliveryResult.userName && (
+                    <p className="text-xl font-bold text-white mt-3">
+                      {deliveryResult.userName}
+                    </p>
+                  )}
+                </div>
+
+                {/* Action Button */}
+                <button
+                  onClick={resetLunchScanner}
+                  className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
+                    deliveryResult.status === 'success'
+                      ? 'bg-green-500 hover:bg-green-600 text-white'
+                      : deliveryResult.status === 'warning'
+                      ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                      : 'bg-red-500 hover:bg-red-600 text-white'
+                  }`}
+                >
+                  {deliveryResult.status === 'success' ? 'Scan Next' : 'Try Again'}
+                </button>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

@@ -99,22 +99,23 @@ export const getCameraConfig = (isMobile = false) => {
   // Mobile devices get optimized settings
   if (isMobile) {
     return {
-      fps: 15,
-      qrbox: { width: 220, height: 220 },
-      aspectRatio: 1.0,
+      fps: 10, // Lower FPS allows more time for focus and processing per frame
+      qrbox: { width: 250, height: 250 },
+      aspectRatio: 1.0, 
       disableFlip: false,
       experimentalFeatures: {
         useBarCodeDetectorIfSupported: true
       },
       // Use back camera by default on mobile
-      facingMode: { ideal: "environment" }
+      facingMode: { ideal: "environment" },
+      focusMode: "continuous" // Attempt to force continuous focus
     };
   }
   
   // Desktop gets higher quality settings
   return {
-    fps: 20,
-    qrbox: { width: 280, height: 280 },
+    fps: 15, // Optimal for desktop
+    qrbox: { width: 300, height: 300 },
     aspectRatio: 1.0,
     disableFlip: false,
     experimentalFeatures: {
