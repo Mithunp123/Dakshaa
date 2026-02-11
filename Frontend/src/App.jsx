@@ -101,6 +101,7 @@ const EventCoordinatorDashboard = lazy(() => import("./Pages/Admin/Coordinator/E
 const CoordinatorOverviewPage = lazy(() => import("./Pages/Admin/Coordinator/OverviewPage"));
 const CoordinatorRegistrationPage = lazy(() => import("./Pages/Admin/Coordinator/RegistrationPage"));
 const CoordinatorAttendancePage = lazy(() => import("./Pages/Admin/Coordinator/AttendancePage"));
+const CoordinatorPrintQRPage = lazy(() => import("./Pages/Admin/Coordinator/PrintQRPage"));
 const CoordinatorGlobalScanner = lazy(() => import("./Pages/Admin/Coordinator/GlobalScannerPage"));
 const AttendanceScanner = lazy(() => import("./Pages/Admin/Volunteer/AttendanceScanner"));
 const VolunteerDashboard = lazy(() => import("./Pages/Admin/Volunteer/VolunteerDashboard"));
@@ -113,6 +114,7 @@ function AppContent() {
     location.pathname.startsWith("/coordinator") ||
     location.pathname.startsWith("/volunteer");
   const isScan = location.pathname === "/scan";
+  const isPrintQR = location.pathname === "/print-qr";
   const isLogin = location.pathname === "/login";
   const isForgotPassword = location.pathname === "/forgot-password";
   const isRegisterEvents = location.pathname === "/register-events";
@@ -120,7 +122,7 @@ function AppContent() {
   const isLiveStats = location.pathname === "/live-stats";
 
   // Check if bottom navbar should be shown (mobile only, non-admin pages)
-  const showBottomNav = !isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword;
+  const showBottomNav = !isDashboard && !isAdmin && !isScan && !isPrintQR && !isLogin && !isForgotPassword;
 
   // Prefetch critical pages after initial load for faster navigation
   useEffect(() => {
@@ -146,8 +148,8 @@ function AppContent() {
   return (
     <div className="min-h-screen min-h-screen-safe" style={{ minHeight: '100vh', position: 'relative' }}>
       <SessionMonitor />
-      {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && <Navbar />}
-      {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && <Tags />}
+      {!isDashboard && !isAdmin && !isScan && !isPrintQR && !isLogin && !isForgotPassword && <Navbar />}
+      {!isDashboard && !isAdmin && !isScan && !isPrintQR && !isLogin && !isForgotPassword && <Tags />}
       <Suspense key={location.key} fallback={<LoadingScreen variant="pulse" text="Loading..." />}>
         <Routes location={location} key={location.key}>
           <Route
@@ -215,6 +217,7 @@ function AppContent() {
               } 
             />
             <Route path="/scan" element={<Scan />} />
+            <Route path="/print-qr" element={<CoordinatorPrintQRPage />} />
             <Route
               path="/dashboard/*"
               element={
@@ -447,6 +450,16 @@ function AppContent() {
                 }
               />
               <Route
+            path="coordinator/attendance/print-qr"
+            element={
+              <ProtectedRoute
+                allowedRoles={["event_coordinator", "super_admin"]}
+              >
+                <CoordinatorPrintQRPage />
+              </ProtectedRoute>
+            }
+          />
+              <Route
                 path="coordinator/global-scanner"
                 element={
                   <ProtectedRoute
@@ -498,12 +511,12 @@ function AppContent() {
           </Routes>
         </Suspense>
 
-      {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && (
+      {!isDashboard && !isAdmin && !isScan && !isPrintQR && !isLogin && !isForgotPassword && (
         <Suspense fallback={null}>
           <UltraFooter />
         </Suspense>
       )}
-      {!isAdmin && !isRegisterEvents && !isLiveStats && (
+      {!isAdmin && !isRegisterEvents && !isLiveStats && !isPrintQR && (
         <Suspense fallback={null}>
           <FloatingDashboardButton />
         </Suspense>
