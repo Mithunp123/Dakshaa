@@ -11,7 +11,7 @@ export const hackathonEventDetails = {
       id: "hackathon-1",
       title: "Neura-Hack 2.0 (36 Hours Hackathon)",
       date: "12th Feb - 13th Feb, 2026",
-      venue: "Bhumi Lab (IT PARK)",
+      venue: "Cyberdome ,CSE Lab – 1 ,CSE Lab – 2 (IT PARK)",
       registrationFee:" ₹ 500 per head.",
       registrationLink: "",
       description: "NeuraHack 2.O is where ideas are built, systems are broken, and security is redefined. Participants Hack, Defend, and Secure technology to shape the future of digital innovation.",
@@ -64,7 +64,7 @@ export const hackathonEventDetails = {
         {
           date: "12th Feb - 13th Feb, 2026",
           time: "9:00 AM to 9:00 PM",
-          location: "Bhumi Lab (IT PARK)",
+          location: "Cyberdome ,CSE Lab – 1 ,CSE Lab – 2 (IT PARK)",
         },
       ],
 
@@ -92,7 +92,7 @@ export const hackathonEventDetails = {
       title: "BioNexathon 2026 (24 Hours Hackathon)",
       date: "February 13 2026 to February 14, 2026",
       registrationFee : " ₹ 500 per head.",
-      venue: "Dr. M.S. Swaminathan Biotech Seminar Hall (Bio Technology Department)",
+      venue: "Dr. M.S. Swaminathan Biotech Seminar Hall (Ground Floor Bio Technology Department)",
       description: "A platform for students, researchers, and professionals to present and discuss recent advancements in biotechnology. Includes keynote lectures, panel discussions, and interactive sessions. Focus on innovation, research impact, and interdisciplinary collaboration. Encourages networking and knowledge exchange among participants.",
       eligibility: {
         categories: [
@@ -212,7 +212,7 @@ export const hackathonEventDetails = {
           round: "Venue",
           date: "February 13 2026 to February 14, 2026",
           time: "24 hours",
-          location: "Dr. M.S. Swaminathan Biotech Seminar Hall (Bio Technology Department)",
+          location: "Dr. M.S. Swaminathan Biotech Seminar Hall (Ground Floor Bio Technology Department)",
         },
       ],
       contact: {
@@ -243,7 +243,7 @@ export const hackathonEventDetails = {
       id: "hackathon-3",
       title: "Neura Code 2.O",
       date: "February 13 2026 ",
-      venue: "IT LAB 1 (IT Park)",
+      venue: "IT LAB 1 (1st Floor IT Park )",
       registrationFee:" ₹ 300 per head.",
       registrationLink: " ",
       description: "NeuraCode 2.0 is a 5-hour competitive programming event designed to test participants’ logical thinking, problem-solving skills, and programming expertise. The event challenges students across multiple difficulty levels, ensuring a fair and engaging experience for both beginners and advanced coders.The competition is conducted in two structured rounds, with cumulative scoring determining the final rankings.",
@@ -414,7 +414,7 @@ lunchannouncement:[
           
           date: "February 13, 2026",
           time: "09:00 AM",
-          location: "UI Path Lab (IT PARK)",
+          location: "IT LAB 1 (1st Floor IT Park )",
         },
       ],
       contact: {
@@ -558,7 +558,7 @@ lunchannouncement:[
       title: "Designathon 2026",
       date: "February 13, 2026",
       registrationFee:" ₹ 300  per head.",
-      venue: "DESIGN CENTER (Mechanical Block)",
+      venue: "DESIGN CENTER (1st floor Mechanical Block)",
       description: " This Designathon is centered on the innovative use of Computer-Aided Design (CAD) tools to create, redesign, and optimize mechanical components and systems for modern engineering applications. The event provides a creative and technical platform for Mechanical Engineering students to transform ideas into precise digital models using industry-standard CAD software.Participants will apply design thinking principles to develop concepts, create 3D models, perform assemblies, and generate engineering drawings while considering functionality, manufacturability, material selection, and sustainability. The Designathon encourages students to rethink conventional designs and propose efficient, lightweight, and cost-effective solutions through advanced CAD modeling techniques. ",
       rewards: [
         {
@@ -603,7 +603,7 @@ lunchannouncement:[
          
           date: "February 13, 2026",
           time: "09:00 AM",
-          location: "DESIGN CENTER (Mechanical Block)",
+          location: "DESIGN CENTER (1st floor Mechanical Block)",
         },
       ],
       contact: {
@@ -748,7 +748,7 @@ lunchannouncement:[
       id: "hackathon-8",
       title: "Cloudathon ",
       date: "13 February 2026",
-      venue: "Shine Lab (IT PARK)",
+      venue: "Shine Lab (3rd floor IT PARK)",
       registrationFee:" ₹ 500 per head.",
       registrationLink: "",
       description: "CLOUDATHON is a high-energy, hands-on cloud hackathon where ideas turn into scalable, real-world solutions. Build, deploy, and optimize cloud-powered applications while tackling today’s most exciting tech challenges. ",  
@@ -809,7 +809,7 @@ lunchannouncement:[
         {
           date: "13 February 2026",
           time: "9:00 AM to 4:00 PM",
-          location: "Shine Lab (IT PARK)",
+          location: "Shine Lab (3rd floor IT PARK)",
         },
       ],
       contact: {

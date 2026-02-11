@@ -251,7 +251,7 @@ export const workshopDetails = [
     description: "This workshop introduces Next-Generation Sequencing (NGS) technologies used in modern and future genomic and biomedical research. Participants gain industry-oriented knowledge on advanced sequencing platforms, workflows, and data analysis trends. The session connects molecular biology and genomics theory with real-time clinical, agricultural, and research applications.",
     img: workshop3,
     date: "February 12, 2026",
-    venue: "Bio Tech Seminar Hall MBA Laboratory (Biotechnology Block)",
+    venue: "Bio Tech Seminar Hall MBA Laboratory (Biotechnology Block 1st Floor MBA F Floor Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
@@ -259,7 +259,7 @@ export const workshopDetails = [
        
         date: "February 12, 2026",
         time: "1 Day",
-        location: "Bio Tech Seminar Hall MBA Laboratory (Biotechnology Block)",
+        location: "Bio Tech Seminar Hall MBA Laboratory (Biotechnology Block 1st Floor MBA F Floor Block)",
       },
     ],
     contact: {
@@ -380,13 +380,13 @@ export const workshopDetails = [
     description: "CyberStrike is a high-impact hands-on cybersecurity workshop designed to introduce participants to the fundamentals of cybersecurity and real-world web application security. The event covers career insights, essential security concepts, and practical exposure to OWASP Top 10 vulnerabilities through live demonstrations and guided activities. Participants will learn how attacks happen, how to defend systems, and how to build secure applications with industry-relevant knowledge and techniques.",
     img: workshop6,
     date: "February 12, 2026",
-    venue: "CSE LAB 1 (IT Park)",
+    venue: "Bhumi Lab (IT Park)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
        
-        location: "CSE LAB 1 (IT Park)",
+        location: "Bhumi Lab (IT Park)",
         time: "9:30 AM to 4:00 PM",
         date: "February 12, 2026",
       },
@@ -449,13 +449,13 @@ export const workshopDetails = [
     description: "The Workshop on EV Retrofitting is designed to provide participants with comprehensive knowledge of converting conventional internal combustion engine (ICE) vehicles into electric vehicles. This workshop focuses on fundamental principles, design considerations, and practical aspects involved in EV retrofitting, including motor selection, battery systems, power electronics, motor controllers, charging infrastructure, and safety standards.",
     img: workshop8,
     date: "February 12, 2026",
-    venue: "Power Electronics and Drives Lab / EEE Computer Lab (Academic Block)",
+    venue: "Power Electronics and Drives Lab / EEE Computer Lab (1st Floor EEE M Block )",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "Power Electronics and Drives Lab / EEE Computer Lab (Academic Block)",
+        location: "Power Electronics and Drives Lab / EEE Computer Lab (1st Floor EEE M Block )",
         time: "2 Days",
         date: "February 12, 2026",
       },
@@ -603,13 +603,13 @@ export const workshopDetails = [
     description: "Flight modes help control how a drone flies, making it safer and easier to operate. This workshop also includes simple drone assembly, covering basic parts, motor fixing, wiring, and controller setup.",
     img: workshop12,
     date: "February 12, 2026",
-    venue: "PLC Laboratory (Academic Block)",
+    venue: "PLC Laboratory (Ground Floor MCT J Block )",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
       
-        location: "PLC Laboratory (Academic Block)",
+        location: "PLC Laboratory (Ground Floor MCT J Block )",
         time: "1 Day",
         date: "February 12, 2026",
       },
@@ -683,13 +683,13 @@ export const workshopDetails = [
     description: "The workshop provides an introduction to AI concepts and their role in smart medical and healthcare technologies, along with an overview of medical textiles, smart fabrics, and sensor-integrated textile systems. Participants will gain exposure to AI-enabled health monitoring, diagnostics, and wearable medical applications through demonstrations and real-world case studies. The program also offers insights into emerging trends, innovations, and career opportunities in AI-driven medical textiles and healthcare technology.",
     img: workshop14,
     date: "February 12, 2026",
-    venue: "MBA Seminar Hall (MBA Block)",
+    venue: "Dr. Amartyasen Hall MBA Seminar Hall  (MBA F Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "MBA Seminar Hall (MBA Block)",
+        location: "Dr. Amartyasen Hall MBA Seminar Hall  (MBA F Block)",
         time: "1 Day",
         date: "February 12, 2026",
       },
@@ -727,13 +727,13 @@ export const workshopDetails = [
     description: "This hands-on workshop will guide students through the journey of VLSI design, from logic design to the implementation of test patterns using DFT techniques. Participants will gain practical experience in identifying faults, creating test strategies, and understanding how DFT ensures reliability and efficiency in modern chip design. By the end of the session, students will have a clear understanding of the role of DFT in bridging design and verification in real-world VLSI circuits.",
     img: workshop15,
     date: "February 12, 2026",
-    venue: "VLSI Lab (MCT Block)",
+    venue: "VLSI Lab (MCT J Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
        
-        location: "VLSI Lab (MCT Block)",
+        location: "VLSI Lab (MCT J Block)",
         time: "9.00 AM to 4.00 PM",
         date: "February 12, 2026",
       },
@@ -884,12 +884,12 @@ export const workshopDetails = [
     description: "The IoT System Engineering is a 1-day hands-on workshop conducted in collaboration with C-DAC Bangalore under the NASSCOM FutureSkills PRIME initiative. It provides practical exposure to IoT architecture, sensors, microcontrollers, communication protocols, and cloud integration using C-DAC's Ubimote IoT Laboratory Kits. The workshop equips participants with industry-relevant skills to develop real-time IoT applications and supports innovation for final-year projects and research.",
     img: workshop18,
     date: "February 12, 2026",
-    venue: "CDAC’s CoE in IoT Applications (Academic Block)",
+    venue: "CDAC’s CoE in IoT Applications (1st Floor EEE M Block )",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
-        location: "CDAC’s CoE in IoT Applications (Academic Block)",
+        location: "CDAC’s CoE in IoT Applications (1st Floor EEE M Block )",
         time: "9:00 AM to 4:00 PM",
         date: "February 12, 2026",
       },

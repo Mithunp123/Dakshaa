@@ -249,7 +249,7 @@ const conferences = [
       " Additional author per head : ₹150",
     ],
     date: "12 February 2026",
-    venue: "A212 (Main Building)",
+    venue: "A202 (Main Building)",
     registrationFee: "₹300",
     contact: {
         facultyCoordinator: [ 
@@ -370,7 +370,7 @@ const conferences = [
       " Additional author per head : ₹150",
     ],
     date: "12 February 2026",
-    venue: "A204 (Main Building)",
+    venue: "A103 (Main Building)",
     registrationFee: "₹300",
     contact: {
         facultyCoordinator: [

@@ -809,7 +809,7 @@ export const technicalDetails = [
     description: "This poster presentation provides students a platform to showcase innovative ideas and research on emerging food processing technologies. Participants will visually present advanced techniques, applications, and benefits that enhance food quality, safety, and sustainability. The session encourages knowledge sharing, creativity, and scientific discussion among students and experts.",
     img: Tech14,
     date: "February 13, 2026",
-    venue: "Dairy Technology Laboratory",
+    venue: "FRE Lab ,Ground Floor,Academic A Block ",
     department: "Technical Events",
     price: "₹250",
     topics: [
@@ -973,7 +973,7 @@ export const technicalDetails = [
       
         date: "February 13, 2026",
         time: "9:00 AM to 4:00 PM",
-        location: "Dairy Technology Laboratory",
+        location: "FRE Lab ,Ground Floor  ,Academic A Block ",
       },
     ],
     contact: {
