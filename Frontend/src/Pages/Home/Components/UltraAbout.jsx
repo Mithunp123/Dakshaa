@@ -11,6 +11,9 @@ import guest3 from "../../../assets/chiefguest/Guest-3.webp";
 import guest4 from "../../../assets/chiefguest/Guest-4.webp";
 import guest5 from "../../../assets/chiefguest/Guest-5.webp";
 import guest6 from "../../../assets/chiefguest/Guest-6.webp";
+import guest7 from "../../../assets/chiefguest/guest7.webp";
+import guest8 from "../../../assets/chiefguest/guest8.webp";
+
 
 // Animated Card Component
 const AnimatedCard = ({ children, delay = 0 }) => {
@@ -352,12 +355,14 @@ function UltraAbout() {
         
         <div className="max-w-6xl mx-auto space-y-8">
           {[
-            { image: guest1, name: "Mr.M.K.Vishaal", designation: "Founder & CEO of HyperHorizon", description: "Bengaluru" },
-            { image: guest2, name: "Mr.P.Durga Rao", designation: "Director of ATUM Beverages Pvt.Ltd", description: "Hyderabad" },
             { image: guest3, name: "Mr.V.Udaya Sankar", designation: "Director of NASSCOM", description: "Co-Founder of Maatram Foundation" },
+            { image: guest8, name: "Mr.Abhijit Sreenivas", designation: "Head Academic Alliance", description: "UiPath" },
             { image: guest4, name: "Mr.Shrikrishna", designation: "Scientist 'E' at C-DAC ", description: "Bengaluru" },
             { image: guest5, name: "Mrs.Bhuvaneswari Subramani", designation: "Chief Cloud Evangelist", description: "Intuitive.ai,Bengaluru" },
+            { image: guest7, name: "Mr.G.N.Basavadarshan ", designation: "Senior Academia Partnership Manager", description: "MongoDB,Bengaluru" },
+            { image: guest2, name: "Mr.P.Durga Rao", designation: "Director of ATUM Beverages Pvt.Ltd", description: "Hyderabad" },
             { image: guest6, name: "Mr.K.Ganesan", designation: "Deputy General Manager", description: "Mahindra Water Utilities,Erode" },
+            { image: guest1, name: "Mr.M.K.Vishaal", designation: "Founder & CEO of HyperHorizon", description: "Bengaluru" },
           ].map((guest, index) => {
             const isReversed = index % 2 === 1;
             

@@ -60,7 +60,7 @@ const chiefCoordinator = [
 
 const jointCoordinators = [
   { id: 13, name: "Narendhar D ", department: "Artificix", img: narendhar, role: "Volunteers, Helpdesk & Participant Support ", phone: "+91 97516 73398", associationLogo: aidsasso },
-  { id: 12, name: "Kaviyarasu P", department: "Artificix", img: kavi, role: "Website, Content & Data Management ", phone: "+91 701067 64469", associationLogo:aidsasso},
+  { id: 12, name: "Kaviyarasu P", department: "Artificix", img: kavi, role: "Website, Content & Data Management ", phone: "+91 70107 64469", associationLogo:aidsasso},
   //{ id: 15, name: "Gopinath", department: "Department of AIML", img: gopinath, role: "Gopinath T ", phone: "+91 93611 63363", associationLogo: aevaLogo },
   { id : 17, name: "Saran Senthur Suthanthran", department: "ZITA", img:saran, role: "Registrations, Payments & Attendance ", phone: "+91 80566 70219", associationLogo: itasso},
   {id : 18, name:"Yashas Yadav", department:"ASCI", img:yadhav, role:"Technical, Non-Technical & Team Events", phone:"+91 70108 43024", associationLogo:cseasso},

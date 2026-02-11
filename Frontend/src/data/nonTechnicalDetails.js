@@ -62,38 +62,33 @@ export const nonTechnicalDetails = [
         {
           name: "Mr.S.Raja",
           phone: "+91 75028 21440",
-        
         },
         {
           name: "Mrs.A.Eswari",
           phone: "+91 94431 81818",
-         
-        }
+        },
       ],
       studentCoordinator: [
         {
           name: "Mr.A.Akash",
           phone: "+91 63695 51324",
-         
         },
         {
           name: "Mr.D.Gobinath",
           phone: "+91 63829 32242",
-         
         },
         {
           name: "Mr.K.Selvabharathi",
           phone: "+91 84286 35597",
-          
         },
         {
           name: "Mr.Dhilip Shanmugam",
           phone: "+91 93633 36136",
-         
         },
       ],
     },
   },
+  
   {
     id: "nontech-aids1",
     shortTitle: "IPL AUCTION",

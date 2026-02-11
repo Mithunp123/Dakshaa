@@ -605,7 +605,7 @@ export const technicalDetails = [
     description: "An engaging electronics-based technical event where participants are given only component symbols without component names. Participants must identify the correct components and build the complete circuit within a limited time. The participant who successfully builds a correct and working circuit in the shortest time is declared the winner.",
     img: Tech11,
     date: "February 13, 2026",
-    venue: "EDC Lab (Main Building)",
+    venue: "Research Lab (Main Building)",
     department: "Technical Events",
     price: "₹250",
     rules: [
@@ -638,7 +638,7 @@ export const technicalDetails = [
         
         date: "February 13, 2026",
         time: "9:00 AM to 1:00 PM",
-        location: "EDC Lab (Main Building)",
+        location: "Research Lab (Main Building)",
       },
     ],
     contact: {

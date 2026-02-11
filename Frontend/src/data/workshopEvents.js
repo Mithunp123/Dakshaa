@@ -138,7 +138,7 @@ export const workshopDetails = [
     id: "workshop-aids",
     shortTitle: "Agentic AI",
     title: "Agentic AI Workshop",
-    description: "A one-day workshop on \"Agentic AI\" will introduce participants to intelligent AI agents capable of autonomous decision-making, planning, and real-world problem solving. The session will be led by Mr. Dineshkumar Shanmugam, Founder & CEO of Wildrise, Korclub Consumer Private Limited, who brings strong industry expertise in AI-driven product development. Through expert talks and real-world use cases, participants will explore the architecture, applications, and future scope of Agentic AI across industries such as automation, robotics, and smart systems.",
+    description: "A one-day workshop on \"Agentic AI\" will introduce participants to intelligent AI agents capable of autonomous decision-making, planning, and real-world problem solving.Through expert talks and real-world use cases, participants will explore the architecture, applications, and future scope of Agentic AI across industries such as automation, robotics, and smart systems.",
     img: workshop1,
     date: "February 12, 2026",
     venue: "AB Lab 2(Academic Block)",
@@ -191,14 +191,14 @@ export const workshopDetails = [
     description: "Step into the AI Arcade and discover how AI tools can supercharge game development — build smarter, faster, and more creative games using cutting-edge AI tools.",
     img: workshop2,
     date: "February 12, 2026",
-    venue: "UIPath Laboratory (IT Park)",
+    venue: "AB Lab 1 , AB Lab 3 (Academic Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
        
         time: "1 Day",
-        venue: "UIPath Laboratory (IT Park)",
+        venue: "AB Lab 1 , AB Lab 3 (Academic Block)",
         registrationFee: "₹300",
       },
     ],
@@ -251,7 +251,7 @@ export const workshopDetails = [
     description: "This workshop introduces Next-Generation Sequencing (NGS) technologies used in modern and future genomic and biomedical research. Participants gain industry-oriented knowledge on advanced sequencing platforms, workflows, and data analysis trends. The session connects molecular biology and genomics theory with real-time clinical, agricultural, and research applications.",
     img: workshop3,
     date: "February 12, 2026",
-    venue: "AB LAB-1(Academic Block)",
+    venue: "Bio Tech Seminar Hall MBA Laboratory (Biotechnology Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
@@ -259,7 +259,7 @@ export const workshopDetails = [
        
         date: "February 12, 2026",
         time: "1 Day",
-        location: "AB LAB-1(Academic Block)",
+        location: "Bio Tech Seminar Hall MBA Laboratory (Biotechnology Block)",
       },
     ],
     contact: {
@@ -300,12 +300,12 @@ export const workshopDetails = [
     description: "Master the future of construction in this BIM workshop, where 3D design meets intelligent data integration to streamline project lifecycles, improve collaboration, minimize structural errors, and build expertise using industry-standard tools for the digital transformation of the Architecture, Engineering, and Construction (ACE) industry.",
     img: workshop4,
     date: "February 12, 2026",
-    venue: "Civil CADD Laboratory (Civil Block)",
+    venue: "MA108 Lecture Hall (MBA Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
-        location: "Civil CADD Laboratory (Civil Block)",
+        location: "MA108 Lecture Hall (MBA Block)",
         time: "1 Day",
         date: "February 12, 2026",
       },
@@ -415,13 +415,13 @@ export const workshopDetails = [
     description: "The Future of IoT: LoRaWAN with Artificial Intelligence workshop by Enthu Technology Solutions India Pvt. Ltd. introduces participants to long-range, low-power IoT communication using LoRaWAN and its integration with AI. The session highlights real-world applications like smart cities, agriculture, and industrial automation through practical demonstrations and insights into intelligent IoT systems.",
     img: workshop7,
     date: "February 12, 2026",
-    venue: "Embedded Lab (Main Building)",
+    venue: "Embedded Lab (Main Building 1st Floor)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "Embedded Lab (Main Building)",
+        location: "Embedded Lab (Main Building 1st Floor)",
         duration: "9:00 AM to 4:00 PM",
         date: "February 12, 2026",
       },
@@ -449,13 +449,13 @@ export const workshopDetails = [
     description: "The Workshop on EV Retrofitting is designed to provide participants with comprehensive knowledge of converting conventional internal combustion engine (ICE) vehicles into electric vehicles. This workshop focuses on fundamental principles, design considerations, and practical aspects involved in EV retrofitting, including motor selection, battery systems, power electronics, motor controllers, charging infrastructure, and safety standards.",
     img: workshop8,
     date: "February 12, 2026",
-    venue: "EEE Project Lab (Academic Block)",
+    venue: "Power Electronics and Drives Lab / EEE Computer Lab (Academic Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "EEE Project Lab (Academic Block)",
+        location: "Power Electronics and Drives Lab / EEE Computer Lab (Academic Block)",
         time: "2 Days",
         date: "February 12, 2026",
       },
@@ -525,7 +525,7 @@ export const workshopDetails = [
     description: "This one-day workshop on \"Monetizing Your Idea through Intellectual Property Rights (IPR)\" focuses on helping students, innovators, and early-stage entrepreneurs understand how ideas can be converted into protected intellectual assets and commercially leveraged. The session covers the practical use of patents, copyrights, trademarks, and designs, explaining what can be protected, when to file, and how IPR directly supports revenue generation through licensing, technology transfer, product commercialization, and startup valuation.",
     img: workshop10,
     date: "February 12, 2026",
-    venue: "NICE Lab (Academic Block)",
+    venue: "C",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
@@ -533,7 +533,7 @@ export const workshopDetails = [
        
         date: "12 February 2026",
         time: "9:00 AM to 4:00 PM",
-        location: "NICE Lab (Academic Block)",
+        location: "PTC Conference Hall (PTC Block)",
       },
     ],
     contact: {
@@ -727,13 +727,13 @@ export const workshopDetails = [
     description: "This hands-on workshop will guide students through the journey of VLSI design, from logic design to the implementation of test patterns using DFT techniques. Participants will gain practical experience in identifying faults, creating test strategies, and understanding how DFT ensures reliability and efficiency in modern chip design. By the end of the session, students will have a clear understanding of the role of DFT in bridging design and verification in real-world VLSI circuits.",
     img: workshop15,
     date: "February 12, 2026",
-    venue: "VLSI Lab (Main Building)",
+    venue: "VLSI Lab (MCT Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
        
-        location: "VLSI Lab (Main Building)",
+        location: "VLSI Lab (MCT Block)",
         time: "9.00 AM to 4.00 PM",
         date: "February 12, 2026",
       },
@@ -780,13 +780,13 @@ export const workshopDetails = [
     description: "Code, Click, Done is a hands-on mobile app development workshop designed to introduce participants to the fundamentals of building functional mobile applications in just one day. This tech event focuses on transforming ideas into real mobile apps through guided coding, interactive demonstrations, and practical exercises.",
     img: workshop16,
     date: "February 12, 2026",
-    venue: "MCA Laboratory (MBA Block)",
+    venue: "NET LAB (IT Park)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "MCA Laboratory (MBA Block)",
+        location: "NET LAB (IT Park)",
         time: "9:30 AM to 4:00 PM",
         date: "February 12, 2026",
       },
@@ -835,13 +835,13 @@ export const workshopDetails = [
     description: "This workshop provides an introduction to Artificial Intelligence, Machine Learning, Deep Learning, and Image Processing using MATLAB in a practical and easy-to-understand manner. Participants will learn how intelligent models are built, how neural networks are trained, and how images are processed and analysed. The session includes hands-on experience with real-time applications such as classification, prediction, object detection, along with applications in Electric Vehicles (EVs) and Robotics. ",
     img: workshop17,
     date: "February 12, 2026",
-    venue: "AB LAB 3 (Academic Block)",
+    venue: "UiPath Laboratory (IT Park)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
         
-        location: "AB LAB-3 (Academic Block)",
+        location: "UiPath Laboratory (IT Park)",
         time: "1:00 PM to 4:30PM ",
         date: "February 12, 2026",
       },
@@ -884,12 +884,12 @@ export const workshopDetails = [
     description: "The IoT System Engineering is a 1-day hands-on workshop conducted in collaboration with C-DAC Bangalore under the NASSCOM FutureSkills PRIME initiative. It provides practical exposure to IoT architecture, sensors, microcontrollers, communication protocols, and cloud integration using C-DAC's Ubimote IoT Laboratory Kits. The workshop equips participants with industry-relevant skills to develop real-time IoT applications and supports innovation for final-year projects and research.",
     img: workshop18,
     date: "February 12, 2026",
-    venue: "EEE Project Lab (Academic Block)",
+    venue: "CDAC’s CoE in IoT Applications (Academic Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
       {
-        location: "EEE Project Lab (Academic Block)",
+        location: "CDAC’s CoE in IoT Applications (Academic Block)",
         time: "9:00 AM to 4:00 PM",
         date: "February 12, 2026",
       },

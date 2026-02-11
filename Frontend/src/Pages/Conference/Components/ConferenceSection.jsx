@@ -91,7 +91,7 @@ const conferences = [
     ],
 
     date: "12 February 2026 ",
-    venue: "A102 (Main Building)",
+    venue: "A203 (Main Building)",
     contact: {
         facultyCoordinator: [
           {
@@ -167,7 +167,7 @@ const conferences = [
     ],
 
     date: "12 February 2026",
-    venue: "A103 (Main Building)",
+    venue: "VLSI LAB (Main Building)",
     registrationFee: "₹300",
     contact: {
         facultyCoordinator: [
@@ -249,7 +249,7 @@ const conferences = [
       " Additional author per head : ₹150",
     ],
     date: "12 February 2026",
-    venue: "A112,A113 (Main Building)",
+    venue: "A212 (Main Building)",
     registrationFee: "₹300",
     contact: {
         facultyCoordinator: [ 
@@ -370,7 +370,7 @@ const conferences = [
       " Additional author per head : ₹150",
     ],
     date: "12 February 2026",
-    venue: "A203 (Main Building)",
+    venue: "A204 (Main Building)",
     registrationFee: "₹300",
     contact: {
         facultyCoordinator: [

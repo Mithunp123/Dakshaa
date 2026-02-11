@@ -60,7 +60,7 @@ export const exposAndShowsDetails = [
     description: "Explores how artificial intelligence leverages data to convert raw information into meaningful insights, intelligent decisions, and smart systems.",
     date: "13 February 2026",
 
-    venue: "",
+    venue: "A113 (Main Block)",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
@@ -1640,12 +1640,12 @@ export const exposAndShowsDetails = [
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
+          name: "",
           
           phone: "+91 ",
         },
         {
-          name: "Student Coordinator 2",
+          name: "",
          
           phone: "+91 ",
         },
@@ -1819,7 +1819,7 @@ export const exposAndShowsDetails = [
     contact: {
       facultyCoordinator: [
         {
-          name: "Dr. Faculty Name",
+          name: "",
          
           phone: "+91 ",
           
@@ -1827,14 +1827,14 @@ export const exposAndShowsDetails = [
       ],
       studentCoordinator: [
         {
-          name: "Student Coordinator 1",
-          department: "Fashion Technology",
+          name: " ",
+          department: "Food Technology",
           phone: "+91 ",
         },
         {
-          name: "Student Coordinator 2",
-          department: "Fashion Technology",
-          phone: "+91 XXXXX",
+          name: " ",
+          department: "Food Technology",
+          phone: "+91 ",
         },
       ],
     },
