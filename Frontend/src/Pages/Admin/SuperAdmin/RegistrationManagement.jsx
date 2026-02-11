@@ -804,7 +804,6 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
                 mobile: leaderProfile.mobile_number || 'N/A',
                 college: leaderProfile.college_name || 'N/A',
                 department: leaderProfile.department || 'N/A',
-                rollNumber: leaderProfile.roll_number || 'N/A',
                 teamName: team.team_name || `Team ${teamIndex + 1}`,
                 role: 'Leader',
                 signature: ''
@@ -825,7 +824,6 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
                   mobile: memberProfile.mobile_number || 'N/A',
                   college: memberProfile.college_name || 'N/A',
                   department: memberProfile.department || 'N/A',
-                  rollNumber: memberProfile.roll_number || 'N/A',
                   teamName: team.team_name || `Team ${teamIndex + 1}`,
                   role: 'Member',
                   signature: ''
@@ -856,7 +854,6 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           mobile: reg.profiles?.mobile_number || 'N/A',
           college: reg.profiles?.college_name || 'N/A',
           department: reg.profiles?.department || 'N/A',
-          rollNumber: reg.profiles?.roll_number || 'N/A',
           teamName: '',
           role: 'Individual',
           signature: ''
@@ -934,12 +931,11 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
       let columns, tableData;
       
       if (isTeamEvent) {
-        columns = ['S.No', 'Name', 'Email', 'Roll Number', 'Department', 'College', 'Team', 'Role', 'Mobile', 'Signature'];
+        columns = ['S.No', 'Name', 'Email', 'Department', 'College', 'Team', 'Role', 'Mobile', 'Signature'];
         tableData = registrations.map(row => [
           row.sno,
           row.name,
           row.email,
-          row.rollNumber,
           row.department,
           row.college,
           row.teamName,
@@ -948,12 +944,11 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           ''
         ]);
       } else {
-        columns = ['S.No', 'Name', 'Email', 'Roll Number', 'Department', 'College', 'Mobile', 'Signature'];
+        columns = ['S.No', 'Name', 'Email', 'Department', 'College', 'Mobile', 'Signature'];
         tableData = registrations.map(row => [
           row.sno,
           row.name,
           row.email,
-          row.rollNumber,
           row.department,
           row.college,
           row.mobile,
@@ -980,25 +975,23 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           valign: 'middle',
         },
         columnStyles: isTeamEvent ? {
-          0: { cellWidth: 16, halign: 'center' }, // S.No
-          1: { cellWidth: 36 }, // Name
-          2: { cellWidth: 48 }, // Email
-          3: { cellWidth: 30 }, // Roll Number
-          4: { cellWidth: 28 }, // Department
-          5: { cellWidth: 46 }, // College
-          6: { cellWidth: 28 }, // Team
-          7: { cellWidth: 18, halign: 'center' }, // Role
-          8: { cellWidth: 26 }, // Mobile
-          9: { cellWidth: 28 }, // Signature
+          0: { cellWidth: 12, halign: 'center' }, // S.No
+          1: { cellWidth: 35 }, // Name
+          2: { cellWidth: 45 }, // Email
+          3: { cellWidth: 28 }, // Department
+          4: { cellWidth: 48 }, // College
+          5: { cellWidth: 28 }, // Team
+          6: { cellWidth: 18, halign: 'center' }, // Role
+          7: { cellWidth: 25 }, // Mobile
+          8: { cellWidth: 30 }, // Signature
         } : {
-          0: { cellWidth: 16, halign: 'center' }, // S.No
-          1: { cellWidth: 40 }, // Name
-          2: { cellWidth: 52 }, // Email
-          3: { cellWidth: 34 }, // Roll Number
-          4: { cellWidth: 34 }, // Department
-          5: { cellWidth: 56 }, // College
-          6: { cellWidth: 30 }, // Mobile
-          7: { cellWidth: 30 }, // Signature
+          0: { cellWidth: 12, halign: 'center' }, // S.No
+          1: { cellWidth: 42 }, // Name
+          2: { cellWidth: 55 }, // Email
+          3: { cellWidth: 32 }, // Department
+          4: { cellWidth: 60 }, // College
+          5: { cellWidth: 28 }, // Mobile
+          6: { cellWidth: 32 }, // Signature
         },
         margin: { left: 14, right: 14 },
         tableWidth: 'auto',
@@ -1536,7 +1529,6 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
             phone: profile.mobile_number || 'N/A',
             college_name: profile.college_name || 'N/A',
             department: profile.department || 'N/A',
-            roll_no: profile.roll_number || 'N/A',
             is_print: profile.is_print || false
           }
         };
@@ -1560,7 +1552,6 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
 
     const dataToExport = eventRegistrations.map(reg => ({
         "Name": reg.profiles.full_name,
-        "Roll Number": reg.profiles.roll_no,
         "College": reg.profiles.college_name,
         "Department": reg.profiles.department,
         "Email": reg.profiles.email,
