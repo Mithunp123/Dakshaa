@@ -3314,16 +3314,22 @@ app.get("/api/schedule", async (req, res) => {
     const { userId } = req.query;
     console.log(`📅 Fetching schedule for userId: ${userId || 'Guest'}`);
 
-    // 1. Fetch all active events with schedule info
+    // 1. Fetch all active events from event_venues table
     const { data: events, error: eventsError } = await supabase
-      .from('events')
-      .select('id, event_id, name, venue, category, event_date, start_time, coordinator_name, coordinator_contact')
+      .from('event_venues')
+      .select('id, event_key, event_name, venue_name, building, room_number, event_type, event_date, start_time, end_time, coordinator_name, coordinator_contact, coordinates')
       .eq('is_active', true)
       .order('start_time', { ascending: true });
 
     if (eventsError) {
-      console.error('Error fetching events:', eventsError);
+      console.error('❌ Error fetching events:', eventsError);
       throw eventsError;
+    }
+
+    console.log(`📅 Found ${events?.length || 0} events in event_venues table`);
+    if (events && events.length > 0) {
+        console.log(`📅 Sample event_keys:`, events.slice(0, 3).map(e => e.event_key));
+        console.log(`📅 Sample event data:`, JSON.stringify(events[0], null, 2));
     }
 
     // 2. If userId is provided, fetch user registrations to mark "My Events"
@@ -3350,6 +3356,8 @@ app.get("/api/schedule", async (req, res) => {
           let timeOnly = timeStr;
           if (timeStr.includes('T')) {
              timeOnly = timeStr.split('T')[1];
+             if (timeOnly.includes('+')) timeOnly = timeOnly.split('+')[0]; // removal of timezone part if present
+             if (timeOnly.includes('.')) timeOnly = timeOnly.split('.')[0]; // removal of ms if present
           }
           
           const [hours, minutes] = timeOnly.split(':');
@@ -3358,6 +3366,7 @@ app.get("/api/schedule", async (req, res) => {
           const h12 = h % 12 || 12; 
           return `${h12}:${minutes} ${ampm}`;
         } catch (e) {
+            console.log(e);
           return timeStr;
         }
     };
@@ -3391,21 +3400,30 @@ app.get("/api/schedule", async (req, res) => {
         const day = getDayFromDate(event.event_date);
         
         if (day) {
-            // Check matches against UUID (id) OR Text ID (event_id)
+            // Check matches against UUID (id) OR Text ID (event_key)
             const isMyEvent = userId ? (
-              myRegisteredEventIds.has(event.event_id) || 
+              myRegisteredEventIds.has(event.event_key) || 
               myRegisteredEventIds.has(event.id)
             ) : false;
 
+            // Build venue display string from event_venues columns
+            let displayVenue = event.venue_name || 'TBA';
+            if (event.building) displayVenue += `, ${event.building}`;
+            if (event.room_number) displayVenue += ` (${event.room_number})`;
+
             schedule[day].push({
                 time: formatTime(event.start_time),
-                name: event.name,
-                venue: event.venue || 'TBA',
-                category: formatCategory(event.category),
+                name: event.event_name || event.venue_name, // Use event_name if available, fallback to venue_name
+                venue: displayVenue,
+                category: formatCategory(event.event_type),
                 coordinator: event.coordinator_name || 'Coordinator',
                 phone: event.coordinator_contact || '',
                 isMyEvent: isMyEvent
             });
+            
+            console.log(`✅ Added event to Day ${day}: ${event.event_name || event.venue_name} at ${displayVenue}`);
+        } else {
+            console.log(`⚠️  Skipped event (date not in range): ${event.event_key} on ${event.event_date}`);
         }
     });
 

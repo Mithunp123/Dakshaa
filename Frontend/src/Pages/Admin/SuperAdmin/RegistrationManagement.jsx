@@ -71,6 +71,8 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
   const [paymentStatusFilter, setPaymentStatusFilter] = useState(coordinatorEvents && coordinatorEvents.length > 0 ? 'paid' : 'all'); // Default to paid for coordinators
   const [downloadingReport, setDownloadingReport] = useState(false);
   const [downloadingOverallReport, setDownloadingOverallReport] = useState(false);
+  const [downloadingCSVReport, setDownloadingCSVReport] = useState(false);
+  const [downloadingOverallCSVReport, setDownloadingOverallCSVReport] = useState(false);
   
   // Filter state for event details view (just paid/pending)
   const [detailsPaymentFilter, setDetailsPaymentFilter] = useState('all');
@@ -1012,6 +1014,223 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
     }
   };
 
+  // Generate CSV Report for selected event
+  const generateRegistrationReportCSV = async () => {
+    if (!selectedEvent) return;
+
+    setDownloadingCSVReport(true);
+    try {
+      // Fetch detailed registrations for the selected event
+      let registrations = [];
+      
+      // Check if it's a team event
+      const isTeamEvent = selectedEvent?.is_team_event || 
+        (() => {
+          const teamEventKeywords = ['paper presentation', 'team', 'group', 'mct', 'hackathon', 'conference'];
+          const eventName = selectedEvent?.name?.toLowerCase() || '';
+          return teamEventKeywords.some(keyword => eventName.includes(keyword));
+        })();
+
+      if (isTeamEvent) {
+        // For team events, first get PAID registrations to filter teams
+        const { data: paidRegistrations, error: regError } = await supabase
+          .from('event_registrations_config')
+          .select('user_id')
+          .eq('event_id', selectedEvent.id)
+          .in('payment_status', ['PAID', 'completed']);
+
+        if (regError) throw regError;
+
+        const paidUserIds = paidRegistrations?.map(reg => reg.user_id) || [];
+        
+        // Fetch only teams where the leader has PAID status
+        const { data: teamData, error: teamError } = await supabase
+          .from('teams')
+          .select('*')
+          .eq('event_id', selectedEvent.id)
+          .in('leader_id', paidUserIds);
+
+        if (teamError) throw teamError;
+
+        // Get all team IDs and leader IDs
+        const teamIds = teamData?.map(team => team.id) || [];
+        const leaderIds = teamData?.map(team => team.leader_id).filter(Boolean) || [];
+        
+        // Fetch team members for all teams
+        const { data: teamMembers } = await supabase
+          .from('team_members')
+          .select('user_id, team_id')
+          .in('team_id', teamIds);
+        
+        // Get all unique user IDs (leaders + members)
+        const memberIds = teamMembers?.map(member => member.user_id) || [];
+        const allUserIds = [...new Set([...leaderIds, ...memberIds])];
+
+        // Fetch user profiles for all participants
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, email, mobile_number, college_name, department, roll_number')
+          .in('id', allUserIds);
+
+        const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+        const teamMemberMap = new Map();
+        
+        // Create team member mapping
+        teamMembers?.forEach(member => {
+          if (!teamMemberMap.has(member.team_id)) {
+            teamMemberMap.set(member.team_id, []);
+          }
+          teamMemberMap.get(member.team_id).push(member.user_id);
+        });
+
+        // Convert team data to individual participant format
+        registrations = [];
+        teamData?.forEach((team, teamIndex) => {
+          // Add team leader
+          if (team.leader_id) {
+            const leaderProfile = profileMap.get(team.leader_id);
+            if (leaderProfile) {
+              registrations.push({
+                sno: registrations.length + 1,
+                name: leaderProfile.full_name || 'N/A',
+                email: leaderProfile.email || 'N/A',
+                mobile: leaderProfile.mobile_number || 'N/A',
+                college: leaderProfile.college_name || 'N/A',
+                department: leaderProfile.department || 'N/A',
+                teamName: team.team_name || `Team ${teamIndex + 1}`,
+                role: 'Leader'
+              });
+            }
+          }
+          
+          // Add team members (excluding leader to avoid duplication)
+          const teamMemberIds = teamMemberMap.get(team.id) || [];
+          teamMemberIds.forEach(memberId => {
+            if (memberId !== team.leader_id) {
+              const memberProfile = profileMap.get(memberId);
+              if (memberProfile) {
+                registrations.push({
+                  sno: registrations.length + 1,
+                  name: memberProfile.full_name || 'N/A',
+                  email: memberProfile.email || 'N/A',
+                  mobile: memberProfile.mobile_number || 'N/A',
+                  college: memberProfile.college_name || 'N/A',
+                  department: memberProfile.department || 'N/A',
+                  teamName: team.team_name || `Team ${teamIndex + 1}`,
+                  role: 'Member'
+                });
+              }
+            }
+          });
+        });
+      } else {
+        // For individual events
+        const { data: individualRegs, error: regError } = await supabase
+          .from('event_registrations_config')
+          .select(`
+            *,
+            profiles(
+              full_name, email, mobile_number, college_name, department, roll_number
+            )
+          `)
+          .eq('event_id', selectedEvent.id)
+          .eq('payment_status', 'PAID');
+
+        if (regError) throw regError;
+
+        registrations = individualRegs?.map((reg, index) => ({
+          sno: index + 1,
+          name: reg.profiles?.full_name || reg.participant_name || 'N/A',
+          email: reg.profiles?.email || reg.participant_email || 'N/A',
+          mobile: reg.profiles?.mobile_number || 'N/A',
+          college: reg.profiles?.college_name || 'N/A',
+          department: reg.profiles?.department || 'N/A',
+          teamName: '',
+          role: 'Individual'
+        })) || [];
+      }
+
+      // Generate CSV content
+      let csvContent = '';
+      
+      if (isTeamEvent) {
+        csvContent = 'S.No,Name,Email,Department,College,Team,Role,Mobile\n';
+        registrations.forEach(row => {
+          csvContent += `${row.sno},"${row.name}","${row.email}","${row.department}","${row.college}","${row.teamName}",${row.role},${row.mobile}\n`;
+        });
+      } else {
+        csvContent = 'S.No,Name,Email,Department,College,Mobile\n';
+        registrations.forEach(row => {
+          csvContent += `${row.sno},"${row.name}","${row.email}","${row.department}","${row.college}",${row.mobile}\n`;
+        });
+      }
+
+      // Download CSV
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `${selectedEvent.name.replace(/[^a-zA-Z0-9]/g, '_')}_Registration_Report.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+    } catch (error) {
+      console.error('Error generating CSV report:', error);
+      alert('Failed to generate CSV report: ' + error.message);
+    } finally {
+      setDownloadingCSVReport(false);
+    }
+  };
+
+  // Generate Overall CSV Report for All Assigned Events
+  const generateOverallReportCSV = async () => {
+    if (eventStats.length === 0) {
+      alert('No events available to generate report');
+      return;
+    }
+
+    setDownloadingOverallCSVReport(true);
+    try {
+      // Prepare CSV header
+      let csvContent = 'S.No,Event Name,Category,Count (Paid),Capacity\n';
+      
+      // Add event data
+      eventStats.forEach((event, index) => {
+        csvContent += `${index + 1},"${event.name || 'N/A'}","${event.category || 'N/A'}",${event.paidRegistrations || 0},${event.capacity || 0}\n`;
+      });
+      
+      // Add summary statistics at the end
+      const totalPaidRegistrations = eventStats.reduce((sum, event) => sum + (event.paidRegistrations || 0), 0);
+      csvContent += '\n';
+      csvContent += 'Summary Statistics\n';
+      csvContent += `Total Events,${eventStats.length}\n`;
+      csvContent += `Total Paid Registrations,${totalPaidRegistrations}\n`;
+      csvContent += `Individual Registrations,${registrationCounts.individual}\n`;
+      csvContent += `Total Teams,${registrationCounts.team}\n`;
+      csvContent += `Team Leaders,${registrationCounts.teamLeader}\n`;
+      csvContent += `Team Members,${registrationCounts.teamMember}\n`;
+
+      // Download CSV
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Dakshaa_Overall_Registration_Report_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+    } catch (error) {
+      console.error('Error generating overall CSV report:', error);
+      alert('Failed to generate overall CSV report: ' + error.message);
+    } finally {
+      setDownloadingOverallCSVReport(false);
+    }
+  };
+
   // Generate Overall Report for All Assigned Events
   const generateOverallReport = async () => {
     if (eventStats.length === 0) {
@@ -1661,7 +1880,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Overall Report Button */}
+            {/* Overall Report Buttons */}
             <button
               onClick={generateOverallReport}
               disabled={downloadingOverallReport || eventStats.length === 0}
@@ -1673,7 +1892,22 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
                 <Download size={20} />
               )}
               <span className="font-medium">
-                {downloadingOverallReport ? 'Generating...' : 'Overall Report'}
+                {downloadingOverallReport ? 'Generating...' : 'Overall Report (PDF)'}
+              </span>
+            </button>
+            
+            <button
+              onClick={generateOverallReportCSV}
+              disabled={downloadingOverallCSVReport || eventStats.length === 0}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg shadow-green-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {downloadingOverallCSVReport ? (
+                <Loader2 className="animate-spin" size={20} />
+              ) : (
+                <Download size={20} />
+              )}
+              <span className="font-medium">
+                {downloadingOverallCSVReport ? 'Generating...' : 'Overall Report (CSV)'}
               </span>
             </button>
             
@@ -2174,20 +2408,37 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
               </p>
               <p className="text-gray-400">Total Registrations</p>
             </div>
-            <button
-              onClick={generateRegistrationReport}
-              disabled={downloadingReport || (selectedEvent.paidRegistrations || 0) === 0}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-secondary/20 to-primary/20 border border-secondary/30 rounded-xl hover:from-secondary/30 hover:to-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {downloadingReport ? (
-                <Loader2 className="animate-spin" size={16} />
-              ) : (
-                <Download size={16} />
-              )}
-              <span className="text-sm font-medium">
-                {downloadingReport ? 'Generating...' : 'Download Report'}
-              </span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={generateRegistrationReport}
+                disabled={downloadingReport || (selectedEvent.paidRegistrations || 0) === 0}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-secondary/20 to-primary/20 border border-secondary/30 rounded-xl hover:from-secondary/30 hover:to-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {downloadingReport ? (
+                  <Loader2 className="animate-spin" size={16} />
+                ) : (
+                  <Download size={16} />
+                )}
+                <span className="text-sm font-medium">
+                  {downloadingReport ? 'Generating...' : 'PDF'}
+                </span>
+              </button>
+              
+              <button
+                onClick={generateRegistrationReportCSV}
+                disabled={downloadingCSVReport || (selectedEvent.paidRegistrations || 0) === 0}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-600/30 rounded-xl hover:from-green-600/30 hover:to-emerald-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {downloadingCSVReport ? (
+                  <Loader2 className="animate-spin" size={16} />
+                ) : (
+                  <Download size={16} />
+                )}
+                <span className="text-sm font-medium">
+                  {downloadingCSVReport ? 'Generating...' : 'CSV'}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
 
