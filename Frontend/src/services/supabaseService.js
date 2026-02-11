@@ -170,18 +170,56 @@ export const supabaseService = {
       .eq("user_id", userId);
       
     if (error) throw error;
-    if (!registrations || registrations.length === 0) return [];
+
+    // Fetch user's team memberships to check if any teams are active (paid)
+    let activeTeams = [];
+    let activeTeamEventIds = new Set();
+    try {
+      const { data: teamMemberships } = await supabase
+        .from("team_members")
+        .select("team_id")
+        .eq("user_id", userId);
+      
+      if (teamMemberships && teamMemberships.length > 0) {
+        const teamIds = teamMemberships.map(tm => tm.team_id);
+        
+        // Fetch teams that are active (is_active = true means paid)
+        const { data: teamsData } = await supabase
+          .from("teams")
+          .select("id, event_id, team_name, total_paid_amount")
+          .in("id", teamIds)
+          .eq("is_active", true);
+        
+        if (teamsData) {
+          activeTeams = teamsData;
+          teamsData.forEach(team => {
+            if (team.event_id) {
+              activeTeamEventIds.add(team.event_id);
+            }
+          });
+          console.log(`📋 Found ${teamsData.length} active team memberships for user`);
+        }
+      }
+    } catch (teamErr) {
+      console.warn("Error fetching team memberships for payment status:", teamErr);
+    }
+
+    // Get existing registration event IDs
+    const existingEventIds = new Set((registrations || []).map(r => r.event_id));
     
-    // Get unique event IDs (could be UUID or text)
-    const eventIds = [...new Set(registrations.map(r => r.event_id).filter(Boolean))];
+    // Get unique event IDs from registrations AND active teams
+    const allEventIds = [...new Set([
+      ...(registrations || []).map(r => r.event_id).filter(Boolean),
+      ...activeTeams.map(t => t.event_id).filter(Boolean)
+    ])];
     
-    if (eventIds.length === 0) return registrations;
+    if (allEventIds.length === 0) return [];
     
     // Fetch events matching either id (UUID) or event_id (text)
     const { data: events } = await supabase
       .from("events")
       .select("id, event_id, name, title, category, price, event_date, start_time, venue, description")
-      .or(`id.in.(${eventIds.map(id => `"${id}"`).join(',')}),event_id.in.(${eventIds.map(id => `"${id}"`).join(',')})`);
+      .or(`id.in.(${allEventIds.map(id => `"${id}"`).join(',')}),event_id.in.(${allEventIds.map(id => `"${id}"`).join(',')})`);
     
     // Create lookup maps
     const eventsById = {};
@@ -191,11 +229,36 @@ export const supabaseService = {
       if (e.event_id) eventsByTextId[e.event_id] = e;
     });
     
-    // Attach event data to registrations
-    const result = registrations.map(reg => ({
-      ...reg,
-      events: eventsById[reg.event_id] || eventsByTextId[reg.event_id] || null
-    }));
+    // Attach event data to existing registrations and check team payment status
+    const result = (registrations || []).map(reg => {
+      // If user belongs to an active team for this event, mark as PAID
+      const isTeamPaid = activeTeamEventIds.has(reg.event_id);
+      
+      return {
+        ...reg,
+        events: eventsById[reg.event_id] || eventsByTextId[reg.event_id] || null,
+        // Override payment_status to PAID if team is active
+        payment_status: isTeamPaid ? 'PAID' : reg.payment_status
+      };
+    });
+
+    // Add virtual registrations for active teams where user has no registration record
+    for (const team of activeTeams) {
+      if (!existingEventIds.has(team.event_id)) {
+        const eventData = eventsById[team.event_id] || eventsByTextId[team.event_id];
+        result.push({
+          id: `team-${team.id}`,
+          user_id: userId,
+          event_id: team.event_id,
+          event_name: team.team_name,
+          payment_status: 'PAID',
+          payment_amount: team.total_paid_amount || 0,
+          events: eventData,
+          is_team_registration: true
+        });
+        console.log(`📋 Added virtual registration for active team: ${team.team_name}`);
+      }
+    }
     
     // Cache the result
     try {

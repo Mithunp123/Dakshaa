@@ -8,13 +8,14 @@ import {
   Filter, 
   Search,
   ChevronRight,
-  Star
+  Star,
+  Navigation
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
 
 const EventSchedule = () => {
   const [activeDay, setActiveDay] = useState(1);
-  const [filter, setFilter] = useState('My Events'); // 'My Events' or 'All Events'
+  const [filter, setFilter] = useState('All Events'); // 'My Events' or 'All Events' - Default to All Events
   const [schedule, setSchedule] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -35,8 +36,16 @@ const EventSchedule = () => {
       const response = await fetch(`${API_URL}/api/schedule${userId ? `?userId=${userId}` : ''}`);
       const data = await response.json();
 
+      console.log('📅 Schedule API Response:', data);
+
       if (data.success) {
         setSchedule(data.schedule);
+        console.log('📅 Schedule loaded:', {
+          day1: data.schedule[1]?.length || 0,
+          day2: data.schedule[2]?.length || 0,
+          day3: data.schedule[3]?.length || 0,
+          total: (data.schedule[1]?.length || 0) + (data.schedule[2]?.length || 0) + (data.schedule[3]?.length || 0)
+        });
       } else {
         console.error('Failed to load schedule:', data.error);
         // Fallback to empty if fetch fails
@@ -55,6 +64,8 @@ const EventSchedule = () => {
   const filteredSchedule = activeDaySchedule.filter(event => 
     filter === 'All Events' || (filter === 'My Events' && event.isMyEvent)
   );
+
+  console.log(`📅 Day ${activeDay} - Filter: ${filter} - Showing ${filteredSchedule.length} of ${activeDaySchedule.length} events`);
 
   return (
     <div className="space-y-8">
@@ -149,6 +160,18 @@ const EventSchedule = () => {
                         <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
                         <span>{event.category}</span>
                       </div>
+                      {event.coordinates && (
+                        <a 
+                          href={event.coordinates} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 text-blue-400 hover:text-blue-300 transition-colors"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Navigation size={14} className="text-blue-400" />
+                          <span>View Map</span>
+                        </a>
+                      )}
                     </div>
                   </div>
 

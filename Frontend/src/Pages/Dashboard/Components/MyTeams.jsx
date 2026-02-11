@@ -249,9 +249,10 @@ const MyTeams = () => {
           const registeredMemberIds = new Set(teamRegistrations.map(r => r.user_id));
           const registeredCount = registeredMemberIds.size;
           
-          // Team is "registered" (fully paid) if at least one member has paid
-          // For teams created via Create Team + Payment, leader will have paid
-          const isRegistered = registeredCount > 0;
+          // Team is "registered" (fully paid) if:
+          // 1. At least one member has paid registration, OR
+          // 2. Team's is_active flag is true (set when leader paid for team)
+          const isRegistered = registeredCount > 0 || team.is_active === true;
           
           // Get team total payment amount
           let teamTotalAmount = null;
@@ -264,8 +265,8 @@ const MyTeams = () => {
             ...team,
             is_registered: isRegistered,
             registration_status: isRegistered ? 'PAID' : null,
-            registered_count: registeredCount,
-            team_payment_amount: teamTotalAmount
+            registered_count: team.is_active ? team.max_members : registeredCount,
+            team_payment_amount: teamTotalAmount || (team.is_active ? Number(team.total_paid_amount) : null)
           };
         })
       );

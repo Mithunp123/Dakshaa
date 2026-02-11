@@ -3315,10 +3315,11 @@ app.get("/api/schedule", async (req, res) => {
     console.log(`📅 Fetching schedule for userId: ${userId || 'Guest'}`);
 
     // 1. Fetch all active events from event_venues table
+    // Handle is_active being null (treat null as active)
     const { data: events, error: eventsError } = await supabase
       .from('event_venues')
-      .select('id, event_key, event_name, venue_name, building, room_number, event_type, event_date, start_time, end_time, coordinator_name, coordinator_contact, coordinates')
-      .eq('is_active', true)
+      .select('id, event_key, event_name, venue_name, building, room_number, event_type, event_date, start_time, end_time, coordinator_name, coordinator_contact, coordinates, is_active')
+      .or('is_active.eq.true,is_active.is.null')
       .order('start_time', { ascending: true });
 
     if (eventsError) {
@@ -3329,7 +3330,7 @@ app.get("/api/schedule", async (req, res) => {
     console.log(`📅 Found ${events?.length || 0} events in event_venues table`);
     if (events && events.length > 0) {
         console.log(`📅 Sample event_keys:`, events.slice(0, 3).map(e => e.event_key));
-        console.log(`📅 Sample event data:`, JSON.stringify(events[0], null, 2));
+        console.log(`📅 Sample event dates:`, events.slice(0, 3).map(e => e.event_date));
     }
 
     // 2. If userId is provided, fetch user registrations to mark "My Events"
@@ -3346,6 +3347,32 @@ app.get("/api/schedule", async (req, res) => {
            });
        }
        console.log(`📅 Found ${myRegisteredEventIds.size} registrations for user`);
+
+      // 2b. Also check if user is a member of any active (paid) team
+      const { data: teamMemberships, error: teamMemberError } = await supabase
+        .from('team_members')
+        .select('team_id')
+        .eq('user_id', userId);
+
+      if (!teamMemberError && teamMemberships && teamMemberships.length > 0) {
+        const teamIds = teamMemberships.map(tm => tm.team_id);
+        
+        // Fetch teams that are active (is_active = true means paid)
+        const { data: activeTeams, error: activeTeamsError } = await supabase
+          .from('teams')
+          .select('id, event_id')
+          .in('id', teamIds)
+          .eq('is_active', true);
+
+        if (!activeTeamsError && activeTeams) {
+          activeTeams.forEach(team => {
+            if (team.event_id) {
+              myRegisteredEventIds.add(team.event_id);
+            }
+          });
+          console.log(`📅 Found ${activeTeams.length} active team memberships for user`);
+        }
+      }
     }
 
     // 3. Helper Functions
@@ -3383,10 +3410,19 @@ app.get("/api/schedule", async (req, res) => {
         // Normalize date string (take YYYY-MM-DD part), trim whitespace
         const datePart = typeof dateStr === 'string' ? dateStr.trim().split('T')[0] : '';
         
+        // console.log(`Checking Date: ${datePart}`); // Debug log
+
+        // Expected DaKshaa dates: February 12-14, 2026
         if (datePart === '2026-02-12') return 1;
         if (datePart === '2026-02-13') return 2;
         if (datePart === '2026-02-14') return 3;
         
+        // ALSO support December dates if user entered them incorrectly (2026-12-02 instead of 2026-02-12)
+        // This is a temporary fix - user should correct dates in DB
+        if (datePart === '2026-12-02') return 1;  // Treat Dec 2 as Day 1
+        if (datePart === '2026-12-03') return 2;  // Treat Dec 3 as Day 2
+        if (datePart === '2026-12-04') return 3;  // Treat Dec 4 as Day 3
+
         return null; 
     };
 
@@ -3395,6 +3431,8 @@ app.get("/api/schedule", async (req, res) => {
     schedule[1] = [];
     schedule[2] = [];
     schedule[3] = [];
+
+    // console.log('Processing events for schedule...'); // Debug log
 
     events.forEach(event => {
         const day = getDayFromDate(event.event_date);
@@ -3416,14 +3454,15 @@ app.get("/api/schedule", async (req, res) => {
                 name: event.event_name || event.venue_name, // Use event_name if available, fallback to venue_name
                 venue: displayVenue,
                 category: formatCategory(event.event_type),
-                coordinator: event.coordinator_name || 'Coordinator',
+                coordinator: event.coordinator_name || 'Coordinator-8883584852',
                 phone: event.coordinator_contact || '',
+                coordinates: event.coordinates || null, // Map link
                 isMyEvent: isMyEvent
             });
             
-            console.log(`✅ Added event to Day ${day}: ${event.event_name || event.venue_name} at ${displayVenue}`);
+            // console.log(`✅ Added event to Day ${day}: ${event.event_name || event.venue_name}`);
         } else {
-            console.log(`⚠️  Skipped event (date not in range): ${event.event_key} on ${event.event_date}`);
+             console.log(`⚠️  Skipped event (date mismatch): ${event.event_key} Date: ${event.event_date}`);
         }
     });
 
