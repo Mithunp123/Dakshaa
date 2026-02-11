@@ -11,7 +11,8 @@ import {
   Loader2,
   RefreshCw,
   Trophy,
-  UserCheck
+  UserCheck,
+  Calendar
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
 import * as XLSX from 'xlsx';
@@ -25,9 +26,13 @@ const TeamReport = () => {
   const { isLoading: authLoading } = usePageAuth('Super Admin Team Reports');
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [availableCategories, setAvailableCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [teams, setTeams] = useState([]);
   const [individualRegistrations, setIndividualRegistrations] = useState([]);
+  const [eventWiseStats, setEventWiseStats] = useState([]);
+  const [loadingEventStats, setLoadingEventStats] = useState(false);
   const [stats, setStats] = useState({
     totalTeams: 0,
     totalHeadcount: 0,
@@ -38,8 +43,13 @@ const TeamReport = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetchEvents();
+    fetchAvailableCategories();
   }, []);
+
+  useEffect(() => {
+    fetchEvents();
+    fetchEventWiseStats();
+  }, [selectedCategory]);
 
   useEffect(() => {
     if (selectedEvent) {
@@ -51,14 +61,49 @@ const TeamReport = () => {
     }
   }, [selectedEvent]);
 
-  const fetchEvents = async () => {
+  const fetchAvailableCategories = async () => {
     try {
       const { data, error } = await supabase
+        .from('events')
+        .select('category')
+        .order('category');
+      
+      if (error) throw error;
+      
+      // Get unique categories (case-insensitive)
+      const categoryMap = new Map();
+      data?.forEach(item => {
+        if (item.category) {
+          const lowerKey = item.category.toLowerCase();
+          if (!categoryMap.has(lowerKey)) {
+            categoryMap.set(lowerKey, item.category);
+          }
+        }
+      });
+      
+      const uniqueCategories = Array.from(categoryMap.values()).sort();
+      console.log('Available categories:', uniqueCategories);
+      setAvailableCategories(uniqueCategories);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  const fetchEvents = async () => {
+    try {
+      let query = supabase
         .from('events')
         .select('id, name, category')
         .order('name');
       
+      if (selectedCategory !== 'all') {
+        query = query.ilike('category', selectedCategory);
+      }
+      
+      const { data, error } = await query;
+      
       if (error) throw error;
+      console.log('Fetched events for category:', selectedCategory, 'Count:', data?.length || 0);
       setEvents(data || []);
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -134,24 +179,24 @@ const TeamReport = () => {
             };
           });
 
-          // Calculate headcount: Use paid_members if available, otherwise count actual members
-          // paid_members field represents total paid count (leader + members)
-          // If team hasn't added members yet, paid_members shows actual paid count
+          // Calculate headcount: ALWAYS use paid_members as the source of truth
+          // paid_members is based on payment amount and doesn't change when members are added
+          // This represents the actual paid headcount from the leader's payment
           let headCount = 0;
           
-          if (teamMembers.length > 0) {
-            // Team has members added - count unique users
+          if (team.paid_members && team.paid_members > 0) {
+            // Use paid_members count - this is the authoritative count based on payment
+            headCount = team.paid_members;
+          } else if (teamMembers.length > 0) {
+            // Fallback: count actual members if paid_members is not available
             const teamUserIds = new Set();
             if (team.leader_id) teamUserIds.add(team.leader_id);
             teamMembers.forEach(m => {
               if (m.user_id) teamUserIds.add(m.user_id);
             });
             headCount = teamUserIds.size;
-          } else if (team.paid_members && team.paid_members > 0) {
-            // No members added yet, but has paid_members count
-            headCount = team.paid_members;
           } else {
-            // Fallback: just count leader if exists
+            // Last resort: just count leader if exists
             headCount = team.leader_id ? 1 : 0;
           }
 
@@ -167,21 +212,47 @@ const TeamReport = () => {
         teamHeadcount = enrichedTeams.reduce((sum, team) => sum + team.headCount, 0);
       }
 
-      // 4. Process Individual Registrations
+      // 4. Collect all user IDs that are part of teams (to exclude from individual count)
+      const teamUserIdsSet = new Set();
+      if (teamsData && teamsData.length > 0) {
+        // Add all leaders
+        teamsData.forEach(team => {
+          if (team.leader_id) teamUserIdsSet.add(team.leader_id);
+        });
+        
+        // Add all members if we have members data
+        if (teamIds.length > 0) {
+          const { data: allMembers } = await supabase
+            .from('team_members')
+            .select('user_id')
+            .in('team_id', teamIds);
+          
+          allMembers?.forEach(member => {
+            if (member.user_id) teamUserIdsSet.add(member.user_id);
+          });
+        }
+      }
+
+      // 5. Process Individual Registrations (EXCLUDING team members)
       let individualParticipants = [];
       if (individualRegs && individualRegs.length > 0) {
-        const userIds = [...new Set(individualRegs.map(r => r.user_id))];
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('id, full_name, email, mobile_number, college_name, roll_number, department, year_of_study')
-          .in('id', userIds);
+        // Filter out registrations that belong to team members
+        const trulyIndividualRegs = individualRegs.filter(reg => !teamUserIdsSet.has(reg.user_id));
+        
+        if (trulyIndividualRegs.length > 0) {
+          const userIds = [...new Set(trulyIndividualRegs.map(r => r.user_id))];
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, full_name, email, mobile_number, college_name, roll_number, department, year_of_study')
+            .in('id', userIds);
 
-        const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+          const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
 
-        individualParticipants = individualRegs.map(reg => ({
-          ...reg,
-          profile: profileMap.get(reg.user_id)
-        }));
+          individualParticipants = trulyIndividualRegs.map(reg => ({
+            ...reg,
+            profile: profileMap.get(reg.user_id)
+          }));
+        }
       }
 
       setTeams(enrichedTeams);
@@ -206,6 +277,93 @@ const TeamReport = () => {
       alert('Failed to fetch team data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchEventWiseStats = async () => {
+    setLoadingEventStats(true);
+    try {
+      let query = supabase
+        .from('events')
+        .select('id, name, category')
+        .order('category', { ascending: true })
+        .order('name', { ascending: true });
+      
+      if (selectedCategory !== 'all') {
+        query = query.ilike('category', selectedCategory);
+      }
+
+      const { data: allEvents, error: eventsError } = await query;
+      if (eventsError) throw eventsError;
+
+      if (!allEvents || allEvents.length === 0) {
+        setEventWiseStats([]);
+        setLoadingEventStats(false);
+        return;
+      }
+
+      const eventStats = await Promise.all(
+        allEvents.map(async (event) => {
+          // Fetch teams for this event
+          const { data: teamsData } = await supabase
+            .from('teams')
+            .select('id, paid_members, leader_id')
+            .eq('event_id', event.id)
+            .eq('is_active', true);
+
+          // Fetch team members to get user IDs
+          const teamIds = teamsData?.map(t => t.id) || [];
+          const teamUserIds = new Set();
+          
+          // Add leaders to the set
+          teamsData?.forEach(team => {
+            if (team.leader_id) teamUserIds.add(team.leader_id);
+          });
+          
+          if (teamIds.length > 0) {
+            const { data: teamMembers } = await supabase
+              .from('team_members')
+              .select('user_id')
+              .in('team_id', teamIds);
+
+            teamMembers?.forEach(m => {
+              if (m.user_id) teamUserIds.add(m.user_id);
+            });
+          }
+
+          const teamHeadcount = teamsData?.reduce((sum, team) => {
+            return sum + (team.paid_members || 0);
+          }, 0) || 0;
+
+          // Fetch individual registrations
+          const { data: individualRegs } = await supabase
+            .from('event_registrations_config')
+            .select('user_id')
+            .eq('event_id', event.id)
+            .eq('payment_status', 'PAID');
+
+          // Filter out team members from individual count
+          const trulyIndividualCount = individualRegs?.filter(
+            reg => !teamUserIds.has(reg.user_id)
+          ).length || 0;
+
+          return {
+            eventId: event.id,
+            eventName: event.name,
+            category: event.category,
+            teamCount: teamsData?.length || 0,
+            teamHeadcount,
+            individualCount: trulyIndividualCount,
+            totalHeadcount: teamHeadcount + trulyIndividualCount
+          };
+        })
+      );
+
+      setEventWiseStats(eventStats);
+    } catch (error) {
+      console.error('Error fetching event-wise stats:', error);
+    } finally {
+      setLoadingEventStats(false);
     }
   };
 
@@ -477,28 +635,147 @@ const TeamReport = () => {
         </div>
       </div>
 
-      {/* Event Selection */}
-      <div className="bg-slate-900/50 p-6 rounded-xl border border-slate-800">
-        <label className="block text-sm font-medium text-slate-400 mb-2">Select Event to Analyze</label>
-        <div className="relative max-w-xl">
-          <select
-            className="w-full bg-slate-800 border-slate-700 text-white rounded-lg pl-4 pr-10 py-3 appearance-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-            onChange={(e) => {
-              const event = events.find(ev => ev.id === e.target.value);
-              setSelectedEvent(event);
-            }}
-            value={selectedEvent?.id || ''}
-          >
-            <option value="">-- Select Event --</option>
-            {events.map(event => (
-              <option key={event.id} value={event.id}>
-                {event.name} ({event.category})
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+      {/* Filter and Event Selection */}
+      <div className="bg-slate-900/50 p-6 rounded-xl border border-slate-800 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Category Filter */}
+          <div>
+            <label className="block text-sm font-medium text-slate-400 mb-2">Filter by Category</label>
+            <div className="relative">
+              <select
+                className="w-full bg-slate-800 border-slate-700 text-white rounded-lg pl-4 pr-10 py-3 appearance-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  setSelectedEvent(null);
+                }}
+                value={selectedCategory}
+              >
+                <option value="all">All Categories</option>
+                {availableCategories.map(category => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+              <Filter className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+            </div>
+          </div>
+
+          {/* Event Selection */}
+          <div>
+            <label className="block text-sm font-medium text-slate-400 mb-2">Select Event to Analyze</label>
+            <div className="relative">
+              <select
+                className="w-full bg-slate-800 border-slate-700 text-white rounded-lg pl-4 pr-10 py-3 appearance-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                onChange={(e) => {
+                  const event = events.find(ev => ev.id === e.target.value);
+                  setSelectedEvent(event);
+                }}
+                value={selectedEvent?.id || ''}
+              >
+                <option value="">-- Select Event --</option>
+                {events.map(event => (
+                  <option key={event.id} value={event.id}>
+                    {event.name} ({event.category})
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Event-Wise Statistics Card */}
+      {!selectedEvent && (
+        <div className="bg-slate-900/50 rounded-xl border border-slate-800 overflow-hidden">
+          <div className="px-6 py-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+              <Calendar className="text-cyan-400" size={20} />
+              Event-Wise Headcount {selectedCategory !== 'all' && `(${selectedCategory})`}
+            </h3>
+            {loadingEventStats && <Loader2 className="animate-spin text-emerald-500" size={20} />}
+          </div>
+          
+          {loadingEventStats ? (
+            <div className="flex flex-col items-center justify-center py-16 space-y-4">
+              <Loader2 className="animate-spin text-emerald-500" size={48} />
+              <p className="text-slate-400 text-sm">Loading event statistics...</p>
+              <div className="flex gap-2">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+            </div>
+          ) : eventWiseStats.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-slate-950 text-slate-400 text-xs uppercase font-semibold">
+                  <tr>
+                    <th className="px-6 py-4">Event Name</th>
+                    <th className="px-6 py-4">Category</th>
+                    <th className="px-6 py-4">Teams</th>
+                    <th className="px-6 py-4">Team Headcount</th>
+                    <th className="px-6 py-4">Individual</th>
+                    <th className="px-6 py-4">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800 text-sm">
+                  {eventWiseStats.map((eventStat, idx) => (
+                    <tr 
+                      key={eventStat.eventId} 
+                      className="hover:bg-slate-800/50 transition-colors cursor-pointer"
+                      onClick={() => {
+                        const event = events.find(e => e.id === eventStat.eventId);
+                        setSelectedEvent(event);
+                      }}
+                    >
+                      <td className="px-6 py-4 font-medium text-white">{eventStat.eventName}</td>
+                      <td className="px-6 py-4">
+                        <span className="px-2 py-1 bg-blue-500/10 text-blue-400 rounded text-xs font-medium">
+                          {eventStat.category}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-slate-300">{eventStat.teamCount}</td>
+                      <td className="px-6 py-4 text-emerald-400 font-semibold">{eventStat.teamHeadcount}</td>
+                      <td className="px-6 py-4 text-orange-400 font-semibold">{eventStat.individualCount}</td>
+                      <td className="px-6 py-4">
+                        <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm font-bold">
+                          {eventStat.totalHeadcount}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {/* Summary Row */}
+                  <tr className="bg-slate-800/50 font-bold">
+                    <td className="px-6 py-4 text-white" colSpan="2">TOTAL</td>
+                    <td className="px-6 py-4 text-white">
+                      {eventWiseStats.reduce((sum, e) => sum + e.teamCount, 0)}
+                    </td>
+                    <td className="px-6 py-4 text-emerald-400">
+                      {eventWiseStats.reduce((sum, e) => sum + e.teamHeadcount, 0)}
+                    </td>
+                    <td className="px-6 py-4 text-orange-400">
+                      {eventWiseStats.reduce((sum, e) => sum + e.individualCount, 0)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="px-3 py-1 bg-purple-500/30 text-purple-200 rounded-full text-sm">
+                        {eventWiseStats.reduce((sum, e) => sum + e.totalHeadcount, 0)}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16 text-slate-400">
+              <Calendar className="mb-4" size={48} strokeWidth={1} />
+              <p className="text-lg font-medium">No events found</p>
+              <p className="text-sm mt-1">Try selecting a different category</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {selectedEvent && (
         <>
