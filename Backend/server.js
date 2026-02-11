@@ -3318,7 +3318,7 @@ app.get("/api/schedule", async (req, res) => {
     // Handle is_active being null (treat null as active)
     const { data: events, error: eventsError } = await supabase
       .from('event_venues')
-      .select('id, event_key, event_name, venue_name, building, room_number, event_type, event_date, start_time, end_time, coordinator_name, coordinator_contact, coordinates, is_active')
+      .select('id, event_key, event_name, venue_name, building, floor, room_number, event_type, event_date, start_time, end_time, coordinator_name, coordinator_contact, coordinates, is_active')
       .or('is_active.eq.true,is_active.is.null')
       .order('start_time', { ascending: true });
 
@@ -3336,6 +3336,7 @@ app.get("/api/schedule", async (req, res) => {
     // 2. If userId is provided, fetch user registrations to mark "My Events"
     let myRegisteredEventIds = new Set();
     if (userId) {
+      // 2a. Fetch from registrations table
       const { data: registrations, error: regError } = await supabase
         .from('registrations')
         .select('event_id')
@@ -3346,9 +3347,26 @@ app.get("/api/schedule", async (req, res) => {
              if (r.event_id) myRegisteredEventIds.add(r.event_id);
            });
        }
-       console.log(`📅 Found ${myRegisteredEventIds.size} registrations for user`);
+       console.log(`📅 Found ${myRegisteredEventIds.size} registrations from registrations table`);
 
-      // 2b. Also check if user is a member of any active (paid) team
+      // 2b. Also fetch from event_registrations_config table (where paid registrations are stored)
+      const { data: configRegistrations, error: configRegError } = await supabase
+        .from('event_registrations_config')
+        .select('event_id, event_name')
+        .eq('user_id', userId)
+        .eq('payment_status', 'PAID');
+        
+       if (!configRegError && configRegistrations) {
+           configRegistrations.forEach(r => {
+             if (r.event_id) myRegisteredEventIds.add(r.event_id);
+             // Also add event_name to help with matching (team events use event_name)
+             if (r.event_name) myRegisteredEventIds.add(r.event_name);
+           });
+           console.log(`📅 PAID reg event_ids:`, configRegistrations.map(r => r.event_id));
+       }
+       console.log(`📅 Found ${configRegistrations?.length || 0} PAID registrations from event_registrations_config`);
+
+      // 2c. Also check if user is a member of any active (paid) team
       const { data: teamMemberships, error: teamMemberError } = await supabase
         .from('team_members')
         .select('team_id')
@@ -3371,6 +3389,36 @@ app.get("/api/schedule", async (req, res) => {
             }
           });
           console.log(`📅 Found ${activeTeams.length} active team memberships for user`);
+        }
+      }
+
+      // 2d. Build a mapping from events table (event_id text -> id UUID and vice versa)
+      // This helps match event_venues.event_key with registrations.event_id
+      if (myRegisteredEventIds.size > 0) {
+        const { data: eventsMapping, error: eventsMappingError } = await supabase
+          .from('events')
+          .select('id, event_id, name, title');
+        
+        if (!eventsMappingError && eventsMapping) {
+          // Create mappings between UUID and text IDs
+          const eventIdToTextId = {};
+          const textIdToEventId = {};
+          
+          eventsMapping.forEach(e => {
+            if (e.id) eventIdToTextId[e.id] = e.event_id || e.name || e.title;
+            if (e.event_id) textIdToEventId[e.event_id] = e.id;
+          });
+          
+          // Add equivalent IDs for registered events
+          const additionalIds = new Set();
+          myRegisteredEventIds.forEach(id => {
+            if (eventIdToTextId[id]) additionalIds.add(eventIdToTextId[id]);
+            if (textIdToEventId[id]) additionalIds.add(textIdToEventId[id]);
+          });
+          
+          additionalIds.forEach(id => myRegisteredEventIds.add(id));
+          console.log(`📅 Total registered event IDs after mapping: ${myRegisteredEventIds.size}`);
+          console.log(`📅 All registered IDs:`, Array.from(myRegisteredEventIds));
         }
       }
     }
@@ -3438,15 +3486,17 @@ app.get("/api/schedule", async (req, res) => {
         const day = getDayFromDate(event.event_date);
         
         if (day) {
-            // Check matches against UUID (id) OR Text ID (event_key)
+            // Check matches against UUID (id), Text ID (event_key), or event_name
             const isMyEvent = userId ? (
               myRegisteredEventIds.has(event.event_key) || 
-              myRegisteredEventIds.has(event.id)
+              myRegisteredEventIds.has(event.id) ||
+              myRegisteredEventIds.has(event.event_name)
             ) : false;
 
             // Build venue display string from event_venues columns
             let displayVenue = event.venue_name || 'TBA';
             if (event.building) displayVenue += `, ${event.building}`;
+            if (event.floor) displayVenue += ` ${event.floor}`;
             if (event.room_number) displayVenue += ` (${event.room_number})`;
 
             schedule[day].push({

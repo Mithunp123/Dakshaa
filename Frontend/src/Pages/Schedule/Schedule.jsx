@@ -27,8 +27,7 @@ const Schedule = () => {
           time: "09:00 AM – 12:30 PM",
           title: "Morning Sessions",
           items: [
-            { name: "Hackathon inauguration & problem statement release (36 hrs)", icon: <Trophy className="w-4 h-4" />, type: "Hackathon" },
-
+            { name: "Hackathon inauguration (Neura-Hack 2.0) & problem statement release (36 hrs)", icon: <Trophy className="w-4 h-4" />, type: "Hackathon" },
             { name: "Registration help desk & QR attendance", icon: <Users className="w-4 h-4" />, type: "General" },
             { name: "Workshops ", icon: <Lightbulb className="w-4 h-4" />, type: "Workshop" },
           ]
@@ -47,13 +46,6 @@ const Schedule = () => {
             { name: "Workshops ", icon: <Lightbulb className="w-4 h-4" />, type: "Workshop" },
           ]
         },
-        {
-          time: "04:30 PM Onwards",
-          title: "Evening Kick-off",
-          items: [
-            { name: "Light cultural opening events", icon: <Music className="w-4 h-4" />, type: "Cultural" }
-          ]
-        }
       ]
     },
     2: {

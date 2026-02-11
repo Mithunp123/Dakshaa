@@ -184,8 +184,7 @@ const PrintQRPage = () => {
             )
             `)
             .eq("user_id", userId)
-            // Relaxed payment check or just fetch all
-            // .in("payment_status", ["paid", "PAID", "completed"]); 
+            .in("payment_status", ["paid", "PAID", "completed", "Completed"]); 
             
           if (registrations) {
              const events = registrations
@@ -250,7 +249,7 @@ const PrintQRPage = () => {
   }
   .badge {
     width: 10cm; height: 3.5cm;
-    padding: 8mm 2mm;
+    padding: 2mm 3mm 2mm 3mm;
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
@@ -274,28 +273,30 @@ const PrintQRPage = () => {
     justify-content: flex-start;
     width: 60%;
     height: 100%;
-    padding-left: 12mm;
+    padding-left: 15mm;
     padding-top: 1mm;
-  }
-  .qr-box {
-    width: 28mm; height: 28mm;
-    padding-top: 3mm;
-    padding-bottom: 3mm;
-  }
-  .qr-box svg {
-    width: 100% !important;
-    height: 100% !important;
   }
   .user-name {
     font-size: 11pt;
     font-weight: bold;
     color: black;
-    line-height: 1.1;
+    line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 1mm;
     width: 100%;
+    margin-bottom: 1mm;
+    min-height: 4mm;
+    display: block;
+  }
+  .qr-box {
+    width: 28mm; height: 28mm;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .qr-box svg {
+    width: 100% !important;
+    height: 100% !important;
   }
   .user-id {
     font-size: 11pt;
@@ -308,6 +309,7 @@ const PrintQRPage = () => {
     flex-direction: column;
     gap: 0.5mm;
     width: 100%;
+    max-width: 50mm;
     overflow: hidden;
   }
   .event-item {
@@ -318,6 +320,8 @@ const PrintQRPage = () => {
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
+    max-width: 50mm;
+    display: block;
   }
 </style>
 </head>
@@ -429,7 +433,7 @@ const PrintQRPage = () => {
             </div>
             <div className="right-col">
                 <div className="user-name">{userData.full_name}</div>
-                <div className="user-id">ID: {userData.id.slice(0, 8)}</div>
+                <div className="user-id">DAK26-{userData.id.split("-")[0]}</div>
                 <div className="events-section">
                     {paidEvents.length > 0 ? (
                         paidEvents.map((event, index) => (
@@ -457,6 +461,12 @@ const PrintQRPage = () => {
           pointer-events: none;
           z-index: -1;
           overflow: hidden;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 4mm;
+          box-sizing: border-box;
+          padding: 2mm 3mm;
         }
       `}</style>
     </div>
