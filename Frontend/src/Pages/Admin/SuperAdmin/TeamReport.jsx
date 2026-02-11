@@ -367,6 +367,278 @@ const TeamReport = () => {
     }
   };
 
+  const downloadAllEventsExcel = async () => {
+    if (eventWiseStats.length === 0) return;
+
+    setLoading(true);
+    try {
+      const allData = [];
+
+      // Fetch detailed data for each event
+      for (const eventStat of eventWiseStats) {
+        const { data: teamsData } = await supabase
+          .from('teams')
+          .select('id, team_name, leader_id, paid_members, created_at')
+          .eq('event_id', eventStat.eventId)
+          .eq('is_active', true);
+
+        const teamIds = teamsData?.map(t => t.id) || [];
+        let teamMembers = [];
+        
+        if (teamIds.length > 0) {
+          const { data: membersData } = await supabase
+            .from('team_members')
+            .select('team_id, user_id')
+            .in('team_id', teamIds);
+          teamMembers = membersData || [];
+        }
+
+        // Get all user IDs
+        const userIds = new Set();
+        teamsData?.forEach(team => {
+          if (team.leader_id) userIds.add(team.leader_id);
+        });
+        teamMembers.forEach(m => {
+          if (m.user_id) userIds.add(m.user_id);
+        });
+
+        const { data: individualRegs } = await supabase
+          .from('event_registrations_config')
+          .select('user_id, registered_at')
+          .eq('event_id', eventStat.eventId)
+          .eq('payment_status', 'PAID');
+
+        individualRegs?.forEach(reg => {
+          if (reg.user_id) userIds.add(reg.user_id);
+        });
+
+        // Fetch all profiles
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, email, mobile_number, college_name, roll_number, department, year_of_study')
+          .in('id', Array.from(userIds));
+
+        const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+        // Add team data
+        teamsData?.forEach(team => {
+          const leaderProfile = profileMap.get(team.leader_id);
+          if (leaderProfile) {
+            allData.push({
+              'Event Name': eventStat.eventName,
+              'Category': eventStat.category,
+              'Team Name': team.team_name,
+              'Team ID': team.id,
+              'Role': 'LEADER',
+              'Name': leaderProfile.full_name,
+              'Email': leaderProfile.email,
+              'Mobile': leaderProfile.mobile_number,
+              'College': leaderProfile.college_name,
+              'Department': leaderProfile.department,
+              'Roll Number': leaderProfile.roll_number,
+              'Year': leaderProfile.year_of_study
+            });
+          }
+
+          const members = teamMembers.filter(m => m.team_id === team.id);
+          members.forEach(member => {
+            if (member.user_id === team.leader_id) return;
+            const profile = profileMap.get(member.user_id);
+            if (profile) {
+              allData.push({
+                'Event Name': eventStat.eventName,
+                'Category': eventStat.category,
+                'Team Name': team.team_name,
+                'Team ID': team.id,
+                'Role': 'MEMBER',
+                'Name': profile.full_name,
+                'Email': profile.email,
+                'Mobile': profile.mobile_number,
+                'College': profile.college_name,
+                'Department': profile.department,
+                'Roll Number': profile.roll_number,
+                'Year': profile.year_of_study
+              });
+            }
+          });
+        });
+
+        // Add individual registrations
+        const teamUserIds = new Set();
+        teamsData?.forEach(team => {
+          if (team.leader_id) teamUserIds.add(team.leader_id);
+        });
+        teamMembers.forEach(m => {
+          if (m.user_id) teamUserIds.add(m.user_id);
+        });
+
+        individualRegs?.forEach(reg => {
+          if (!teamUserIds.has(reg.user_id)) {
+            const profile = profileMap.get(reg.user_id);
+            if (profile) {
+              allData.push({
+                'Event Name': eventStat.eventName,
+                'Category': eventStat.category,
+                'Team Name': 'INDIVIDUAL',
+                'Team ID': '-',
+                'Role': 'INDIVIDUAL',
+                'Name': profile.full_name,
+                'Email': profile.email,
+                'Mobile': profile.mobile_number,
+                'College': profile.college_name,
+                'Department': profile.department,
+                'Roll Number': profile.roll_number,
+                'Year': profile.year_of_study
+              });
+            }
+          }
+        });
+      }
+
+      const ws = XLSX.utils.json_to_sheet(allData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "All Events Report");
+      const fileName = selectedCategory !== 'all' 
+        ? `${selectedCategory}_All_Events_Report.xlsx`
+        : 'All_Categories_Report.xlsx';
+      XLSX.writeFile(wb, fileName);
+    } catch (error) {
+      console.error('Error generating Excel report:', error);
+      alert('Failed to generate Excel report');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const downloadAllEventsPDF = async () => {
+    if (eventWiseStats.length === 0) return;
+
+    setLoading(true);
+    try {
+      const doc = new jsPDF('landscape', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      
+      const loadImageAsBase64 = (url) => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'Anonymous';
+          img.onload = () => {
+            const scale = 4;
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+            ctx.scale(scale, scale);
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+            resolve({
+              data: canvas.toDataURL('image/png', 1.0),
+              width: img.width,
+              height: img.height
+            });
+          };
+          img.onerror = () => resolve(null);
+          img.src = url;
+        });
+      };
+
+      const dakshaaLogoData = await loadImageAsBase64(dakshaaLogo);
+      const ksrctLogoData = await loadImageAsBase64(ksrctLogo);
+
+      const headerY = 22;
+      
+      if (ksrctLogoData) {
+        const logoHeight = 35;
+        const aspectRatio = ksrctLogoData.width / ksrctLogoData.height;
+        const logoWidth = logoHeight * aspectRatio;
+        doc.addImage(ksrctLogoData.data, 'PNG', 14, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+      }
+      
+      if (dakshaaLogoData) {
+        const logoHeight = 30;
+        const aspectRatio = dakshaaLogoData.width / dakshaaLogoData.height;
+        const logoWidth = logoHeight * aspectRatio;
+        doc.addImage(dakshaaLogoData.data, 'PNG', pageWidth - logoWidth - 14, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+      }
+      
+      doc.setFontSize(18);
+      doc.setTextColor(26, 54, 93);
+      doc.setFont('helvetica', 'bold');
+      doc.text('K.S.Rangasamy College of Technology', pageWidth / 2, headerY - 4, { align: 'center' });
+      doc.setFontSize(11);
+      doc.setTextColor(230, 126, 34);
+      doc.text('AUTONOMOUS | TIRUCHENGODE', pageWidth / 2, headerY + 2, { align: 'center' });
+      doc.setFontSize(14);
+      doc.setTextColor(197, 48, 48);
+      const title = selectedCategory !== 'all' 
+        ? `${selectedCategory} - All Events Report`
+        : 'All Categories - Complete Report';
+      doc.text(title, pageWidth / 2, headerY + 10, { align: 'center' });
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text('Comprehensive Headcount Report', pageWidth / 2, headerY + 16, { align: 'center' });
+      
+      const totalStats = eventWiseStats.reduce((acc, e) => ({
+        teams: acc.teams + e.teamCount,
+        teamHeadcount: acc.teamHeadcount + e.teamHeadcount,
+        individual: acc.individual + e.individualCount,
+        total: acc.total + e.totalHeadcount
+      }), { teams: 0, teamHeadcount: 0, individual: 0, total: 0 });
+      
+      doc.setFontSize(9);
+      doc.setTextColor(120, 120, 120);
+      doc.text(`Events: ${eventWiseStats.length} | Teams: ${totalStats.teams} | Team Headcount: ${totalStats.teamHeadcount} | Individual: ${totalStats.individual} | Grand Total: ${totalStats.total}`, pageWidth / 2, headerY + 22, { align: 'center' });
+
+      const tableRows = eventWiseStats.map(event => [
+        event.eventName,
+        event.category,
+        event.teamCount.toString(),
+        event.teamHeadcount.toString(),
+        event.individualCount.toString(),
+        event.totalHeadcount.toString()
+      ]);
+
+      // Add total row
+      tableRows.push([
+        'TOTAL',
+        '',
+        totalStats.teams.toString(),
+        totalStats.teamHeadcount.toString(),
+        totalStats.individual.toString(),
+        totalStats.total.toString()
+      ]);
+
+      autoTable(doc, {
+        head: [['Event Name', 'Category', 'Teams', 'Team Headcount', 'Individual', 'Total']],
+        body: tableRows,
+        startY: 50,
+        theme: 'grid',
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+        bodyStyles: {
+          0: { fontStyle: 'bold' }
+        },
+        didParseCell: function(data) {
+          if (data.row.index === tableRows.length - 1) {
+            data.cell.styles.fontStyle = 'bold';
+            data.cell.styles.fillColor = [200, 200, 200];
+          }
+        }
+      });
+
+      const fileName = selectedCategory !== 'all' 
+        ? `${selectedCategory}_All_Events_Report.pdf`
+        : 'All_Categories_Report.pdf';
+      doc.save(fileName);
+    } catch (error) {
+      console.error('Error generating PDF report:', error);
+      alert('Failed to generate PDF report');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const downloadExcel = () => {
     if (!selectedEvent || teams.length === 0) return;
 
@@ -694,7 +966,29 @@ const TeamReport = () => {
               <Calendar className="text-cyan-400" size={20} />
               Event-Wise Headcount {selectedCategory !== 'all' && `(${selectedCategory})`}
             </h3>
-            {loadingEventStats && <Loader2 className="animate-spin text-emerald-500" size={20} />}
+            <div className="flex items-center gap-3">
+              {eventWiseStats.length > 0 && (
+                <>
+                  <button 
+                    onClick={downloadAllEventsExcel}
+                    disabled={loading || loadingEventStats}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <FileSpreadsheet size={14} />
+                    Export Excel
+                  </button>
+                  <button 
+                    onClick={downloadAllEventsPDF}
+                    disabled={loading || loadingEventStats}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <FileText size={14} />
+                    Export PDF
+                  </button>
+                </>
+              )}
+              {loadingEventStats && <Loader2 className="animate-spin text-emerald-500" size={20} />}
+            </div>
           </div>
           
           {loadingEventStats ? (
