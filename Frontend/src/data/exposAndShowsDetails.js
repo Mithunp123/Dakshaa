@@ -60,7 +60,7 @@ export const exposAndShowsDetails = [
     description: "Explores how artificial intelligence leverages data to convert raw information into meaningful insights, intelligent decisions, and smart systems.",
     date: "13 February 2026",
 
-    venue: "A113 (Main Block)",
+    venue: "A113 (1st Floor, Main Building)",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
@@ -110,7 +110,7 @@ export const exposAndShowsDetails = [
     title: "Department of Artificial Intelligence and Machine Learning",
     description: "Recent Trends in Machine Learning” explores the latest advancements shaping intelligent systems, including deep learning, generative AI, and self-supervised learning. It highlights how ML is transforming industries such as healthcare, finance, automation, and cybersecurity through data-driven decision-making. The theme emphasizes emerging techniques like explainable AI, federated learning, and AI-driven automation for real-world applications. It also reflects the growing focus on ethical AI, efficiency, and scalability in modern machine learning systems.",
     date: "13 February 2026",
-    venue: "",
+    venue: "A112 (1st Floor, Main Building)",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
@@ -168,7 +168,7 @@ export const exposAndShowsDetails = [
     description: "Next-Generation Technologies are transforming the digital world through intelligent, immersive, and scalable innovations.Technologies like Cloud Computing, Artificial Intelligence, Industry 5.0, and the Metaverse enhance efficiency, human collaboration, and connectivity.These advancements aim to create a smarter, ethical, and sustainable future.",
     date: "13 February 2026",
 
-    venue: "",
+    venue: "IT Board Room (2nd Floor, IT Park)",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
@@ -223,7 +223,7 @@ export const exposAndShowsDetails = [
     description: "How AI technologies are improving industries and shaping the future of society",
     date: "13 February 2026",
 
-    venue: "",
+    venue: "A103",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
@@ -276,7 +276,7 @@ export const exposAndShowsDetails = [
     description: "This papers discusses key concepts in VLSI system design, focusing on CMOS technology, VLSI design flow, power consumption, and logic gate implementation. It explains how these elements contribute to the development of efficient and low-power digital integrated circuits used in modern electronic systems.",
     date: "13 February 2026",
 
-    venue: "",
+    venue: "A102",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],
@@ -333,7 +333,7 @@ export const exposAndShowsDetails = [
     description: "Research innovation for environmental sustainability ",
     date: "13 February 2026",
 
-    venue: "",
+    venue: "Dr. Amartyasen Hall MBA Seminar Hall (2nd Floor, MBA F Block)",
     price: "₹150 per member",
     registrationLink: "",
     schedule: [],

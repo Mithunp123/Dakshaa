@@ -135,8 +135,8 @@ const UltraCountdown = () => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Event registration ends on February 10, 2026
-    const targetDate = new Date('February 10, 2026 23:59:59');
+    // Event starts on February 12, 2026
+    const targetDate = new Date('February 12, 2026 09:00:00');
     const targetTime = targetDate.getTime();
 
     const interval = setInterval(() => {
@@ -204,7 +204,7 @@ const UltraCountdown = () => {
           }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          ⚡ Registration Ends In ⚡
+          ⚡ Event Starts In ⚡
         </motion.p>
 
         {/* Timer Grid */}

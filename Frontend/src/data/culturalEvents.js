@@ -49,7 +49,7 @@ export const culturalDetails = [
     description: "Solo dance is a personal expression of rhythm, emotion, and creativity through graceful movements. It captivates audiences with unique styles and storytelling.",
     img: hr1,
     date: "February 14, 2026",
-    venue: "Visvesaraya Hall (Academic Block)",
+    venue: "Visvesaraya Hall (Ground Floor EEE M Block )",
     department: "Cultural Committee",
     price: "₹250 per head",
     rules: [
@@ -82,7 +82,7 @@ export const culturalDetails = [
       {
         date: "February 14, 2026",
         time: "09:00 AM to 3:00 PM",
-        location: "Visvesaraya Hall (Academic Block)",
+        location: "Visvesaraya Hall (Ground Floor EEE M Block )",
       },
     ],
     contact: {
@@ -124,7 +124,7 @@ export const culturalDetails = [
     description: "A thrilling showcase of teamwork, rhythm, and creativity as groups compete with electrifying dance performances!",
     img: hr2,
     date: "February 14, 2026",
-    venue: "Visvesaraya Hall (Academic Block)",
+    venue: "Visvesaraya Hall (Ground Floor EEE M Block )",
     department: "Cultural Committee",
     price: "₹150 (per member)",
     rules: [
@@ -157,7 +157,7 @@ export const culturalDetails = [
       {
         date: "February 14, 2026",
         time: "09:00 AM to 3:00 PM",
-        location: "Visvesaraya Hall (Academic Block)",
+        location: "Visvesaraya Hall (Ground Floor EEE M Block )",
       },
     ],
     contact: {
@@ -200,7 +200,7 @@ export const culturalDetails = [
     description: "Cine Fest is a short film competition that celebrates the art of storytelling through visual media. Participants are invited to create and submit original short films that captivate audiences with compelling narratives, creative cinematography, and impactful messages. This event provides a platform for aspiring filmmakers to showcase their talent, creativity, and passion for cinema.",
     img: hr3,
     date: "February 14, 2026",
-    venue: "MBA Hall (MBA Block)",
+    venue: "Dr. Amartyasen Hall  MBA Seminar Hall  (2nd Floor MBA F Block )",
     department: "Cultural Committee",
     price: "₹150 (per member)",
     rules: [
@@ -234,7 +234,7 @@ export const culturalDetails = [
       {
         date: "February 14, 2026",
         time: "09:00 AM to 03:00 PM",
-        location: "MBA Hall (MBA Block)",
+        location: "Dr. Amartyasen Hall  MBA Seminar Hall  (2nd Floor MBA F Block )",
       },
     ],
     contact: {
@@ -277,7 +277,7 @@ export const culturalDetails = [
     description: "A talented vocalist who mesmerizes the audience with a soulful performance, adding emotion and energy to the event.",
     img: hr4,
     date: "February 14, 2026",
-    venue: "Cyberdome (IT Park)",
+    venue: "Cyberdome (3rd Floor IT Park )",
     department: "Cultural Committee",
     price: "₹200",
     rules: [
@@ -309,7 +309,7 @@ export const culturalDetails = [
       {
         date: "February 14, 2026",
         time: "09:00 AM to 03:00 PM",
-        location: "Cyberdome (IT Park)",
+        location: "Cyberdome (3rd Floor IT Park )",
       },
     ],
     contact: {
@@ -347,7 +347,7 @@ export const culturalDetails = [
     description: "SPOTLIGHT is a special cultural event that celebrates unique and extraordinary talents of participants. This platform is open for performances such as magic shows, musical instrument performances, Silambam, martial arts, beatboxing, mimicry, and other creative skills. Participants will be judged based on originality, stage presence, skill level, and overall impact.",
     img: hr5,
     date: "February 14, 2026",
-    venue: "Cyberdome (IT Park)",
+    venue: "Cyberdome (3rd Floor IT Park )",
     department: "Cultural Committee",
     price: "₹200",
     rules: [
@@ -383,7 +383,7 @@ export const culturalDetails = [
       
         date: "February 14, 2026",
         time: "09:00 AM to 03:00 PM",
-        location: "Cyberdome (IT Park)",
+        location: "Cyberdome (3rd Floor IT Park )",
       },
     ],
     contact: {
