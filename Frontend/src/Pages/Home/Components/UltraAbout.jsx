@@ -352,7 +352,6 @@ function UltraAbout() {
             </motion.button>
           </Link>
         </div>
-        
         <div className="max-w-6xl mx-auto space-y-8">
           {[
             { image: guest3, name: "Mr.V.Udaya Sankar", designation: "Director of NASSCOM", description: "Co-Founder of Maatram Foundation", position: "center_20%" },
