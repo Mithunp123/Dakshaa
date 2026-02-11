@@ -29,6 +29,13 @@ import indianoil from "./assets/indianoil.webp";
 import mongodb from "./assets/mongodb.webp";
 import kavipar from "./assets/kavipart.webp";  
 import tree from "./assets/tree.webp";
+import txtlogo from "./assets/txtlogo.webp";
+import txtlogo2 from "./assets/txtlogo2.webp";
+import txtlogo3 from "./assets/txtlogo3.webp";
+import txtlogo4 from "./assets/txtlogo4.webp";
+import txtlogo5 from "./assets/txtlogo5.webp";
+import txtlogo6 from "./assets/txttlogo6.webp";
+import other from "./assets/other.webp";
 
 
 
@@ -42,7 +49,7 @@ function Sponsors() {
   const cosponser=[comingsoon];
   const ecosystem=[startuptn];
 
-  const eventSponsors = [lovable,kavipar,mongodb,indianoil,aidswk,aimlwk,tree,btwk,civilwk,csbswk,csewk,ecewk,eeewk,ftwk,iprwk,itwk,mcawk,mctwk,mechwk,txtwk,vlsiwk,eduskill,finestcoder ];
+  const eventSponsors = [lovable,kavipar,mongodb,indianoil,aidswk,aimlwk,tree,btwk,civilwk,csbswk,csewk,ecewk,eeewk,ftwk,iprwk,itwk,mcawk,mctwk,mechwk,txtwk,vlsiwk,eduskill,finestcoder,txtlogo,txtlogo2,txtlogo3,txtlogo4,txtlogo5,txtlogo6,other];
   const stallsponsors = [comingsoon];
 
   const letter = "Sponsors";

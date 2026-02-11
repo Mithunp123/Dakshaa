@@ -525,7 +525,7 @@ export const workshopDetails = [
     description: "This one-day workshop on \"Monetizing Your Idea through Intellectual Property Rights (IPR)\" focuses on helping students, innovators, and early-stage entrepreneurs understand how ideas can be converted into protected intellectual assets and commercially leveraged. The session covers the practical use of patents, copyrights, trademarks, and designs, explaining what can be protected, when to file, and how IPR directly supports revenue generation through licensing, technology transfer, product commercialization, and startup valuation.",
     img: workshop10,
     date: "February 12, 2026",
-    venue: "C",
+    venue: "PTC Conference Hall (PTC Block)",
     department: "Workshop",
     price: "₹300 per member",
     schedule: [
