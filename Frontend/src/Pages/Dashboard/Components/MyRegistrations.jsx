@@ -10,6 +10,7 @@ import {
   RefreshCw,
   Users
 } from 'lucide-react';
+import { jsPDF } from 'jspdf';
 import { supabaseService } from '../../../services/supabaseService';
 import { supabase } from '../../../supabase';
 import notificationService from '../../../services/notificationService';
@@ -276,6 +277,90 @@ const MyRegistrations = () => {
     }
   };
 
+  const downloadCertificate = async (reg) => {
+    try {
+      if (reg.certificate_url) {
+        window.open(reg.certificate_url, "_blank");
+        return;
+      }
+
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
+
+      const doc = new jsPDF("landscape", "mm", "a4");
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+
+      // Background
+      doc.setFillColor(255, 255, 255);
+      doc.rect(0, 0, pageWidth, pageHeight, "F");
+      
+      // Border
+      doc.setDrawColor(20, 20, 80); // Dark blue
+      doc.setLineWidth(5);
+      doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
+      
+      // Inner Border
+      doc.setDrawColor(200, 150, 50); // Gold
+      doc.setLineWidth(1);
+      doc.rect(17, 17, pageWidth - 34, pageHeight - 34);
+
+      // Title
+      doc.setTextColor(20, 20, 80);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(40);
+      doc.text("Certificate of Participation", pageWidth / 2, 60, { align: "center" });
+
+      // Subtitle
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(80, 80, 80);
+      doc.text("This is to certify that", pageWidth / 2, 85, { align: "center" });
+
+      // Name
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(32);
+      doc.setTextColor(200, 150, 50); // Gold
+      const userName = user?.user_metadata?.full_name || "Participant";
+      doc.text(userName.toUpperCase(), pageWidth / 2, 110, { align: "center" });
+      doc.setLineWidth(0.5);
+      doc.line(pageWidth / 2 - 60, 115, pageWidth / 2 + 60, 115);
+
+      // Event Text
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(16);
+      doc.setTextColor(80, 80, 80);
+      doc.text("has successfully participated in the event", pageWidth / 2, 135, { align: "center" });
+
+      // Event Name
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(28);
+      doc.setTextColor(20, 20, 80);
+      const eventName = reg.event_name || reg.events?.name || "Event";
+      doc.text(eventName, pageWidth / 2, 155, { align: "center" });
+
+      // Date
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(14);
+      doc.setTextColor(100, 100, 100);
+      const eventDate = reg.events?.event_date 
+        ? new Date(reg.events.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+        : new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+      doc.text(`Held on ${eventDate}`, pageWidth / 2, 175, { align: "center" });
+
+      // Footer
+      doc.setFontSize(12);
+      doc.text("Dakshaa '26 | K.S.Rangasamy College of Technology", pageWidth / 2, pageHeight - 30, { align: "center" });
+
+      doc.save(`${eventName.replace(/[^a-zA-Z0-9]/g, '_')}_Certificate.pdf`);
+      
+      toast.success('Certificate downloaded successfully');
+    } catch (err) {
+      console.error("Error generating certificate:", err);
+      toast.error("Could not generate certificate. Please try again.");
+    }
+  };
+
   const getStatusColor = (status) => {
     const statusUpper = status?.toUpperCase();
     switch (statusUpper) {
@@ -350,12 +435,13 @@ const MyRegistrations = () => {
               </div>
 
               <div className="mt-6 flex gap-2">
-                <button 
+                {/* <button 
+                  onClick={() => downloadCertificate(reg)}
                   disabled={reg.payment_status?.toUpperCase() !== 'PAID'}
                   className="flex-1 py-2 bg-gray-700 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Download size={14} /> Certificate
-                </button>
+                </button> */}
               </div>
             </motion.div>
           ))}
