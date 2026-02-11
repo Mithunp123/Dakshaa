@@ -352,12 +352,12 @@ function UltraAbout() {
         
         <div className="max-w-6xl mx-auto space-y-8">
           {[
-            { image: guest1, name: "[Guest Name 1]", designation: "[Designation]", description: "[Brief description about the chief guest's achievements and expertise. This text can be updated with actual information about the guest speaker.]" },
-            { image: guest2, name: "[Guest Name 2]", designation: "[Designation]", description: "[Brief description about the chief guest's achievements and expertise. This text can be updated with actual information about the guest speaker.]" },
-            { image: guest3, name: "[Guest Name 3]", designation: "[Designation]", description: "[Brief description about the chief guest's achievements and expertise. This text can be updated with actual information about the guest speaker.]" },
-            { image: guest4, name: "[Guest Name 4]", designation: "[Designation]", description: "[Brief description about the chief guest's achievements and expertise. This text can be updated with actual information about the guest speaker.]" },
-            { image: guest5, name: "[Guest Name 5]", designation: "[Designation]", description: "[Brief description about the chief guest's achievements and expertise. This text can be updated with actual information about the guest speaker.]" },
-            { image: guest6, name: "[Guest Name 6]", designation: "[Designation]", description: "[Brief description about the chief guest's achievements and expertise. This text can be updated with actual information about the guest speaker.]" },
+            { image: guest1, name: "Mr.M.K.Vishaal", designation: "Founder & CEO of HyperHorizon", description: "Bengaluru" },
+            { image: guest2, name: "Mr.P.Durga Rao", designation: "Director of ATUM Beverages Pvt.Ltd", description: "Hyderabad" },
+            { image: guest3, name: "Mr.V.Udaya Sankar", designation: "Director of NASSCOM", description: "Co-Founder of Maatram Foundation" },
+            { image: guest4, name: "Mr.Shrikrishna", designation: "Scientist 'E' at C-DAC ", description: "Bengaluru" },
+            { image: guest5, name: "Mrs.Bhuvaneswari Subramani", designation: "Chief Cloud Evangelist", description: "Intuitive.ai,Bengaluru" },
+            { image: guest6, name: "Mr.K.Ganesan", designation: "Deputy General Manager", description: "Mahindra Water Utilities,Erode" },
           ].map((guest, index) => {
             const isReversed = index % 2 === 1;
             
@@ -386,7 +386,7 @@ function UltraAbout() {
                 </div>
 
                 {/* Text Section */}
-                <div className="w-full md:w-2/3 text-center md:text-left">
+                <div className={`w-full md:w-2/3 text-center ${isReversed ? 'md:text-right' : 'md:text-left'}`}>
                   <motion.h3
                     className="text-xl md:text-2xl font-bold text-cyan-400 mb-2"
                     initial={{ opacity: 0 }}
