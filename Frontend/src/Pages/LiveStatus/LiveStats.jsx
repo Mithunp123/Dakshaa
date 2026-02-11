@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, TicketCheck, TrendingUp, Radio, ArrowLeft } from "lucide-react";
 import { supabase } from "../../supabase";
@@ -153,7 +153,7 @@ const LiveStats = () => {
                 type: 'users',
                 value: Math.floor(currUsers / 100) * 100,
                 label: 'STUDENTS ONBOARDED!',
-                subLabel: 'New Batch Just Arrived 🚀',
+                subLabel: 'New Batch Just Arrived ­ƒÜÇ',
                 color: 'text-secondary'
             });
             setTimeout(() => setMilestone(null), 5000);
@@ -167,7 +167,7 @@ const LiveStats = () => {
                 type: 'registrations',
                 value: Math.floor(currRegs / 50) * 50,
                 label: 'REGISTRATIONS!',
-                subLabel: 'Events Filling Up Fast 🔥',
+                subLabel: 'Events Filling Up Fast ­ƒöÑ',
                 color: 'text-primary'
             });
             setTimeout(() => setMilestone(null), 5000);
@@ -187,7 +187,7 @@ const LiveStats = () => {
 
     return () => {
       if (channelRef.current) {
-        console.log('🔄 Cleaning up real-time subscriptions');
+        console.log('­ƒöä Cleaning up real-time subscriptions');
         channelRef.current.unsubscribe();
         channelRef.current = null;
       }
@@ -286,7 +286,7 @@ const LiveStats = () => {
             deptCounts[dept] = {
                 registrations: regCount,
                 teamMembers: teamMembersCount,
-                total: regCount + teamMembersCount
+                total: regCount
             };
         }
 
@@ -375,7 +375,7 @@ const LiveStats = () => {
                     name: event.name,
                     registrations: regCount,
                     teamMembers: tmCount,
-                    count: regCount + tmCount
+                    count: regCount
                 };
             })
             .sort((a, b) => b.count - a.count);
@@ -393,16 +393,18 @@ const LiveStats = () => {
         setExpandedDept(null);
     } else {
         setExpandedDept(deptName);
-                fetchDeptEventDetails(deptName, true);
+        // Force refresh of both department stats and event details to ensure consistency
+        fetchDeptStats();
+        fetchDeptEventDetails(deptName, true);
     }
   };
 
   const fetchConferenceEventDetails = async (conferenceName) => {
     try {
-        console.log('🎪 Fetching events for conference:', conferenceName);
+        console.log('­ƒÄ¬ Fetching events for conference:', conferenceName);
         // Check if we already have this data cached
         if (conferenceEventDetails[conferenceName]) {
-            console.log('✅ Conference data already cached');
+            console.log('Ô£à Conference data already cached');
             return;
         }
 
@@ -413,7 +415,7 @@ const LiveStats = () => {
             .eq('is_active', true)
             .eq('category', 'conference');
 
-        console.log('📋 All conference events:', events);
+        console.log('­ƒôï All conference events:', events);
         if (eventsError) throw eventsError;
 
         // Filter events by conference name
@@ -423,7 +425,7 @@ const LiveStats = () => {
             return confName === conferenceName;
         });
 
-        console.log('🔍 Filtered events for', conferenceName, ':', conferenceEvents);
+        console.log('­ƒöì Filtered events for', conferenceName, ':', conferenceEvents);
         const eventIds = conferenceEvents.map(e => e.id);
 
         if (eventIds.length === 0) {
@@ -472,12 +474,12 @@ const LiveStats = () => {
                     name: event.name,
                     registrations: regCount,
                     teamMembers: tmCount,
-                    count: regCount + tmCount
+                    count: regCount
                 };
             })
             .sort((a, b) => b.count - a.count);
 
-        console.log('✅ Conference event details ready:', eventDetails);
+        console.log('Ô£à Conference event details ready:', eventDetails);
         setConferenceEventDetails(prev => ({ ...prev, [conferenceName]: eventDetails }));
 
     } catch (err) {
@@ -511,7 +513,7 @@ const LiveStats = () => {
 
         // Special handling for Conference - show conference names instead of events
         if (categoryName === 'Conference') {
-            console.log('🎯 Fetching Conference events...');
+            console.log('­ƒÄ» Fetching Conference events...');
             // Fetch all active conference events
             const { data: events, error: eventsError } = await supabase
                 .from('events')
@@ -519,7 +521,7 @@ const LiveStats = () => {
                 .eq('is_active', true)
                 .eq('category', 'conference');
 
-            console.log('📊 Conference events fetched:', events);
+            console.log('­ƒôè Conference events fetched:', events);
             if (eventsError) throw eventsError;
 
             // Group by conference name
@@ -594,13 +596,13 @@ const LiveStats = () => {
                         name: confName,
                         registrations: regCount,
                         teamMembers: tmCount,
-                        count: regCount + tmCount,
+                        count: regCount,
                         isConference: true // Flag to identify this as a conference group
                     };
                 })
                 .sort((a, b) => b.count - a.count);
 
-            console.log('✅ Conference details formatted:', conferenceDetails);
+            console.log('Ô£à Conference details formatted:', conferenceDetails);
             setCategoryEventDetails(prev => ({ ...prev, [categoryName]: conferenceDetails }));
             return;
         }
@@ -690,7 +692,7 @@ const LiveStats = () => {
                     name: event.name,
                     registrations: regCount,
                     teamMembers: tmCount,
-                    count: regCount + tmCount
+                    count: regCount
                 };
             })
             .sort((a, b) => b.count - a.count);
@@ -733,7 +735,7 @@ const LiveStats = () => {
                 totalPaidMembers: Number(data.totalPaidMembers) || 0
             };
         } catch (error) {
-            console.error('❌ Error fetching team participant stats:', error);
+            console.error('ÔØî Error fetching team participant stats:', error);
             return {
                 extraPaidMembers: 0,
                 activeTeamCount: 0,
@@ -811,7 +813,7 @@ const LiveStats = () => {
             const extraPaidMembers = teamStats.extraPaidMembers;
       
       const totalParticipants = validRegs.length + extraPaidMembers;
-      console.log('👥 Participant Calculation (Python Logic Match):', {
+      console.log('­ƒæÑ Participant Calculation (Python Logic Match):', {
         baseRegs: validRegs.length,
         teamMembersTotal: totalTeamPaidMembers,
         activeTeamsCount: activeTeamCount,
@@ -925,7 +927,7 @@ const LiveStats = () => {
 
             deptTotalsByBase[base][dept].registrations += regCount;
             deptTotalsByBase[base][dept].teamMembers += tmCount;
-            deptTotalsByBase[base][dept].count += regCount + tmCount;
+            deptTotalsByBase[base][dept].count += regCount;
         });
 
         const specialStats = SPECIAL_EVENT_BASES.map(base => {
@@ -982,32 +984,32 @@ const LiveStats = () => {
     try {
       setLoading(true);
       
-      console.log("🔍 Fetching live stats...");
+      console.log("­ƒöì Fetching live stats...");
       
       // Always use fallback method for most accurate count
-      console.log("⚡ Using direct database counting for accuracy...");
+      console.log("ÔÜí Using direct database counting for accuracy...");
       await fetchStatsFallback();
       
       // Also try RPC for comparison
       try {
         const { data: rpcData, error: rpcError } = await supabase.rpc('get_live_stats');
         if (!rpcError && rpcData) {
-          console.log("📊 RPC Result for comparison:", rpcData);
-          console.log("🔍 Count comparison - RPC vs Direct:", {
+          console.log("­ƒôè RPC Result for comparison:", rpcData);
+          console.log("­ƒöì Count comparison - RPC vs Direct:", {
             rpc: rpcData.registrations,
             direct: "See fallback logs above"
           });
         }
       } catch (rpcErr) {
-        console.log("⚠️ RPC comparison failed (using direct count):", rpcErr.message);
+        console.log("ÔÜá´©Å RPC comparison failed (using direct count):", rpcErr.message);
       }
       
     } catch (err) {
-      console.error('❌ Error in fetchInitialStats:', err);
+      console.error('ÔØî Error in fetchInitialStats:', err);
       try {
           await fetchStatsFallback();
       } catch (fallbackErr) {
-          console.error('❌ Fallback also failed:', fallbackErr);
+          console.error('ÔØî Fallback also failed:', fallbackErr);
           setStats({ users: 0, registrations: 0, last_updated: new Date().toISOString() });
       }
     } finally {
@@ -1017,7 +1019,7 @@ const LiveStats = () => {
 
   const fetchStatsFallback = async () => {
     try {
-        console.log("🔍 Using fallback counting method...");
+        console.log("­ƒöì Using fallback counting method...");
         
         // Execute queries in parallel with manual join for teams to ensure accuracy
         const [
@@ -1037,7 +1039,7 @@ const LiveStats = () => {
             (async () => {
                 const teamStats = await fetchTeamParticipantStats();
                 console.log(
-                  `👥 Team Stats Debug (API): Active Teams=${teamStats.activeTeamCount}, ` +
+                  `­ƒæÑ Team Stats Debug (API): Active Teams=${teamStats.activeTeamCount}, ` +
                   `Total Paid Members Sum=${teamStats.totalPaidMembers}, Additional Members=${teamStats.extraPaidMembers}`
                 );
                 return teamStats.extraPaidMembers;
@@ -1048,7 +1050,7 @@ const LiveStats = () => {
         const studentCount = studentStats;
         const teamMembersCount = teamMemberCount;
 
-        console.log("📊 Comprehensive Count Results:");
+        console.log("­ƒôè Comprehensive Count Results:");
         console.log("- Standard 'PAID' count:", standardPaidCount.count);
         console.log("- Case-insensitive 'paid' count:", caseInsensitivePaidCount.count);
         console.log("- Total registrations (all statuses):", allStatusesCount.count);
@@ -1069,8 +1071,8 @@ const LiveStats = () => {
             const status = record.payment_status || 'NULL';
             statusCounts[status] = (statusCounts[status] || 0) + 1;
           });
-          console.log("📋 Recent payment statuses breakdown:", statusCounts);
-          console.log("📝 Sample records:", statusSample.data.slice(0, 5));
+          console.log("­ƒôï Recent payment statuses breakdown:", statusCounts);
+          console.log("­ƒôØ Sample records:", statusSample.data.slice(0, 5));
         }
 
         // Try multiple queries to find the highest accurate count
@@ -1082,7 +1084,7 @@ const LiveStats = () => {
         ]);
         
         const counts = queries.map(q => q.count || 0);
-        console.log("🔍 All payment status variations:", {
+        console.log("­ƒöì All payment status variations:", {
           'PAID': counts[0],
           'paid': counts[1], 
           'Paid': counts[2],
@@ -1091,11 +1093,11 @@ const LiveStats = () => {
         
         // Use the highest count as it's likely the most accurate
         const maxCount = Math.max(...counts);
-        console.log("📈 Using maximum count:", maxCount);
+        console.log("­ƒôê Using maximum count:", maxCount);
         
         // If we're still seeing 315/316 discrepancy, do a manual verification
         if (maxCount === 315) {
-          console.log("🚨 Still showing 315, investigating further...");
+          console.log("­ƒÜ¿ Still showing 315, investigating further...");
           
           // Get actual records to count manually
           const allRecords = await supabase
@@ -1108,14 +1110,14 @@ const LiveStats = () => {
               record.payment_status && record.payment_status.toLowerCase() === 'paid'
             ).length;
             
-            console.log("🔢 Manual count (case-insensitive):", manualCount);
-            console.log("📦 Total records with payment_status:", allRecords.data.length);
+            console.log("­ƒöó Manual count (case-insensitive):", manualCount);
+            console.log("­ƒôª Total records with payment_status:", allRecords.data.length);
             
             // Use manual count if it's different
             if (manualCount !== maxCount) {
-              console.log("⚡ Using manual count as it differs from DB count");
+              console.log("ÔÜí Using manual count as it differs from DB count");
               const totalParticipants = manualCount + teamMembersCount;
-              console.log("📊 Total Participants (registrations + team members):", totalParticipants);
+              console.log("­ƒôè Total Participants (registrations + team members):", totalParticipants);
               setStats(prev => ({
                 ...prev,
                 users: studentCount.count || 0,
@@ -1130,7 +1132,7 @@ const LiveStats = () => {
         }
 
         const totalParticipants = maxCount + teamMembersCount;
-        console.log("📊 Total Participants (registrations + team members):", totalParticipants);
+        console.log("­ƒôè Total Participants (registrations + team members):", totalParticipants);
         
         setStats(prev => ({
           ...prev,
@@ -1142,7 +1144,7 @@ const LiveStats = () => {
         }));
         
     } catch (error) {
-         console.error("❌ Error in fallback:", error);
+         console.error("ÔØî Error in fallback:", error);
          setStats(prev => ({ ...prev, users: 0, registrations: 0, last_updated: new Date().toISOString() }));
     }
   };
@@ -1206,7 +1208,7 @@ const LiveStats = () => {
 
             deptTotals[dept].registrations += regCount;
             deptTotals[dept].teamMembers += tmCount;
-            deptTotals[dept].count += regCount + tmCount;
+            deptTotals[dept].count += regCount;
         });
 
         const details = Object.entries(deptTotals)
@@ -1247,7 +1249,7 @@ const LiveStats = () => {
           filter: 'role=eq.student'
         },
         (payload) => {
-          console.log('🎓 New student onboarded!', payload);
+          console.log('­ƒÄô New student onboarded!', payload);
           setStats(prev => ({
             ...prev,
             users: prev.users + 1,
@@ -1268,11 +1270,11 @@ const LiveStats = () => {
         },
         (payload) => {
           try {
-            console.log('📨 Raw registration event received:', payload);
+            console.log('­ƒô¿ Raw registration event received:', payload);
             const oldStatus = payload.old?.payment_status;
             const newStatus = payload.new?.payment_status;
             
-            console.log('📊 Payment Status Change:', { oldStatus, newStatus });
+            console.log('­ƒôè Payment Status Change:', { oldStatus, newStatus });
 
             // Handle both case variations and new records
             const isPaidNow = newStatus && (newStatus.toUpperCase() === 'PAID');
@@ -1282,7 +1284,7 @@ const LiveStats = () => {
             // 1. New record with PAID status (INSERT)
             // 2. Status changed from non-PAID to PAID (UPDATE)
             if (isPaidNow && !wasPaidBefore) {
-              console.log('🎉 New PAID registration detected!', payload);
+              console.log('­ƒÄë New PAID registration detected!', payload);
               
               const eventId = payload.new.event_id;
               const meta = eventLookupRef.current[eventId];
@@ -1297,7 +1299,7 @@ const LiveStats = () => {
                   totalParticipants: newTotalParticipants,
                   last_updated: new Date().toISOString()
                 };
-                console.log('📊 Stats updated:', { 
+                console.log('­ƒôè Stats updated:', { 
                   oldRegistrations: prevStats.registrations, 
                   newRegistrations: newStats.registrations,
                   oldTotalParticipants: prevStats.totalParticipants,
@@ -1355,7 +1357,7 @@ const LiveStats = () => {
              setTimeout(() => setIsLive(false), 2000);
             }
           } catch (error) {
-            console.error('❌ Error processing registration update:', error);
+            console.error('ÔØî Error processing registration update:', error);
           }
         }
       );
@@ -1369,7 +1371,7 @@ const LiveStats = () => {
             table: 'team_members'
         },
         async (payload) => {
-            console.log('👥 Team member change detected:', payload);
+            console.log('­ƒæÑ Team member change detected:', payload);
             // Re-run stats to get accurate participants count
             await fetchStatsFallback();
         }
@@ -1384,17 +1386,17 @@ const LiveStats = () => {
             table: 'teams'
         },
         async (payload) => {
-             console.log('🛡️ Team data changed:', payload);
+             console.log('­ƒøí´©Å Team data changed:', payload);
              await fetchStatsFallback();
         }
       );
 
       channel.subscribe((status, err) => {
-        console.log('📡 Subscription status:', status);
+        console.log('­ƒôí Subscription status:', status);
         setConnectionStatus(status.toLowerCase());
         
         if (status === 'SUBSCRIBED') {
-          console.log('✅ Real-time subscriptions active');
+          console.log('Ô£à Real-time subscriptions active');
           // Start heartbeat to ensure connection stays alive
           if (heartbeatRef.current) {
             clearInterval(heartbeatRef.current);
@@ -1402,9 +1404,9 @@ const LiveStats = () => {
           heartbeatRef.current = setInterval(() => {
             // Ping the connection every 30 seconds
             if (channelRef.current && channelRef.current.state === 'joined') {
-              console.log('💓 Heartbeat: connection active');
+              console.log('­ƒÆô Heartbeat: connection active');
             } else {
-              console.warn('💔 Heartbeat: connection lost, reconnecting...');
+              console.warn('­ƒÆö Heartbeat: connection lost, reconnecting...');
               setupRealtimeSubscriptions();
             }
           }, 30000);
@@ -1414,31 +1416,31 @@ const LiveStats = () => {
             clearInterval(refreshIntervalRef.current);
           }
           refreshIntervalRef.current = setInterval(() => {
-            console.log('🔄 Periodic refresh to ensure accuracy...');
+            console.log('­ƒöä Periodic refresh to ensure accuracy...');
             fetchInitialStats();
           }, 120000); // 2 minutes
         } else if (status === 'CHANNEL_ERROR') {
-          console.error('❌ Subscription error:', err);
+          console.error('ÔØî Subscription error:', err);
           setConnectionStatus('error');
           // Retry subscription after a delay
           setTimeout(() => {
-            console.log('🔄 Retrying real-time subscription...');
+            console.log('­ƒöä Retrying real-time subscription...');
             setupRealtimeSubscriptions();
           }, 5000);
         } else if (status === 'TIMED_OUT') {
-          console.warn('⏰ Subscription timed out, retrying...');
+          console.warn('ÔÅ░ Subscription timed out, retrying...');
           setConnectionStatus('timeout');
           setTimeout(() => setupRealtimeSubscriptions(), 2000);
         } else if (status === 'CLOSED') {
-          console.warn('🔒 Subscription closed');
+          console.warn('­ƒöÆ Subscription closed');
           setConnectionStatus('closed');
         }
       });
     } catch (error) {
-      console.error('❌ Error setting up real-time subscriptions:', error);
+      console.error('ÔØî Error setting up real-time subscriptions:', error);
       // Retry after a delay
       setTimeout(() => {
-        console.log('🔄 Retrying real-time subscription setup...');
+        console.log('­ƒöä Retrying real-time subscription setup...');
         setupRealtimeSubscriptions();
       }, 5000);
     }
@@ -1798,9 +1800,9 @@ const LiveStats = () => {
                                 </div>
                                 
                                 {/* Rank Icons */}
-                                {index === 0 && <div className="absolute top-0.5 right-0.5 text-xl opacity-20 rotate-12 pointer-events-none">👑</div>}
-                                {index === 1 && <div className="absolute top-0.5 right-0.5 text-xl opacity-20 rotate-12 pointer-events-none">🥈</div>}
-                                {index === 2 && <div className="absolute top-0.5 right-0.5 text-xl opacity-20 rotate-12 pointer-events-none">🥉</div>}
+                                {index === 0 && <div className="absolute top-0.5 right-0.5 text-xl opacity-20 rotate-12 pointer-events-none">­ƒææ</div>}
+                                {index === 1 && <div className="absolute top-0.5 right-0.5 text-xl opacity-20 rotate-12 pointer-events-none">­ƒÑê</div>}
+                                {index === 2 && <div className="absolute top-0.5 right-0.5 text-xl opacity-20 rotate-12 pointer-events-none">­ƒÑë</div>}
                             </motion.div>
                         ))}
                     </AnimatePresence>
@@ -1857,7 +1859,7 @@ const LiveStats = () => {
                                         </div>
                                     ) : deptEventDetails[expandedDept]?.length === 0 ? (
                                         <div className="text-center py-12">
-                                            <div className="text-6xl mb-4 opacity-30">📊</div>
+                                            <div className="text-6xl mb-4 opacity-30">­ƒôè</div>
                                             <p className="text-gray-400 font-semibold">No events found for this department</p>
                                         </div>
                                     ) : (
@@ -1880,7 +1882,7 @@ const LiveStats = () => {
                                                                     {event.name}
                                                                 </h4>
                                                                 <p className="text-xs text-gray-400">
-                                                                    {event.registrations || 0} Regs + {event.teamMembers || 0} Team Members
+                                                                    {event.registrations || 0} Registrations
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -1907,9 +1909,9 @@ const LiveStats = () => {
                                     <div className="mt-4 pt-4 border-t border-gray-700/30">
                                         <div className="flex items-center justify-between bg-gradient-to-r from-primary/10 to-purple-600/10 rounded-lg p-3">
                                             <div className="flex flex-col">
-                                                <span className="text-gray-300 font-semibold">Total Participants</span>
+                                                <span className="text-gray-300 font-semibold">Total Registrations</span>
                                                 <span className="text-xs text-gray-500">
-                                                    {deptEventDetails[expandedDept]?.reduce((sum, e) => sum + (e.registrations || 0), 0)} Registrations + {deptEventDetails[expandedDept]?.reduce((sum, e) => sum + (e.teamMembers || 0), 0)} Team Members
+                                                    {deptEventDetails[expandedDept]?.reduce((sum, e) => sum + (e.registrations || 0), 0)} Registrations
                                                 </span>
                                             </div>
                                             <span className="text-3xl font-black text-primary font-mono">
@@ -1974,7 +1976,7 @@ const LiveStats = () => {
                                         </div>
                                     ) : categoryEventDetails[expandedCategory]?.length === 0 ? (
                                         <div className="text-center py-12">
-                                            <div className="text-6xl mb-4 opacity-30">📋</div>
+                                            <div className="text-6xl mb-4 opacity-30">­ƒôï</div>
                                             <p className="text-gray-400 font-semibold">No events found for this category</p>
                                         </div>
                                     ) : (
@@ -2004,7 +2006,7 @@ const LiveStats = () => {
                                                                     {event.name}
                                                                 </h4>
                                                                 {event.isConference && (
-                                                                    <p className="text-xs text-gray-400">Conference • Click for Events</p>
+                                                                    <p className="text-xs text-gray-400">Conference ÔÇó Click for Events</p>
                                                                 )}
                                                             </div>
                                                         </div>
@@ -2031,9 +2033,9 @@ const LiveStats = () => {
                                     <div className="mt-4 pt-4 border-t border-gray-700/30">
                                         <div className="flex items-center justify-between bg-gradient-to-r from-secondary/10 to-orange-600/10 rounded-lg p-3">
                                             <div className="flex flex-col">
-                                                <span className="text-gray-300 font-semibold">Total Participants</span>
+                                                <span className="text-gray-300 font-semibold">Total Registrations</span>
                                                 <span className="text-xs text-gray-500">
-                                                    {categoryEventDetails[expandedCategory]?.reduce((sum, e) => sum + (e.registrations || 0), 0)} Registrations + {categoryEventDetails[expandedCategory]?.reduce((sum, e) => sum + (e.teamMembers || 0), 0)} Team Members
+                                                    {categoryEventDetails[expandedCategory]?.reduce((sum, e) => sum + (e.registrations || 0), 0)} Registrations
                                                 </span>
                                             </div>
                                             <span className="text-3xl font-black text-secondary font-mono">
@@ -2098,7 +2100,7 @@ const LiveStats = () => {
                                         </div>
                                     ) : conferenceEventDetails[expandedConference]?.length === 0 ? (
                                         <div className="text-center py-12">
-                                            <div className="text-6xl mb-4 opacity-30">📊</div>
+                                            <div className="text-6xl mb-4 opacity-30">­ƒôè</div>
                                             <p className="text-gray-400 font-semibold">No events found for this conference</p>
                                         </div>
                                     ) : (
@@ -2121,7 +2123,7 @@ const LiveStats = () => {
                                                                     {event.name}
                                                                 </h4>
                                                                 <p className="text-xs text-gray-400">
-                                                                    {event.registrations || 0} Regs + {event.teamMembers || 0} Team Members
+                                                                    {event.registrations || 0} Registrations
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -2148,9 +2150,9 @@ const LiveStats = () => {
                                     <div className="mt-4 pt-4 border-t border-gray-700/30">
                                         <div className="flex items-center justify-between bg-gradient-to-r from-primary/10 to-purple-600/10 rounded-lg p-3">
                                             <div className="flex flex-col">
-                                                <span className="text-gray-300 font-semibold">Total Participants</span>
+                                                <span className="text-gray-300 font-semibold">Total Registrations</span>
                                                 <span className="text-xs text-gray-500">
-                                                    {conferenceEventDetails[expandedConference]?.reduce((sum, e) => sum + (e.registrations || 0), 0)} Registrations + {conferenceEventDetails[expandedConference]?.reduce((sum, e) => sum + (e.teamMembers || 0), 0)} Team Members
+                                                    {conferenceEventDetails[expandedConference]?.reduce((sum, e) => sum + (e.registrations || 0), 0)} Registrations
                                                 </span>
                                             </div>
                                             <span className="text-3xl font-black text-primary font-mono">

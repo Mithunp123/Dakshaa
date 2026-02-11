@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Radio,
@@ -102,7 +102,7 @@ const LiveStatusBoard = () => {
 
   const fetchEvents = async () => {
     try {
-      console.log('📊 Fetching all events for live status (bypassing 1000 limit)...');
+      console.log('­ƒôè Fetching all events for live status (bypassing 1000 limit)...');
       const { data, error } = await fetchAllRecords(
         supabase,
         'events',
@@ -115,7 +115,7 @@ const LiveStatusBoard = () => {
 
       if (error) throw error;
 
-      console.log(`✅ Loaded ${data?.length || 0} events for live status`);
+      console.log(`Ô£à Loaded ${data?.length || 0} events for live status`);
 
       const now = new Date();
       
@@ -134,7 +134,7 @@ const LiveStatusBoard = () => {
       setNowHappening(live);
       setUpNext(upcoming);
     } catch (error) {
-      console.error("❌ Error fetching events:", error);
+      console.error("ÔØî Error fetching events:", error);
     }
   };
 
@@ -234,7 +234,7 @@ const LiveStatusBoard = () => {
                 month: "long",
                 day: "numeric"
                 })}{" "}
-                • {currentTime.toLocaleTimeString("en-IN")}
+                ÔÇó {currentTime.toLocaleTimeString("en-IN")}
             </p>
             
             <motion.div 
