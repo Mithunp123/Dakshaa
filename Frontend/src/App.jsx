@@ -18,7 +18,6 @@ import { AuthProvider } from "./Components/AuthProvider";
 
 // Lazy load non-critical layout components
 const UltraFooter = lazy(() => import("./Pages/Layout/UltraFooter"));
-const FloatingCallButton = lazy(() => import("./Pages/Layout/FloatingCallButton"));
 const FloatingDashboardButton = lazy(() => import("./Pages/Layout/FloatingDashboardButton"));
 const SupabaseHealthCheck = lazy(() => import("./Components/SupabaseHealthCheck"));
 
@@ -498,11 +497,6 @@ function AppContent() {
       {!isAdmin && !isRegisterEvents && !isLiveStats && (
         <Suspense fallback={null}>
           <FloatingDashboardButton />
-        </Suspense>
-      )}
-      {!isDashboard && !isAdmin && !isScan && !isLogin && !isForgotPassword && !isRegisterEvents && !isLiveStats && (
-        <Suspense fallback={null}>
-          <FloatingCallButton />
         </Suspense>
       )}
       {showBottomNav && <BottomNavbar />}

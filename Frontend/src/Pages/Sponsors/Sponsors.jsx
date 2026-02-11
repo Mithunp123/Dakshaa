@@ -25,6 +25,13 @@ import titlesp from "./assets/atum.webp";
 import finestcoder from "./assets/finestcoder.webp";
 import eduskill from "./assets/eduskill.webp";
 
+import indianoil from "./assets/indianoil.webp";
+import mongodb from "./assets/mongodb.webp";
+import kavipar from "./assets/kavipart.webp";  
+import tree from "./assets/tree.webp";
+
+
+
 
 
 import AOS from "aos";
@@ -35,7 +42,7 @@ function Sponsors() {
   const cosponser=[comingsoon];
   const ecosystem=[startuptn];
 
-  const eventSponsors = [lovable,aidswk,aimlwk,btwk,civilwk,csbswk,csewk,ecewk,eeewk,ftwk,iprwk,itwk,mcawk,mctwk,mechwk,txtwk,vlsiwk,eduskill,finestcoder ];
+  const eventSponsors = [lovable,kavipar,mongodb,indianoil,aidswk,aimlwk,tree,btwk,civilwk,csbswk,csewk,ecewk,eeewk,ftwk,iprwk,itwk,mcawk,mctwk,mechwk,txtwk,vlsiwk,eduskill,finestcoder ];
   const stallsponsors = [comingsoon];
 
   const letter = "Sponsors";

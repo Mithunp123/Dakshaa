@@ -26,9 +26,6 @@ const InquiryCard = ({ inquiry }) => (
     <p>
       <FaUser className="inline mr-2 text-secondary" /> {inquiry.name}
     </p>
-    <p>
-      <FaPhone className="inline mr-2 text-secondary" /> {inquiry.mobile}
-    </p>
     {/* <p><FaEnvelope className="inline mr-2 text-red-400" /> {inquiry.email}</p> */}
     {inquiry.company && (
       <p>
@@ -77,7 +74,7 @@ const InquirySection = ({ title, inquiries }) => {
 
 const Contact = () => {
   const generalInquiries = [
-    { name: "Kavinesh", mobile: "+91 9489243775" },
+    { name: "Kavinesh", mobile: "+91 8891850995" },
   ];
 
   const [formData, setFormData] = useState({
