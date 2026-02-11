@@ -1623,6 +1623,16 @@ const Events = () => {
                     </div>
                   </div>
 
+
+                  {/* Important Note */}
+                  <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
+                      <span className="text-yellow-400 font-semibold text-sm">Important Note:</span>
+                    </div>
+                    <p className="text-yellow-300 text-sm mt-1 ml-7">Lunch will be provided for all Events.</p>
+                  </div>
+
                   {/* Register Button */}
                   <button
                     className="w-full md:w-auto px-8 py-3 bg-primary hover:bg-primary/90 text-white font-bold text-lg tracking-widest transition-all shadow-lg shadow-primary/20 border-2 border-primary"
@@ -1818,13 +1828,13 @@ const Events = () => {
                   </div>
 
                   {/* Important Note */}
-                  {/*<div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
+                  <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
                       <span className="text-yellow-400 font-semibold text-sm">Important Note:</span>
                     </div>
-                    <p className="text-yellow-300 text-sm mt-1 ml-7">No Lunch will be provided for this event.</p>
-                  </div>*/}
+                    <p className="text-yellow-300 text-sm mt-1 ml-7">Lunch will be provided for all Events.</p>
+                  </div>
 
 
                   {/* Important Note */}
@@ -2024,6 +2034,16 @@ const Events = () => {
                       <Users className="w-5 h-5 text-primary" />
                       <span className="text-sm">{selectedExpo.price}</span>
                     </div>
+                  </div>
+
+
+                  {/* Important Note */}
+                  <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
+                      <span className="text-yellow-400 font-semibold text-sm">Important Note:</span>
+                    </div>
+                    <p className="text-yellow-300 text-sm mt-1 ml-7">Lunch will be provided for all Events.</p>
                   </div>
 
                   {/* Register Button */}
@@ -2384,6 +2404,15 @@ const Events = () => {
                     </div>
                   )}
 
+                  {/* Important Note */}
+                  <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
+                      <span className="text-yellow-400 font-semibold text-sm">Important Note:</span>
+                    </div>
+                    <p className="text-yellow-300 text-sm mt-1 ml-7">Lunch will be provided for all Events.</p>
+                  </div>
+
                   {/* Register Button */}
                   <button
                     className="w-full md:w-auto px-8 py-3 bg-primary hover:bg-primary/90 text-white font-bold text-lg tracking-widest transition-all shadow-lg shadow-primary/20 border-2 border-primary"
@@ -2722,14 +2751,14 @@ const Events = () => {
                     </div>
                   </div>
 
-                  {/* Important Note */}{/*}
+                  {/* Important Note */}
                   <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
                       <span className="text-yellow-400 font-semibold text-sm">Important Note:</span>
                     </div>
-                    <p className="text-yellow-300 text-sm mt-1 ml-7">No Lunch will be provided for this event.</p>
-                  </div>*/}
+                    <p className="text-yellow-300 text-sm mt-1 ml-7">Lunch will be provided for all Events.</p>
+                  </div>
 
                   {/* Register Button */}
                   <button

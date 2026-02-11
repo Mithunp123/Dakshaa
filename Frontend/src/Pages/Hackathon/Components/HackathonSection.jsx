@@ -306,6 +306,9 @@ export const hackathonEventDetails = {
   "Failure to adhere to time limits or technical instructions may lead to disqualification",
   "The decision of the judges will be final and binding"
 ],
+lunchannouncement:[
+        "Lunch Will be Provide for this event ",
+      ],
 
       schedule: [
         {
@@ -505,6 +508,9 @@ export const hackathonEventDetails = {
         }
         
       ],
+      lunchannouncement:[
+        "Lunch Will be Provide for this event ",
+      ],
       rules: [
         "Teams must consist of 1-3 members.",
         "Max 10 slides are allowed for the presentation.",
@@ -589,6 +595,9 @@ export const hackathonEventDetails = {
       "	The organizing committee reserves the right to modify rules if necessary. ",
 
       ],
+      lunchannouncement:[
+        "Lunch Will be Provide for this event ",
+      ],
       schedule: [
         {
          
@@ -671,9 +680,7 @@ export const hackathonEventDetails = {
           ]
         },
       ],
-       lunchannouncement:[
-        "Lunch and accommodation are Free for all participants during the hackathon.",
-      ],
+       
        eligibility: {
         categories: [
           "Students who want to pursue a career in Hardware Development, Electronics Engineers, and Tech enthusiasts.",
@@ -702,6 +709,9 @@ export const hackathonEventDetails = {
         "Participants are required to give an interactive demonstration of their design",
         "Ensure that your PCB marking and connection are well-commented and organized.",
         "You cannot use hackathon work/development/code and any other material related to assessment or evaluation other than this event.",
+      ],
+      lunchannouncement:[
+        "Lunch and accommodation are Free for all participants during the hackathon.",
       ],
       schedule: [
         {
@@ -792,6 +802,9 @@ export const hackathonEventDetails = {
         "Plagiarism, copied ideas, or pre-built projects will lead to immediate disqualification",
         "Participants must maintain professionalism and ethical conduct"
             ],
+            lunchannouncement:[
+        "Lunch Will be Provide for this event ",
+      ],
       schedule: [
         {
           date: "13 February 2026",
@@ -897,6 +910,9 @@ export const hackathonEventDetails = {
         "Late submissions will not be accepted",
         "Any hardware/software must be arranged by the team"
             ],
+            lunchannouncement:[
+        "Lunch Will be Provide for this event ",
+      ],
       schedule: [
         {
           date: "13 February 2026",
