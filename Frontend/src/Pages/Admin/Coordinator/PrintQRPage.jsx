@@ -49,14 +49,20 @@ const PrintQRPage = () => {
       try {
         const devices = await Html5Qrcode.getCameras();
         if (devices && devices.length) {
-          const cameraId = devices[0].id; // Use first camera
-          setCameraId(cameraId);
+          // Prefer back camera on mobile
+          const backCamera = devices.find(d => 
+            d.label.toLowerCase().includes("back") || 
+            d.label.toLowerCase().includes("rear") || 
+            d.label.toLowerCase().includes("environment")
+          );
+          const selectedCamera = backCamera ? backCamera.id : devices[devices.length - 1].id;
+          setCameraId(selectedCamera);
           
           html5QrCode = new Html5Qrcode("reader");
           scannerRef.current = html5QrCode;
 
           await html5QrCode.start(
-            cameraId,
+            { facingMode: "environment" },
             {
               fps: 10,
               qrbox: { width: 250, height: 250 },
