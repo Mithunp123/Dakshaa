@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../../supabase';
 import AttendanceManagement from '../SuperAdmin/AttendanceManagement';
+import { useNavigate } from 'react-router-dom';
+import { Printer } from 'lucide-react';
 
 const AttendancePage = () => {
   const [assignedEvents, setAssignedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchAssignedEvents();
@@ -104,7 +107,20 @@ const AttendancePage = () => {
     );
   }
 
-  return <AttendanceManagement coordinatorEvents={assignedEvents} />;
+  return (
+    <div className="relative">
+      <div className="absolute top-4 right-4 z-10">
+        <button
+          onClick={() => navigate('/admin/coordinator/attendance/print-qr')}
+          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition shadow-lg"
+        >
+          <Printer size={18} />
+          <span>Print QR Badges</span>
+        </button>
+      </div>
+      <AttendanceManagement coordinatorEvents={assignedEvents} />
+    </div>
+  );
 };
 
 export default AttendancePage;
