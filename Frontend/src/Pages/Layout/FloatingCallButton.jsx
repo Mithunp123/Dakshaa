@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Phone } from 'lucide-react';
 
 const FloatingCallButton = () => {
-  const phoneNumber = "9489243775";
+  const phoneNumber = "8891850995";
 
   return (
     <motion.a
