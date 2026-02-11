@@ -14,7 +14,6 @@ import ftwk from "./assets/ftwknew.webp";
 import iprwk from "./assets/iprwk.webp";
 import itwk from "./assets/itwk.webp";
 import mcawk from "./assets/mcawk.webp";
-import mctwk from "./assets/mctwk.webp";
 import mechwk from "./assets/mechwk.webp";
 import txtwk from "./assets/txtwk.webp";
 import vlsiwk from "./assets/vlsiwk.webp";
@@ -36,6 +35,7 @@ import txtlogo4 from "./assets/txtlogo4.webp";
 import txtlogo5 from "./assets/txtlogo5.webp";
 import txtlogo6 from "./assets/txttlogo6.webp";
 import other from "./assets/other.webp";
+import wireline from "./assets/wireline.webp";
 
 
 
@@ -49,7 +49,7 @@ function Sponsors() {
   const cosponser=[comingsoon];
   const ecosystem=[startuptn];
 
-  const eventSponsors = [lovable,kavipar,mongodb,indianoil,aidswk,aimlwk,tree,btwk,civilwk,csbswk,csewk,ecewk,eeewk,ftwk,iprwk,itwk,mcawk,mctwk,mechwk,txtwk,vlsiwk,eduskill,finestcoder,txtlogo,txtlogo2,txtlogo3,txtlogo4,txtlogo5,txtlogo6,other];
+  const eventSponsors = [lovable,kavipar,mongodb,indianoil,aidswk,aimlwk,tree,btwk,civilwk,csbswk,csewk,ecewk,eeewk,ftwk,iprwk,itwk,mcawk,wireline,mechwk,txtwk,vlsiwk,eduskill,finestcoder,txtlogo,txtlogo2,txtlogo3,txtlogo4,txtlogo5,txtlogo6,other];
   const stallsponsors = [comingsoon];
 
   const letter = "Sponsors";
