@@ -133,8 +133,8 @@ const Navbar = () => {
           <div className="scroll-note bg-slate-950/90 border-b border-white/10">
             <div className="scroll-note-inner">
               <div className="scroll-note-track">
-                <span className="scroll-note-text">On Spot Registration available for only this event "Vibe Coding with GitHub Copilot"</span>
-                <span className="scroll-note-text" aria-hidden="true">On Spot Registration available for only this event "Vibe Coding with GitHub Copilot"</span>
+                <span className="scroll-note-text">No onspot registration for any events</span>
+                <span className="scroll-note-text" aria-hidden="true">No onspot registration for any events</span>
               </div>
             </div>
           </div>

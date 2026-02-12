@@ -211,6 +211,8 @@ body{
     position: relative;
     overflow: hidden;
     width: 100%;
+    background: linear-gradient(90deg, rgba(251, 146, 60, 0.15), rgba(234, 88, 12, 0.15));
+    box-shadow: 0 2px 10px rgba(251, 146, 60, 0.2);
 }
 
 .scroll-note-inner {
@@ -223,17 +225,19 @@ body{
     align-items: center;
     gap: 3rem;
     white-space: nowrap;
-    padding: 0.35rem 0;
+    padding: 0.5rem 0;
     animation: scroll-note 14s linear infinite;
     will-change: transform;
 }
 
 .scroll-note-text {
-    color: #f8fafc;
+    color: #fbbf24;
     font-family: "orbitron", sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
+    font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5), 0 0 20px rgba(251, 191, 36, 0.3);
 }
 
 /* ============================================
