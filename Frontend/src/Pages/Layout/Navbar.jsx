@@ -120,6 +120,7 @@ const Navbar = () => {
     ? cachedRole 
     : userRole;
   const isAdminRole = ['super_admin', 'registration_admin', 'event_coordinator', 'volunteer'].includes(effectiveRole);
+  const showScrollNote = location.pathname === "/" || location.pathname === "/events";
 
   return (
     <>
@@ -128,6 +129,16 @@ const Navbar = () => {
           ? "bg-slate-950/90 backdrop-blur-lg py-3 shadow-2xl border-b border-white/10" 
           : "bg-transparent py-5"
       }`}>
+        {showScrollNote && (
+          <div className="scroll-note bg-slate-950/90 border-b border-white/10">
+            <div className="scroll-note-inner">
+              <div className="scroll-note-track">
+                <span className="scroll-note-text">On Spot Registration available for only this event "Vibe Coding with GitHub Copilot"</span>
+                <span className="scroll-note-text" aria-hidden="true">On Spot Registration available for only this event "Vibe Coding with GitHub Copilot"</span>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             {/* Logo */}

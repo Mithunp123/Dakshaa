@@ -202,6 +202,40 @@ body{
     animation: marquee 10s linear infinite;
 }
 
+@keyframes scroll-note {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.scroll-note {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+.scroll-note-inner {
+    overflow: hidden;
+    width: 100%;
+}
+
+.scroll-note-track {
+    display: inline-flex;
+    align-items: center;
+    gap: 3rem;
+    white-space: nowrap;
+    padding: 0.35rem 0;
+    animation: scroll-note 14s linear infinite;
+    will-change: transform;
+}
+
+.scroll-note-text {
+    color: #f8fafc;
+    font-family: "orbitron", sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
 /* ============================================
    ENHANCED ANIMATIONS & EFFECTS
    ============================================ */
