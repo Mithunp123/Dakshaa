@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Calendar, 
@@ -11,133 +11,25 @@ import {
   Star,
   Navigation
 } from 'lucide-react';
-import { supabase } from '../../../supabase';
 import { eventScheduleData } from '../../../data/eventScheduleData';
 
 const EventSchedule = () => {
   const [activeDay, setActiveDay] = useState(1);
-  const [filter, setFilter] = useState('All Events'); // 'My Events' or 'All Events' - Default to All Events
-  const [schedule, setSchedule] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('All Events');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    fetchSchedule();
-  }, []);
+  // Get events directly from eventScheduleData
+  const activeDaySchedule = eventScheduleData[activeDay]?.events || [];
 
-  const fetchSchedule = async () => {
-    try {
-      setLoading(true);
-      
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user?.id;
-
-      // Ensure backend runs on 3000 or configure via env
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-      const response = await fetch(`${API_URL}/api/schedule${userId ? `?userId=${userId}` : ''}`);
-      const data = await response.json();
-
-      console.log('📅 Schedule API Response:', data);
-
-      if (data.success) {
-        let mergedSchedule = { ...data.schedule };
-        
-        // Merge JSON data for Day 1, 2 & 3
-        [1, 2, 3].forEach(day => {
-          const jsonData = eventScheduleData[day];
-          if (jsonData?.events) {
-            // Convert JSON format to API format
-            const jsonEvents = jsonData.events.map(event => ({
-              id: event.id,
-              name: event.eventName,
-              time: event.startTime,
-              endTime: event.endTime,
-              venue: event.location,
-              category: event.type,
-              coordinates: event.mapUrl,
-              coordinator: event.coordinatorName,
-              phone: event.coordinatorNumber,
-              description: event.description,
-              isFromJSON: true
-            }));
-            
-            // Merge with existing API data (API data takes precedence, JSON data is backup/additional)
-            if (!mergedSchedule[day]) {
-              mergedSchedule[day] = [];
-            }
-            
-            // Add JSON events that aren't already in API data
-            mergedSchedule[day] = [...mergedSchedule[day], ...jsonEvents];
-            console.log(`📅 Merged ${jsonEvents.length} JSON events for Day ${day}`);
-          }
-        });
-        
-        setSchedule(mergedSchedule);
-        console.log('📅 Schedule loaded:', {
-          day1: mergedSchedule[1]?.length || 0,
-          day2: mergedSchedule[2]?.length || 0,
-          day3: mergedSchedule[3]?.length || 0,
-          total: (mergedSchedule[1]?.length || 0) + (mergedSchedule[2]?.length || 0) + (mergedSchedule[3]?.length || 0)
-        });
-      } else {
-        console.error('Failed to load schedule:', data.error);
-        // Fallback to JSON data if API fails
-        const fallbackSchedule = {};
-        [1, 2, 3].forEach(day => {
-          const jsonData = eventScheduleData[day];
-          if (jsonData?.events) {
-            fallbackSchedule[day] = jsonData.events.map(event => ({
-              id: event.id,
-              name: event.eventName,
-              time: event.startTime,
-              endTime: event.endTime,
-              venue: event.location,
-              category: event.type,
-              coordinates: event.mapUrl,
-              coordinator: event.coordinatorName,
-              phone: event.coordinatorNumber,
-              description: event.description,
-              isFromJSON: true
-            }));
-          }
-        });
-        setSchedule(fallbackSchedule);
-      }
-    } catch (error) {
-      console.error('Error fetching schedule:', error);
-      // Fallback to JSON data if API fails
-      const fallbackSchedule = {};
-      [1, 2, 3].forEach(day => {
-        const jsonData = eventScheduleData[day];
-        if (jsonData?.events) {
-          fallbackSchedule[day] = jsonData.events.map(event => ({
-            id: event.id,
-            name: event.eventName,
-            time: event.startTime,
-            endTime: event.endTime,
-            venue: event.location,
-            category: event.type,
-            coordinates: event.mapUrl,
-            coordinator: event.coordinatorName,
-            phone: event.coordinatorNumber,
-            description: event.description,
-            isFromJSON: true
-          }));
-        }
-      });
-      setSchedule(fallbackSchedule);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const activeDaySchedule = schedule[activeDay] || [];
-
-  const filteredSchedule = activeDaySchedule.filter(event => 
-    filter === 'All Events' || (filter === 'My Events' && event.isMyEvent)
-  );
-
-  console.log(`📅 Day ${activeDay} - Filter: ${filter} - Showing ${filteredSchedule.length} of ${activeDaySchedule.length} events`);
+  const filteredSchedule = activeDaySchedule.filter(event => {
+    const matchesFilter = filter === 'All Events' || (filter === 'My Events' && event.isMyEvent);
+    const matchesSearch = !searchTerm || 
+      event.eventName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.coordinatorName?.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
 
   return (
     <div className="space-y-8">
@@ -163,7 +55,21 @@ const EventSchedule = () => {
       </div>
 
       {/* Day Tabs */}
-      <div className="flex gap-4 border-b border-white/10">
+      <div className="flex flex-col gap-4">
+        {/* Search Box */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Search events by name, location, type, or coordinator..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-all"
+          />
+        </div>
+
+        {/* Day Tabs */}
+        <div className="flex gap-4 border-b border-white/10">
         {[1, 2, 3].map((day) => (
           <button
             key={day}
@@ -182,14 +88,10 @@ const EventSchedule = () => {
           </button>
         ))}
       </div>
+      </div>
 
       {/* Schedule List */}
       <div className="space-y-4">
-        {loading ? (
-             <div className="flex justify-center items-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary"></div>
-             </div>
-        ) : (
         <AnimatePresence mode="wait">
           <motion.div
             key={`${activeDay}-${filter}`}
@@ -210,7 +112,7 @@ const EventSchedule = () => {
                   <div className="md:w-32 shrink-0">
                     <div className="flex items-center gap-2 text-secondary font-bold">
                       <Clock size={16} />
-                      <span>{event.time}</span>
+                      <span>{event.startTime}</span>
                     </div>
                     <p className="text-xs text-gray-500 mt-1 uppercase tracking-widest">Session Start</p>
                   </div>
@@ -218,7 +120,7 @@ const EventSchedule = () => {
                   {/* Event Info */}
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-1">
-                      <h3 className="text-xl font-bold group-hover:text-secondary transition-colors">{event.name}</h3>
+                      <h3 className="text-xl font-bold group-hover:text-secondary transition-colors">{event.eventName}</h3>
                       {event.isMyEvent && (
                         <Star size={16} className="text-yellow-500 fill-yellow-500" />
                       )}
@@ -226,15 +128,15 @@ const EventSchedule = () => {
                     <div className="flex flex-wrap gap-4 text-sm text-gray-400">
                       <div className="flex items-center gap-1.5">
                         <MapPin size={14} className="text-secondary" />
-                        <span>{event.venue}</span>
+                        <span>{event.location}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                        <span>{event.category}</span>
+                        <span>{event.type}</span>
                       </div>
-                      {event.coordinates && (
+                      {event.mapUrl && (
                         <a 
-                          href={event.coordinates} 
+                          href={event.mapUrl} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="flex items-center gap-1.5 text-blue-400 hover:text-blue-300 transition-colors"
@@ -250,9 +152,9 @@ const EventSchedule = () => {
                   {/* Coordinator Info & Mobile Actions */}
                   <div className="md:w-56 shrink-0 flex flex-col gap-2 w-full mt-2 md:mt-0">
                     <a 
-                      href={event.phone ? `tel:${event.phone}` : undefined}
+                      href={event.coordinatorNumber ? `tel:${event.coordinatorNumber}` : undefined}
                       className={`flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/5 transition-all w-full relative group/btn ${
-                        event.phone ? 'hover:bg-secondary/10 hover:border-secondary/30 active:scale-95 cursor-pointer' : ''
+                        event.coordinatorNumber ? 'hover:bg-secondary/10 hover:border-secondary/30 active:scale-95 cursor-pointer' : ''
                       }`}
                     >
                       <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center text-secondary shrink-0 group-hover/btn:bg-secondary group-hover/btn:text-white transition-colors">
@@ -260,11 +162,11 @@ const EventSchedule = () => {
                       </div>
                       <div className="overflow-hidden flex-1 text-left">
                         <p className="text-[10px] text-gray-500 uppercase font-bold">Coordinator</p>
-                        <p className="text-sm font-bold truncate text-white">{event.coordinator}</p>
+                        <p className="text-sm font-bold truncate text-white">{event.coordinatorName}</p>
                       </div>
                       
                       {/* Mobile Call Indicator */}
-                      {event.phone && (
+                      {event.coordinatorNumber && (
                         <div className="md:hidden flex items-center justify-center w-8 h-8 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
                            <Phone size={14} className="fill-current" />
                         </div>
@@ -291,7 +193,6 @@ const EventSchedule = () => {
             )}
           </motion.div>
         </AnimatePresence>
-        )}
       </div>
     </div>
   );
