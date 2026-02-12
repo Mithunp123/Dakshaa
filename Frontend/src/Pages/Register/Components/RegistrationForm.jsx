@@ -57,6 +57,7 @@ const RegistrationForm = () => {
   // Check URL parameter for skip flag
   const urlParams = new URLSearchParams(location.search);
   const skipFromUrl = urlParams.get('skip') === 'true';
+  const eventTypeFromUrl = urlParams.get('event'); // Get event type filter from URL (e.g., ?event=paper)
   const skipToEventSelection = location.state?.skipToEventSelection || skipFromUrl; // Flag to skip step 1
   
   // Check if returning from successful payment
@@ -110,6 +111,9 @@ const RegistrationForm = () => {
   const [deptFilter, setDeptFilter] = useState("ALL");
   const [isDeptDropdownOpen, setIsDeptDropdownOpen] = useState(false);
   const deptDropdownRef = useRef(null);
+  
+  // Event Type Filter State (from URL parameter)
+  const [eventTypeFilter, setEventTypeFilter] = useState(eventTypeFromUrl || "all");
 
   const departments = [
     "ALL",
@@ -145,6 +149,16 @@ const RegistrationForm = () => {
   // Ref to track footer visibility
   const footerObserverRef = useRef(null);
   const searchContainerRef = useRef(null);
+  
+  // Helper function to extract event type from event_id
+  const getEventType = (eventId) => {
+    if (!eventId) return null;
+    const eventIdLower = eventId.toLowerCase();
+    if (eventIdLower.includes('paper')) return 'paper';
+    if (eventIdLower.includes('poster')) return 'poster';
+    if (eventIdLower.includes('project')) return 'project';
+    return null;
+  };
 
   // Detect when footer becomes visible to hide navigation buttons
   useEffect(() => {
@@ -665,10 +679,17 @@ const RegistrationForm = () => {
            matchesDept = false;
         }
       }
+      
+      // Event Type Filter Logic (from URL parameter)
+      let matchesEventType = true;
+      if (eventTypeFilter !== "all") {
+        const eventType = getEventType(event.event_id);
+        matchesEventType = eventType === eventTypeFilter;
+      }
 
-      return matchesSearch && matchesCategory && matchesDept;
+      return matchesSearch && matchesCategory && matchesDept && matchesEventType;
     });
-  }, [events, searchTerm, categoryFilter, deptFilter, registrationMode, selectedCombo]);
+  }, [events, searchTerm, categoryFilter, deptFilter, registrationMode, selectedCombo, eventTypeFilter]);
 
   // Memoized selected event details
   const selectedEventDetails = useMemo(
