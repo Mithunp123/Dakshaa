@@ -75,7 +75,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
   const [downloadingOverallCSVReport, setDownloadingOverallCSVReport] = useState(false);
   
   // Filter state for event details view (just paid/pending)
-  const [detailsPaymentFilter, setDetailsPaymentFilter] = useState('all');
+  const [detailsPaymentFilter, setDetailsPaymentFilter] = useState('PAID');
   
   // Cache for event stats to prevent reloading
   const [eventStatsCache, setEventStatsCache] = useState(null);
@@ -741,23 +741,12 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         })();
 
       if (isTeamEvent) {
-        // For team events, first get PAID registrations to filter teams
-        const { data: paidRegistrations, error: regError } = await supabase
-          .from('event_registrations_config')
-          .select('user_id')
-          .eq('event_id', selectedEvent.id)
-          .in('payment_status', ['PAID', 'completed']);
-
-        if (regError) throw regError;
-
-        const paidUserIds = paidRegistrations?.map(reg => reg.user_id) || [];
-        
-        // Fetch only teams where the leader has PAID status
+        // For team events, fetch only teams where is_active = true (fully paid teams)
         const { data: teamData, error: teamError } = await supabase
           .from('teams')
           .select('*')
           .eq('event_id', selectedEvent.id)
-          .in('leader_id', paidUserIds);
+          .eq('is_active', true);
 
         if (teamError) throw teamError;
 
@@ -765,13 +754,13 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         const teamIds = teamData?.map(team => team.id) || [];
         const leaderIds = teamData?.map(team => team.leader_id).filter(Boolean) || [];
         
-        // Fetch team members for all teams
+        // Fetch ALL team members for active (paid) teams
         const { data: teamMembers } = await supabase
           .from('team_members')
           .select('user_id, team_id')
           .in('team_id', teamIds);
         
-        // Get all unique user IDs (leaders + members)
+        // Get all unique user IDs (leaders + all members of paid teams)
         const memberIds = teamMembers?.map(member => member.user_id) || [];
         const allUserIds = [...new Set([...leaderIds, ...memberIds])];
 
@@ -784,7 +773,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
         const teamMemberMap = new Map();
         
-        // Create team member mapping
+        // Create team member mapping (all members of paid teams)
         teamMembers?.forEach(member => {
           if (!teamMemberMap.has(member.team_id)) {
             teamMemberMap.set(member.team_id, []);
@@ -845,7 +834,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
             )
           `)
           .eq('event_id', selectedEvent.id)
-          .eq('payment_status', 'PAID');
+          .in('payment_status', ['PAID', 'paid', 'completed', 'COMPLETED', 'verified', 'VERIFIED']);
 
         if (regError) throw regError;
 
@@ -1032,23 +1021,12 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         })();
 
       if (isTeamEvent) {
-        // For team events, first get PAID registrations to filter teams
-        const { data: paidRegistrations, error: regError } = await supabase
-          .from('event_registrations_config')
-          .select('user_id')
-          .eq('event_id', selectedEvent.id)
-          .in('payment_status', ['PAID', 'completed']);
-
-        if (regError) throw regError;
-
-        const paidUserIds = paidRegistrations?.map(reg => reg.user_id) || [];
-        
-        // Fetch only teams where the leader has PAID status
+        // For team events, fetch only teams where is_active = true (fully paid teams)
         const { data: teamData, error: teamError } = await supabase
           .from('teams')
           .select('*')
           .eq('event_id', selectedEvent.id)
-          .in('leader_id', paidUserIds);
+          .eq('is_active', true);
 
         if (teamError) throw teamError;
 
@@ -1056,13 +1034,13 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         const teamIds = teamData?.map(team => team.id) || [];
         const leaderIds = teamData?.map(team => team.leader_id).filter(Boolean) || [];
         
-        // Fetch team members for all teams
+        // Fetch ALL team members for active (paid) teams
         const { data: teamMembers } = await supabase
           .from('team_members')
           .select('user_id, team_id')
           .in('team_id', teamIds);
         
-        // Get all unique user IDs (leaders + members)
+        // Get all unique user IDs (leaders + all members of paid teams)
         const memberIds = teamMembers?.map(member => member.user_id) || [];
         const allUserIds = [...new Set([...leaderIds, ...memberIds])];
 
@@ -1075,7 +1053,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
         const teamMemberMap = new Map();
         
-        // Create team member mapping
+        // Create team member mapping (all members of paid teams)
         teamMembers?.forEach(member => {
           if (!teamMemberMap.has(member.team_id)) {
             teamMemberMap.set(member.team_id, []);
@@ -1134,7 +1112,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
             )
           `)
           .eq('event_id', selectedEvent.id)
-          .eq('payment_status', 'PAID');
+          .in('payment_status', ['PAID', 'paid', 'completed', 'COMPLETED', 'verified', 'VERIFIED']);
 
         if (regError) throw regError;
 
@@ -1534,15 +1512,49 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
 
       const eventIds = data.map(event => event.id);
       const registrationStats = new Map();
+      
+      // Separate team events and individual events
+      const teamEventIds = data.filter(e => e.is_team_event).map(e => e.id);
+      const individualEventIds = data.filter(e => !e.is_team_event).map(e => e.id);
 
-      if (eventIds.length > 0) {
-        console.log('📊 Fetching registrations in bulk for stats...');
+      // For team events, count teams with is_active=true
+      if (teamEventIds.length > 0) {
+        console.log('📊 Fetching team stats for team events...');
+        const { data: teams, error: teamsError } = await fetchAllRecords(
+          supabase,
+          'teams',
+          'event_id, is_active',
+          {
+            filters: [{ column: 'event_id', operator: 'in', value: teamEventIds }]
+          }
+        );
+
+        if (teamsError) console.error('Error fetching teams:', teamsError);
+
+        teams?.forEach(team => {
+          if (!registrationStats.has(team.event_id)) {
+            registrationStats.set(team.event_id, { paid: 0, pending: 0, partial: 0, total: 0 });
+          }
+          const stats = registrationStats.get(team.event_id);
+          stats.total += 1;
+
+          if (team.is_active === true) {
+            stats.paid += 1;
+          } else {
+            stats.pending += 1;
+          }
+        });
+      }
+
+      // For individual events, count from event_registrations_config
+      if (individualEventIds.length > 0) {
+        console.log('📊 Fetching registrations in bulk for individual event stats...');
         const { data: registrations, error: registrationsError } = await fetchAllRecords(
           supabase,
           'event_registrations_config',
           'event_id, payment_status',
           {
-            filters: [{ column: 'event_id', operator: 'in', value: eventIds }]
+            filters: [{ column: 'event_id', operator: 'in', value: individualEventIds }]
           }
         );
 
@@ -1796,7 +1808,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
     
     // Reset states first
     setLoadingDetails(true);
-    setDetailsPaymentFilter('all'); // Reset filter
+    setDetailsPaymentFilter('PAID'); // Reset filter to paid only
     setEventRegistrations([]);
     setSelectedEvent(event);
     
@@ -1814,7 +1826,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
     setLoadingDetails(false);
     setSelectedEvent(null);
     setEventRegistrations([]);
-    setDetailsPaymentFilter('all');
+    setDetailsPaymentFilter('PAID');
     
     // Use cached stats if available to prevent reload
     if (eventStatsCache && eventStatsCache.length > 0) {

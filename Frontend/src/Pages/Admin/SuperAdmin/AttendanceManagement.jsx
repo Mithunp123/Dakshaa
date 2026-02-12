@@ -50,6 +50,7 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState({
     totalMarked: 0,
@@ -571,11 +572,21 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
     );
   });
 
+  // Get unique categories from events
+  const categories = [...new Set(events.map(e => e.category).filter(Boolean))].sort();
+
+  // Filter events by category and search
+  const filteredEvents = events.filter(event => {
+    const matchesCategory = !selectedCategory || event.category === selectedCategory;
+    const matchesSearch = !searchTerm || event.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  // Get filtered event ids for stats filtering
+  const filteredEventIds = new Set(filteredEvents.map(e => e.event_id || e.id));
+
   const filteredEventStats = eventStats.filter(stat => {
-    if (!searchTerm) return true;
-    
-    const eventName = getEventName(stat.event_id);
-    return eventName.toLowerCase().includes(searchTerm.toLowerCase());
+    return filteredEventIds.has(stat.event_id);
   });
 
   const getEventName = (eventId) => {
@@ -660,15 +671,32 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
               </div>
             </div>
             
-            <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Search events..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-secondary"
-              />
+            <div className="flex flex-col md:flex-row gap-3 mb-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Search events..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-secondary"
+                />
+              </div>
+              <div className="relative min-w-[200px]">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white appearance-none focus:outline-none focus:border-secondary cursor-pointer"
+                >
+                  <option value="" className="bg-gray-900 text-white">All Categories</option>
+                  {categories.map(cat => (
+                    <option key={cat} value={cat} className="bg-gray-900 text-white">
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {loading ? (
@@ -695,14 +723,10 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
-                    {events.map((event, index) => {
+                    {filteredEvents.map((event, index) => {
                       // Use event_id (text slug) to match attendance stats
                       const textEventId = event.event_id || event.id;
                       const stat = eventStats.find(s => s.event_id === textEventId) || { morning: 0, evening: 0, total: 0 };
-                      
-                      if (searchTerm && !event.name.toLowerCase().includes(searchTerm.toLowerCase())) {
-                        return null;
-                      }
 
                       return (
                         <motion.tr
@@ -735,16 +759,16 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
                   <tfoot className="bg-white/5 border-t border-white/10">
                     <tr>
                       <td className="px-6 py-4 text-left font-bold text-white">
-                        OVERALL TOTAL
+                        {selectedCategory ? `TOTAL (${selectedCategory})` : 'OVERALL TOTAL'}
                       </td>
                       <td className="px-6 py-4 text-center font-bold text-white">
-                        {eventStats.reduce((sum, stat) => sum + stat.morning, 0)}
+                        {filteredEventStats.reduce((sum, stat) => sum + stat.morning, 0)}
                       </td>
                       <td className="px-6 py-4 text-center font-bold text-white">
-                        {eventStats.reduce((sum, stat) => sum + stat.evening, 0)}
+                        {filteredEventStats.reduce((sum, stat) => sum + stat.evening, 0)}
                       </td>
                       <td className="px-6 py-4 text-center font-bold text-white">
-                        {eventStats.reduce((sum, stat) => sum + stat.total, 0)}
+                        {filteredEventStats.reduce((sum, stat) => sum + stat.total, 0)}
                       </td>
                     </tr>
                   </tfoot>
