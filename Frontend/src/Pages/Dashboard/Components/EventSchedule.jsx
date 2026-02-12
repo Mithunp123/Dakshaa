@@ -12,6 +12,7 @@ import {
   Navigation
 } from 'lucide-react';
 import { supabase } from '../../../supabase';
+import { eventScheduleData } from '../../../data/eventScheduleData';
 
 const EventSchedule = () => {
   const [activeDay, setActiveDay] = useState(1);
@@ -39,21 +40,92 @@ const EventSchedule = () => {
       console.log('📅 Schedule API Response:', data);
 
       if (data.success) {
-        setSchedule(data.schedule);
+        let mergedSchedule = { ...data.schedule };
+        
+        // Merge JSON data for Day 1, 2 & 3
+        [1, 2, 3].forEach(day => {
+          const jsonData = eventScheduleData[day];
+          if (jsonData?.events) {
+            // Convert JSON format to API format
+            const jsonEvents = jsonData.events.map(event => ({
+              id: event.id,
+              name: event.eventName,
+              time: event.startTime,
+              endTime: event.endTime,
+              venue: event.location,
+              category: event.type,
+              coordinates: event.mapUrl,
+              coordinator: event.coordinatorName,
+              phone: event.coordinatorNumber,
+              description: event.description,
+              isFromJSON: true
+            }));
+            
+            // Merge with existing API data (API data takes precedence, JSON data is backup/additional)
+            if (!mergedSchedule[day]) {
+              mergedSchedule[day] = [];
+            }
+            
+            // Add JSON events that aren't already in API data
+            mergedSchedule[day] = [...mergedSchedule[day], ...jsonEvents];
+            console.log(`📅 Merged ${jsonEvents.length} JSON events for Day ${day}`);
+          }
+        });
+        
+        setSchedule(mergedSchedule);
         console.log('📅 Schedule loaded:', {
-          day1: data.schedule[1]?.length || 0,
-          day2: data.schedule[2]?.length || 0,
-          day3: data.schedule[3]?.length || 0,
-          total: (data.schedule[1]?.length || 0) + (data.schedule[2]?.length || 0) + (data.schedule[3]?.length || 0)
+          day1: mergedSchedule[1]?.length || 0,
+          day2: mergedSchedule[2]?.length || 0,
+          day3: mergedSchedule[3]?.length || 0,
+          total: (mergedSchedule[1]?.length || 0) + (mergedSchedule[2]?.length || 0) + (mergedSchedule[3]?.length || 0)
         });
       } else {
         console.error('Failed to load schedule:', data.error);
-        // Fallback to empty if fetch fails
-        setSchedule({});
+        // Fallback to JSON data if API fails
+        const fallbackSchedule = {};
+        [1, 2, 3].forEach(day => {
+          const jsonData = eventScheduleData[day];
+          if (jsonData?.events) {
+            fallbackSchedule[day] = jsonData.events.map(event => ({
+              id: event.id,
+              name: event.eventName,
+              time: event.startTime,
+              endTime: event.endTime,
+              venue: event.location,
+              category: event.type,
+              coordinates: event.mapUrl,
+              coordinator: event.coordinatorName,
+              phone: event.coordinatorNumber,
+              description: event.description,
+              isFromJSON: true
+            }));
+          }
+        });
+        setSchedule(fallbackSchedule);
       }
     } catch (error) {
       console.error('Error fetching schedule:', error);
-      setSchedule({});
+      // Fallback to JSON data if API fails
+      const fallbackSchedule = {};
+      [1, 2, 3].forEach(day => {
+        const jsonData = eventScheduleData[day];
+        if (jsonData?.events) {
+          fallbackSchedule[day] = jsonData.events.map(event => ({
+            id: event.id,
+            name: event.eventName,
+            time: event.startTime,
+            endTime: event.endTime,
+            venue: event.location,
+            category: event.type,
+            coordinates: event.mapUrl,
+            coordinator: event.coordinatorName,
+            phone: event.coordinatorNumber,
+            description: event.description,
+            isFromJSON: true
+          }));
+        }
+      });
+      setSchedule(fallbackSchedule);
     } finally {
       setLoading(false);
     }

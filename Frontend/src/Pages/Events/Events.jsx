@@ -2038,13 +2038,13 @@ const Events = () => {
 
 
                   {/* Important Note */}
-                  <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
+                  {/*<div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-6">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
                       <span className="text-yellow-400 font-semibold text-sm">Important Note:</span>
                     </div>
                     <p className="text-yellow-300 text-sm mt-1 ml-7">Lunch will be provided for all Events.</p>
-                  </div>
+                  </div>*/}
 
                   {/* Register Button */}
                   <button
