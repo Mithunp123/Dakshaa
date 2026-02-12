@@ -27,6 +27,7 @@ const TeamReport = () => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedEventType, setSelectedEventType] = useState('all');
   const [availableCategories, setAvailableCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [teams, setTeams] = useState([]);
@@ -49,7 +50,7 @@ const TeamReport = () => {
   useEffect(() => {
     fetchEvents();
     fetchEventWiseStats();
-  }, [selectedCategory]);
+  }, [selectedCategory, selectedEventType]);
 
   useEffect(() => {
     if (selectedEvent) {
@@ -99,11 +100,21 @@ const TeamReport = () => {
     }
   };
 
+  // Helper function to extract event type from event_id
+  const getEventType = (eventId) => {
+    if (!eventId) return null;
+    const eventIdLower = eventId.toLowerCase();
+    if (eventIdLower.includes('paper')) return 'paper';
+    if (eventIdLower.includes('poster')) return 'poster';
+    if (eventIdLower.includes('project')) return 'project';
+    return null;
+  };
+
   const fetchEvents = async () => {
     try {
       let query = supabase
         .from('events')
-        .select('id, name, category')
+        .select('id, name, category, event_id')
         .order('name');
       
       if (selectedCategory !== 'all') {
@@ -113,8 +124,18 @@ const TeamReport = () => {
       const { data, error } = await query;
       
       if (error) throw error;
-      console.log('Fetched events for category:', selectedCategory, 'Count:', data?.length || 0);
-      setEvents(data || []);
+      
+      // Filter by event type if selected
+      let filteredData = data || [];
+      if (selectedEventType !== 'all') {
+        filteredData = filteredData.filter(event => {
+          const eventType = getEventType(event.event_id);
+          return eventType === selectedEventType;
+        });
+      }
+      
+      console.log('Fetched events for category:', selectedCategory, 'Type:', selectedEventType, 'Count:', filteredData.length);
+      setEvents(filteredData);
     } catch (error) {
       console.error('Error fetching events:', error);
     }
@@ -295,7 +316,7 @@ const TeamReport = () => {
     try {
       let query = supabase
         .from('events')
-        .select('id, name, category')
+        .select('id, name, category, event_id')
         .order('category', { ascending: true })
         .order('name', { ascending: true });
       
@@ -303,8 +324,18 @@ const TeamReport = () => {
         query = query.ilike('category', selectedCategory);
       }
 
-      const { data: allEvents, error: eventsError } = await query;
+      const { data: allEventsData, error: eventsError } = await query;
+      
       if (eventsError) throw eventsError;
+      
+      // Filter by event type if selected
+      let allEvents = allEventsData || [];
+      if (selectedEventType !== 'all') {
+        allEvents = allEvents.filter(event => {
+          const eventType = getEventType(event.event_id);
+          return eventType === selectedEventType;
+        });
+      }
 
       if (!allEvents || allEvents.length === 0) {
         setEventWiseStats([]);
@@ -508,9 +539,19 @@ const TeamReport = () => {
       const ws = XLSX.utils.json_to_sheet(allData);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "All Events Report");
-      const fileName = selectedCategory !== 'all' 
-        ? `${selectedCategory}_All_Events_Report.xlsx`
-        : 'All_Categories_Report.xlsx';
+      
+      // Build filename based on filters
+      let fileName = '';
+      if (selectedCategory !== 'all' && selectedEventType !== 'all') {
+        fileName = `${selectedCategory}_${selectedEventType.charAt(0).toUpperCase() + selectedEventType.slice(1)}_All_Events_Report.xlsx`;
+      } else if (selectedCategory !== 'all') {
+        fileName = `${selectedCategory}_All_Events_Report.xlsx`;
+      } else if (selectedEventType !== 'all') {
+        fileName = `${selectedEventType.charAt(0).toUpperCase() + selectedEventType.slice(1)}_All_Events_Report.xlsx`;
+      } else {
+        fileName = 'All_Categories_Report.xlsx';
+      }
+      
       XLSX.writeFile(wb, fileName);
     } catch (error) {
       console.error('Error generating Excel report:', error);
@@ -580,9 +621,23 @@ const TeamReport = () => {
       doc.text('AUTONOMOUS | TIRUCHENGODE', pageWidth / 2, headerY + 2, { align: 'center' });
       doc.setFontSize(14);
       doc.setTextColor(197, 48, 48);
-      const title = selectedCategory !== 'all' 
-        ? `${selectedCategory} - All Events Report`
-        : 'All Categories - Complete Report';
+      
+      // Build title based on filters
+      let title = '';
+      const eventTypeStr = selectedEventType !== 'all' 
+        ? selectedEventType.charAt(0).toUpperCase() + selectedEventType.slice(1)
+        : '';
+      
+      if (selectedCategory !== 'all' && selectedEventType !== 'all') {
+        title = `${selectedCategory} - ${eventTypeStr} Events Report`;
+      } else if (selectedCategory !== 'all') {
+        title = `${selectedCategory} - All Events Report`;
+      } else if (selectedEventType !== 'all') {
+        title = `${eventTypeStr} Events - Complete Report`;
+      } else {
+        title = 'All Categories - Complete Report';
+      }
+      
       doc.text(title, pageWidth / 2, headerY + 10, { align: 'center' });
       doc.setFontSize(10);
       doc.setTextColor(100, 100, 100);
@@ -919,7 +974,7 @@ const TeamReport = () => {
 
       {/* Filter and Event Selection */}
       <div className="bg-slate-900/50 p-6 rounded-xl border border-slate-800 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Category Filter */}
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-2">Filter by Category</label>
@@ -938,6 +993,27 @@ const TeamReport = () => {
                     {category}
                   </option>
                 ))}
+              </select>
+              <Filter className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+            </div>
+          </div>
+
+          {/* Event Type Filter */}
+          <div>
+            <label className="block text-sm font-medium text-slate-400 mb-2">Filter by Event Type</label>
+            <div className="relative">
+              <select
+                className="w-full bg-slate-800 border-slate-700 text-white rounded-lg pl-4 pr-10 py-3 appearance-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                onChange={(e) => {
+                  setSelectedEventType(e.target.value);
+                  setSelectedEvent(null);
+                }}
+                value={selectedEventType}
+              >
+                <option value="all">All Types</option>
+                <option value="paper">Paper</option>
+                <option value="poster">Poster</option>
+                <option value="project">Project</option>
               </select>
               <Filter className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
             </div>
@@ -974,7 +1050,7 @@ const TeamReport = () => {
           <div className="px-6 py-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
             <h3 className="text-lg font-semibold text-white flex items-center gap-2">
               <Calendar className="text-cyan-400" size={20} />
-              Event-Wise Headcount {selectedCategory !== 'all' && `(${selectedCategory})`}
+              Event-Wise Headcount {selectedCategory !== 'all' && `(${selectedCategory})`}{selectedEventType !== 'all' && ` - ${selectedEventType.charAt(0).toUpperCase() + selectedEventType.slice(1)}`}
             </h3>
             <div className="flex items-center gap-3">
               {eventWiseStats.length > 0 && (
