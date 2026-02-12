@@ -399,7 +399,13 @@ const GlobalScannerPage = () => {
       
       const errStr = typeof error === 'string' ? error : JSON.stringify(error);
       if (errStr.includes('duplicate key') || errStr.includes('attendance_user_id_event_id_key') || errStr.includes('23505')) {
-        toast('⚠️ Duplicate Entry - Attendance already marked', { 
+        toast('⚠️ Already marked for this session', { 
+          duration: 2000, 
+          icon: '⚠️', 
+          style: { background: '#fed7aa', color: '#92400e' } 
+        });
+      } else if (error?.code === 'DUPLICATE_SESSION' || error?.status === 'duplicate') {
+        toast('⚠️ Already marked for this session', { 
           duration: 2000, 
           icon: '⚠️', 
           style: { background: '#fed7aa', color: '#92400e' } 

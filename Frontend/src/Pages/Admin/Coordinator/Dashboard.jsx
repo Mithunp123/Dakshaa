@@ -430,11 +430,19 @@ const CoordinatorDashboard = () => {
           .eq('event_id', eventKey)
           .eq('evening_attended', true);
 
+        // Count total unique attendees (anyone who has morning OR evening = true)
+        // This is a single count - not morning + evening
+        const { count: totalUniqueCount } = await supabase
+          .from('attendance')
+          .select('*', { count: 'exact', head: true })
+          .eq('event_id', eventKey)
+          .or('morning_attended.eq.true,evening_attended.eq.true');
+
         setStats({
           registered: registeredCount,
           morningCheckedIn: morningCount || 0,
           eveningCheckedIn: eveningCount || 0,
-          totalCheckedIn: (morningCount || 0) + (eveningCount || 0),
+          totalCheckedIn: totalUniqueCount || 0,
           morningRemaining: registeredCount - (morningCount || 0),
           eveningRemaining: registeredCount - (eveningCount || 0)
         });
@@ -555,8 +563,11 @@ const CoordinatorDashboard = () => {
   // Helper to detect duplicate key errors from any error shape
   const isDuplicateAttendanceError = (err) => {
     if (!err) return false;
+    // Check for explicit duplicate session code from RPC
+    if (err.code === 'DUPLICATE_SESSION' || err.status === 'duplicate') return true;
+    // Check for database-level duplicate key errors only
     const str = typeof err === 'string' ? err : JSON.stringify(err);
-    return str.includes('duplicate key') || str.includes('attendance_user_id_event_id_key') || str.includes('23505') || str.includes('already marked');
+    return str.includes('duplicate key') || str.includes('attendance_user_id_event_id_key') || str.includes('23505');
   };
 
   // This function uses explicit parameters to avoid closure issues
@@ -588,11 +599,11 @@ const CoordinatorDashboard = () => {
 
       console.log('RPC Result:', result);
 
-      // Handle duplicate key error (attendance already marked)
+      // Handle RPC-level error (network/auth issues)
       if (rpcError) {
         if (isDuplicateAttendanceError(rpcError)) {
           playBuzzSound();
-          toast('⚠️ Duplicate Entry - Attendance already marked', { 
+          toast('⚠️ Already marked for this session', { 
             duration: 2000, 
             icon: '⚠️', 
             style: { background: '#fed7aa', color: '#92400e' } 
@@ -602,19 +613,22 @@ const CoordinatorDashboard = () => {
         throw rpcError;
       }
 
+      // Handle duplicate session (same session scanned twice)
+      if (result.status === 'duplicate') {
+        playBuzzSound();
+        const sessionLabel = result.session_type === 'evening' ? 'Afternoon' : 'Forenoon';
+        toast(`⚠️ ${sessionLabel} already marked for ${result.student_name || 'student'}`, { 
+          duration: 2000, 
+          icon: '⚠️', 
+          style: { background: '#fed7aa', color: '#92400e' } 
+        });
+        return;
+      }
+
+      // Handle other errors/warnings
       if (result.status === 'error' || result.status === 'warning') {
         playBuzzSound();
-        if (isDuplicateAttendanceError(result)) {
-          toast('⚠️ Duplicate Entry - Attendance already marked', { 
-            duration: 2000, 
-            icon: '⚠️', 
-            style: { background: '#fed7aa', color: '#92400e' } 
-          });
-        } else if (result.status === 'warning') {
-          toast(result.message, { duration: 2000, icon: '⚠️', style: { background: '#fef3c7', color: '#92400e' } });
-        } else {
-          toast.error(result.message, { duration: 2000, icon: '❌' });
-        }
+        toast.error(result.message || 'Failed to mark attendance', { duration: 2000, icon: '❌' });
         return;
       }
 
@@ -629,7 +643,7 @@ const CoordinatorDashboard = () => {
       playBuzzSound();
       
       if (isDuplicateAttendanceError(error)) {
-        toast('⚠️ Duplicate Entry - Attendance already marked', { 
+        toast('⚠️ Already marked for this session', { 
           duration: 2000, 
           icon: '⚠️', 
           style: { background: '#fed7aa', color: '#92400e' } 
@@ -796,57 +810,26 @@ const CoordinatorDashboard = () => {
         </select>
       </div>
 
-      {/* Session Selector */}
-      <div className="flex gap-2 px-4 py-2">
-        <button
-          onClick={() => setSelectedSession('morning')}
-          className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
-            selectedSession === 'morning'
-              ? 'bg-yellow-500 text-white shadow-lg shadow-yellow-500/20'
-              : 'bg-white/5 text-gray-400 border border-white/10'
-          }`}
-        >
-          <Sun size={18} />
-          Forenoon
-        </button>
-        <button
-          onClick={() => setSelectedSession('evening')}
-          className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
-            selectedSession === 'evening'
-              ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-              : 'bg-white/5 text-gray-400 border border-white/10'
-          }`}
-        >
-          <Moon size={18} />
-          Afternoon
-        </button>
-      </div>
 
-      {/* Stats Row - Now with session breakdown */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
+
+      {/* Stats Row - Single attendance count with session indicators */}
+      <div className="grid grid-cols-3 gap-3 p-4">
         <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 text-center">
           <Users className="mx-auto text-blue-500 mb-2" size={24} />
           <p className="text-2xl font-bold text-blue-500">{stats.registered}</p>
           <p className="text-xs text-gray-400 uppercase">Registered</p>
         </div>
-        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-4 text-center">
-          <Sun className="mx-auto text-yellow-500 mb-2" size={24} />
-          <p className="text-2xl font-bold text-yellow-500">{stats.morningCheckedIn}</p>
-          <p className="text-xs text-gray-400 uppercase">Forenoon ✓</p>
-        </div>
-        <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-4 text-center">
-          <Moon className="mx-auto text-indigo-500 mb-2" size={24} />
-          <p className="text-2xl font-bold text-indigo-500">{stats.eveningCheckedIn}</p>
-          <p className="text-xs text-gray-400 uppercase">Afternoon ✓</p>
+        <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 text-center">
+          <CheckCircle2 className="mx-auto text-green-500 mb-2" size={24} />
+          <p className="text-2xl font-bold text-green-500">{stats.totalCheckedIn}</p>
+          <p className="text-xs text-gray-400 uppercase">Attended</p>
         </div>
         <div className="bg-secondary/10 border border-secondary/20 rounded-2xl p-4 text-center">
           <Clock className="mx-auto text-secondary mb-2" size={24} />
           <p className="text-2xl font-bold text-secondary">
-            {selectedSession === 'morning' ? stats.morningRemaining : stats.eveningRemaining}
+            {stats.registered - stats.totalCheckedIn}
           </p>
-          <p className="text-xs text-gray-400 uppercase">
-            {selectedSession === 'morning' ? 'AM Left' : 'PM Left'}
-          </p>
+          <p className="text-xs text-gray-400 uppercase">Remaining</p>
         </div>
       </div>
 
@@ -905,11 +888,7 @@ const CoordinatorDashboard = () => {
                     <div>
                       <h3 className="text-2xl font-bold mb-2">Ready to Scan</h3>
                       <p className="text-gray-400">Tap below to start QR code scanner</p>
-                      <p className="text-xs text-gray-500 mt-2">
-                        Session: <span className={selectedSession === 'morning' ? 'text-yellow-500' : 'text-indigo-500'}>
-                          {selectedSession === 'morning' ? 'Morning (AM)' : 'Evening (PM)'}
-                        </span>
-                      </p>
+
                     </div>
                     {cameraError ? (
                       <div className="flex flex-col gap-3">
@@ -941,14 +920,7 @@ const CoordinatorDashboard = () => {
                       <p className="text-xs text-gray-400 uppercase mb-1">Scanning for Event</p>
                       <p className="text-secondary font-bold text-lg">{selectedEvent?.name || 'No Event Selected'}</p>
                     </div>
-                    <div className={`p-3 rounded-xl text-center font-bold text-sm flex items-center justify-center gap-2 ${
-                      selectedSession === 'morning' 
-                        ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' 
-                        : 'bg-indigo-500/20 text-indigo-500 border border-indigo-500/30'
-                    }`}>
-                      {selectedSession === 'morning' ? <Sun size={18} /> : <Moon size={18} />}
-                      {selectedSession === 'morning' ? 'MORNING' : 'EVENING'} Session
-                    </div>
+
                     <div 
                       id="qr-reader" 
                       ref={scannerRef}
@@ -988,10 +960,7 @@ const CoordinatorDashboard = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="flex gap-1">
-                          {p.morningAttended && <span className="text-xs px-2 py-0.5 bg-yellow-500/20 text-yellow-500 rounded">AM</span>}
-                          {p.eveningAttended && <span className="text-xs px-2 py-0.5 bg-indigo-500/20 text-indigo-500 rounded">PM</span>}
-                        </div>
+                        {(p.morningAttended || p.eveningAttended) && <span className="text-xs px-2 py-0.5 bg-green-500/20 text-green-500 rounded">✓ Present</span>}
                         <p className="text-xs text-gray-500 mt-1">
                           {p.attendance[0]?.created_at ? new Date(p.attendance[0].created_at).toLocaleTimeString() : ''}
                         </p>
@@ -1012,18 +981,7 @@ const CoordinatorDashboard = () => {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-4"
             >
-              {/* Current Session Indicator */}
-              <div className={`p-3 rounded-xl text-center font-bold ${
-                selectedSession === 'morning' 
-                  ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' 
-                  : 'bg-indigo-500/20 text-indigo-500 border border-indigo-500/30'
-              }`}>
-                {selectedSession === 'morning' ? (
-                  <span className="flex items-center justify-center gap-2"><Sun size={18} /> Marking FORENOON Session</span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2"><Moon size={18} /> Marking AFTERNOON Session</span>
-                )}
-              </div>
+
 
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
@@ -1038,7 +996,7 @@ const CoordinatorDashboard = () => {
 
               <div className="space-y-3">
                 {filteredParticipants.map(p => {
-                  const hasCurrentSessionAttendance = selectedSession === 'morning' ? p.morningAttended : p.eveningAttended;
+                  const hasCurrentSessionAttendance = p.morningAttended || p.eveningAttended;
                   const hasAnyAttendance = p.morningAttended || p.eveningAttended;
                   return (
                     <div
@@ -1065,24 +1023,17 @@ const CoordinatorDashboard = () => {
                           <div>
                             <p className="font-bold">{p.profiles?.full_name}</p>
                             <p className="text-xs text-secondary font-mono">{formatDakshaaId(p.user_id)}</p>
-                            {/* Session badges */}
-                            <div className="flex gap-1 mt-1">
-                              {p.morningAttended && <span className="text-xs px-2 py-0.5 bg-yellow-500/20 text-yellow-500 rounded">AM ✓</span>}
-                              {p.eveningAttended && <span className="text-xs px-2 py-0.5 bg-indigo-500/20 text-indigo-500 rounded">PM ✓</span>}
-                            </div>
+                            {/* Attendance badge */}
+                            {(p.morningAttended || p.eveningAttended) && <div className="mt-1"><span className="text-xs px-2 py-0.5 bg-green-500/20 text-green-500 rounded">✓ Present</span></div>}
                           </div>
                         </div>
                         {!hasCurrentSessionAttendance && (
                           <button
                             onClick={() => handleManualAttendance(p.user_id)}
                             disabled={submitting}
-                            className={`px-4 py-2 rounded-xl font-bold text-sm transition-all disabled:opacity-50 ${
-                              selectedSession === 'morning'
-                                ? 'bg-yellow-500 text-white hover:bg-yellow-600'
-                                : 'bg-indigo-500 text-white hover:bg-indigo-600'
-                            }`}
+                            className="px-4 py-2 rounded-xl font-bold text-sm transition-all disabled:opacity-50 bg-green-500 text-white hover:bg-green-600"
                           >
-                            {selectedSession === 'morning' ? 'Mark AM' : 'Mark PM'}
+                            Mark
                           </button>
                         )}
                       </div>
