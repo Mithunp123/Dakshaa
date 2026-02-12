@@ -14,10 +14,17 @@ import {
   Sun,
   Moon,
   Loader2,
-  User
+  User,
+  FileText,
+  FileSpreadsheet
 } from "lucide-react";
 import { supabase } from "../../../supabase";
 import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { fetchAllRecords, fetchAllRecordsWithJoins } from '../../../utils/bulkFetch';
+import logo1Img from '../../../assets/logo1.webp';
+import logoImg from '../../../assets/logo.webp';
 
 // Helper function to format dates
 const formatDate = (date, formatStr) => {
@@ -107,32 +114,52 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
       let data;
       
       if (hasCoordinatorFilter) {
-        // For coordinators, use their assigned events
-        const allowedUUIDs = coordinatorEvents.map(e => e.id).filter(Boolean);
-        console.log('🎯 AttendanceManagement - Filtering by coordinator events:', allowedUUIDs);
+        // coordinatorEvents come with event_id (text slug) from AttendancePage
+        // Try both UUID and text slug matching
+        const coordIds = coordinatorEvents.map(e => e.event_id || e.id).filter(Boolean);
+        const coordUUIDs = coordinatorEvents.map(e => e.id).filter(Boolean);
+        console.log('🎯 AttendanceManagement - Coordinator event_ids:', coordIds);
+        console.log('🎯 AttendanceManagement - Coordinator UUIDs:', coordUUIDs);
         
+        // First try by UUID
         const { data: filteredData, error } = await supabase
           .from('events')
-          .select('id, name, category')
-          .in('id', allowedUUIDs)
+          .select('id, name, event_id, category')
+          .in('id', coordUUIDs)
           .order('name');
 
         if (error) throw error;
-        data = filteredData;
+        
+        if (filteredData && filteredData.length > 0) {
+          data = filteredData;
+        } else {
+          // Fallback: try by event_id text slug
+          const { data: fallbackData, error: fbErr } = await supabase
+            .from('events')
+            .select('id, name, event_id, category')
+            .in('event_id', coordIds)
+            .order('name');
+          if (fbErr) throw fbErr;
+          data = fallbackData;
+        }
       } else {
         // For super admin, get all events
         const { data: allData, error } = await supabase
           .from('events')
-          .select('id, name, category')
+          .select('id, name, event_id, category')
           .order('name');
 
         if (error) throw error;
         data = allData;
       }
       
+      console.log('📋 Events loaded:', data?.length || 0);
+      if (data && data.length > 0) {
+        console.log('📋 Sample event:', { id: data[0].id, event_id: data[0].event_id, name: data[0].name });
+      }
       setEvents(data || []);
     } catch (error) {
-      console.error('Error loading events:', error);
+      console.error('❌ Error loading events:', error);
     }
   };
 
@@ -144,51 +171,63 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
       
       if (hasCoordinatorFilter) {
         // For coordinators, filter by their assigned events
-        const allowedEventIds = coordinatorEvents.map(e => e.id).filter(Boolean);
-        console.log('📊 AttendanceManagement - Loading stats for coordinator events:', allowedEventIds);
+        // Use text event_id slugs since attendance table stores text slugs
+        const textEventIds = coordinatorEvents.map(e => e.event_id || e.id).filter(Boolean);
+        console.log('📊 AttendanceManagement - Loading stats for coordinator text event_ids:', textEventIds);
         
-        const { data, error } = await supabase
-          .from('attendance')
-          .select('event_id, morning_attended, evening_attended')
-          .in('event_id', allowedEventIds);
+        const { data, error } = await fetchAllRecords(supabase, 'attendance', 'event_id, morning_attended, evening_attended', {
+          filters: [{ column: 'event_id', operator: 'in', value: textEventIds }]
+        });
 
         if (error) throw error;
         attendanceData = data;
+        console.log('📊 Attendance data fetched (coordinator):', data?.length || 0, 'records');
       } else {
         // For super admin, get all attendance records
-        const { data, error } = await supabase
-          .from('attendance')
-          .select('event_id, morning_attended, evening_attended');
+        const { data, error } = await fetchAllRecords(supabase, 'attendance', 'event_id, morning_attended, evening_attended');
 
         if (error) throw error;
         attendanceData = data;
+        console.log('📊 Attendance data fetched (all):', data?.length || 0, 'records');
       }
 
-      // Group by event and calculate stats
+      // Debug: log sample attendance records
+      if (attendanceData && attendanceData.length > 0) {
+        console.log('📊 Sample attendance event_id:', attendanceData[0].event_id);
+      } else {
+        console.warn('⚠️ No attendance records found!');
+      }
+
+      // Group by event_id (text slug) and calculate stats
       const statsMap = {};
       (attendanceData || []).forEach(record => {
-        if (!statsMap[record.event_id]) {
-          statsMap[record.event_id] = {
-            event_id: record.event_id,
+        const eventIdKey = String(record.event_id);
+        
+        if (!statsMap[eventIdKey]) {
+          statsMap[eventIdKey] = {
+            event_id: eventIdKey,
             morning: 0,
             evening: 0,
             total: 0
           };
         }
         
-        if (record.morning_attended) statsMap[record.event_id].morning++;
-        if (record.evening_attended) statsMap[record.event_id].evening++;
+        if (record.morning_attended) statsMap[eventIdKey].morning++;
+        if (record.evening_attended) statsMap[eventIdKey].evening++;
         
-        // Count unique attendance (if either morning or evening is attended)
         if (record.morning_attended || record.evening_attended) {
-          statsMap[record.event_id].total++;
+          statsMap[eventIdKey].total++;
         }
       });
 
       const statsArray = Object.values(statsMap);
+      console.log('📊 Event stats calculated:', statsArray.length, 'events with data');
+      if (statsArray.length > 0) {
+        console.log('📊 Sample stat:', statsArray[0]);
+      }
       setEventStats(statsArray);
     } catch (error) {
-      console.error('Error loading event stats:', error);
+      console.error('❌ Error loading event stats:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -199,28 +238,32 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
     try {
       setLoading(true);
       
-      let query = supabase
-        .from('attendance')
-        .select(`
+      // selectedEvent is now the text slug (e.g., 'workshop-event-aiml')
+      const eventIdStr = selectedEvent;
+      console.log('📋 Loading attendance for event (text slug):', eventIdStr);
+      
+      const { data, error } = await fetchAllRecordsWithJoins(supabase, 'attendance', `
           *,
           profiles:user_id (
             full_name,
             email,
             mobile_number,
             college_name,
-            roll_number
+            roll_number,
+            department
           ),
           marked_by_profile:marked_by (
             full_name
           )
-        `)
-        .eq('event_id', selectedEvent)
-        .order('created_at', { ascending: false });
-
-      const { data, error } = await query;
+        `, {
+          filters: [{ column: 'event_id', operator: 'eq', value: eventIdStr }],
+          orderBy: 'created_at',
+          orderAscending: false
+        });
 
       if (error) throw error;
 
+      console.log('📋 Attendance records loaded:', data?.length || 0);
       setAttendance(data || []);
       calculateStats(data || []);
     } catch (error) {
@@ -255,7 +298,7 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
     }
   };
 
-  const exportToExcel = () => {
+  const exportToCSV = () => {
     if (!selectedEvent) {
       // Export event stats
       const exportData = eventStats.map(stat => ({
@@ -277,6 +320,7 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
         'Phone': record.profiles?.mobile_number || 'N/A',
         'College': record.profiles?.college_name || 'N/A',
         'Roll Number': record.profiles?.roll_number || 'N/A',
+        'Department': record.profiles?.department || 'N/A',
         'Morning Attended': record.morning_attended ? 'Yes' : 'No',
         'Morning Time': record.morning_time ? formatDate(record.morning_time, 'dd/MM/yyyy HH:mm') : 'N/A',
         'Evening Attended': record.evening_attended ? 'Yes' : 'No',
@@ -289,6 +333,226 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
       XLSX.writeFile(wb, `attendance_${getEventName(selectedEvent)}_${formatDate(new Date(), 'yyyy-MM-dd')}.xlsx`);
+    }
+  };
+
+  // Load image as base64 for PDF
+  const loadImageAsBase64 = (url) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = () => {
+        const scale = 4;
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+        ctx.scale(scale, scale);
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+        resolve({
+          data: canvas.toDataURL('image/png', 1.0),
+          width: img.width,
+          height: img.height
+        });
+      };
+      img.onerror = () => resolve(null);
+      img.src = url;
+    });
+  };
+
+  const exportToPDF = async () => {
+    try {
+      if (!selectedEvent) {
+        // Export event-wise summary
+        const doc = new jsPDF('landscape', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+
+        // Load logos from src/assets
+        const logo1Data = await loadImageAsBase64(logo1Img);
+        const logoData = await loadImageAsBase64(logoImg);
+
+        const headerY = 22;
+
+        // Left logo (logo1.webp)
+        if (logo1Data) {
+          const logoHeight = 30;
+          const aspectRatio = logo1Data.width / logo1Data.height;
+          const logoWidth = logoHeight * aspectRatio;
+          doc.addImage(logo1Data.data, 'PNG', 32, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+        }
+
+        // Right logo (logo.webp)
+        if (logoData) {
+          const logoHeight = 14;
+          const aspectRatio = logoData.width / logoData.height;
+          const logoWidth = logoHeight * aspectRatio;
+          doc.addImage(logoData.data, 'PNG', pageWidth - logoWidth - 32, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+        }
+
+        // Header text
+        doc.setFontSize(18);
+        doc.setTextColor(26, 54, 93);
+        doc.setFont('helvetica', 'bold');
+        doc.text('K.S.Rangasamy College of Technology', pageWidth / 2, headerY - 4, { align: 'center' });
+        doc.setFontSize(11);
+        doc.setTextColor(230, 126, 34);
+        doc.text('AUTONOMOUS | TIRUCHENGODE', pageWidth / 2, headerY + 2, { align: 'center' });
+        doc.setFontSize(14);
+        doc.setTextColor(197, 48, 48);
+        doc.text('Attendance Summary - All Events', pageWidth / 2, headerY + 10, { align: 'center' });
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Generated on ${formatDate(new Date(), 'dd MMM yyyy')}`, pageWidth / 2, headerY + 16, { align: 'center' });
+
+        // Table data
+        const tableData = filteredEventStats.map((stat, index) => [
+          index + 1,
+          getEventName(stat.event_id),
+          stat.morning,
+          stat.evening,
+          stat.total
+        ]);
+
+        // Add totals row
+        const totalRow = [
+          'TOTAL',
+          '',
+          eventStats.reduce((sum, stat) => sum + stat.morning, 0),
+          eventStats.reduce((sum, stat) => sum + stat.evening, 0),
+          eventStats.reduce((sum, stat) => sum + stat.total, 0)
+        ];
+
+        autoTable(doc, {
+          startY: headerY + 22,
+          head: [['S.No', 'Event Name', 'Morning', 'Evening', 'Total']],
+          body: tableData,
+          foot: [totalRow],
+          theme: 'grid',
+          headStyles: {
+            fillColor: [240, 240, 240],
+            textColor: [0, 0, 0],
+            fontStyle: 'bold',
+            fontSize: 10,
+            halign: 'center',
+          },
+          footStyles: {
+            fillColor: [240, 240, 240],
+            textColor: [0, 0, 0],
+            fontStyle: 'bold',
+            fontSize: 10,
+            halign: 'center',
+          },
+          bodyStyles: {
+            fontSize: 9,
+            textColor: [0, 0, 0],
+          },
+          columnStyles: {
+            0: { cellWidth: 20, halign: 'center' },
+            1: { cellWidth: 'auto' },
+            2: { cellWidth: 30, halign: 'center' },
+            3: { cellWidth: 30, halign: 'center' },
+            4: { cellWidth: 30, halign: 'center' },
+          },
+          margin: { left: 14, right: 14 },
+        });
+
+        doc.save(`attendance_summary_${formatDate(new Date(), 'yyyy-MM-dd')}.pdf`);
+      } else {
+        // Export detailed attendance for selected event
+        const doc = new jsPDF('landscape', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+
+        // Load logos from src/assets
+        const logo1Data = await loadImageAsBase64(logo1Img);
+        const logoData = await loadImageAsBase64(logoImg);
+
+        const headerY = 22;
+
+        // Left logo (logo1.webp)
+        if (logo1Data) {
+          const logoHeight = 30;
+          const aspectRatio = logo1Data.width / logo1Data.height;
+          const logoWidth = logoHeight * aspectRatio;
+          doc.addImage(logo1Data.data, 'PNG', 32, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+        }
+
+        // Right logo (logo.webp)
+        if (logoData) {
+          const logoHeight = 14;
+          const aspectRatio = logoData.width / logoData.height;
+          const logoWidth = logoHeight * aspectRatio;
+          doc.addImage(logoData.data, 'PNG', pageWidth - logoWidth - 32, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+        }
+
+        // Header text
+        doc.setFontSize(18);
+        doc.setTextColor(26, 54, 93);
+        doc.setFont('helvetica', 'bold');
+        doc.text('K.S.Rangasamy College of Technology', pageWidth / 2, headerY - 4, { align: 'center' });
+        doc.setFontSize(11);
+        doc.setTextColor(230, 126, 34);
+        doc.text('AUTONOMOUS | TIRUCHENGODE', pageWidth / 2, headerY + 2, { align: 'center' });
+        doc.setFontSize(14);
+        doc.setTextColor(197, 48, 48);
+        doc.text(getEventName(selectedEvent), pageWidth / 2, headerY + 10, { align: 'center' });
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Attendance Report', pageWidth / 2, headerY + 16, { align: 'center' });
+
+        // Table data
+        const tableData = filteredAttendance.map((record, index) => [
+          index + 1,
+          record.profiles?.full_name || 'N/A',
+          record.profiles?.roll_number || 'N/A',
+          record.profiles?.department || 'N/A',
+          record.profiles?.college_name || 'N/A',
+          record.profiles?.mobile_number || 'N/A',
+          record.morning_attended ? '✓' : '✗',
+          record.evening_attended ? '✓' : '✗',
+        ]);
+
+        autoTable(doc, {
+          startY: headerY + 22,
+          head: [['S.No', 'Name', 'Roll No', 'Dept', 'College', 'Mobile', 'Morning', 'Evening']],
+          body: tableData,
+          theme: 'grid',
+          headStyles: {
+            fillColor: [240, 240, 240],
+            textColor: [0, 0, 0],
+            fontStyle: 'bold',
+            fontSize: 10,
+            halign: 'center',
+          },
+          bodyStyles: {
+            fontSize: 9,
+            textColor: [0, 0, 0],
+          },
+          columnStyles: {
+            0: { cellWidth: 15, halign: 'center' },
+            1: { cellWidth: 45 },
+            2: { cellWidth: 30 },
+            3: { cellWidth: 30 },
+            4: { cellWidth: 50 },
+            5: { cellWidth: 30 },
+            6: { cellWidth: 20, halign: 'center' },
+            7: { cellWidth: 20, halign: 'center' },
+          },
+          margin: { left: 14, right: 14 },
+        });
+
+        // Add footer with stats
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Total Marked: ${stats.totalMarked} | Morning: ${stats.morningCount} | Evening: ${stats.eveningCount}`, 14, finalY);
+        doc.text(`Generated on ${formatDate(new Date(), 'dd/MM/yyyy HH:mm')}`, 14, finalY + 5);
+
+        doc.save(`attendance_${getEventName(selectedEvent)}_${formatDate(new Date(), 'yyyy-MM-dd')}.pdf`);
+      }
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF report');
     }
   };
 
@@ -312,7 +576,8 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
   });
 
   const getEventName = (eventId) => {
-    const event = events.find(e => e.id === eventId);
+    // Match by text event_id slug first, then by UUID id
+    const event = events.find(e => e.event_id === eventId || e.id === eventId);
     return event?.name || eventId;
   };
 
@@ -343,11 +608,18 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
               Refresh
             </button>
             <button
-              onClick={exportToExcel}
+              onClick={exportToCSV}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white flex items-center gap-2 transition-colors"
+            >
+              <FileSpreadsheet size={18} />
+              CSV
+            </button>
+            <button
+              onClick={exportToPDF}
               className="px-4 py-2 bg-secondary hover:bg-secondary/80 rounded-lg text-white flex items-center gap-2 transition-colors"
             >
-              <Download size={18} />
-              Export
+              <FileText size={18} />
+              PDF
             </button>
           </div>
         )}
@@ -357,7 +629,33 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
         <>
           {/* Event Selection View */}
           <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-            <h2 className="text-xl font-bold text-white mb-4">Select Event to Manage</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-white">Select Event to Manage</h2>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-white flex items-center gap-2 transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
+                  Refresh
+                </button>
+                <button
+                  onClick={exportToCSV}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white flex items-center gap-2 transition-colors"
+                >
+                  <FileSpreadsheet size={18} />
+                  CSV
+                </button>
+                <button
+                  onClick={exportToPDF}
+                  className="px-4 py-2 bg-secondary hover:bg-secondary/80 rounded-lg text-white flex items-center gap-2 transition-colors"
+                >
+                  <FileText size={18} />
+                  PDF
+                </button>
+              </div>
+            </div>
             
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -395,7 +693,9 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
                   </thead>
                   <tbody className="divide-y divide-white/10">
                     {events.map((event, index) => {
-                      const stat = eventStats.find(s => s.event_id === event.id) || { morning: 0, evening: 0, total: 0 };
+                      // Use event_id (text slug) to match attendance stats
+                      const textEventId = event.event_id || event.id;
+                      const stat = eventStats.find(s => s.event_id === textEventId) || { morning: 0, evening: 0, total: 0 };
                       
                       if (searchTerm && !event.name.toLowerCase().includes(searchTerm.toLowerCase())) {
                         return null;
@@ -407,7 +707,7 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          onClick={() => setSelectedEvent(event.id)}
+                          onClick={() => setSelectedEvent(textEventId)}
                           className="hover:bg-white/5 transition-colors cursor-pointer"
                         >
                           <td className="px-6 py-4">
