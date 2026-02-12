@@ -1838,7 +1838,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
   const filteredStats = eventStats.filter(event => {
     const matchesSearch = event.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (event.event_key || event.event_id || '').toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !categoryFilter || event.category?.toUpperCase() === categoryFilter;
+    const matchesCategory = !categoryFilter || event.category?.toLowerCase() === categoryFilter.toLowerCase();
     const matchesPaymentStatus = paymentStatusFilter === 'all' || 
                                  (paymentStatusFilter === 'paid' && event.paidRegistrations > 0) ||
                                  (paymentStatusFilter === 'pending' && event.pendingRegistrations > 0) ||
@@ -1846,12 +1846,27 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
     return matchesSearch && matchesCategory && matchesPaymentStatus;
   });
 
-  // Remove duplicates and handle null/undefined categories
-  const categories = [...new Set(eventStats
-    .map(e => e.category)
-    .filter(cat => cat && cat.trim() !== '') // Remove null, undefined, and empty strings
-    .map(cat => cat.toUpperCase()) // Normalize to uppercase for deduplication
-  )].sort(); // Sort alphabetically
+  // Normalize category names to Title Case and remove duplicates
+  const normalizeCategoryName = (category) => {
+    if (!category) return '';
+    return category.toLowerCase().split(/[\s-]+/).map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+  
+  const categoryMap = new Map();
+  eventStats.forEach(e => {
+    if (e.category && e.category.trim() !== '') {
+      const lowerKey = e.category.toLowerCase();
+      if (!categoryMap.has(lowerKey)) {
+        categoryMap.set(lowerKey, normalizeCategoryName(e.category));
+      }
+    }
+  });
+  
+  const categories = Array.from(categoryMap.values()).sort((a, b) => 
+    a.toLowerCase().localeCompare(b.toLowerCase())
+  );
   // Calculate total registrations based on payment filter
   const getTotalByPaymentFilter = (events) => {
     return events.reduce((sum, e) => {

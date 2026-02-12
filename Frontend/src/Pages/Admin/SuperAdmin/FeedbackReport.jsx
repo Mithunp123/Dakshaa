@@ -47,6 +47,14 @@ const getQuestionSet = (category) => {
   return normalized.includes('workshop') ? WORKSHOP_QUESTIONS : EVENT_QUESTIONS;
 };
 
+const normalizeCategoryName = (category) => {
+  if (!category) return '';
+  // Convert to Title Case (capitalize first letter of each word)
+  return category.toLowerCase().split(/[\s-]+/).map(word => 
+    word.charAt(0).toUpperCase() + word.slice(1)
+  ).join(' ');
+};
+
 const RatingStars = ({ rating, size = 'sm' }) => {
   const starSize = size === 'sm' ? 'w-4 h-4' : 'w-5 h-5';
   return (
@@ -120,10 +128,12 @@ const FeedbackReport = ({ coordinatorEvents }) => {
       coordinatorEvents.forEach(evt => {
         if (evt.category) {
           const lowerKey = evt.category.toLowerCase();
-          if (!cats.has(lowerKey)) cats.set(lowerKey, evt.category);
+          if (!cats.has(lowerKey)) cats.set(lowerKey, normalizeCategoryName(evt.category));
         }
       });
-      setAvailableCategories(Array.from(cats.values()).sort());
+      setAvailableCategories(Array.from(cats.values()).sort((a, b) => 
+        a.toLowerCase().localeCompare(b.toLowerCase())
+      ));
       setEvents(coordinatorEvents);
     } else {
       fetchCategories();
@@ -166,11 +176,13 @@ const FeedbackReport = ({ coordinatorEvents }) => {
         if (item.category) {
           const lowerKey = item.category.toLowerCase();
           if (!categoryMap.has(lowerKey)) {
-            categoryMap.set(lowerKey, item.category);
+            categoryMap.set(lowerKey, normalizeCategoryName(item.category));
           }
         }
       });
-      setAvailableCategories(Array.from(categoryMap.values()).sort());
+      setAvailableCategories(Array.from(categoryMap.values()).sort((a, b) => 
+        a.toLowerCase().localeCompare(b.toLowerCase())
+      ));
     } catch (error) {
       console.error('Error fetching categories:', error);
     }

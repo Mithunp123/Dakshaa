@@ -70,18 +70,28 @@ const TeamReport = () => {
       
       if (error) throw error;
       
+      // Normalize category names to Title Case
+      const normalizeCategoryName = (category) => {
+        if (!category) return '';
+        return category.toLowerCase().split(/[\s-]+/).map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+      };
+      
       // Get unique categories (case-insensitive)
       const categoryMap = new Map();
       data?.forEach(item => {
         if (item.category) {
           const lowerKey = item.category.toLowerCase();
           if (!categoryMap.has(lowerKey)) {
-            categoryMap.set(lowerKey, item.category);
+            categoryMap.set(lowerKey, normalizeCategoryName(item.category));
           }
         }
       });
       
-      const uniqueCategories = Array.from(categoryMap.values()).sort();
+      const uniqueCategories = Array.from(categoryMap.values()).sort((a, b) => 
+        a.toLowerCase().localeCompare(b.toLowerCase())
+      );
       console.log('Available categories:', uniqueCategories);
       setAvailableCategories(uniqueCategories);
     } catch (error) {

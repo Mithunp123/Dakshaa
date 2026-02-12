@@ -12,7 +12,6 @@ import {
   XCircle,
   Clock,
   Sun,
-  Moon,
   Loader2,
   User,
   FileText,
@@ -54,8 +53,7 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState({
     totalMarked: 0,
-    morningCount: 0,
-    eveningCount: 0
+    morningCount: 0
   });
   
   // Check if this is a coordinator view
@@ -208,15 +206,12 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
           statsMap[eventIdKey] = {
             event_id: eventIdKey,
             morning: 0,
-            evening: 0,
             total: 0
           };
         }
         
-        if (record.morning_attended) statsMap[eventIdKey].morning++;
-        if (record.evening_attended) statsMap[eventIdKey].evening++;
-        
-        if (record.morning_attended || record.evening_attended) {
+        if (record.morning_attended) {
+          statsMap[eventIdKey].morning++;
           statsMap[eventIdKey].total++;
         }
       });
@@ -277,14 +272,15 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
 
   const calculateStats = (data) => {
     const stats = {
-      totalMarked: data.length,
-      morningCount: 0,
-      eveningCount: 0
+      totalMarked: 0,
+      morningCount: 0
     };
 
     data.forEach(record => {
-      if (record.morning_attended) stats.morningCount++;
-      if (record.evening_attended) stats.eveningCount++;
+      if (record.morning_attended) {
+        stats.morningCount++;
+        stats.totalMarked++;
+      }
     });
 
     setStats(stats);
@@ -305,7 +301,6 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
       const exportData = eventStats.map(stat => ({
         'Event': getEventName(stat.event_id),
         'Morning Attended': stat.morning,
-        'Evening Attended': stat.evening,
         'Total Present': stat.total
       }));
 
@@ -324,8 +319,6 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
         'Department': record.profiles?.department || 'N/A',
         'Morning Attended': record.morning_attended ? 'Yes' : 'No',
         'Morning Time': record.morning_time ? formatDate(record.morning_time, 'dd/MM/yyyy HH:mm') : 'N/A',
-        'Evening Attended': record.evening_attended ? 'Yes' : 'No',
-        'Evening Time': record.evening_time ? formatDate(record.evening_time, 'dd/MM/yyyy HH:mm') : 'N/A',
         'Marked By': record.marked_by_profile?.full_name || 'N/A',
         'Created At': formatDate(record.created_at, 'dd/MM/yyyy HH:mm')
       }));
@@ -412,7 +405,6 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
           stat.event_id,
           getEventName(stat.event_id),
           stat.morning,
-          stat.evening,
           stat.total
         ]);
 
@@ -422,13 +414,12 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
           '',
           '',
           eventStats.reduce((sum, stat) => sum + stat.morning, 0),
-          eventStats.reduce((sum, stat) => sum + stat.evening, 0),
           eventStats.reduce((sum, stat) => sum + stat.total, 0)
         ];
 
         autoTable(doc, {
           startY: headerY + 22,
-          head: [['S.No', 'Event ID', 'Event Name', 'Morning', 'Evening', 'Total']],
+          head: [['S.No', 'Event ID', 'Event Name', 'Morning', 'Total']],
           body: tableData,
           foot: [totalRow],
           theme: 'grid',
@@ -454,9 +445,8 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
             0: { cellWidth: 15, halign: 'center' },
             1: { cellWidth: 50 },
             2: { cellWidth: 'auto' },
-            3: { cellWidth: 25, halign: 'center' },
-            4: { cellWidth: 25, halign: 'center' },
-            5: { cellWidth: 25, halign: 'center' },
+            3: { cellWidth: 30, halign: 'center' },
+            4: { cellWidth: 30, halign: 'center' },
           },
           margin: { left: 14, right: 14 },
         });
@@ -513,12 +503,11 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
           record.profiles?.college_name || 'N/A',
           record.profiles?.mobile_number || 'N/A',
           record.morning_attended ? '✓' : '✗',
-          record.evening_attended ? '✓' : '✗',
         ]);
 
         autoTable(doc, {
           startY: headerY + 22,
-          head: [['S.No', 'Name', 'Roll No', 'Dept', 'College', 'Mobile', 'Morning', 'Evening']],
+          head: [['S.No', 'Name', 'Roll No', 'Dept', 'College', 'Mobile', 'Morning']],
           body: tableData,
           theme: 'grid',
           headStyles: {
@@ -534,13 +523,12 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
           },
           columnStyles: {
             0: { cellWidth: 15, halign: 'center' },
-            1: { cellWidth: 45 },
-            2: { cellWidth: 30 },
-            3: { cellWidth: 30 },
-            4: { cellWidth: 50 },
-            5: { cellWidth: 30 },
-            6: { cellWidth: 20, halign: 'center' },
-            7: { cellWidth: 20, halign: 'center' },
+            1: { cellWidth: 50 },
+            2: { cellWidth: 35 },
+            3: { cellWidth: 35 },
+            4: { cellWidth: 60 },
+            5: { cellWidth: 35 },
+            6: { cellWidth: 25, halign: 'center' },
           },
           margin: { left: 14, right: 14 },
         });
@@ -549,7 +537,7 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
         const finalY = doc.lastAutoTable.finalY + 10;
         doc.setFontSize(10);
         doc.setTextColor(100, 100, 100);
-        doc.text(`Total Marked: ${stats.totalMarked} | Morning: ${stats.morningCount} | Evening: ${stats.eveningCount}`, 14, finalY);
+        doc.text(`Total Marked: ${stats.totalMarked} | Morning: ${stats.morningCount}`, 14, finalY);
         doc.text(`Generated on ${formatDate(new Date(), 'dd/MM/yyyy HH:mm')}`, 14, finalY + 5);
 
         doc.save(`attendance_${getEventName(selectedEvent)}_${formatDate(new Date(), 'yyyy-MM-dd')}.pdf`);
@@ -572,13 +560,33 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
     );
   });
 
-  // Get unique categories from events
-  const categories = [...new Set(events.map(e => e.category).filter(Boolean))].sort();
+  // Get unique categories from events (case-insensitive, normalized to Title Case)
+  const normalizeCategoryName = (category) => {
+    if (!category) return '';
+    return category.toLowerCase().split(/[\s-]+/).map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
 
-  // Filter events by category and search
+  const categoryMap = new Map();
+  events.forEach(e => {
+    if (e.category) {
+      const lowerKey = e.category.toLowerCase();
+      if (!categoryMap.has(lowerKey)) {
+        categoryMap.set(lowerKey, normalizeCategoryName(e.category));
+      }
+    }
+  });
+  const categories = Array.from(categoryMap.values()).sort((a, b) => 
+    a.toLowerCase().localeCompare(b.toLowerCase())
+  );
+
+  // Filter events by category and search (case-insensitive for category)
   const filteredEvents = events.filter(event => {
-    const matchesCategory = !selectedCategory || event.category === selectedCategory;
-    const matchesSearch = !searchTerm || event.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = !selectedCategory || 
+      event.category?.toLowerCase() === selectedCategory.toLowerCase();
+    const matchesSearch = !searchTerm || 
+      event.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -715,9 +723,6 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
                         Morning Attended
                       </th>
                       <th className="px-6 py-4 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Evening Attended
-                      </th>
-                      <th className="px-6 py-4 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Total Present
                       </th>
                     </tr>
@@ -747,9 +752,6 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
                             <span className="text-white font-semibold">{stat.morning}</span>
                           </td>
                           <td className="px-6 py-4 text-center">
-                            <span className="text-white font-semibold">{stat.evening}</span>
-                          </td>
-                          <td className="px-6 py-4 text-center">
                             <span className="text-white font-semibold">{stat.total}</span>
                           </td>
                         </motion.tr>
@@ -763,9 +765,6 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
                       </td>
                       <td className="px-6 py-4 text-center font-bold text-white">
                         {filteredEventStats.reduce((sum, stat) => sum + stat.morning, 0)}
-                      </td>
-                      <td className="px-6 py-4 text-center font-bold text-white">
-                        {filteredEventStats.reduce((sum, stat) => sum + stat.evening, 0)}
                       </td>
                       <td className="px-6 py-4 text-center font-bold text-white">
                         {filteredEventStats.reduce((sum, stat) => sum + stat.total, 0)}
@@ -788,7 +787,7 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -815,21 +814,6 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
                   <p className="text-3xl font-bold text-white mt-1">{stats.morningCount}</p>
                 </div>
                 <Sun className="text-yellow-500" size={32} />
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border border-purple-500/20 rounded-xl p-6"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-400 text-sm font-medium">Evening Session</p>
-                  <p className="text-3xl font-bold text-white mt-1">{stats.eveningCount}</p>
-                </div>
-                <Moon className="text-purple-500" size={32} />
               </div>
             </motion.div>
           </div>
@@ -880,9 +864,6 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
                         Morning
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Evening
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Marked At
                       </th>
                     </tr>
@@ -925,25 +906,6 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
                                 <p className="text-gray-500 text-xs flex items-center gap-1">
                                   <Clock size={12} />
                                   {formatDate(record.morning_time, 'HH:mm')}
-                                </p>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              <XCircle className="text-red-500" size={18} />
-                              <span className="text-red-400 text-sm">Absent</span>
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          {record.evening_attended ? (
-                            <div className="flex items-center gap-2">
-                              <CheckCircle2 className="text-green-500" size={18} />
-                              <div>
-                                <p className="text-green-400 text-sm font-medium">Present</p>
-                                <p className="text-gray-500 text-xs flex items-center gap-1">
-                                  <Clock size={12} />
-                                  {formatDate(record.evening_time, 'HH:mm')}
                                 </p>
                               </div>
                             </div>
