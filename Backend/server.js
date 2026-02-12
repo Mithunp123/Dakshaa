@@ -368,26 +368,33 @@ app.get("/contacts", async (req, res) => {
   }
 });
 
-/* 🟢 Route to Insert Data into feedback_details */
+/* 🟢 Route to Insert Data into feedback */
 app.post("/add-feedback", formLimiter, async (req, res) => {
   try {
-    let { username, email_id, rating, message } = req.body;
+    let { username, email_id, event_category, event_id, event_name, question_ratings, message } = req.body;
+
+    const ratingValues = Object.values(question_ratings || {})
+      .map((value) => Number(value))
+      .filter((value) => Number.isFinite(value));
+    const rating = ratingValues.length > 0
+      ? Math.max(1, Math.min(5, Math.round(ratingValues.reduce((sum, value) => sum + value, 0) / ratingValues.length)))
+      : 5;
 
     // Validate required fields
-    if (!username || !email_id || !rating || !message) {
+    if (!username || !email_id || !event_category || !event_id || !message) {
       return res.status(400).json({ error: "All fields are required!" });
     }
 
-    // Generate UUID for feedback_id
-    const feedback_id = uuidv4();
-
     // Insert using Supabase
     const { data, error } = await supabase
-      .from('feedback_details')
+      .from('feedback')
       .insert([{
-        feedback_id,
         username,
         email_id,
+        event_category,
+        event_id,
+        event_name,
+        question_ratings,
         rating,
         message
       }])
@@ -409,8 +416,8 @@ app.post("/add-feedback", formLimiter, async (req, res) => {
 app.get("/feedbacks", async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('feedback_details')
-      .select('username, email_id, rating, message, created_at')
+      .from('feedback')
+      .select('username, email_id, event_category, event_id, event_name, question_ratings, rating, message, created_at')
       .order('created_at', { ascending: false });
 
     if (error) throw error;

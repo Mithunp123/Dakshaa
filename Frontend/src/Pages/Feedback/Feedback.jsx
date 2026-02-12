@@ -1,16 +1,52 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { FaUser, FaEnvelope, FaStar, FaCommentAlt } from "react-icons/fa";
 import { Send, CheckCircle } from "lucide-react";
 import { submitFeedback } from "../../services/feedbackService";
+import { supabase } from "../../supabase";
+
+const WORKSHOP_QUESTIONS = [
+  "How would you rate the overall quality of the workshop?",
+  "How would you rate the clarity of the resource person’s explanation?",
+  "How would you rate the relevance of the workshop content?",
+  "How would you rate the organization and coordination of the event?",
+  "How would you rate the venue and overall arrangements?",
+];
+
+const EVENT_QUESTIONS = [
+  "How would you rate the overall quality of the event?",
+  "How would you rate the organization and coordination of the event?",
+  "How would you rate the opportunities provided for interaction and discussion?",
+  "How would you rate the usefulness for your academic/career growth?",
+  "How would you rate the time management of the event?",
+];
+
+const getQuestionSet = (category) => {
+  const normalized = (category || "").toLowerCase();
+  return normalized.includes("workshop") ? WORKSHOP_QUESTIONS : EVENT_QUESTIONS;
+};
+
+const normalizeCategory = (category) => (category || "").trim().toUpperCase();
+
+const buildInitialRatings = (questions) =>
+  questions.reduce((acc, _, index) => {
+    acc[`q${index + 1}`] = 5;
+    return acc;
+  }, {});
 
 const Feedback = () => {
+  const initialQuestions = getQuestionSet("");
   const [formData, setFormData] = useState({
     username: "",
     email_id: "",
-    rating: 5,
+    event_category: "",
+    event_id: "",
+    question_ratings: buildInitialRatings(initialQuestions),
     message: "",
   });
+
+  const [events, setEvents] = useState([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
 
   const [status, setStatus] = useState({
     submitting: false,
@@ -18,19 +54,85 @@ const Feedback = () => {
     error: null,
   });
 
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("events")
+          .select("id, name, category")
+          .eq("is_active", true)
+          .order("name", { ascending: true });
+
+        if (error) throw error;
+        setEvents(data || []);
+      } catch (error) {
+        console.error("Error loading events for feedback:", error);
+        setStatus((prev) => ({
+          ...prev,
+          error: "Unable to load events. Please refresh and try again.",
+        }));
+      } finally {
+        setEventsLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  const categories = useMemo(() => {
+    const map = new Map();
+    (events || []).forEach((event) => {
+      const normalized = normalizeCategory(event.category);
+      if (normalized && !map.has(normalized)) {
+        map.set(normalized, normalized);
+      }
+    });
+    return Array.from(map.values()).sort((a, b) => a.localeCompare(b));
+  }, [events]);
+
+  const categoryEvents = useMemo(
+    () => events.filter((event) => normalizeCategory(event.category) === formData.event_category),
+    [events, formData.event_category]
+  );
+
+  const questions = useMemo(() => getQuestionSet(formData.event_category), [formData.event_category]);
+
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      question_ratings: buildInitialRatings(questions),
+    }));
+  }, [questions]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "event_category") {
+      const normalizedValue = normalizeCategory(value);
+      const categoryQuestions = getQuestionSet(normalizedValue);
+      setFormData((prev) => ({
+        ...prev,
+        event_category: normalizedValue,
+        event_id: "",
+        question_ratings: buildInitialRatings(categoryQuestions),
+      }));
+      return;
+    }
+
     setFormData({
       ...formData,
       [name]: value,
     });
   };
 
-  const handleRatingChange = (rating) => {
-    setFormData({
-      ...formData,
-      rating,
-    });
+  const handleQuestionRatingChange = (questionKey, rating) => {
+    setFormData((prev) => ({
+      ...prev,
+      question_ratings: {
+        ...prev.question_ratings,
+        [questionKey]: rating,
+      },
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -38,14 +140,30 @@ const Feedback = () => {
     setStatus({ submitting: true, submitted: false, error: null });
 
     try {
-      const result = await submitFeedback(formData);
+      if (!formData.event_category || !formData.event_id) {
+        setStatus({
+          submitting: false,
+          submitted: false,
+          error: "Please select event category and event.",
+        });
+        return;
+      }
+
+      const selectedEvent = categoryEvents.find((event) => event.id === formData.event_id);
+
+      const result = await submitFeedback({
+        ...formData,
+        event_name: selectedEvent?.name || null,
+      });
 
       if (result.success) {
         setStatus({ submitting: false, submitted: true, error: null });
         setFormData({
           username: "",
           email_id: "",
-          rating: 5,
+          event_category: "",
+          event_id: "",
+          question_ratings: buildInitialRatings(initialQuestions),
           message: "",
         });
         setTimeout(() => setStatus((prev) => ({ ...prev, submitted: false })), 5000);
@@ -136,23 +254,75 @@ const Feedback = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-4">Rating</label>
-                <div className="flex gap-4">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => handleRatingChange(star)}
-                      className="focus:outline-none transition-transform hover:scale-110"
-                    >
-                      <FaStar
-                        className={`text-3xl ${
-                          star <= formData.rating ? "text-yellow-400" : "text-gray-600"
-                        }`}
-                      />
-                    </button>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Event Category</label>
+                <select
+                  name="event_category"
+                  required
+                  value={formData.event_category}
+                  onChange={handleChange}
+                  className="block w-full px-3 py-3 bg-slate-800/50 border border-secondary/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-transparent transition-all"
+                  disabled={eventsLoading}
+                >
+                  <option value="" className="bg-slate-900 text-gray-300">Select category</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category} className="bg-slate-900 text-white">
+                      {category}
+                    </option>
                   ))}
-                </div>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Event</label>
+                <select
+                  name="event_id"
+                  required
+                  value={formData.event_id}
+                  onChange={handleChange}
+                  className="block w-full px-3 py-3 bg-slate-800/50 border border-secondary/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-transparent transition-all"
+                  disabled={!formData.event_category || eventsLoading}
+                >
+                  <option value="" className="bg-slate-900 text-gray-300">Select event</option>
+                  {categoryEvents.map((event) => (
+                    <option key={event.id} value={event.id} className="bg-slate-900 text-white">
+                      {event.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-5">
+                <label className="block text-sm font-medium text-gray-400">Rate each question (out of 5)</label>
+                {questions.map((question, index) => {
+                  const questionKey = `q${index + 1}`;
+                  const selectedRating = formData.question_ratings?.[questionKey] || 0;
+
+                  return (
+                    <div key={questionKey} className="p-4 rounded-xl border border-secondary/20 bg-slate-800/30">
+                      <p className="text-sm text-gray-200 mb-3">{index + 1}. {question}</p>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex gap-3">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={() => handleQuestionRatingChange(questionKey, star)}
+                              className="focus:outline-none transition-transform hover:scale-110"
+                              aria-label={`Rate ${star} out of 5`}
+                            >
+                              <FaStar
+                                className={`text-2xl ${
+                                  star <= selectedRating ? "text-yellow-400" : "text-gray-600"
+                                }`}
+                              />
+                            </button>
+                          ))}
+                        </div>
+                        <span className="text-sm text-secondary font-semibold">{selectedRating}/5</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
               <div>
@@ -168,7 +338,7 @@ const Feedback = () => {
                     value={formData.message}
                     onChange={handleChange}
                     className="block w-full pl-10 pr-3 py-3 bg-slate-800/50 border border-secondary/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-transparent transition-all"
-                    placeholder="Tell us what you think..."
+                    placeholder="Share your feedback..."
                   ></textarea>
                 </div>
               </div>

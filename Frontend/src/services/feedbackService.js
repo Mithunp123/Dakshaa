@@ -12,12 +12,33 @@ import { supabase } from "../supabase";
  */
 export const submitFeedback = async (feedbackData) => {
   try {
-    const { username, email_id, rating, message } = feedbackData;
+    const {
+      username,
+      email_id,
+      event_category,
+      event_id,
+      event_name,
+      question_ratings,
+      message,
+    } = feedbackData;
+
+    const ratingValues = Object.values(question_ratings || {})
+      .map((value) => Number(value))
+      .filter((value) => Number.isFinite(value));
+
+    const overallRating =
+      ratingValues.length > 0
+        ? Math.max(1, Math.min(5, Math.round(ratingValues.reduce((sum, value) => sum + value, 0) / ratingValues.length)))
+        : 5;
 
     const { data, error } = await supabase.rpc('submit_feedback', {
       p_username: username,
       p_email_id: email_id,
-      p_rating: rating,
+      p_event_category: event_category,
+      p_event_id: event_id,
+      p_event_name: event_name,
+      p_question_ratings: question_ratings,
+      p_rating: overallRating,
       p_message: message
     });
 
