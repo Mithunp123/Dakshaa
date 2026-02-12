@@ -39,6 +39,7 @@ const Register = lazy(() => import("./Pages/Register/Register.jsx"));
 const EventRegistration = lazy(() => import("./Pages/Register/EventRegistration.jsx"));
 const Dashboard = lazy(() => import("./Pages/Dashboard/Dashboard.jsx"));
 const Schedule = lazy(() => import("./Pages/Schedule/Schedule"));
+const DetailedSchedule = lazy(() => import("./Pages/Schedule/DetailedSchedule"));
 const Referral = lazy(() => import("./Pages/Referral/Referral"));
 const Feedback = lazy(() => import("./Pages/Feedback/Feedback"));
 const Scan = lazy(() => import("./Pages/Scan/Scan"));
@@ -204,6 +205,7 @@ function AppContent() {
             <Route path="/accomodation" element={<Accomodation />} />
             <Route path="/event/codeathon" element={<Codathon />} />
             <Route path="/schedule" element={<Schedule />} />
+            <Route path="/schedule/detailed" element={<DetailedSchedule />} />
             <Route path="/referral" element={<Referral />} />
             <Route path="/feedback" element={<Feedback />} />
             <Route path="/terms" element={<TermsAndConditions />} />
