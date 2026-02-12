@@ -110,13 +110,16 @@ const DashboardLayout = ({ children }) => {
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-14 sm:h-16 bg-slate-900/95 backdrop-blur-xl border-b border-white/10 z-50 flex items-center justify-between px-3 sm:px-4 safe-area-top">
         <h2 className="text-lg sm:text-xl font-bold font-orbitron text-secondary truncate">DASHBOARD</h2>
-        <button 
-          onClick={() => setIsSidebarOpen(true)}
-          className="p-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors touch-manipulation"
-          aria-label="Open menu"
-        >
-          <Menu size={22} />
-        </button>
+        <div className="flex items-center gap-2">
+          <NotificationDropdown />
+          <button 
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors touch-manipulation"
+            aria-label="Open menu"
+          >
+            <Menu size={22} />
+          </button>
+        </div>
       </div>
 
       {/* Mobile Sidebar Drawer */}
