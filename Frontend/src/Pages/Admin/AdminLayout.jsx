@@ -158,6 +158,7 @@ const AdminLayout = () => {
         { label: 'Pending Registrations', icon: ClipboardList, path: '/admin/pending-registrations' },
         { label: 'Attendance Management', icon: Users, path: '/admin/attendance' },
         { label: 'College Stats', icon: School, path: '/admin/college-stats' },
+        { label: 'Feedback Report', icon: ClipboardList, path: '/admin/feedback-report' },
         { label: 'Event Controller', icon: Radio, path: '/admin/event-controller' }
       );
     }
@@ -174,6 +175,7 @@ const AdminLayout = () => {
         { label: 'Overview', icon: LayoutDashboard, path: '/admin/coordinator/overview' },
         { label: 'Registration Management', icon: ClipboardList, path: '/admin/coordinator/registration' },
         { label: 'Attendance Management', icon: Users, path: '/admin/coordinator/attendance' },
+        { label: 'Feedback Report', icon: ClipboardList, path: '/admin/coordinator/feedback' },
         { label: 'Gate Pass Scanner', icon: ShieldCheck, path: '/volunteer' },
         { label: 'Attendance Scanner', icon: Shield, path: '/admin/coordinator' }
       );

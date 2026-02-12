@@ -96,11 +96,13 @@ const PendingRegistrations = lazy(() => import("./Pages/Admin/SuperAdmin/Pending
 const AttendanceManagement = lazy(() => import("./Pages/Admin/SuperAdmin/AttendanceManagement"));
 const CollegeStats = lazy(() => import("./Pages/Admin/SuperAdmin/CollegeStats"));
 const TeamReport = lazy(() => import("./Pages/Admin/SuperAdmin/TeamReport"));
+const FeedbackReport = lazy(() => import("./Pages/Admin/SuperAdmin/FeedbackReport"));
 const RegistrationAdminDashboard = lazy(() => import("./Pages/Admin/RegAdmin/RegistrationAdminDashboard"));
 const EventCoordinatorDashboard = lazy(() => import("./Pages/Admin/Coordinator/EventCoordinatorDashboard"));
 const CoordinatorOverviewPage = lazy(() => import("./Pages/Admin/Coordinator/OverviewPage"));
 const CoordinatorRegistrationPage = lazy(() => import("./Pages/Admin/Coordinator/RegistrationPage"));
 const CoordinatorAttendancePage = lazy(() => import("./Pages/Admin/Coordinator/AttendancePage"));
+const CoordinatorFeedbackPage = lazy(() => import("./Pages/Admin/Coordinator/FeedbackPage"));
 const CoordinatorPrintQRPage = lazy(() => import("./Pages/Admin/Coordinator/PrintQRPage"));
 const CoordinatorGlobalScanner = lazy(() => import("./Pages/Admin/Coordinator/GlobalScannerPage"));
 const AttendanceScanner = lazy(() => import("./Pages/Admin/Volunteer/AttendanceScanner"));
@@ -384,6 +386,14 @@ function AppContent() {
                 }
               />
               <Route
+                path="feedback-report"
+                element={
+                  <ProtectedRoute allowedRoles={["super_admin"]}>
+                    <FeedbackReport />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="event-controller"
                 element={
                   <ProtectedRoute allowedRoles={["super_admin", "coordinator"]}>
@@ -446,6 +456,16 @@ function AppContent() {
                     allowedRoles={["event_coordinator", "super_admin"]}
                   >
                     <CoordinatorAttendancePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="coordinator/feedback"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={["event_coordinator", "super_admin"]}
+                  >
+                    <CoordinatorFeedbackPage />
                   </ProtectedRoute>
                 }
               />
