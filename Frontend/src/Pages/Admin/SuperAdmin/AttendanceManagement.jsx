@@ -50,6 +50,7 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedEventType, setSelectedEventType] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState({
     totalMarked: 0,
@@ -58,6 +59,16 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
   
   // Check if this is a coordinator view
   const hasCoordinatorFilter = coordinatorEvents && coordinatorEvents.length > 0;
+
+  // Helper function to extract event type from event_id
+  const getEventType = (eventId) => {
+    if (!eventId) return null;
+    const eventIdLower = eventId.toLowerCase();
+    if (eventIdLower.includes('paper')) return 'paper';
+    if (eventIdLower.includes('poster')) return 'poster';
+    if (eventIdLower.includes('project')) return 'project';
+    return null;
+  };
 
   useEffect(() => {
     loadEvents();
@@ -581,13 +592,15 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
     a.toLowerCase().localeCompare(b.toLowerCase())
   );
 
-  // Filter events by category and search (case-insensitive for category)
+  // Filter events by category, event type, and search (case-insensitive for category)
   const filteredEvents = events.filter(event => {
     const matchesCategory = !selectedCategory || 
       event.category?.toLowerCase() === selectedCategory.toLowerCase();
+    const matchesEventType = selectedEventType === 'all' || 
+      getEventType(event.event_id) === selectedEventType;
     const matchesSearch = !searchTerm || 
       event.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return matchesCategory && matchesEventType && matchesSearch;
   });
 
   // Get filtered event ids for stats filtering
@@ -705,6 +718,19 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
                   ))}
                 </select>
               </div>
+              <div className="relative min-w-[200px]">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <select
+                  value={selectedEventType}
+                  onChange={(e) => setSelectedEventType(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white appearance-none focus:outline-none focus:border-secondary cursor-pointer"
+                >
+                  <option value="all" className="bg-gray-900 text-white">All Types</option>
+                  <option value="paper" className="bg-gray-900 text-white">Paper</option>
+                  <option value="poster" className="bg-gray-900 text-white">Poster</option>
+                  <option value="project" className="bg-gray-900 text-white">Project</option>
+                </select>
+              </div>
             </div>
 
             {loading ? (
@@ -761,7 +787,10 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
                   <tfoot className="bg-white/5 border-t border-white/10">
                     <tr>
                       <td className="px-6 py-4 text-left font-bold text-white">
-                        {selectedCategory ? `TOTAL (${selectedCategory})` : 'OVERALL TOTAL'}
+                        {selectedCategory && selectedEventType !== 'all' ? `TOTAL (${selectedCategory} - ${selectedEventType.charAt(0).toUpperCase() + selectedEventType.slice(1)})` : 
+                         selectedCategory ? `TOTAL (${selectedCategory})` : 
+                         selectedEventType !== 'all' ? `TOTAL (${selectedEventType.charAt(0).toUpperCase() + selectedEventType.slice(1)})` : 
+                         'OVERALL TOTAL'}
                       </td>
                       <td className="px-6 py-4 text-center font-bold text-white">
                         {filteredEventStats.reduce((sum, stat) => sum + stat.morning, 0)}
