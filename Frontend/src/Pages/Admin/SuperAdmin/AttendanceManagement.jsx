@@ -23,7 +23,7 @@ import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { fetchAllRecords, fetchAllRecordsWithJoins } from '../../../utils/bulkFetch';
-import logo1Img from '../../../assets/logo1.webp';
+import ksrctImg from '../../../assets/ksrct.webp';
 import logoImg from '../../../assets/logo.webp';
 
 // Helper function to format dates
@@ -369,25 +369,25 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
         const pageWidth = doc.internal.pageSize.getWidth();
 
         // Load logos from src/assets
-        const logo1Data = await loadImageAsBase64(logo1Img);
+        const ksrctData = await loadImageAsBase64(ksrctImg);
         const logoData = await loadImageAsBase64(logoImg);
 
         const headerY = 22;
 
-        // Left logo (logo1.webp)
-        if (logo1Data) {
-          const logoHeight = 30;
-          const aspectRatio = logo1Data.width / logo1Data.height;
+        // Left logo (ksrct.webp)
+        if (ksrctData) {
+          const logoHeight = 20;
+          const aspectRatio = ksrctData.width / ksrctData.height;
           const logoWidth = logoHeight * aspectRatio;
-          doc.addImage(logo1Data.data, 'PNG', 32, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+          doc.addImage(ksrctData.data, 'PNG', 14, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
         }
 
-        // Right logo (logo.webp)
+        // Right logo (logo.webp) - larger size
         if (logoData) {
-          const logoHeight = 14;
+          const logoHeight = 28;
           const aspectRatio = logoData.width / logoData.height;
           const logoWidth = logoHeight * aspectRatio;
-          doc.addImage(logoData.data, 'PNG', pageWidth - logoWidth - 32, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+          doc.addImage(logoData.data, 'PNG', pageWidth - logoWidth - 14, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
         }
 
         // Header text
@@ -405,9 +405,10 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
         doc.setTextColor(100, 100, 100);
         doc.text(`Generated on ${formatDate(new Date(), 'dd MMM yyyy')}`, pageWidth / 2, headerY + 16, { align: 'center' });
 
-        // Table data
+        // Table data with event_id and total attendance
         const tableData = filteredEventStats.map((stat, index) => [
           index + 1,
+          stat.event_id,
           getEventName(stat.event_id),
           stat.morning,
           stat.evening,
@@ -418,6 +419,7 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
         const totalRow = [
           'TOTAL',
           '',
+          '',
           eventStats.reduce((sum, stat) => sum + stat.morning, 0),
           eventStats.reduce((sum, stat) => sum + stat.evening, 0),
           eventStats.reduce((sum, stat) => sum + stat.total, 0)
@@ -425,7 +427,7 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
 
         autoTable(doc, {
           startY: headerY + 22,
-          head: [['S.No', 'Event Name', 'Morning', 'Evening', 'Total']],
+          head: [['S.No', 'Event ID', 'Event Name', 'Morning', 'Evening', 'Total']],
           body: tableData,
           foot: [totalRow],
           theme: 'grid',
@@ -448,11 +450,12 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
             textColor: [0, 0, 0],
           },
           columnStyles: {
-            0: { cellWidth: 20, halign: 'center' },
-            1: { cellWidth: 'auto' },
-            2: { cellWidth: 30, halign: 'center' },
-            3: { cellWidth: 30, halign: 'center' },
-            4: { cellWidth: 30, halign: 'center' },
+            0: { cellWidth: 15, halign: 'center' },
+            1: { cellWidth: 50 },
+            2: { cellWidth: 'auto' },
+            3: { cellWidth: 25, halign: 'center' },
+            4: { cellWidth: 25, halign: 'center' },
+            5: { cellWidth: 25, halign: 'center' },
           },
           margin: { left: 14, right: 14 },
         });
@@ -464,25 +467,25 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
         const pageWidth = doc.internal.pageSize.getWidth();
 
         // Load logos from src/assets
-        const logo1Data = await loadImageAsBase64(logo1Img);
+        const ksrctData = await loadImageAsBase64(ksrctImg);
         const logoData = await loadImageAsBase64(logoImg);
 
         const headerY = 22;
 
-        // Left logo (logo1.webp)
-        if (logo1Data) {
-          const logoHeight = 30;
-          const aspectRatio = logo1Data.width / logo1Data.height;
+        // Left logo (ksrct.webp)
+        if (ksrctData) {
+          const logoHeight = 20;
+          const aspectRatio = ksrctData.width / ksrctData.height;
           const logoWidth = logoHeight * aspectRatio;
-          doc.addImage(logo1Data.data, 'PNG', 32, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+          doc.addImage(ksrctData.data, 'PNG', 14, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
         }
 
-        // Right logo (logo.webp)
+        // Right logo (logo.webp) - larger size
         if (logoData) {
-          const logoHeight = 14;
+          const logoHeight = 28;
           const aspectRatio = logoData.width / logoData.height;
           const logoWidth = logoHeight * aspectRatio;
-          doc.addImage(logoData.data, 'PNG', pageWidth - logoWidth - 32, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
+          doc.addImage(logoData.data, 'PNG', pageWidth - logoWidth - 14, headerY - logoHeight/2, logoWidth, logoHeight, undefined, 'NONE');
         }
 
         // Header text
@@ -495,10 +498,10 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
         doc.text('AUTONOMOUS | TIRUCHENGODE', pageWidth / 2, headerY + 2, { align: 'center' });
         doc.setFontSize(14);
         doc.setTextColor(197, 48, 48);
-        doc.text(getEventName(selectedEvent), pageWidth / 2, headerY + 10, { align: 'center' });
+        doc.text(`${getEventName(selectedEvent)} (${selectedEvent})`, pageWidth / 2, headerY + 10, { align: 'center' });
         doc.setFontSize(10);
         doc.setTextColor(100, 100, 100);
-        doc.text('Attendance Report', pageWidth / 2, headerY + 16, { align: 'center' });
+        doc.text(`Attendance Report | Total Attendance: ${stats.totalMarked}`, pageWidth / 2, headerY + 16, { align: 'center' });
 
         // Table data
         const tableData = filteredAttendance.map((record, index) => [
