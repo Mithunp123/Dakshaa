@@ -230,8 +230,9 @@ const Events = () => {
       if (technical) {
         setSelectedTechnical(technical);
       }
-    } else if (eventId && eventId.startsWith("nontech")) {
+    } else if (eventId && (eventId.startsWith("nontech") || eventId.startsWith("expo-"))) {
       // Check if it's a non-technical event - open modal instead of navigating
+      // Also handles "expo-" events (autoshow, droneshow, etc.) which are stored in nonTechnicalDetails
       const nonTechnical = nonTechnicalDetails.find(nt => nt.id === eventId);
       if (nonTechnical) {
         setSelectedNonTechnical(nonTechnical);

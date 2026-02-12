@@ -286,8 +286,8 @@ export const eventCoordinatorsData = [
     eventId: "vibe-code-26",
     department: "",
     eventType: "Hackathon",
-    coordinatorName: "Ms. Dhinesha",
-    coordinatorContact: "9942687393"
+    coordinatorName: "Ms.Dhinesha",
+    coordinatorContact: "99426 87393"
   },
   {
     eventName: "PCBathon",
@@ -296,7 +296,7 @@ export const eventCoordinatorsData = [
     department: "",
     eventType: "Hackathon",
     coordinatorName: "Iniyavan S",
-    coordinatorContact: "9637484010"
+    coordinatorContact: "963748 84010"
   },
   {
     eventName: "Cloudathon",
@@ -305,7 +305,7 @@ export const eventCoordinatorsData = [
     department: "",
     eventType: "Hackathon",
     coordinatorName: "Rasikashree S",
-    coordinatorContact: "9442290033"
+    coordinatorContact: "94422 90033"
   },
   {
     eventName: "Designathon",
@@ -313,8 +313,8 @@ export const eventCoordinatorsData = [
     eventId: "designathon",
     department: "",
     eventType: "Hackathon",
-    coordinatorName: "Mr. G. S. Priyan",
-    coordinatorContact: "8668057985"
+    coordinatorName: "Mr.G.S.Priyan",
+    coordinatorContact: "86680 57985"
   },
   {
     eventName: "Startup Pitch",
@@ -323,7 +323,7 @@ export const eventCoordinatorsData = [
     department: "",
     eventType: "Startup",
     coordinatorName: "Mr. M. Barath Kumar",
-    coordinatorContact: "8012355633"
+    coordinatorContact: "80123 55633"
   },
   {
     eventName: "Sustainathon",
@@ -331,8 +331,8 @@ export const eventCoordinatorsData = [
     eventId: "sustainathon",
     department: "",
     eventType: "Hackathon",
-    coordinatorName: "Mr. S. K. Suje",
-    coordinatorContact: "6374126445"
+    coordinatorName: "Mr.S.K.Suje",
+    coordinatorContact: "63741 26445"
   },
   {
     eventName: "Matlab Cody Challenge",
@@ -341,7 +341,7 @@ export const eventCoordinatorsData = [
     department: "",
     eventType: "Technical",
     coordinatorName: "KiranKumar R",
-    coordinatorContact: "8489526160"
+    coordinatorContact: "84895 26160"
   }
 ];
 
@@ -687,7 +687,7 @@ export const eventScheduleData = {
         location: "IDEA Lab, Ground Floor Main Building",
         mapUrl: "https://maps.app.goo.gl/Xp2PGHwaSNaXXpAr9",
         coordinatorName: "Iniyavan S",
-        coordinatorNumber: "9637488401",
+        coordinatorNumber: "963748 84010",
         type: "Hackathon",
         description: "PCB design competition"
       },
@@ -1031,7 +1031,7 @@ export const eventScheduleData = {
         location: "AB Lab 3, 2nd Floor Academic A Block",
         mapUrl: "https://maps.app.goo.gl/7vKUEqBscktoToAz5",
         coordinatorName: "KiranKumar R",
-        coordinatorNumber: "8489526160",
+        coordinatorNumber: "84895 26160",
         type: "Technical",
         description: "Cody Challenge Event"
       },
@@ -1126,8 +1126,8 @@ export const eventScheduleData = {
         endTime: "04:00 PM",
         location: "IT Lab 1, 1st Floor IT Park",
         mapUrl: "https://maps.app.goo.gl/PQ7aLBs6o73a3dAA8",
-        coordinatorName: "Mr. A. Shanmugeshwara",
-        coordinatorNumber: "9487119381",
+        coordinatorName: "Ms.G.Kari Vikashini",
+        coordinatorNumber: "93845 25869",
         type: "Technical",
         description: "Neura Code 2.0 Event"
       },
@@ -1139,7 +1139,7 @@ export const eventScheduleData = {
         location: "Shine Lab, 3rd Floor IT Park",
         mapUrl: "https://maps.app.goo.gl/FCYFE4cG5SXYUD7QA",
         coordinatorName: "Rasikashree S",
-        coordinatorNumber: "9442290033",
+        coordinatorNumber: "94422 90033",
         type: "Hackathon",
         description: "Cloud computing hackathon"
       },
@@ -1150,8 +1150,8 @@ export const eventScheduleData = {
         endTime: "04:00 PM",
         location: "Design Centre, Mechanical Block",
         mapUrl: "https://maps.app.goo.gl/ZF3SZxD4LhS2oxwt7",
-        coordinatorName: "G. S. Priyan",
-        coordinatorNumber: "8668057985",
+        coordinatorName: "Mr.G.S.Priyan",
+        coordinatorNumber: "86680 57985",
         type: "Hackathon",
         description: "Mechanical design hackathon"
       },
@@ -1162,8 +1162,8 @@ export const eventScheduleData = {
         endTime: "04:00 PM",
         location: "Cyberdome, NET Lab, 2nd/3rd Floor IT Park",
         mapUrl: "https://maps.app.goo.gl/FCYFE4cG5SXYUD7QA",
-        coordinatorName: "Ms. Dhinesha",
-        coordinatorNumber: "9942687393",
+        coordinatorName: "Ms.Dhinesha",
+        coordinatorNumber: "99426 87393",
         type: "Hackathon",
         description: "24-hour Vibe Coding Hackathon with AI tools"
       },
@@ -1174,8 +1174,8 @@ export const eventScheduleData = {
         endTime: "04:00 PM",
         location: "AB Lab 3, 2nd Floor Academic Block",
         mapUrl: "https://maps.app.goo.gl/cgnuwpUg5SqkvTby7",
-        coordinatorName: "",
-        coordinatorNumber: "",
+        coordinatorName: "KiranKumar R",
+        coordinatorNumber: " 84895 26160",
         type: "Hackathon",
         description: "MATLAB simulation and modelling hackathon"
       },
@@ -1186,8 +1186,8 @@ export const eventScheduleData = {
         endTime: "04:00 PM",
         location: "PTC Seminar Hall (KSRCT Innovation Technology Park)",
         mapUrl: "https://maps.app.goo.gl/PQ7aLBs6o73a3dAA8",
-        coordinatorName: "Dr. N. Tiruvenkadam",
-        coordinatorNumber: "",
+        coordinatorName: "Mr. M. Barath Kumar",
+        coordinatorNumber: "80123 55633",
         type: "Hackathon",
         description: "StartUp Pitch Event organized by EDC for students to ideate, innovate, and present impactful startup solutions in emerging technology domains"
       },
@@ -1198,8 +1198,8 @@ export const eventScheduleData = {
         endTime: "04:00 PM",
         location: "NICE Lab (Academic Block)",
         mapUrl: "https://maps.app.goo.gl/cgnuwpUg5SqkvTby7",
-        coordinatorName: "",
-        coordinatorNumber: "",
+        coordinatorName: "Mr.S.K.Suje",
+        coordinatorNumber: "63741 26445",
         type: "Hackathon",
         description: "Sustainathon is a problem-solving hackathon focused on creating innovative, practical, and scalable solutions aligned with UN Sustainable Development Goals"
       },
@@ -1210,8 +1210,8 @@ export const eventScheduleData = {
         endTime: "04:00 PM",
         location: "Biotech Seminar Hall",
         mapUrl: "https://maps.app.goo.gl/pbMooP4pV5E2o5rv7",
-        coordinatorName: "Nishaanth P",
-        coordinatorNumber: "9843493094",
+        coordinatorName: "Mr. D Hariharasudhan",
+        coordinatorNumber: "98428 25230",
         type: "Hackathon",
         description: "Biotechnology hackathon"
       },
