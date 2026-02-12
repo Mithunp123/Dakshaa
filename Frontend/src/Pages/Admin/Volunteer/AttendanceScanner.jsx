@@ -433,6 +433,33 @@ const AttendanceScanner = () => {
 
   const markAttendance = async (userId, eventId, eventName) => {
     setMarkingAttendance(true);
+
+    // Helper to detect duplicate key errors from any shape
+    const isDuplicate = (obj) => {
+      if (!obj) return false;
+      const str = typeof obj === 'string' ? obj : JSON.stringify(obj);
+      return str.includes('duplicate key') || str.includes('attendance_user_id_event_id_key') || str.includes('23505');
+    };
+
+    const showDuplicateResult = async () => {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, department, id')
+        .eq('id', userId)
+        .single();
+
+      setScanResult({
+        status: "warning",
+        message: "Duplicate Entry - Already Marked",
+        code: "DUPLICATE_ENTRY",
+        student_name: profile?.full_name,
+        student_dept: profile?.department,
+        student_id: userId,
+        event_name: eventName
+      });
+      errorAudio.current?.play().catch(() => {});
+      navigator.vibrate?.(500);
+    };
     
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -445,29 +472,43 @@ const AttendanceScanner = () => {
         p_scan_location: null
       });
 
-      if (error) throw error;
-
-      setScanResult({
-        ...data,
-        event_name: eventName || data.event_name
-      });
-
-      if (data.status === "success") {
-        successAudio.current?.play().catch(() => {});
-        navigator.vibrate?.(200);
+      // Check for duplicate attendance in error
+      if (error && isDuplicate(error)) {
+        await showDuplicateResult();
+      } else if (error) {
+        throw error;
+      } else if (isDuplicate(data)) {
+        // RPC caught the error internally and returned it in data
+        await showDuplicateResult();
       } else {
-        errorAudio.current?.play().catch(() => {});
-        navigator.vibrate?.(500);
+        setScanResult({
+          ...data,
+          student_id: userId,
+          event_name: eventName || data.event_name
+        });
+
+        if (data.status === "success") {
+          successAudio.current?.play().catch(() => {});
+          navigator.vibrate?.(200);
+        } else {
+          errorAudio.current?.play().catch(() => {});
+          navigator.vibrate?.(500);
+        }
       }
 
       setShowEventSelection(false);
     } catch (error) {
       console.error("Error marking attendance:", error);
-      setScanResult({
-        status: "error",
-        message: error.message || "Failed to mark attendance",
-        code: "MARK_ERROR"
-      });
+      
+      if (isDuplicate(error)) {
+        await showDuplicateResult();
+      } else {
+        setScanResult({
+          status: "error",
+          message: error.message || "Failed to mark attendance",
+          code: "MARK_ERROR"
+        });
+      }
       errorAudio.current?.play().catch(() => {});
     } finally {
       setMarkingAttendance(false);
@@ -924,7 +965,7 @@ const AttendanceScanner = () => {
                     {scanResult.status === "success"
                       ? "Success!"
                       : scanResult.status === "warning"
-                      ? "Already Done"
+                      ? "Duplicate Entry"
                       : "Error"}
                   </h3>
                   <p className="text-gray-300 text-sm sm:text-base">{scanResult.message}</p>
@@ -933,6 +974,15 @@ const AttendanceScanner = () => {
                 {/* Student & Event Details */}
                 {(scanResult.student_name || scanResult.event_name) && (
                   <div className="bg-white/10 rounded-2xl p-4 sm:p-5 space-y-3 text-left">
+                    {scanResult.student_id && (
+                      <div className="flex items-center gap-3 pb-2 border-b border-white/10">
+                        <Hash className="text-cyan-400 flex-shrink-0" size={18} />
+                        <div>
+                          <p className="text-xs text-gray-400">Dakshaa ID</p>
+                          <p className="font-bold text-cyan-400 font-mono text-sm">{scanResult.student_id.substring(0, 8).toUpperCase()}</p>
+                        </div>
+                      </div>
+                    )}
                     {scanResult.student_name && (
                       <div className="flex items-center gap-3">
                         <User className="text-gray-400 flex-shrink-0" size={18} />

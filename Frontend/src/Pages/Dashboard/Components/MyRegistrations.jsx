@@ -378,6 +378,15 @@ const MyRegistrations = () => {
     }
   };
 
+  const handleViewMap = (venue) => {
+    // Default to college location if venue not specified
+    const location = venue || 'K.S.Rangasamy College of Technology, Tiruchengode';
+    
+    // Open Google Maps with the venue location
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+    window.open(mapsUrl, '_blank', 'noopener,noreferrer');
+  };
+
   if (loading) return <div className="text-center p-10">Loading your registrations...</div>;
 
   return (
@@ -437,6 +446,7 @@ const MyRegistrations = () => {
 
               <div className="mt-6 flex gap-2">
                 <button 
+                  onClick={() => handleViewMap(reg.events?.venue)}
                   className="flex-1 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 hover:bg-blue-500 transition-colors"
                 >
                   <Navigation size={14} /> View Map

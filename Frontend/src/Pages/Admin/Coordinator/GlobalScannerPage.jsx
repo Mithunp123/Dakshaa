@@ -339,39 +339,45 @@ const GlobalScannerPage = () => {
       const eventName = eventToMark?.name || 'Event';
       let isAlreadyAttended = attendanceResult?.already_attended;
 
-      // Handle duplicate attendance error (when attendance was already marked)
+      // Helper to detect duplicate key errors from any shape
+      const isDuplicate = (obj) => {
+        if (!obj) return false;
+        const str = typeof obj === 'string' ? obj : JSON.stringify(obj);
+        return str.includes('duplicate key') || str.includes('attendance_user_id_event_id_key') || str.includes('23505') || str.includes('already marked');
+      };
+
+      // Handle duplicate attendance error
       if (attendanceError) {
         console.error('Attendance error:', attendanceError);
-        
-        // Check if it's a duplicate key error (attendance already marked)
-        if (attendanceError.message?.includes('duplicate key') || 
-            attendanceError.message?.includes('attendance_user_id_event_id_key') ||
-            attendanceError.code === '23505') {
-          // Treat as already attended
+        if (isDuplicate(attendanceError)) {
           isAlreadyAttended = true;
         } else {
-          // Other errors - show error toast
           toast.error(attendanceError.message || 'Failed to mark attendance');
           return;
         }
       }
 
+      // Also check if the RPC returned success but with error/warning status containing duplicate key
+      if (!attendanceError && isDuplicate(attendanceResult)) {
+        isAlreadyAttended = true;
+      }
+
       toast.custom((t) => (
-        <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full ${isAlreadyAttended ? 'bg-yellow-500' : 'bg-green-500'} shadow-lg rounded-2xl pointer-events-auto p-4`}>
+        <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full ${isAlreadyAttended ? 'bg-orange-500' : 'bg-green-500'} shadow-lg rounded-2xl pointer-events-auto p-4`}>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-              <UserCheck className={isAlreadyAttended ? 'text-yellow-500' : 'text-green-500'} size={28} />
+              <UserCheck className={isAlreadyAttended ? 'text-orange-500' : 'text-green-500'} size={28} />
             </div>
             <div className="flex-1">
               <p className="text-white font-bold text-lg">{participant.full_name}</p>
-              <p className="text-white/80 text-sm">{formatDakshaaId(participant.id)}</p>
+              <p className="text-white/80 text-sm font-mono">{formatDakshaaId(participant.id)}</p>
             </div>
           </div>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="text-white" size={16} />
               <p className="text-white font-medium">
-                {isAlreadyAttended ? 'Already attended' : 'Attendance marked'}: {eventName}
+                {isAlreadyAttended ? '⚠️ Duplicate Entry - Already Marked' : '✓ Attendance Marked'}: {eventName}
               </p>
             </div>
             {registeredEventNames.length > 1 && (
@@ -390,7 +396,17 @@ const GlobalScannerPage = () => {
 
     } catch (error) {
       console.error('Error in global scan:', error);
-      toast.error('Error processing scan');
+      
+      const errStr = typeof error === 'string' ? error : JSON.stringify(error);
+      if (errStr.includes('duplicate key') || errStr.includes('attendance_user_id_event_id_key') || errStr.includes('23505')) {
+        toast('⚠️ Duplicate Entry - Attendance already marked', { 
+          duration: 2000, 
+          icon: '⚠️', 
+          style: { background: '#fed7aa', color: '#92400e' } 
+        });
+      } else {
+        toast.error('Error processing scan');
+      }
     } finally {
       setSubmitting(false);
     }

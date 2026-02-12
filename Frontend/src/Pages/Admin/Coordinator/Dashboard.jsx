@@ -552,6 +552,12 @@ const CoordinatorDashboard = () => {
       startScanning();
     }, 1000);
   };
+  // Helper to detect duplicate key errors from any error shape
+  const isDuplicateAttendanceError = (err) => {
+    if (!err) return false;
+    const str = typeof err === 'string' ? err : JSON.stringify(err);
+    return str.includes('duplicate key') || str.includes('attendance_user_id_event_id_key') || str.includes('23505') || str.includes('already marked');
+  };
 
   // This function uses explicit parameters to avoid closure issues
   const markAttendanceWithSessionAndEvent = async (userId, session, event) => {
@@ -582,17 +588,33 @@ const CoordinatorDashboard = () => {
 
       console.log('RPC Result:', result);
 
-      if (rpcError) throw rpcError;
-
-      if (result.status === 'error') {
-        playBuzzSound();
-        toast.error(result.message, { duration: 2000, icon: '❌' });
-        return;
+      // Handle duplicate key error (attendance already marked)
+      if (rpcError) {
+        if (isDuplicateAttendanceError(rpcError)) {
+          playBuzzSound();
+          toast('⚠️ Duplicate Entry - Attendance already marked', { 
+            duration: 2000, 
+            icon: '⚠️', 
+            style: { background: '#fed7aa', color: '#92400e' } 
+          });
+          return;
+        }
+        throw rpcError;
       }
 
-      if (result.status === 'warning') {
+      if (result.status === 'error' || result.status === 'warning') {
         playBuzzSound();
-        toast(result.message, { duration: 2000, icon: '⚠️', style: { background: '#fef3c7', color: '#92400e' } });
+        if (isDuplicateAttendanceError(result)) {
+          toast('⚠️ Duplicate Entry - Attendance already marked', { 
+            duration: 2000, 
+            icon: '⚠️', 
+            style: { background: '#fed7aa', color: '#92400e' } 
+          });
+        } else if (result.status === 'warning') {
+          toast(result.message, { duration: 2000, icon: '⚠️', style: { background: '#fef3c7', color: '#92400e' } });
+        } else {
+          toast.error(result.message, { duration: 2000, icon: '❌' });
+        }
         return;
       }
 
@@ -605,7 +627,16 @@ const CoordinatorDashboard = () => {
     } catch (error) {
       console.error('Error marking attendance:', error);
       playBuzzSound();
-      toast.error(error.message, { duration: 2000 });
+      
+      if (isDuplicateAttendanceError(error)) {
+        toast('⚠️ Duplicate Entry - Attendance already marked', { 
+          duration: 2000, 
+          icon: '⚠️', 
+          style: { background: '#fed7aa', color: '#92400e' } 
+        });
+      } else {
+        toast.error(typeof error === 'object' ? (error.message || 'Failed to mark attendance') : String(error), { duration: 2000 });
+      }
     } finally {
       setSubmitting(false);
     }

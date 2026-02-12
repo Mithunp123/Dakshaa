@@ -18,11 +18,11 @@ const ChatbotButton = () => (
     href="https://vibe-code-navigator.vercel.app/"
     target="_blank"
     rel="noopener noreferrer"
-    className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-sky-500 to-indigo-600 rounded-full shadow-lg hover:shadow-sky-500/50 hover:scale-110 transition-all duration-300 group"
+    className="fixed bottom-[5.5rem] md:bottom-6 right-4 md:right-6 z-50 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-gradient-to-r from-sky-500 to-indigo-600 rounded-full shadow-lg hover:shadow-sky-500/50 hover:scale-110 transition-all duration-300 group"
     aria-label="Open Chatbot"
   >
-    <MessageCircle className="w-7 h-7 text-white group-hover:animate-pulse" />
-    <span className="absolute -top-10 right-0 bg-slate-800 text-white text-xs px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+    <MessageCircle className="w-6 h-6 md:w-7 md:h-7 text-white group-hover:animate-pulse" />
+    <span className="absolute -top-10 right-0 bg-slate-800 text-white text-xs px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden md:block">
       Chat with us!
     </span>
   </a>

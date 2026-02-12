@@ -40,7 +40,7 @@ const ScrollToTop = () => {
     <AnimatePresence>
       {isVisible && (
         <motion.button
-          className="fixed bottom-8 right-8 z-50 group"
+          className="fixed bottom-[9.75rem] md:bottom-24 right-4 md:right-6 z-50 group"
           onClick={scrollToTop}
           initial={{ opacity: 0, scale: 0, rotate: -180 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
@@ -50,8 +50,17 @@ const ScrollToTop = () => {
           transition={{ duration: 0.3 }}
         >
           {/* Progress ring */}
-          <svg className="w-14 h-14 -rotate-90">
+          <svg className="w-12 h-12 md:w-14 md:h-14 -rotate-90">
             {/* Background ring */}
+            <circle
+              cx="24"
+              cy="24"
+              r="20"
+              fill="none"
+              stroke="rgba(14, 165, 233, 0.2)"
+              strokeWidth="3"
+              className="md:hidden"
+            />
             <circle
               cx="28"
               cy="28"
@@ -59,8 +68,22 @@ const ScrollToTop = () => {
               fill="none"
               stroke="rgba(14, 165, 233, 0.2)"
               strokeWidth="3"
+              className="hidden md:block"
             />
             {/* Progress ring */}
+            <motion.circle
+              cx="24"
+              cy="24"
+              r="20"
+              fill="none"
+              stroke="url(#scrollGradient)"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeDasharray={2 * Math.PI * 20}
+              strokeDashoffset={2 * Math.PI * 20 * (1 - (isNaN(scrollProgress) ? 0 : scrollProgress) / 100)}
+              transition={{ duration: 0.2 }}
+              className="md:hidden"
+            />
             <motion.circle
               cx="28"
               cy="28"
@@ -72,6 +95,7 @@ const ScrollToTop = () => {
               strokeDasharray={2 * Math.PI * 24}
               strokeDashoffset={2 * Math.PI * 24 * (1 - (isNaN(scrollProgress) ? 0 : scrollProgress) / 100)}
               transition={{ duration: 0.2 }}
+              className="hidden md:block"
             />
             <defs>
               <linearGradient id="scrollGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -83,12 +107,12 @@ const ScrollToTop = () => {
           
           {/* Button center */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-10 h-10 flex items-center justify-center bg-sky-900/90 backdrop-blur-sm rounded-full border border-sky-700/50 group-hover:border-cyan-400 group-hover:bg-sky-800 transition-colors">
+            <div className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-sky-900/90 backdrop-blur-sm rounded-full border border-sky-700/50 group-hover:border-cyan-400 group-hover:bg-sky-800 transition-colors">
               <motion.div
                 animate={{ y: [0, -3, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
-                <FaArrowUp className="text-cyan-400 text-lg group-hover:text-white transition-colors" />
+                <FaArrowUp className="text-cyan-400 text-base md:text-lg group-hover:text-white transition-colors" />
               </motion.div>
             </div>
           </div>
