@@ -560,17 +560,17 @@ export const hackathonEventDetails = {
         {
           position: "1st Prize",
           emoji: "🥇",
-          amount: "₹1,500",
+          amount: "₹2,000",
         },
         {
           position: "2nd Prize",
           emoji: "🥈",
-          amount: "₹1,000",
+          amount: "₹1,500",
         },
         {
           position: "3rd Prize",
           emoji: "🥉",
-          amount: "₹500",
+          amount: "₹1,000",
         },
       ],
      
