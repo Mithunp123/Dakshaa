@@ -1071,7 +1071,7 @@ export const exposAndShowsDetails = [
       "Plagiarism or copied work will lead to immediate disqualification",
       "Teams must have a well-defined project plan with a unique solution",
       "Attendance in all sessions is mandatory to receive the certificate",
-      "The winner team will be awarded the announced prize amount"
+      
     ],
     contact: {
       facultyCoordinator: [
@@ -1137,7 +1137,7 @@ export const exposAndShowsDetails = [
       "Plagiarism or copied work will lead to immediate disqualification",
       "Teams must have a well-defined project plan with a unique solution",
       "Attendance in all sessions is mandatory to receive the certificate",
-      "The winner team will be awarded the announced prize amount"
+      
     ],
     contact: {
       facultyCoordinator: [
@@ -1197,7 +1197,7 @@ export const exposAndShowsDetails = [
       "Plagiarism or copied work will lead to immediate disqualification",
       "Teams must have a well-defined project plan with a unique solution",
       "Attendance in all sessions is mandatory to receive the certificate",
-      "The winner team will be awarded the announced prize amount"
+      
     ],
     contact: {
       facultyCoordinator: [
@@ -1258,7 +1258,7 @@ export const exposAndShowsDetails = [
       "Plagiarism or copied work will lead to immediate disqualification",
       "Teams must have a well-defined project plan with a unique solution",
       "Attendance in all sessions is mandatory to receive the certificate",
-      "The winner team will be awarded the announced prize amount"
+      
     ],
     contact: {
       facultyCoordinator: [
@@ -1319,7 +1319,7 @@ export const exposAndShowsDetails = [
       "Plagiarism or copied work will lead to immediate disqualification",
       "Teams must have a well-defined project plan with a unique solution",
       "Attendance in all sessions is mandatory to receive the certificate",
-      "The winner team will be awarded the announced prize amount"
+      
     ],
     contact: {
       facultyCoordinator: [
@@ -1382,7 +1382,7 @@ export const exposAndShowsDetails = [
       "Plagiarism or copied work will lead to immediate disqualification",
       "Teams must have a well-defined project plan with a unique solution",
       "Attendance in all sessions is mandatory to receive the certificate",
-      "The winner team will be awarded the announced prize amount"
+      
     ],
     contact: {
       facultyCoordinator: [
@@ -1441,7 +1441,7 @@ export const exposAndShowsDetails = [
       "Plagiarism or copied work will lead to immediate disqualification",
       "Teams must have a well-defined project plan with a unique solution",
       "Attendance in all sessions is mandatory to receive the certificate",
-      "The winner team will be awarded the announced prize amount"
+      
     ],
     contact: {
       facultyCoordinator: [
@@ -1508,7 +1508,7 @@ export const exposAndShowsDetails = [
       "Plagiarism or copied work will lead to immediate disqualification",
       "Teams must have a well-defined project plan with a unique solution",
       "Attendance in all sessions is mandatory to receive the certificate",
-      "The winner team will be awarded the announced prize amount"
+      
     ],
     contact: {
       facultyCoordinator: [
@@ -1567,7 +1567,7 @@ export const exposAndShowsDetails = [
       "Plagiarism or copied work will lead to immediate disqualification",
       "Teams must have a well-defined project plan with a unique solution",
       "Attendance in all sessions is mandatory to receive the certificate",
-      "The winner team will be awarded the announced prize amount"
+      
     ],
     contact: {
       facultyCoordinator: [
@@ -1627,7 +1627,7 @@ export const exposAndShowsDetails = [
       "Plagiarism or copied work will lead to immediate disqualification",
       "Teams must have a well-defined project plan with a unique solution",
       "Attendance in all sessions is mandatory to receive the certificate",
-      "The winner team will be awarded the announced prize amount"
+      
     ],
     contact: {
       facultyCoordinator: [
@@ -1696,7 +1696,7 @@ export const exposAndShowsDetails = [
       "Plagiarism or copied work will lead to immediate disqualification",
       "Teams must have a well-defined project plan with a unique solution",
       "Attendance in all sessions is mandatory to receive the certificate",
-      "The winner team will be awarded the announced prize amount"
+      
     ],
     contact: {
       facultyCoordinator: [
@@ -1755,7 +1755,7 @@ export const exposAndShowsDetails = [
       "Plagiarism or copied work will lead to immediate disqualification",
       "Teams must have a well-defined project plan with a unique solution",
       "Attendance in all sessions is mandatory to receive the certificate",
-      "The winner team will be awarded the announced prize amount"
+      
     ],
     contact: {
       facultyCoordinator: [
@@ -1814,7 +1814,7 @@ export const exposAndShowsDetails = [
       "Plagiarism or copied work will lead to immediate disqualification",
       "Teams must have a well-defined project plan with a unique solution",
       "Attendance in all sessions is mandatory to receive the certificate",
-      "The winner team will be awarded the announced prize amount"
+      
     ],
     contact: {
       facultyCoordinator: [
