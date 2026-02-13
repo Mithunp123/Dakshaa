@@ -92,11 +92,27 @@ const getDeptFromEventName = (name) => {
 
 const fetchPaidRegistrationsByEventIds = async (eventIds) => {
     if (!eventIds || eventIds.length === 0) return { data: [] };
-    return supabase
-        .from('event_registrations_config')
-        .select('event_id')
-        .in('event_id', eventIds)
-        .ilike('payment_status', 'paid');
+    let allData = [];
+    let page = 0;
+    const pageSize = 1000;
+    let hasMore = true;
+    while (hasMore) {
+        const { data, error } = await supabase
+            .from('event_registrations_config')
+            .select('event_id')
+            .in('event_id', eventIds)
+            .ilike('payment_status', 'paid')
+            .range(page * pageSize, (page + 1) * pageSize - 1);
+        if (error) throw error;
+        if (data && data.length > 0) {
+            allData = [...allData, ...data];
+            if (data.length < pageSize) hasMore = false;
+            else page++;
+        } else {
+            hasMore = false;
+        }
+    }
+    return { data: allData };
 };
 
 // Flip Card Component removed
@@ -286,7 +302,7 @@ const LiveStats = () => {
             deptCounts[dept] = {
                 registrations: regCount,
                 teamMembers: teamMembersCount,
-                total: regCount
+                total: regCount + teamMembersCount
             };
         }
 
@@ -375,7 +391,7 @@ const LiveStats = () => {
                     name: event.name,
                     registrations: regCount,
                     teamMembers: tmCount,
-                    count: regCount
+                    count: regCount + tmCount
                 };
             })
             .sort((a, b) => b.count - a.count);
@@ -474,7 +490,7 @@ const LiveStats = () => {
                     name: event.name,
                     registrations: regCount,
                     teamMembers: tmCount,
-                    count: regCount
+                    count: regCount + tmCount
                 };
             })
             .sort((a, b) => b.count - a.count);
@@ -596,7 +612,7 @@ const LiveStats = () => {
                         name: confName,
                         registrations: regCount,
                         teamMembers: tmCount,
-                        count: regCount,
+                        count: regCount + tmCount,
                         isConference: true // Flag to identify this as a conference group
                     };
                 })
@@ -692,7 +708,7 @@ const LiveStats = () => {
                     name: event.name,
                     registrations: regCount,
                     teamMembers: tmCount,
-                    count: regCount
+                    count: regCount + tmCount
                 };
             })
             .sort((a, b) => b.count - a.count);
@@ -870,7 +886,66 @@ const LiveStats = () => {
             }
          }
       });
-      
+
+      // Also count team members per category for consistent counts
+      const categoryEventIdMap = {
+          workshop: [], nontech: [], tech: [], cultural: [], sports: [], hackathon: [], conference: []
+      };
+      events.forEach(e => {
+          const cat = (e.category || '').toLowerCase().trim();
+          if (cat.includes('workshop')) categoryEventIdMap.workshop.push(e.id);
+          else if (cat.includes('non-technical') || cat.includes('non-tech') || cat.includes('nontech') || cat.includes('non tech')) categoryEventIdMap.nontech.push(e.id);
+          else if (cat.includes('technical') || cat === 'tech') {
+              const normalizeForMatch = (str) => (str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+              const eventNameNormalized = normalizeForMatch(e.name);
+              const isAllowedTechEvent = ALLOWED_TECH_EVENTS.some(allowedName => normalizeForMatch(allowedName) === eventNameNormalized);
+              if (isAllowedTechEvent) categoryEventIdMap.tech.push(e.id);
+          }
+          else if (cat.includes('cultural')) categoryEventIdMap.cultural.push(e.id);
+          else if (cat.includes('sport')) categoryEventIdMap.sports.push(e.id);
+          else if (cat.includes('hack')) categoryEventIdMap.hackathon.push(e.id);
+          else if (cat.includes('conference')) categoryEventIdMap.conference.push(e.id);
+      });
+
+      const allCatEventIds = Object.values(categoryEventIdMap).flat();
+      let categoryTeamMembers = [];
+      if (allCatEventIds.length > 0) {
+          const { data: ctm } = await supabase
+              .from('team_members')
+              .select('id, role, status, teams!inner(event_id, is_active)')
+              .in('teams.event_id', allCatEventIds)
+              .eq('teams.is_active', true)
+              .neq('role', 'leader')
+              .eq('status', 'joined');
+          categoryTeamMembers = ctm || [];
+      }
+
+      const catEventIdSets = {};
+      for (const [key, ids] of Object.entries(categoryEventIdMap)) {
+          catEventIdSets[key] = new Set(ids);
+      }
+
+      let workshopTm = 0, nonTechTm = 0, techTm = 0, culturalTm = 0, sportsTm = 0, hackathonTm = 0, conferenceTm = 0;
+      categoryTeamMembers.forEach(tm => {
+          const eventId = tm.teams?.event_id;
+          if (!eventId) return;
+          if (catEventIdSets.workshop.has(eventId)) workshopTm++;
+          else if (catEventIdSets.nontech.has(eventId)) nonTechTm++;
+          else if (catEventIdSets.tech.has(eventId)) techTm++;
+          else if (catEventIdSets.cultural.has(eventId)) culturalTm++;
+          else if (catEventIdSets.sports.has(eventId)) sportsTm++;
+          else if (catEventIdSets.hackathon.has(eventId)) hackathonTm++;
+          else if (catEventIdSets.conference.has(eventId)) conferenceTm++;
+      });
+
+      workshopCount += workshopTm;
+      nonTechCount += nonTechTm;
+      techCount += techTm;
+      culturalCount += culturalTm;
+      sportsCount += sportsTm;
+      hackathonCount += hackathonTm;
+      conferenceCount += conferenceTm;
+
       const buildSpecialCategoryStats = async () => {
         const specialEvents = events.filter(e => getSpecialBaseFromEventName(e.name));
         const specialEventIds = specialEvents.map(e => e.id);
@@ -927,7 +1002,7 @@ const LiveStats = () => {
 
             deptTotalsByBase[base][dept].registrations += regCount;
             deptTotalsByBase[base][dept].teamMembers += tmCount;
-            deptTotalsByBase[base][dept].count += regCount;
+            deptTotalsByBase[base][dept].count += regCount + tmCount;
         });
 
         const specialStats = SPECIAL_EVENT_BASES.map(base => {
@@ -1208,7 +1283,7 @@ const LiveStats = () => {
 
             deptTotals[dept].registrations += regCount;
             deptTotals[dept].teamMembers += tmCount;
-            deptTotals[dept].count += regCount;
+            deptTotals[dept].count += regCount + tmCount;
         });
 
         const details = Object.entries(deptTotals)
@@ -1881,9 +1956,6 @@ const LiveStats = () => {
                                                                 <h4 className="text-white font-semibold text-sm group-hover:text-primary transition-colors truncate">
                                                                     {event.name}
                                                                 </h4>
-                                                                <p className="text-xs text-gray-400">
-                                                                    {event.registrations || 0} Registrations
-                                                                </p>
                                                             </div>
                                                         </div>
                                                         <div className={`bg-gradient-to-r rounded-lg px-4 py-2 shrink-0 ${
@@ -1908,12 +1980,7 @@ const LiveStats = () => {
                                 {deptEventDetails[expandedDept]?.length > 0 && (
                                     <div className="mt-4 pt-4 border-t border-gray-700/30">
                                         <div className="flex items-center justify-between bg-gradient-to-r from-primary/10 to-purple-600/10 rounded-lg p-3">
-                                            <div className="flex flex-col">
-                                                <span className="text-gray-300 font-semibold">Total Registrations</span>
-                                                <span className="text-xs text-gray-500">
-                                                    {deptEventDetails[expandedDept]?.reduce((sum, e) => sum + (e.registrations || 0), 0)} Registrations
-                                                </span>
-                                            </div>
+                                            <span className="text-gray-300 font-semibold">Total</span>
                                             <span className="text-3xl font-black text-primary font-mono">
                                                 {deptEventDetails[expandedDept]?.reduce((sum, e) => sum + e.count, 0)}
                                             </span>
@@ -2032,12 +2099,7 @@ const LiveStats = () => {
                                 {categoryEventDetails[expandedCategory]?.length > 0 && (
                                     <div className="mt-4 pt-4 border-t border-gray-700/30">
                                         <div className="flex items-center justify-between bg-gradient-to-r from-secondary/10 to-orange-600/10 rounded-lg p-3">
-                                            <div className="flex flex-col">
-                                                <span className="text-gray-300 font-semibold">Total Registrations</span>
-                                                <span className="text-xs text-gray-500">
-                                                    {categoryEventDetails[expandedCategory]?.reduce((sum, e) => sum + (e.registrations || 0), 0)} Registrations
-                                                </span>
-                                            </div>
+                                            <span className="text-gray-300 font-semibold">Total</span>
                                             <span className="text-3xl font-black text-secondary font-mono">
                                                 {categoryEventDetails[expandedCategory]?.reduce((sum, e) => sum + e.count, 0)}
                                             </span>
@@ -2122,9 +2184,6 @@ const LiveStats = () => {
                                                                 <h4 className="text-white font-semibold text-sm group-hover:text-primary transition-colors truncate">
                                                                     {event.name}
                                                                 </h4>
-                                                                <p className="text-xs text-gray-400">
-                                                                    {event.registrations || 0} Registrations
-                                                                </p>
                                                             </div>
                                                         </div>
                                                         <div className={`bg-gradient-to-r rounded-lg px-4 py-2 shrink-0 ${
@@ -2149,12 +2208,7 @@ const LiveStats = () => {
                                 {conferenceEventDetails[expandedConference]?.length > 0 && (
                                     <div className="mt-4 pt-4 border-t border-gray-700/30">
                                         <div className="flex items-center justify-between bg-gradient-to-r from-primary/10 to-purple-600/10 rounded-lg p-3">
-                                            <div className="flex flex-col">
-                                                <span className="text-gray-300 font-semibold">Total Registrations</span>
-                                                <span className="text-xs text-gray-500">
-                                                    {conferenceEventDetails[expandedConference]?.reduce((sum, e) => sum + (e.registrations || 0), 0)} Registrations
-                                                </span>
-                                            </div>
+                                            <span className="text-gray-300 font-semibold">Total</span>
                                             <span className="text-3xl font-black text-primary font-mono">
                                                 {conferenceEventDetails[expandedConference]?.reduce((sum, e) => sum + e.count, 0)}
                                             </span>
