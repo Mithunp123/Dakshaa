@@ -767,7 +767,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         // Fetch user profiles for all participants
         const { data: profiles } = await supabase
           .from('profiles')
-          .select('id, full_name, email, mobile_number, college_name, department, roll_number')
+          .select('id, full_name, user_code, mobile_number, college_name, department, roll_number')
           .in('id', allUserIds);
 
         const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
@@ -1047,7 +1047,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         // Fetch user profiles for all participants
         const { data: profiles } = await supabase
           .from('profiles')
-          .select('id, full_name, email, mobile_number, college_name, department, roll_number')
+          .select('id, full_name, user_code, mobile_number, college_name, department, roll_number')
           .in('id', allUserIds);
 
         const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
