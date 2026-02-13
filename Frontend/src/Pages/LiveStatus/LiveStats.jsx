@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, TicketCheck, TrendingUp, Radio, ArrowLeft } from "lucide-react";
 import { supabase } from "../../supabase";
@@ -732,28 +732,131 @@ const LiveStats = () => {
     }
   };
 
-    // Fetch total headcount from backend API (bypasses RLS, uses TeamReport logic)
-    const fetchTotalHeadcount = async () => {
+    // Fetch team stats via backend API (bypasses RLS on teams table)
+    const fetchTeamParticipantStats = async () => {
         try {
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
             const response = await fetch(`${apiUrl}/api/live/participant-stats`);
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Participant stats API failed: ${response.status} - ${errorText}`);
+                throw new Error(`Team stats API failed: ${response.status}`);
             }
+
             const data = await response.json();
             if (!data?.success) {
-                throw new Error('Participant stats API returned no success flag');
+                throw new Error('Team stats API returned no success flag');
             }
+
             return {
-                totalHeadcount: Number(data.totalHeadcount) || 0,
-                teamHeadcount: Number(data.teamHeadcount) || 0,
-                trulyIndividualCount: Number(data.trulyIndividualCount) || 0,
-                activeTeamCount: Number(data.activeTeamCount) || 0
+                extraPaidMembers: Number(data.extraPaidMembers) || 0,
+                activeTeamCount: Number(data.activeTeamCount) || 0,
+                totalPaidMembers: Number(data.totalPaidMembers) || 0
             };
         } catch (error) {
-            console.error('Error fetching total headcount:', error);
-            return { totalHeadcount: 0, teamHeadcount: 0, trulyIndividualCount: 0, activeTeamCount: 0 };
+            console.error('⚠️ Error fetching team participant stats:', error);
+            return {
+                extraPaidMembers: 0,
+                activeTeamCount: 0,
+                totalPaidMembers: 0
+            };
+        }
+    };
+
+    // Fetch total participants using the formula:
+    // payment_status_count + (total_paid_members - active_team_count)
+    const fetchTotalParticipants = async () => {
+        try {
+            let activeTeamCount = 0;
+            let totalPaidMembers = 0;
+
+            // Try 1: Use RPC function (bypasses RLS and row limits - most accurate)
+            try {
+                const { data: rpcResult, error: rpcError } = await supabase.rpc('get_team_participant_stats');
+                if (rpcError) throw rpcError;
+                
+                if (rpcResult && rpcResult.active_team_count > 0) {
+                    activeTeamCount = Number(rpcResult.active_team_count) || 0;
+                    totalPaidMembers = Number(rpcResult.total_paid_members) || 0;
+                    console.log('\ud83d\udc65 Team Stats (RPC):', { activeTeamCount, totalPaidMembers });
+                } else {
+                    throw new Error('RPC returned no data');
+                }
+            } catch (rpcErr) {
+                console.log('\ud83d\udd04 RPC failed, trying backend API...', rpcErr.message);
+                // Try 2: Fallback to backend API
+                try {
+                    const teamStats = await fetchTeamParticipantStats();
+                    activeTeamCount = teamStats.activeTeamCount;
+                    totalPaidMembers = teamStats.totalPaidMembers;
+                } catch (apiErr) {
+                    console.log('\ud83d\udd04 API also failed, trying direct query...', apiErr.message);
+                    // Try 3: Direct Supabase with pagination
+                    const { count: teamCount } = await supabase
+                        .from('teams')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('is_active', true);
+                    activeTeamCount = teamCount || 0;
+
+                    let allTeams = [];
+                    let page = 0;
+                    const pageSize = 1000;
+                    let hasMore = true;
+                    while (hasMore) {
+                        const { data: teams } = await supabase
+                            .from('teams')
+                            .select('paid_members')
+                            .eq('is_active', true)
+                            .order('id', { ascending: true })
+                            .range(page * pageSize, (page + 1) * pageSize - 1);
+                        if (teams && teams.length > 0) {
+                            allTeams = [...allTeams, ...teams];
+                            if (teams.length < pageSize) hasMore = false;
+                            else page++;
+                        } else {
+                            hasMore = false;
+                        }
+                    }
+                    totalPaidMembers = allTeams.reduce((sum, t) => sum + (Number(t.paid_members) || 0), 0);
+                }
+            }
+
+            // Query 2: SELECT COUNT(*) FROM public.event_registrations_config WHERE payment_status = 'PAID';
+            const { count: paidCount, error: regError } = await supabase
+                .from('event_registrations_config')
+                .select('*', { count: 'exact', head: true })
+                .eq('payment_status', 'PAID');
+
+            if (regError) throw regError;
+
+            // Formula: payment_status + (total_paid_members - active_team_count)
+            const paymentStatusCount = paidCount || 0;
+            const extraMembers = Math.max(0, totalPaidMembers - activeTeamCount);
+            const totalParticipants = paymentStatusCount + extraMembers;
+
+            console.log('\ud83c\udfaf Total Participants Calculation:', {
+                paymentStatusCount,
+                activeTeamCount,
+                totalPaidMembers,
+                extraMembers,
+                formula: `${paymentStatusCount} + (${totalPaidMembers} - ${activeTeamCount}) = ${totalParticipants}`,
+                totalParticipants
+            });
+
+            return {
+                totalParticipants,
+                paymentStatusCount,
+                activeTeamCount,
+                totalPaidMembers,
+                extraMembers
+            };
+        } catch (error) {
+            console.error('\u26a0\ufe0f Error calculating total participants:', error);
+            return {
+                totalParticipants: 0,
+                paymentStatusCount: 0,
+                activeTeamCount: 0,
+                totalPaidMembers: 0,
+                extraMembers: 0
+            };
         }
     };
 
@@ -813,25 +916,28 @@ const LiveStats = () => {
       });
 
       // 2. Fetch all paid registrations
+      // Need user_id for unique count calculation
       const validRegs = await fetchAllData('event_registrations_config', 'event_id, user_id', q => q.ilike('payment_status', 'paid'));
 
-      // 3. Calculate Total Participants using backend API (bypasses RLS issues)
-      const headcountData = await fetchTotalHeadcount();
-      const totalParticipants = headcountData.totalHeadcount;
-
-      console.log('Total Participants (headcount via API):', {
-        totalRegs: validRegs.length,
-        teamHeadcount: headcountData.teamHeadcount,
-        trulyIndividual: headcountData.trulyIndividualCount,
-        activeTeams: headcountData.activeTeamCount,
-        totalParticipants
+      // 3. Calculate Total Paid Participants using formula:
+      // payment_status_count + (total_paid_members - active_team_count)
+      const participantResult = await fetchTotalParticipants();
+      
+      console.log('\ud83c\udfaf Participant Calculation:', {
+        paymentStatusCount: participantResult.paymentStatusCount,
+        totalPaidMembers: participantResult.totalPaidMembers,
+        activeTeamCount: participantResult.activeTeamCount,
+        extraMembers: participantResult.extraMembers,
+        totalParticipants: participantResult.totalParticipants
       });
 
-      // Update global stats
+      // Update global stats with corrected count
       setStats(prev => ({
           ...prev,
-          uniquePaidUsers: validRegs.length,
-          totalParticipants: totalParticipants,
+          uniquePaidUsers: participantResult.paymentStatusCount,
+          teamMembersCount: participantResult.extraMembers,
+          totalParticipants: participantResult.totalParticipants,
+          extraTeamMembers: participantResult.extraMembers
       }));
 
       // 4. Aggregate counts
@@ -1082,89 +1188,41 @@ const LiveStats = () => {
 
   const fetchStatsFallback = async () => {
     try {
-        console.log("­ƒöì Using fallback counting method...");
+        console.log("\ud83d\udd0c Using direct Supabase counting method...");
         
-        // Execute queries in parallel with manual join for teams to ensure accuracy
+        // Execute queries in parallel
         const [
-            regStats,
+            participantResult,
             studentStats
         ] = await Promise.all([
-            // 1. Registrations stats (various payment status checks)
-            Promise.all([
-                supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).eq('payment_status', 'PAID'),
-                supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).ilike('payment_status', 'paid'),
-                supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }) // Total
-            ]),
+            // 1. Total Participants using formula: payment_status + (total_paid_members - active_team_count)
+            fetchTotalParticipants(),
             // 2. Student profiles
             supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student')
         ]);
 
-        const [standardPaidCount, caseInsensitivePaidCount, allStatusesCount] = regStats;
         const studentCount = studentStats;
 
-        console.log("Comprehensive Count Results:");
-        console.log("- Standard 'PAID' count:", standardPaidCount.count);
-        console.log("- Case-insensitive 'paid' count:", caseInsensitivePaidCount.count);
-        console.log("- Total registrations (all statuses):", allStatusesCount.count);
-        console.log("- Student profiles:", studentCount.count);
-
-        
-        // Get a sample of payment statuses to debug
-        const statusSample = await supabase
-          .from('event_registrations_config')
-          .select('payment_status, created_at, id')
-          .order('created_at', { ascending: false })
-          .limit(20);
-          
-        if (statusSample.data) {
-          const statusCounts = {};
-          statusSample.data.forEach(record => {
-            const status = record.payment_status || 'NULL';
-            statusCounts[status] = (statusCounts[status] || 0) + 1;
-          });
-          console.log("­ƒôï Recent payment statuses breakdown:", statusCounts);
-          console.log("­ƒôØ Sample records:", statusSample.data.slice(0, 5));
-        }
-
-        // Try multiple queries to find the highest accurate count
-        const queries = await Promise.all([
-          supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).eq('payment_status', 'PAID'),
-          supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).eq('payment_status', 'paid'),
-          supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).eq('payment_status', 'Paid'),
-          supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }).ilike('payment_status', 'paid')
-        ]);
-        
-        const counts = queries.map(q => q.count || 0);
-        console.log("­ƒöì All payment status variations:", {
-          'PAID': counts[0],
-          'paid': counts[1], 
-          'Paid': counts[2],
-          'ilike_paid': counts[3]
-        });
-        
-        // Use the highest count as it's likely the most accurate
-        const maxCount = Math.max(...counts);
-        console.log("Registrations (PAID count):", maxCount);
-
-        // Calculate Total Participants using backend API (bypasses RLS issues)
-        const headcountData = await fetchTotalHeadcount();
-        const totalParticipants = headcountData.totalHeadcount;
-        
-        console.log('Total Participants (headcount via API):', {
-            totalRegs: maxCount,
-            totalParticipants
+        console.log("\ud83d\udcca Total Participants Result:", {
+            paymentStatusCount: participantResult.paymentStatusCount,
+            activeTeamCount: participantResult.activeTeamCount,
+            totalPaidMembers: participantResult.totalPaidMembers,
+            extraMembers: participantResult.extraMembers,
+            totalParticipants: participantResult.totalParticipants,
+            students: studentCount.count
         });
         
         setStats(prev => ({
           ...prev,
           users: studentCount.count || 0,
-          registrations: maxCount,
-          totalParticipants: totalParticipants,
+          registrations: participantResult.paymentStatusCount,
+          teamMembersCount: participantResult.extraMembers,
+          totalParticipants: participantResult.totalParticipants,
           last_updated: new Date().toISOString()
         }));
         
     } catch (error) {
-         console.error("ÔØî Error in fallback:", error);
+         console.error("\u26a0\ufe0f Error in fallback:", error);
          setStats(prev => ({ ...prev, users: 0, registrations: 0, last_updated: new Date().toISOString() }));
     }
   };
@@ -1309,18 +1367,21 @@ const LiveStats = () => {
               const eventId = payload.new.event_id;
               const meta = eventLookupRef.current[eventId];
               
-              // Force state update with callback to ensure it happens
+              // Force state update: increment registration and recalculate totalParticipants
+              // Formula: payment_status + (total_paid_members - active_team_count)
               setStats(prevStats => {
                 const newRegistrations = prevStats.registrations + 1;
+                const newTotalParticipants = newRegistrations + prevStats.teamMembersCount;
                 const newStats = {
                   ...prevStats,
                   registrations: newRegistrations,
-                  totalParticipants: prevStats.totalParticipants + 1,
+                  totalParticipants: newTotalParticipants,
                   last_updated: new Date().toISOString()
                 };
-                console.log('­ƒôè Stats updated:', { 
+                console.log('\ud83c\udfaf Stats updated (realtime):', { 
                   oldRegistrations: prevStats.registrations, 
                   newRegistrations: newStats.registrations,
+                  teamMembersCount: prevStats.teamMembersCount,
                   oldTotalParticipants: prevStats.totalParticipants,
                   newTotalParticipants: newStats.totalParticipants
                 });
