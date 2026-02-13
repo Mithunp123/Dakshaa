@@ -79,19 +79,23 @@ const TeamReport = () => {
         ).join(' ');
       };
       
-      // Get unique categories (case-insensitive)
+      // Get unique categories (case-insensitive) - store both display and original value
       const categoryMap = new Map();
       data?.forEach(item => {
         if (item.category) {
-          const lowerKey = item.category.toLowerCase();
-          if (!categoryMap.has(lowerKey)) {
-            categoryMap.set(lowerKey, normalizeCategoryName(item.category));
+          // Use normalized version as key for deduplication
+          const normalizedKey = item.category.toLowerCase().replace(/[\s-]+/g, '');
+          if (!categoryMap.has(normalizedKey)) {
+            categoryMap.set(normalizedKey, {
+              display: normalizeCategoryName(item.category),
+              value: item.category // Keep original for querying
+            });
           }
         }
       });
       
       const uniqueCategories = Array.from(categoryMap.values()).sort((a, b) => 
-        a.toLowerCase().localeCompare(b.toLowerCase())
+        a.display.toLowerCase().localeCompare(b.display.toLowerCase())
       );
       console.log('Available categories:', uniqueCategories);
       setAvailableCategories(uniqueCategories);
@@ -118,6 +122,7 @@ const TeamReport = () => {
         .order('name');
       
       if (selectedCategory !== 'all') {
+        // Use case-insensitive exact match on the original database value
         query = query.ilike('category', selectedCategory);
       }
       
@@ -989,8 +994,8 @@ const TeamReport = () => {
               >
                 <option value="all">All Categories</option>
                 {availableCategories.map(category => (
-                  <option key={category} value={category}>
-                    {category}
+                  <option key={category.value} value={category.value}>
+                    {category.display}
                   </option>
                 ))}
               </select>
