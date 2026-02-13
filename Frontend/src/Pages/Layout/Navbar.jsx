@@ -133,8 +133,8 @@ const Navbar = () => {
           <div className="scroll-note bg-slate-950/90 border-b border-white/10">
             <div className="scroll-note-inner">
               <div className="scroll-note-track">
-                <span className="scroll-note-text">Food is available only for Neura-Hack 2.0,BioNexathon ,Vibe Code -26 </span>
-                <span className="scroll-note-text" aria-hidden="true">Food is available only for Neura-Hack 2.0,BioNexathon ,Vibe Code -26 </span>
+                <span className="scroll-note-text">Only Online payment accepted in onspot registration and on 14/02/2026 only refreshment no food </span>
+                <span className="scroll-note-text" aria-hidden="true">Only Online payment accepted in onspot registration and on 14/02/2026 only refreshment no food </span>
               </div>
             </div>
           </div>
