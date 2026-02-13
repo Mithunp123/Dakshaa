@@ -2158,30 +2158,108 @@ app.all("/payment/callback", async (req, res) => { // Changed to app.all to hand
   }
 });
 
-/* 🟢 Admin Dashboard - Overview Stats (Bypasses 1000 record limit) */
+/* 🟢 Live Stats - Total Participants (exact copy of TeamReport fetchEventWiseStats grand total) */
 app.get("/api/live/participant-stats", async (req, res) => {
   try {
-    const { data: teams, error } = await supabase
-      .from('teams')
-      .select('id, paid_members')
-      .eq('is_active', true);
+    // Step 1: Fetch ALL events (no is_active filter - same as TeamReport)
+    const { data: allEvents, error: eventsError } = await supabase
+      .from('events')
+      .select('id');
 
-    if (error) {
-      throw error;
+    if (eventsError) throw eventsError;
+
+    if (!allEvents || allEvents.length === 0) {
+      return res.json({ success: true, totalHeadcount: 0 });
     }
 
-    const activeTeamCount = teams?.length || 0;
-    const totalPaidMembers = (teams || []).reduce((sum, team) => {
-      return sum + (Number(team.paid_members) || 0);
-    }, 0);
+    // Step 2: For each event, calculate headcount exactly like TeamReport
+    let grandTotal = 0;
+    let totalTeamHeadcount = 0;
+    let totalIndividual = 0;
+    let totalTeams = 0;
 
-    const extraPaidMembers = Math.max(0, totalPaidMembers - activeTeamCount);
+    // Process in batches to avoid overwhelming the DB
+    const batchSize = 20;
+    for (let i = 0; i < allEvents.length; i += batchSize) {
+      const batch = allEvents.slice(i, i + batchSize);
+      
+      const batchResults = await Promise.all(
+        batch.map(async (event) => {
+          // Fetch teams for this event (same query as TeamReport line 355-358)
+          const { data: teamsData } = await supabase
+            .from('teams')
+            .select('id, paid_members, leader_id')
+            .eq('event_id', event.id)
+            .eq('is_active', true);
+
+          // Fetch team members to get user IDs (same as TeamReport line 361-375)
+          const teamIds = teamsData?.map(t => t.id) || [];
+          const teamUserIds = new Set();
+
+          // Add leaders to the set
+          teamsData?.forEach(team => {
+            if (team.leader_id) teamUserIds.add(team.leader_id);
+          });
+
+          if (teamIds.length > 0) {
+            const { data: teamMembers } = await supabase
+              .from('team_members')
+              .select('user_id')
+              .in('team_id', teamIds);
+
+            teamMembers?.forEach(m => {
+              if (m.user_id) teamUserIds.add(m.user_id);
+            });
+          }
+
+          // Team headcount = sum(paid_members) (same as TeamReport line 377-379)
+          const teamHeadcount = teamsData?.reduce((sum, team) => {
+            return sum + (team.paid_members || 0);
+          }, 0) || 0;
+
+          // Fetch individual registrations (same as TeamReport line 381-385)
+          const { data: individualRegs } = await supabase
+            .from('event_registrations_config')
+            .select('user_id')
+            .eq('event_id', event.id)
+            .eq('payment_status', 'PAID');
+
+          // Filter out team members from individual count (same as TeamReport line 387-389)
+          const trulyIndividualCount = individualRegs?.filter(
+            reg => !teamUserIds.has(reg.user_id)
+          ).length || 0;
+
+          return {
+            teamCount: teamsData?.length || 0,
+            teamHeadcount,
+            individualCount: trulyIndividualCount,
+            totalHeadcount: teamHeadcount + trulyIndividualCount
+          };
+        })
+      );
+
+      batchResults.forEach(r => {
+        grandTotal += r.totalHeadcount;
+        totalTeamHeadcount += r.teamHeadcount;
+        totalIndividual += r.individualCount;
+        totalTeams += r.teamCount;
+      });
+    }
+
+    console.log('Live participant stats (TeamReport exact logic):', {
+      totalEvents: allEvents.length,
+      totalTeams,
+      teamHeadcount: totalTeamHeadcount,
+      trulyIndividualCount: totalIndividual,
+      totalHeadcount: grandTotal
+    });
 
     res.json({
       success: true,
-      activeTeamCount,
-      totalPaidMembers,
-      extraPaidMembers
+      activeTeamCount: totalTeams,
+      teamHeadcount: totalTeamHeadcount,
+      trulyIndividualCount: totalIndividual,
+      totalHeadcount: grandTotal
     });
   } catch (error) {
     console.error('Live participant stats API error:', error);

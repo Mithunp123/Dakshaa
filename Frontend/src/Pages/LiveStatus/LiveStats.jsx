@@ -732,31 +732,28 @@ const LiveStats = () => {
     }
   };
 
-    const fetchTeamParticipantStats = async () => {
+    // Fetch total headcount from backend API (bypasses RLS, uses TeamReport logic)
+    const fetchTotalHeadcount = async () => {
         try {
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
             const response = await fetch(`${apiUrl}/api/live/participant-stats`);
             if (!response.ok) {
-                throw new Error(`Team stats API failed: ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(`Participant stats API failed: ${response.status} - ${errorText}`);
             }
-
             const data = await response.json();
             if (!data?.success) {
-                throw new Error('Team stats API returned no success flag');
+                throw new Error('Participant stats API returned no success flag');
             }
-
             return {
-                extraPaidMembers: Number(data.extraPaidMembers) || 0,
-                activeTeamCount: Number(data.activeTeamCount) || 0,
-                totalPaidMembers: Number(data.totalPaidMembers) || 0
+                totalHeadcount: Number(data.totalHeadcount) || 0,
+                teamHeadcount: Number(data.teamHeadcount) || 0,
+                trulyIndividualCount: Number(data.trulyIndividualCount) || 0,
+                activeTeamCount: Number(data.activeTeamCount) || 0
             };
         } catch (error) {
-            console.error('ÔØî Error fetching team participant stats:', error);
-            return {
-                extraPaidMembers: 0,
-                activeTeamCount: 0,
-                totalPaidMembers: 0
-            };
+            console.error('Error fetching total headcount:', error);
+            return { totalHeadcount: 0, teamHeadcount: 0, trulyIndividualCount: 0, activeTeamCount: 0 };
         }
     };
 
@@ -816,34 +813,25 @@ const LiveStats = () => {
       });
 
       // 2. Fetch all paid registrations
-      // Need user_id for unique count calculation
       const validRegs = await fetchAllData('event_registrations_config', 'event_id, user_id', q => q.ilike('payment_status', 'paid'));
 
-      // 3. Calculate Total Paid Participants (Matches Python Logic Exactly)
-      // Formula: Total Paid Participants = (PAID Registrations) + (Total Team Paid Members - Active Team Count)
-      // Note: If (Sum(paid_members) - Count(active_teams)) is negative, use 0.
-      
-            const teamStats = await fetchTeamParticipantStats();
-            const totalTeamPaidMembers = teamStats.totalPaidMembers;
-            const activeTeamCount = teamStats.activeTeamCount;
-            const extraPaidMembers = teamStats.extraPaidMembers;
-      
-      const totalParticipants = validRegs.length + extraPaidMembers;
-      console.log('­ƒæÑ Participant Calculation (Python Logic Match):', {
-        baseRegs: validRegs.length,
-        teamMembersTotal: totalTeamPaidMembers,
-        activeTeamsCount: activeTeamCount,
-        CalculatedExtra: extraPaidMembers,
-        total: totalParticipants
+      // 3. Calculate Total Participants using backend API (bypasses RLS issues)
+      const headcountData = await fetchTotalHeadcount();
+      const totalParticipants = headcountData.totalHeadcount;
+
+      console.log('Total Participants (headcount via API):', {
+        totalRegs: validRegs.length,
+        teamHeadcount: headcountData.teamHeadcount,
+        trulyIndividual: headcountData.trulyIndividualCount,
+        activeTeams: headcountData.activeTeamCount,
+        totalParticipants
       });
 
-      // Update global stats with corrected count
+      // Update global stats
       setStats(prev => ({
           ...prev,
-          uniquePaidUsers: validRegs.length, // Count of unique paid registrations
-          teamMembersCount: extraPaidMembers,
+          uniquePaidUsers: validRegs.length,
           totalParticipants: totalParticipants,
-          extraTeamMembers: extraPaidMembers
       }));
 
       // 4. Aggregate counts
@@ -1099,8 +1087,7 @@ const LiveStats = () => {
         // Execute queries in parallel with manual join for teams to ensure accuracy
         const [
             regStats,
-            studentStats,
-            teamMemberCount
+            studentStats
         ] = await Promise.all([
             // 1. Registrations stats (various payment status checks)
             Promise.all([
@@ -1109,28 +1096,17 @@ const LiveStats = () => {
                 supabase.from('event_registrations_config').select('*', { count: 'exact', head: true }) // Total
             ]),
             // 2. Student profiles
-            supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
-            // 3. Team Members (Use backend API to bypass RLS)
-            (async () => {
-                const teamStats = await fetchTeamParticipantStats();
-                console.log(
-                  `­ƒæÑ Team Stats Debug (API): Active Teams=${teamStats.activeTeamCount}, ` +
-                  `Total Paid Members Sum=${teamStats.totalPaidMembers}, Additional Members=${teamStats.extraPaidMembers}`
-                );
-                return teamStats.extraPaidMembers;
-            })()
+            supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student')
         ]);
 
         const [standardPaidCount, caseInsensitivePaidCount, allStatusesCount] = regStats;
         const studentCount = studentStats;
-        const teamMembersCount = teamMemberCount;
 
-        console.log("­ƒôè Comprehensive Count Results:");
+        console.log("Comprehensive Count Results:");
         console.log("- Standard 'PAID' count:", standardPaidCount.count);
         console.log("- Case-insensitive 'paid' count:", caseInsensitivePaidCount.count);
         console.log("- Total registrations (all statuses):", allStatusesCount.count);
         console.log("- Student profiles:", studentCount.count);
-        console.log("- Team Members (calculated):", teamMembersCount);
 
         
         // Get a sample of payment statuses to debug
@@ -1168,52 +1144,21 @@ const LiveStats = () => {
         
         // Use the highest count as it's likely the most accurate
         const maxCount = Math.max(...counts);
-        console.log("­ƒôê Using maximum count:", maxCount);
-        
-        // If we're still seeing 315/316 discrepancy, do a manual verification
-        if (maxCount === 315) {
-          console.log("­ƒÜ¿ Still showing 315, investigating further...");
-          
-          // Get actual records to count manually
-          const allRecords = await supabase
-            .from('event_registrations_config')
-            .select('payment_status, id')
-            .not('payment_status', 'is', null);
-            
-          if (allRecords.data) {
-            const manualCount = allRecords.data.filter(record => 
-              record.payment_status && record.payment_status.toLowerCase() === 'paid'
-            ).length;
-            
-            console.log("­ƒöó Manual count (case-insensitive):", manualCount);
-            console.log("­ƒôª Total records with payment_status:", allRecords.data.length);
-            
-            // Use manual count if it's different
-            if (manualCount !== maxCount) {
-              console.log("ÔÜí Using manual count as it differs from DB count");
-              const totalParticipants = manualCount + teamMembersCount;
-              console.log("­ƒôè Total Participants (registrations + team members):", totalParticipants);
-              setStats(prev => ({
-                ...prev,
-                users: studentCount.count || 0,
-                registrations: manualCount,
-                teamMembersCount: teamMembersCount,
-                totalParticipants: totalParticipants,
-                last_updated: new Date().toISOString()
-              }));
-              return;
-            }
-          }
-        }
+        console.log("Registrations (PAID count):", maxCount);
 
-        const totalParticipants = maxCount + teamMembersCount;
-        console.log("­ƒôè Total Participants (registrations + team members):", totalParticipants);
+        // Calculate Total Participants using backend API (bypasses RLS issues)
+        const headcountData = await fetchTotalHeadcount();
+        const totalParticipants = headcountData.totalHeadcount;
+        
+        console.log('Total Participants (headcount via API):', {
+            totalRegs: maxCount,
+            totalParticipants
+        });
         
         setStats(prev => ({
           ...prev,
           users: studentCount.count || 0,
           registrations: maxCount,
-          teamMembersCount: teamMembersCount,
           totalParticipants: totalParticipants,
           last_updated: new Date().toISOString()
         }));
@@ -1367,11 +1312,10 @@ const LiveStats = () => {
               // Force state update with callback to ensure it happens
               setStats(prevStats => {
                 const newRegistrations = prevStats.registrations + 1;
-                const newTotalParticipants = newRegistrations + prevStats.teamMembersCount;
                 const newStats = {
                   ...prevStats,
                   registrations: newRegistrations,
-                  totalParticipants: newTotalParticipants,
+                  totalParticipants: prevStats.totalParticipants + 1,
                   last_updated: new Date().toISOString()
                 };
                 console.log('­ƒôè Stats updated:', { 
