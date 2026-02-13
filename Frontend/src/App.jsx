@@ -48,6 +48,7 @@ const ForgotPassword = lazy(() => import("./Pages/ForgotPassword/ForgotPassword"
 const Leaderboard = lazy(() => import("./Pages/Leaderboard/Leaderboard"));
 const LiveStatusBoard = lazy(() => import("./Pages/LiveStatus/LiveStatusBoard"));
 const LiveStats = lazy(() => import("./Pages/LiveStatus/LiveStats"));
+const OnSpotReg = lazy(() => import("./Pages/LiveStatus/OnSpotReg"));
 const TestConnection = lazy(() => import("./Pages/TestConnection"));
 const MyRegistrations = lazy(() => import("./Pages/MyRegistrations/MyRegistrations"));
 const AdminDashboard = lazy(() => import("./Pages/Admin/AdminDashboard"));
@@ -123,6 +124,7 @@ function AppContent() {
   const isRegisterEvents = location.pathname === "/register-events";
   const isHome = location.pathname === "/";
   const isLiveStats = location.pathname === "/live-stats";
+  const isOnSpotReg = location.pathname === "/on-spot-reg";
 
   // Check if bottom navbar should be shown (mobile only, non-admin pages)
   const showBottomNav = !isDashboard && !isAdmin && !isScan && !isPrintQR && !isLogin && !isForgotPassword;
@@ -233,6 +235,7 @@ function AppContent() {
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/live-status" element={<LiveStatusBoard />} />
             <Route path="/live-stats" element={<LiveStats />} />
+            <Route path="/on-spot-reg" element={<OnSpotReg />} />
             <Route path="/test-connection" element={<TestConnection />} />
             <Route path="/my-registrations" element={<MyRegistrations />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
@@ -538,7 +541,7 @@ function AppContent() {
           <UltraFooter />
         </Suspense>
       )}
-      {!isAdmin && !isRegisterEvents && !isLiveStats && !isPrintQR && (
+      {!isAdmin && !isRegisterEvents && !isLiveStats && !isOnSpotReg && !isPrintQR && (
         <Suspense fallback={null}>
           <FloatingDashboardButton />
         </Suspense>
