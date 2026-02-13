@@ -791,7 +791,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
               registrations.push({
                 sno: registrations.length + 1,
                 name: leaderProfile.full_name || 'N/A',
-                email: leaderProfile.email || 'N/A',
+                userCode: leaderProfile.user_code || 'N/A',
                 mobile: leaderProfile.mobile_number || 'N/A',
                 college: leaderProfile.college_name || 'N/A',
                 department: leaderProfile.department || 'N/A',
@@ -811,7 +811,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
                 registrations.push({
                   sno: registrations.length + 1,
                   name: memberProfile.full_name || 'N/A',
-                  email: memberProfile.email || 'N/A',
+                  userCode: memberProfile.user_code || 'N/A',
                   mobile: memberProfile.mobile_number || 'N/A',
                   college: memberProfile.college_name || 'N/A',
                   department: memberProfile.department || 'N/A',
@@ -830,7 +830,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           .select(`
             *,
             profiles(
-              full_name, email, mobile_number, college_name, department, roll_number
+              full_name, user_code, mobile_number, college_name, department, roll_number
             )
           `)
           .eq('event_id', selectedEvent.id)
@@ -841,7 +841,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         registrations = individualRegs?.map((reg, index) => ({
           sno: index + 1,
           name: reg.profiles?.full_name || reg.participant_name || 'N/A',
-          email: reg.profiles?.email || reg.participant_email || 'N/A',
+          userCode: reg.profiles?.user_code || 'N/A',
           mobile: reg.profiles?.mobile_number || 'N/A',
           college: reg.profiles?.college_name || 'N/A',
           department: reg.profiles?.department || 'N/A',
@@ -922,11 +922,11 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
       let columns, tableData;
       
       if (isTeamEvent) {
-        columns = ['S.No', 'Name', 'Email', 'Department', 'College', 'Team', 'Role', 'Mobile', 'Signature'];
+        columns = ['S.No', 'Name', 'User Code', 'Department', 'College', 'Team', 'Role', 'Mobile', 'Signature'];
         tableData = registrations.map(row => [
           row.sno,
           row.name,
-          row.email,
+          row.userCode,
           row.department,
           row.college,
           row.teamName,
@@ -935,11 +935,11 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           ''
         ]);
       } else {
-        columns = ['S.No', 'Name', 'Email', 'Department', 'College', 'Mobile', 'Signature'];
+        columns = ['S.No', 'Name', 'User Code', 'Department', 'College', 'Mobile', 'Signature'];
         tableData = registrations.map(row => [
           row.sno,
           row.name,
-          row.email,
+          row.userCode,
           row.department,
           row.college,
           row.mobile,
@@ -968,7 +968,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         columnStyles: isTeamEvent ? {
           0: { cellWidth: 12, halign: 'center' }, // S.No
           1: { cellWidth: 35 }, // Name
-          2: { cellWidth: 45 }, // Email
+          2: { cellWidth: 45 }, // User Code
           3: { cellWidth: 28 }, // Department
           4: { cellWidth: 48 }, // College
           5: { cellWidth: 28 }, // Team
@@ -978,7 +978,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         } : {
           0: { cellWidth: 12, halign: 'center' }, // S.No
           1: { cellWidth: 42 }, // Name
-          2: { cellWidth: 55 }, // Email
+          2: { cellWidth: 55 }, // User Code
           3: { cellWidth: 32 }, // Department
           4: { cellWidth: 60 }, // College
           5: { cellWidth: 28 }, // Mobile
@@ -1071,7 +1071,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
               registrations.push({
                 sno: registrations.length + 1,
                 name: leaderProfile.full_name || 'N/A',
-                email: leaderProfile.email || 'N/A',
+                userCode: leaderProfile.user_code || 'N/A',
                 mobile: leaderProfile.mobile_number || 'N/A',
                 college: leaderProfile.college_name || 'N/A',
                 department: leaderProfile.department || 'N/A',
@@ -1090,7 +1090,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
                 registrations.push({
                   sno: registrations.length + 1,
                   name: memberProfile.full_name || 'N/A',
-                  email: memberProfile.email || 'N/A',
+                  userCode: memberProfile.user_code || 'N/A',
                   mobile: memberProfile.mobile_number || 'N/A',
                   college: memberProfile.college_name || 'N/A',
                   department: memberProfile.department || 'N/A',
@@ -1108,7 +1108,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           .select(`
             *,
             profiles(
-              full_name, email, mobile_number, college_name, department, roll_number
+              full_name, user_code, mobile_number, college_name, department, roll_number
             )
           `)
           .eq('event_id', selectedEvent.id)
@@ -1119,7 +1119,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         registrations = individualRegs?.map((reg, index) => ({
           sno: index + 1,
           name: reg.profiles?.full_name || reg.participant_name || 'N/A',
-          email: reg.profiles?.email || reg.participant_email || 'N/A',
+          userCode: reg.profiles?.user_code || 'N/A',
           mobile: reg.profiles?.mobile_number || 'N/A',
           college: reg.profiles?.college_name || 'N/A',
           department: reg.profiles?.department || 'N/A',
@@ -1132,14 +1132,14 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
       let csvContent = '';
       
       if (isTeamEvent) {
-        csvContent = 'S.No,Name,Email,Department,College,Team,Role,Mobile\n';
+        csvContent = 'S.No,Name,User Code,Department,College,Team,Role,Mobile\n';
         registrations.forEach(row => {
-          csvContent += `${row.sno},"${row.name}","${row.email}","${row.department}","${row.college}","${row.teamName}",${row.role},${row.mobile}\n`;
+          csvContent += `${row.sno},"${row.name}","${row.userCode}","${row.department}","${row.college}","${row.teamName}",${row.role},${row.mobile}\n`;
         });
       } else {
-        csvContent = 'S.No,Name,Email,Department,College,Mobile\n';
+        csvContent = 'S.No,Name,User Code,Department,College,Mobile\n';
         registrations.forEach(row => {
-          csvContent += `${row.sno},"${row.name}","${row.email}","${row.department}","${row.college}",${row.mobile}\n`;
+          csvContent += `${row.sno},"${row.name}","${row.userCode}","${row.department}","${row.college}",${row.mobile}\n`;
         });
       }
 
@@ -1737,7 +1737,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
       const { data: profiles, error: profilesError } = await fetchAllRecords(
         supabase,
         'profiles',
-        'id, full_name, email, mobile_number, college_name, department, roll_number, is_print',
+        'id, full_name, user_code, mobile_number, college_name, department, roll_number, is_print',
         {
           filters: [{ column: 'id', operator: 'in', value: userIds }]
         }
@@ -1755,7 +1755,7 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
           profiles: {
             id: profile.id || r.user_id,
             full_name: profile.full_name || 'Unknown',
-            email: profile.email || 'N/A',
+            user_code: profile.user_code || 'N/A',
             mobile_number: profile.mobile_number || null,
             phone: profile.mobile_number || 'N/A',
             college_name: profile.college_name || 'N/A',
@@ -1785,8 +1785,8 @@ const RegistrationManagement = ({ coordinatorEvents, hideFinancials = false }) =
         "Name": reg.profiles.full_name,
         "College": reg.profiles.college_name,
         "Department": reg.profiles.department,
-        "Email": reg.profiles.email,
-        "Phone": reg.profiles.phone,
+        "User Code": reg.profiles.user_code,
+        "Phone": reg.profiles.mobile_number,
         "Payment Status": reg.payment_status,
         "Registered At": new Date(reg.registered_at).toLocaleString()
     }));
