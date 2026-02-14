@@ -41,7 +41,7 @@ export default defineConfig({
           // UI utilities
           'vendor-ui': ['lucide-react', 'react-hot-toast'],
           // Heavy libraries - lazy loaded
-          'vendor-pdf': ['jspdf', 'jspdf-autotable'],
+          'vendor-pdf': ['jspdf', 'jspdf-autotable', 'qrcode'],
           'vendor-charts': ['recharts'],
           // Particles - only needed on home page
           'vendor-particles': ['@tsparticles/react', '@tsparticles/slim'],
@@ -55,7 +55,7 @@ export default defineConfig({
   },
   // Optimize dependencies
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
+    include: ['react', 'react-dom', 'react-router-dom', 'qrcode'],
     exclude: ['@tsparticles/react'], // Don't pre-bundle particles
   },
   publicDir: 'public'

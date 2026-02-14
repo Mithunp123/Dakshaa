@@ -588,9 +588,10 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
       }
     }
   });
-  const categories = Array.from(categoryMap.values()).sort((a, b) => 
-    a.toLowerCase().localeCompare(b.toLowerCase())
-  );
+  // Build categories as {key, label} to preserve original key (with hyphens) for filtering
+  const categories = Array.from(categoryMap.entries())
+    .map(([key, label]) => ({ key, label }))
+    .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
 
   // Filter events by category, event type, and search (case-insensitive for category)
   const filteredEvents = events.filter(event => {
@@ -712,8 +713,8 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
                 >
                   <option value="" className="bg-gray-900 text-white">All Categories</option>
                   {categories.map(cat => (
-                    <option key={cat} value={cat} className="bg-gray-900 text-white">
-                      {cat}
+                    <option key={cat.key} value={cat.key} className="bg-gray-900 text-white">
+                      {cat.label}
                     </option>
                   ))}
                 </select>
@@ -787,8 +788,8 @@ const AttendanceManagement = ({ coordinatorEvents }) => {
                   <tfoot className="bg-white/5 border-t border-white/10">
                     <tr>
                       <td className="px-6 py-4 text-left font-bold text-white">
-                        {selectedCategory && selectedEventType !== 'all' ? `TOTAL (${selectedCategory} - ${selectedEventType.charAt(0).toUpperCase() + selectedEventType.slice(1)})` : 
-                         selectedCategory ? `TOTAL (${selectedCategory})` : 
+                        {selectedCategory && selectedEventType !== 'all' ? `TOTAL (${normalizeCategoryName(selectedCategory)} - ${selectedEventType.charAt(0).toUpperCase() + selectedEventType.slice(1)})` : 
+                         selectedCategory ? `TOTAL (${normalizeCategoryName(selectedCategory)})` : 
                          selectedEventType !== 'all' ? `TOTAL (${selectedEventType.charAt(0).toUpperCase() + selectedEventType.slice(1)})` : 
                          'OVERALL TOTAL'}
                       </td>

@@ -11,7 +11,7 @@ import {
   Lock,
   XCircle
 } from 'lucide-react';
-import QRCode from 'qrcode/lib/browser';
+import QRCode from 'qrcode';
 import { jsPDF } from 'jspdf';
 import { supabaseService } from '../../../services/supabaseService';
 import { supabase } from '../../../supabase';

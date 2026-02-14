@@ -83,12 +83,13 @@ const TeamReport = () => {
       const categoryMap = new Map();
       data?.forEach(item => {
         if (item.category) {
-          // Use normalized version as key for deduplication
+          // Use normalized version as key for deduplication (case-insensitive)
           const normalizedKey = item.category.toLowerCase().replace(/[\s-]+/g, '');
           if (!categoryMap.has(normalizedKey)) {
             categoryMap.set(normalizedKey, {
               display: normalizeCategoryName(item.category),
-              value: item.category // Keep original for querying
+              value: item.category, // Keep original for querying
+              normalizedValue: item.category.toLowerCase() // Add normalized for matching
             });
           }
         }
@@ -104,13 +105,17 @@ const TeamReport = () => {
     }
   };
 
-  // Helper function to extract event type from event_id
+  // Helper function to extract event type from event_id with better matching
   const getEventType = (eventId) => {
     if (!eventId) return null;
     const eventIdLower = eventId.toLowerCase();
-    if (eventIdLower.includes('paper')) return 'paper';
-    if (eventIdLower.includes('poster')) return 'poster';
-    if (eventIdLower.includes('project')) return 'project';
+    
+    // More comprehensive keyword matching
+    if (eventIdLower.includes('paper') || eventIdLower.includes('publication')) return 'paper';
+    if (eventIdLower.includes('poster') || eventIdLower.includes('presentation')) return 'poster';
+    if (eventIdLower.includes('project') || eventIdLower.includes('prototype')) return 'project';
+    
+    // Return null instead of excluding - let all events through if no specific type
     return null;
   };
 
@@ -121,28 +126,53 @@ const TeamReport = () => {
         .select('id, name, category, event_id')
         .order('name');
       
+      // Improved category filtering with case-insensitive matching
       if (selectedCategory !== 'all') {
-        // Use case-insensitive exact match on the original database value
-        query = query.ilike('category', selectedCategory);
+        // Find the selected category object to get both display and original value
+        const selectedCategoryObj = availableCategories.find(cat => cat.value === selectedCategory);
+        
+        if (selectedCategoryObj) {
+          // Use case-insensitive pattern matching to catch all variations
+          const categoryPattern = selectedCategoryObj.normalizedValue || selectedCategory.toLowerCase();
+          query = query.ilike('category', `%${categoryPattern}%`);
+          console.log(`Filtering by category pattern: ${categoryPattern}`);
+        } else {
+          // Fallback to exact case-insensitive match
+          query = query.ilike('category', selectedCategory);
+          console.log(`Filtering by exact category: ${selectedCategory}`);
+        }
       }
       
       const { data, error } = await query;
       
       if (error) throw error;
       
+      console.log(`Raw events fetched: ${data?.length || 0}`);
+      
       // Filter by event type if selected
       let filteredData = data || [];
       if (selectedEventType !== 'all') {
+        const beforeFilter = filteredData.length;
         filteredData = filteredData.filter(event => {
           const eventType = getEventType(event.event_id);
           return eventType === selectedEventType;
         });
+        console.log(`Events after type filter (${selectedEventType}): ${filteredData.length} (filtered out: ${beforeFilter - filteredData.length})`);
+      } else {
+        console.log('No event type filter applied - showing all events');
       }
       
-      console.log('Fetched events for category:', selectedCategory, 'Type:', selectedEventType, 'Count:', filteredData.length);
+      console.log('Final filtered events:', {
+        category: selectedCategory, 
+        type: selectedEventType, 
+        count: filteredData.length,
+        eventNames: filteredData.map(e => e.name).slice(0, 5) // Show first 5 event names for debugging
+      });
+      
       setEvents(filteredData);
     } catch (error) {
       console.error('Error fetching events:', error);
+      setEvents([]); // Ensure events is always an array
     }
   };
 
@@ -215,25 +245,31 @@ const TeamReport = () => {
             };
           });
 
-          // Calculate headcount: ALWAYS use paid_members as the source of truth
-          // paid_members is based on payment amount and doesn't change when members are added
-          // This represents the actual paid headcount from the leader's payment
+          // Calculate headcount with improved logic to handle edge cases
           let headCount = 0;
           
+          // Method 1: Use paid_members if available and valid
           if (team.paid_members && team.paid_members > 0) {
-            // Use paid_members count - this is the authoritative count based on payment
             headCount = team.paid_members;
-          } else if (teamMembers.length > 0) {
-            // Fallback: count actual members if paid_members is not available
+          } 
+          // Method 2: Count actual members + leader
+          else {
             const teamUserIds = new Set();
+            // Always count the leader if exists
             if (team.leader_id) teamUserIds.add(team.leader_id);
+            
+            // Add all team members
             teamMembers.forEach(m => {
               if (m.user_id) teamUserIds.add(m.user_id);
             });
-            headCount = teamUserIds.size;
-          } else {
-            // Last resort: just count leader if exists
-            headCount = team.leader_id ? 1 : 0;
+            
+            // Use the actual count, but ensure minimum of 1 if leader exists
+            headCount = Math.max(teamUserIds.size, team.leader_id ? 1 : 0);
+          }
+          
+          // Debug logging for count verification
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`Team ${team.team_name}: paid_members=${team.paid_members}, actual_count=${headCount}, members=${teamMembers.length}`);
           }
 
           return {
@@ -253,52 +289,96 @@ const TeamReport = () => {
       if (teamsData && teamsData.length > 0) {
         // Add all leaders
         teamsData.forEach(team => {
-          if (team.leader_id) teamUserIdsSet.add(team.leader_id);
+          if (team.leader_id) {
+            teamUserIdsSet.add(team.leader_id);
+            console.log(`Added leader ${team.leader_id} from team ${team.team_name}`);
+          }
         });
         
-        // Add all members if we have members data
+        // Add all members if we have teams data
         if (teamIds.length > 0) {
-          const { data: allMembers } = await supabase
-            .from('team_members')
-            .select('user_id')
-            .in('team_id', teamIds);
-          
-          allMembers?.forEach(member => {
-            if (member.user_id) teamUserIdsSet.add(member.user_id);
-          });
+          try {
+            const { data: allMembers, error: membersError } = await supabase
+              .from('team_members')
+              .select('user_id, team_id')
+              .in('team_id', teamIds);
+            
+            if (membersError) {
+              console.error('Error fetching team members for exclusion:', membersError);
+            } else {
+              allMembers?.forEach(member => {
+                if (member.user_id) {
+                  teamUserIdsSet.add(member.user_id);
+                }
+              });
+              console.log(`Total team user IDs to exclude from individual count: ${teamUserIdsSet.size}`);
+            }
+          } catch (error) {
+            console.error('Failed to fetch team members for exclusion:', error);
+          }
         }
       }
 
       // 5. Process Individual Registrations (EXCLUDING team members)
       let individualParticipants = [];
+      console.log(`Processing ${individualRegs?.length || 0} individual registrations`);
+      
       if (individualRegs && individualRegs.length > 0) {
         // Filter out registrations that belong to team members
-        const trulyIndividualRegs = individualRegs.filter(reg => !teamUserIdsSet.has(reg.user_id));
+        const trulyIndividualRegs = individualRegs.filter(reg => {
+          const isTeamMember = teamUserIdsSet.has(reg.user_id);
+          if (process.env.NODE_ENV === 'development' && isTeamMember) {
+            console.log(`Excluding user ${reg.user_id} from individual count (team member)`);
+          }
+          return !isTeamMember;
+        });
+        
+        console.log(`After filtering team members: ${trulyIndividualRegs.length} individual registrations`);
         
         if (trulyIndividualRegs.length > 0) {
-          const userIds = [...new Set(trulyIndividualRegs.map(r => r.user_id))];
-          const { data: profiles } = await supabase
-            .from('profiles')
-            .select('id, full_name, email, mobile_number, college_name, roll_number, department, year_of_study')
-            .in('id', userIds);
+          try {
+            const userIds = [...new Set(trulyIndividualRegs.map(r => r.user_id).filter(Boolean))];
+            const { data: profiles, error: profilesError } = await supabase
+              .from('profiles')
+              .select('id, full_name, email, mobile_number, college_name, roll_number, department, year_of_study')
+              .in('id', userIds);
 
-          const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+            if (profilesError) {
+              console.error('Error fetching individual profiles:', profilesError);
+            }
 
-          individualParticipants = trulyIndividualRegs.map(reg => ({
-            ...reg,
-            profile: profileMap.get(reg.user_id)
-          }));
+            const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+            individualParticipants = trulyIndividualRegs.map(reg => ({
+              ...reg,
+              profile: profileMap.get(reg.user_id)
+            })).filter(reg => reg.profile); // Only include participants with valid profiles
+            
+            console.log(`Final individual participants with profiles: ${individualParticipants.length}`);
+          } catch (error) {
+            console.error('Failed to fetch individual participant profiles:', error);
+          }
         }
       }
 
       setTeams(enrichedTeams);
       setIndividualRegistrations(individualParticipants);
 
-      // Calculate Stats
+      // Calculate Stats with detailed logging
       const totalTeams = enrichedTeams.length;
       const individualCount = individualParticipants.length;
       const grandTotal = teamHeadcount + individualCount;
       const avgTeamSize = totalTeams > 0 ? (teamHeadcount / totalTeams).toFixed(1) : 0;
+
+      // Debug logging for final counts
+      console.log('=== FINAL COUNT SUMMARY ===');
+      console.log(`Event: ${selectedEvent.name}`);
+      console.log(`Total Teams: ${totalTeams}`);
+      console.log(`Team Headcount: ${teamHeadcount}`);
+      console.log(`Individual Count: ${individualCount}`);
+      console.log(`Grand Total: ${grandTotal}`);
+      console.log(`Average Team Size: ${avgTeamSize}`);
+      console.log('============================');
 
       setStats({
         totalTeams,
@@ -325,28 +405,47 @@ const TeamReport = () => {
         .order('category', { ascending: true })
         .order('name', { ascending: true });
       
+      // Improved category filtering
       if (selectedCategory !== 'all') {
-        query = query.ilike('category', selectedCategory);
+        const selectedCategoryObj = availableCategories.find(cat => cat.value === selectedCategory);
+        
+        if (selectedCategoryObj) {
+          const categoryPattern = selectedCategoryObj.normalizedValue || selectedCategory.toLowerCase();
+          query = query.ilike('category', `%${categoryPattern}%`);
+        } else {
+          query = query.ilike('category', selectedCategory);
+        }
       }
 
       const { data: allEventsData, error: eventsError } = await query;
       
       if (eventsError) throw eventsError;
       
+      console.log(`Event-wise stats: Raw events fetched: ${allEventsData?.length || 0}`);
+      
       // Filter by event type if selected
       let allEvents = allEventsData || [];
       if (selectedEventType !== 'all') {
+        const beforeFilter = allEvents.length;
         allEvents = allEvents.filter(event => {
           const eventType = getEventType(event.event_id);
-          return eventType === selectedEventType;
+          const matches = eventType === selectedEventType;
+          if (!matches && process.env.NODE_ENV === 'development') {
+            console.log(`Event ${event.name} (${event.event_id}) filtered out: type=${eventType}, expected=${selectedEventType}`);
+          }
+          return matches;
         });
+        console.log(`Events after type filter: ${allEvents.length} (filtered out: ${beforeFilter - allEvents.length})`);
       }
 
       if (!allEvents || allEvents.length === 0) {
+        console.log('No events found after filtering');
         setEventWiseStats([]);
         setLoadingEventStats(false);
         return;
       }
+
+      console.log(`Processing ${allEvents.length} events for statistics`);
 
       const eventStats = await Promise.all(
         allEvents.map(async (event) => {
@@ -377,8 +476,16 @@ const TeamReport = () => {
             });
           }
 
+          // Calculate team headcount with better fallback logic
           const teamHeadcount = teamsData?.reduce((sum, team) => {
-            return sum + (team.paid_members || 0);
+            let teamCount = 0;
+            if (team.paid_members && team.paid_members > 0) {
+              teamCount = team.paid_members;
+            } else {
+              // Fallback: count leader (minimum 1 if team exists)
+              teamCount = team.leader_id ? 1 : 0;
+            }
+            return sum + teamCount;
           }, 0) || 0;
 
           // Fetch individual registrations
@@ -388,11 +495,26 @@ const TeamReport = () => {
             .eq('event_id', event.id)
             .eq('payment_status', 'PAID');
 
-          // Filter out team members from individual count
-          const trulyIndividualCount = individualRegs?.filter(
-            reg => !teamUserIds.has(reg.user_id)
-          ).length || 0;
+          // Filter out team members from individual count with better error handling
+          let trulyIndividualCount = 0;
+          if (individualRegs && Array.isArray(individualRegs)) {
+            try {
+              trulyIndividualCount = individualRegs.filter(
+                reg => reg && reg.user_id && !teamUserIds.has(reg.user_id)
+              ).length;
+            } catch (error) {
+              console.error(`Error filtering individual registrations for event ${event.name}:`, error);
+              trulyIndividualCount = 0;
+            }
+          }
 
+          const totalHeadcount = teamHeadcount + trulyIndividualCount;
+          
+          // Debug logging for event-wise stats
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`Event: ${event.name} - Teams: ${teamsData?.length || 0}, Team Headcount: ${teamHeadcount}, Individual: ${trulyIndividualCount}, Total: ${totalHeadcount}`);
+          }
+          
           return {
             eventId: event.id,
             eventName: event.name,
@@ -400,10 +522,18 @@ const TeamReport = () => {
             teamCount: teamsData?.length || 0,
             teamHeadcount,
             individualCount: trulyIndividualCount,
-            totalHeadcount: teamHeadcount + trulyIndividualCount
+            totalHeadcount
           };
         })
       );
+
+      console.log('Event-wise statistics calculated:', {
+        totalEvents: eventStats.length,
+        totalTeams: eventStats.reduce((sum, e) => sum + e.teamCount, 0),
+        totalTeamHeadcount: eventStats.reduce((sum, e) => sum + e.teamHeadcount, 0),
+        totalIndividual: eventStats.reduce((sum, e) => sum + e.individualCount, 0),
+        grandTotal: eventStats.reduce((sum, e) => sum + e.totalHeadcount, 0)
+      });
 
       setEventWiseStats(eventStats);
     } catch (error) {
@@ -987,6 +1117,7 @@ const TeamReport = () => {
               <select
                 className="w-full bg-slate-800 border-slate-700 text-white rounded-lg pl-4 pr-10 py-3 appearance-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 onChange={(e) => {
+                  console.log('Category changed to:', e.target.value);
                   setSelectedCategory(e.target.value);
                   setSelectedEvent(null);
                 }}
@@ -1010,6 +1141,7 @@ const TeamReport = () => {
               <select
                 className="w-full bg-slate-800 border-slate-700 text-white rounded-lg pl-4 pr-10 py-3 appearance-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 onChange={(e) => {
+                  console.log('Event type changed to:', e.target.value);
                   setSelectedEventType(e.target.value);
                   setSelectedEvent(null);
                 }}
