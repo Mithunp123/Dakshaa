@@ -83,7 +83,7 @@ const Navbar = () => {
   const navLinks = [
     { name: "Home", path: "/", preload: "home" },
     { name: "Events", path: "/events", preload: "events" },
-    { name: "Referral", path: "/referral", preload: "referral" },
+    { name: "Verify", path: "/verify", preload: "verifyCertificate" },
     { name: "Event Schedule", path: "/schedule", preload: "schedule" },
     { name: "Sponsors", path: "/sponsors", preload: "sponsors" },
     { name: "Teams", path: "/teams", preload: "teams" },
@@ -133,8 +133,8 @@ const Navbar = () => {
           <div className="scroll-note bg-slate-950/90 border-b border-white/10">
             <div className="scroll-note-inner">
               <div className="scroll-note-track">
-                <span className="scroll-note-text">14/02/2026 : Only Online payment accepted in onspot registration and only  refreshment will be provided.</span>
-                <span className="scroll-note-text" aria-hidden="true"> 14/02/2026 : Only Online payment accepted in onspot registration and only  refreshment will be provided.</span>
+                <span className="scroll-note-text">Food is available only for Neura-Hack 2.0,BioNexathon ,Vibe Code -26 </span>
+                <span className="scroll-note-text" aria-hidden="true">Food is available only for Neura-Hack 2.0,BioNexathon ,Vibe Code -26 </span>
               </div>
             </div>
           </div>
