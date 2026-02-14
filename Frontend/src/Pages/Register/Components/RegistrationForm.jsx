@@ -16,7 +16,7 @@ import {
   Ticket,
 } from "lucide-react";
 import { jsPDF } from "jspdf";
-import { supabase } from "../../supabase";
+import { supabase } from "../../../supabase";
 
 const MyRegistrations = () => {
   const [registrations, setRegistrations] = useState([]);
