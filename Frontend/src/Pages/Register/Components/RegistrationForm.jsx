@@ -1,673 +1,609 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { 
-  Calendar, 
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  Calendar,
   Clock,
-  CheckCircle2,
-  Download,
+  Check,
+  Package,
   RefreshCw,
-  Users,
-  Lock,
-  XCircle
-} from 'lucide-react';
-import QRCode from 'qrcode';
-import { jsPDF } from 'jspdf';
-import { supabaseService } from '../../../services/supabaseService';
-import { supabase } from '../../../supabase';
-import certificateTemplate from '../../../assets/cerficate.png';
-import notificationService from '../../../services/notificationService';
-import toast from 'react-hot-toast';
+  Search,
+  Filter,
+  ChevronDown,
+  AlertCircle,
+  Bell,
+  CheckCircle,
+  Download,
+  Ticket,
+} from "lucide-react";
+import { jsPDF } from "jspdf";
+import { supabase } from "../../supabase";
 
 const MyRegistrations = () => {
   const [registrations, setRegistrations] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState(null);
-  const [searchParams, setSearchParams] = useSearchParams();
-  
-  // Ref to track mounted state for async operations
-  const mountedRef = useRef(true);
-  
-  // Cleanup on unmount
+  const [user, setUser] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("ALL");
+  const [showFilter, setShowFilter] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+
   useEffect(() => {
+    let isMounted = true;
+    
+    const getCurrentUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user;
+      
+      if (!isMounted) return;
+      
+      setUser(user);
+      if (user) {
+        await fetchRegistrations(user.id);
+        await fetchUserNotifications(user.id);
+      } else {
+        setLoading(false);
+      }
+    };
+    
+    getCurrentUser();
+    
     return () => {
-      mountedRef.current = false;
+      isMounted = false;
     };
   }, []);
 
-  // Handle payment success - refresh registrations with delay to allow webhook processing
-  useEffect(() => {
-    const paymentStatus = searchParams.get('payment');
-    if (paymentStatus === 'success') {
-      console.log('✅ Payment success detected on MyRegistrations page');
-      toast.success('Payment successful! Refreshing your registrations...', {
-        duration: 3000,
-        position: 'top-center',
-      });
-      
-      // Clear the URL parameter
-      setSearchParams({});
-      
-      // Delay refresh slightly to allow webhook to process
-      const timer = setTimeout(() => {
-        setLoading(true);
-        fetchRegistrations();
-      }, 2000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [searchParams]);
-
-  // Sync registrations for teams where this user is a member
-  const syncUserTeamRegistrations = async (userId) => {
+  const fetchUserNotifications = async (userId) => {
     try {
-      console.log('🔄 Syncing team registrations for user:', userId);
-      
-      // Get all teams where user is a member
-      const { data: memberships } = await supabase
-        .from('team_members')
-        .select('team_id')
-        .eq('user_id', userId)
-        .in('status', ['active', 'joined']);
-      
-      if (!memberships || memberships.length === 0) {
-        console.log('No team memberships found');
-        return;
+      const { data, error } = await supabase
+        .from("user_notifications")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      if (!error && data) {
+        setNotifications(data);
       }
-      
-      const teamIds = memberships.map(m => m.team_id);
-      console.log('Found team memberships:', teamIds.length);
-      
-      // Fetch teams with their members and events
-      const { data: teams } = await supabase
-        .from('teams')
-        .select(`
-          id,
-          team_name,
-          event_id,
-          leader_id,
-          is_active,
-          team_members (user_id, role, status)
-        `)
-        .in('id', teamIds)
-        .eq('is_active', true);
-      
-      if (!teams || teams.length === 0) {
-        console.log('No active teams found');
-        return;
-      }
-      
-      // For each team, sync registrations
-      for (const team of teams) {
-        const teamData = {
-          id: team.id,
-          name: team.team_name,
-          team_name: team.team_name,
-          event_id: team.event_id,
-          members: (team.team_members || []).filter(m => m.status === 'active' || m.status === 'joined')
-        };
-        console.log('Syncing team:', teamData.name);
-        await notificationService.syncTeamMemberRegistrations(teamData);
-      }
-      
-      console.log('✅ Team registration sync complete');
     } catch (err) {
-      console.error('Error syncing team registrations:', err);
+      console.log("Notifications table may not exist:", err);
     }
   };
 
-  useEffect(() => {
-    fetchRegistrations();
-  }, []);
+  const markNotificationRead = async (notificationId) => {
+    await supabase
+      .from("user_notifications")
+      .update({ is_read: true })
+      .eq("id", notificationId);
+    fetchUserNotifications(user.id);
+  };
 
-  // Set up real-time subscription for dynamic updates
-  useEffect(() => {
-    if (!userId) return;
-
-    // Subscribe to changes in event_registrations_config table for this user
-    const subscription = supabase
-      .channel(`user-registrations-${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*', // Listen to INSERT, UPDATE, DELETE
-          schema: 'public',
-          table: 'event_registrations_config',
-          filter: `user_id=eq.${userId}`
-        },
-        (payload) => {
-          console.log('Registration change detected:', payload);
-          // Refresh registrations when any change occurs
-          fetchRegistrations();
-        }
-      )
-      .subscribe();
-
-    // Cleanup subscription on unmount
-    return () => {
-      supabase.removeChannel(subscription);
-    };
-  }, [userId]);
-
-  const fetchRegistrations = async () => {
+  const fetchRegistrations = async (userId) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const user = session?.user;
-      if (user) {
-        setUserId(user.id);
-        
-        // Sync team member registrations first
-        // This ensures team members see events they're part of
-        await syncUserTeamRegistrations(user.id);
-        
-        const data = await supabaseService.getUserRegistrations(user.id);
-        // Filter to only show registrations that exist (have valid data)
-        const validRegistrations = (data || []).filter(reg => reg && reg.id);
-        
-        // For team events, calculate cumulative totals
-        // Each registration is processed individually with error handling
-        const registrationsWithTotals = await Promise.all(
-          validRegistrations.map(async (reg) => {
-            // Wrap each registration processing in try-catch to prevent one bad record from failing all
-            try {
-              if (reg.event_name) {
-                // This is a team registration
-                let cumulativeTotal = 0;
-                let totalMembers = 0;
-                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-                
-                // 1. Try to find Team ID
-                let teamId = null;
-                try {
-                  // Strategy A: Direct Membership check
-                  const { data: userTeams } = await supabase
-                      .from('team_members')
-                      .select('team_id')
-                      .eq('user_id', user.id);
-                      
-                  if (userTeams?.length > 0) {
-                      // Check which of these teams corresponds to our event
-                      const { data: eventTeam } = await supabase
-                          .from('teams')
-                          .select('id')
-                          .in('id', userTeams.map(t => t.team_id))
-                          .eq('event_id', reg.event_id)
-                          .maybeSingle();
-                      if (eventTeam) teamId = eventTeam.id;
-                  }
+      setLoading(true);
 
-                  // Strategy B: Name Lookup (Fallback)
-                  if (!teamId) {
-                       const { data: teamByName } = await supabase
-                          .from('teams')
-                          .select('id')
-                          .eq('event_id', reg.event_id)
-                          .ilike('team_name', reg.event_name.trim())
-                          .maybeSingle();
-                       if (teamByName) teamId = teamByName.id;
-                  }
-              } catch (e) {
-                  console.error('Team lookup error:', e);
-              }
+      // Fetch registrations with event details
+      const { data, error } = await supabase
+        .from("event_registrations_config")
+        .select(
+          `
+          *,
+          events:event_id (
+            id,
+            event_id,
+            name,
+            description,
+            category,
+            price,
+            event_date,
+            start_time,
+            venue
+          )
+        `
+        )
+        .eq("user_id", userId)
+        .order("registered_at", { ascending: false });
 
-              // 2. Fetch Amount using API (Source of Truth)
-              if (teamId) {
-                  try {
-                    const response = await fetch(`${apiUrl}/payment/calculate-team-amount`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ team_id: teamId, event_id: reg.event_id }),
-                    });
-                    const result = await response.json();
-                    if (response.ok && result.success) {
-                        // Show FULL TEAM FEE (Team Size * Price Per Member)
-                        cumulativeTotal = result.team_size * result.price_per_member;
-                        totalMembers = result.team_size;
-                    } 
-                  } catch (err) {
-                     console.error('API Error:', err);
-                  }
-              }
+      if (error) {
+        console.error("Error fetching registrations:", error);
+        // Try alternative query without join
+        const { data: simpleData, error: simpleError } = await supabase
+          .from("event_registrations_config")
+          .select("*")
+          .eq("user_id", userId)
+          .order("registered_at", { ascending: false });
 
-              // 3. Fallback calculation if API failed or returned 0 (unexpectedly)
-              if (cumulativeTotal === 0) {
-                  const price = Number(reg.events?.price || 0);
-                  let count = 1;
-                  
-                  if (teamId) {
-                      // Count actual members in DB
-                      const { count: dbCount } = await supabase
-                          .from('team_members')
-                          .select('*', { count: 'exact', head: true })
-                          .eq('team_id', teamId);
-                      count = dbCount || 1;
-                  } else {
-                      // Count registrations sharing same event_name
-                      const { count: regCount } = await supabase
-                          .from('event_registrations_config')
-                          .select('*', { count: 'exact', head: true })
-                          .eq('event_id', reg.event_id)
-                          .eq('event_name', reg.event_name);
-                      count = regCount || 1;
-                  }
-                  
-                  totalMembers = count;
-                  cumulativeTotal = count * price;
-              }
-              
-              return {
-                ...reg,
-                cumulative_total: cumulativeTotal,
-                team_member_count: totalMembers
-              };
-              }
-              return reg;
-            } catch (regError) {
-              // If processing this registration fails, return it without totals
-              console.error(`Error processing registration ${reg.id}:`, regError);
-              return reg;
-            }
-          })
-        );
-        
-        // Fetch attendance records for this user to check eligibility
-        let attendedEventIds = new Set();
-        try {
-          const { data: attendanceLogs } = await supabase
-            .from('attendance_logs')
-            .select('event_id')
-            .eq('user_id', user.id);
-          if (attendanceLogs) {
-            attendanceLogs.forEach(log => attendedEventIds.add(log.event_id));
-          }
-        } catch (attErr) {
-          console.warn('Could not fetch attendance logs:', attErr);
+        if (!simpleError) {
+          setRegistrations(simpleData || []);
         }
-
-        // Attach attendance flag to each registration
-        const registrationsWithAttendance = registrationsWithTotals.map(reg => ({
-          ...reg,
-          has_attendance: attendedEventIds.has(reg.event_id),
-        }));
-
-        setRegistrations(registrationsWithAttendance);
+      } else {
+        setRegistrations(data || []);
       }
-    } catch (error) {
-      console.error('Error fetching registrations:', error);
-      setRegistrations([]);
+    } catch (err) {
+      console.error("Error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const downloadCertificate = async (reg) => {
+  const downloadCertificate = (reg) => {
     try {
-      toast.loading('Processing certificate...', { id: 'cert-gen' });
-
-      // Fetch user profile from DB
-      const { data: { session } } = await supabase.auth.getSession();
-      const user = session?.user;
-      if (!user) {
-        toast.dismiss('cert-gen');
-        toast.error('Please log in to download your certificate.');
-        return;
-      }
-
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('full_name, gender, college_name, department, year_of_study, user_code')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError) {
-        console.error('Profile fetch error:', profileError);
-      }
-
-      const userName = profile?.full_name || user?.user_metadata?.full_name || 'Participant';
-      const gender = (profile?.gender || '').toLowerCase();
-      const collegeName = profile?.college_name || 'K. S. Rangasamy College of Technology';
-      const department = profile?.department || '';
-      const yearOfStudy = profile?.year_of_study || '';
-      const collegeText = `${collegeName}${department ? ' - ' + department : ''}${yearOfStudy ? ' - ' + yearOfStudy : ''}`;
-      const eventName = reg.events?.name || reg.events?.title || reg.event_name || 'Event';
-      const eventCategory = (reg.events?.category || '').trim().toLowerCase();
-      // Map category to display label (case-insensitive)
-      const categoryMap = {
-        'technical': 'Technical',
-        'workshop': 'Workshop',
-        'conference': 'Conference',
-        'cultural': 'Cultural',
-        'hackathon': 'Hackathon',
-        'sports': 'Sports',
-      };
-      const eventType = categoryMap[eventCategory] || (eventCategory ? eventCategory.charAt(0).toUpperCase() + eventCategory.slice(1) : '');
-      const eventDate = reg.events?.event_date
-        ? new Date(reg.events.event_date)
-        : new Date();
-      // Format: February-12-2026
-      const formattedDate = `${eventDate.toLocaleString('en-US', { month: 'long' })}-${String(eventDate.getDate()).padStart(2, '0')}-${eventDate.getFullYear()}`;
-
-      // ---- Store / retrieve certificate from certificate_data table ----
-      // Ensure data exists in certificate_data before download/generation
-      let ksrctId = null;
-
-      // Check if certificate already exists for this user + event
-      const { data: existingCert } = await supabase
-        .from('certificate_data')
-        .select('ksrct_id')
-        .eq('user_id', user.id)
-        .eq('event_name', eventName)
-        .maybeSingle();
-
-      if (existingCert) {
-        // Reuse existing certificate ID
-        ksrctId = existingCert.ksrct_id;
-        console.log('📜 Reusing existing certificate:', ksrctId);
-      } else {
-        // Insert new certificate record (ksrct_id auto-generated by DB trigger)
-        const { data: newCert, error: insertError } = await supabase
-          .from('certificate_data')
-          .insert({
-            user_id: user.id,
-            user_code: profile?.user_code || null,
-            full_name: userName,
-            gender: profile?.gender || null,
-            college_name: collegeName,
-            department: department || null,
-            year_of_study: yearOfStudy || null,
-            event_name: eventName,
-            event_type: eventType || null,
-            event_date: formattedDate,
-          })
-          .select('ksrct_id')
-          .single();
-
-        if (insertError) {
-          console.error('Certificate insert error:', insertError);
-          // If unique constraint violation, try fetching the existing one
-          if (insertError.code === '23505') {
-            const { data: retryFetch } = await supabase
-              .from('certificate_data')
-              .select('ksrct_id')
-              .eq('user_id', user.id)
-              .eq('event_name', eventName)
-              .maybeSingle();
-            ksrctId = retryFetch?.ksrct_id;
-          }
-          if (!ksrctId) {
-            toast.dismiss('cert-gen');
-            toast.error('Could not save certificate data. Please try again.');
-            return;
-          }
-        } else {
-          ksrctId = newCert.ksrct_id;
-          console.log('📜 New certificate created:', ksrctId);
-        }
-      }
-
-      // Check if we have a pre-generated URL to use
       if (reg.certificate_url) {
-        toast.dismiss('cert-gen');
         window.open(reg.certificate_url, "_blank");
         return;
       }
 
-      toast.loading('Generating certificate...', { id: 'cert-gen' });
+      const doc = new jsPDF("landscape", "mm", "a4");
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
 
-      // ---- Generate QR code as data URL ----
-      const qrUrl = `https://authenticate.ksrctdigipro.in/?certid=${ksrctId}`;
-      const qrDataUrl = await QRCode.toDataURL(qrUrl, {
-        width: 200,
-        margin: 1,
-        color: { dark: '#000000', light: '#ffffff' },
-      });
+      // Background
+      doc.setFillColor(255, 255, 255);
+      doc.rect(0, 0, pageWidth, pageHeight, "F");
+      
+      // Border
+      doc.setDrawColor(20, 20, 80); // Dark blue
+      doc.setLineWidth(5);
+      doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
+      
+      // Inner Border
+      doc.setDrawColor(200, 150, 50); // Gold
+      doc.setLineWidth(1);
+      doc.rect(17, 17, pageWidth - 34, pageHeight - 34);
 
-      // Load QR image
-      const qrImg = new Image();
-      qrImg.src = qrDataUrl;
-      await new Promise((resolve, reject) => {
-        qrImg.onload = resolve;
-        qrImg.onerror = reject;
-      });
+      // Title
+      doc.setTextColor(20, 20, 80);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(40);
+      doc.text("Certificate of Participation", pageWidth / 2, 60, { align: "center" });
 
-      // ---- Load template image ----
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.src = certificateTemplate;
+      // Subtitle
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(80, 80, 80);
+      doc.text("This is to certify that", pageWidth / 2, 85, { align: "center" });
 
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-      });
+      // Name
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(32);
+      doc.setTextColor(200, 150, 50); // Gold
+      const userName = user?.user_metadata?.full_name || "Participant";
+      doc.text(userName.toUpperCase(), pageWidth / 2, 110, { align: "center" });
+      doc.setLineWidth(0.5);
+      doc.line(pageWidth / 2 - 60, 115, pageWidth / 2 + 60, 115);
 
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
+      // Event Text
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(16);
+      doc.setTextColor(80, 80, 80);
+      doc.text("has successfully participated in the event", pageWidth / 2, 135, { align: "center" });
 
-      // Draw template
-      ctx.drawImage(img, 0, 0);
+      // Event Name
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(28);
+      doc.setTextColor(20, 20, 80);
+      const eventName = reg.event_name || reg.events?.name || "Event";
+      doc.text(eventName, pageWidth / 2, 155, { align: "center" });
 
-      const width = canvas.width;
-      const height = canvas.height;
+      // Date
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(14);
+      doc.setTextColor(100, 100, 100);
+      const eventDate = reg.events?.event_date 
+        ? new Date(reg.events.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+        : new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+      doc.text(`Held on ${eventDate}`, pageWidth / 2, 175, { align: "center" });
 
-      // Font setup
-      const fontSize = Math.round(width / 55);
-      const textColor = '#000000';
+      // Footer
+      doc.setFontSize(12);
+      doc.text("Dakshaa '26 | K.S.Rangasamy College of Technology", pageWidth / 2, pageHeight - 30, { align: "center" });
 
-      // Helper to center text at a given x center
-      const getCenteredX = (text, font, centerX) => {
-        ctx.font = font;
-        const metrics = ctx.measureText(text);
-        return centerX - metrics.width / 2;
-      };
-
-      // Coordinates matching the Python analysis (approximate for new template)
-      const nameY = height * 0.595;    // Changed from 0.53 based on 0.533 line
-      const collegeY = height * 0.645;  // Changed from 0.60 based on 0.597 line
-      const eventY = height * 0.69;    // Changed from 0.67 based on 0.646 line
-      const typeY = height * 0.74;     // Changed from 0.75 based on 0.695/0.737 lines
-      const dateY = height * 0.886;     // Changed from 0.755 based on 0.737 line
-
-      const nameLineCenter = width * 0.50;    // Adjusted center slightly left as most certs center align
-      const collegeLineCenter = width * 0.50; // Center align
-      const eventLineCenter = width * 0.50;   // Center align
-
-      const boldFont = `bold ${fontSize}px Arial, sans-serif`;
-
-      // Draw strike-through on Mr./Ms. based on gender
-      const tickSymbol = '----';
-      const mrX = width * 0.130;
-      const msX = width * 0.165;
-      const tickYPos = nameY - 0.9;
-      ctx.font = boldFont;
-      ctx.fillStyle = textColor;
-
-      if (gender.includes('female')) {
-        // Female: strike out Mr.
-        ctx.fillText(tickSymbol, mrX, tickYPos);
-      } else if (gender) {
-        // Male: strike out Ms.
-        ctx.fillText(tickSymbol, msX, tickYPos);
-      }
-
-      // Draw Name (centered on line)
-      ctx.font = boldFont;
-      ctx.fillStyle = textColor;
-      const nameX = getCenteredX(userName, boldFont, nameLineCenter);
-      ctx.fillText(userName, nameX, nameY);
-
-      // Draw College (with dynamic font sizing)
-      const maxCollegeWidth = width * 0.70;
-      let collegeFontSize = fontSize;
-      let collegeFont = `bold ${collegeFontSize}px Arial, sans-serif`;
-      ctx.font = collegeFont;
-      while (ctx.measureText(collegeText).width > maxCollegeWidth && collegeFontSize > 10) {
-        collegeFontSize -= 2;
-        collegeFont = `bold ${collegeFontSize}px Arial, sans-serif`;
-        ctx.font = collegeFont;
-      }
-      const collegeX = getCenteredX(collegeText, collegeFont, collegeLineCenter);
-      ctx.fillText(collegeText, collegeX, collegeY);
-
-      // Draw Event Name (centered)
-      ctx.font = boldFont;
-      const eventX = getCenteredX(eventName, boldFont, eventLineCenter);
-      ctx.fillText(eventName, eventX, eventY);
-
-      // Draw Event Type (left aligned)
-      if (eventType) {
-        ctx.font = boldFont;
-        const typeX = width * 0.14;
-        ctx.fillText(eventType, typeX, typeY);
-      }
-
-      // Draw Date (smaller font)
-      const dateFont = `bold ${Math.round(fontSize * 0.7)}px Arial, sans-serif`;
-      ctx.font = dateFont;
-      const dateFontX = width * 0.20;
-      ctx.fillText(formattedDate, dateFontX, dateY);
-
-      // ---- Draw Certificate ID next to "Certificate ID:" label (bottom-left) ----
-      const certIdFont = `bold ${Math.round(fontSize * 0.75)}px Arial, sans-serif`;
-      ctx.font = certIdFont;
-      ctx.fillStyle = '#000000';
-      const certIdX = width * 0.261; // right after the "Certificate ID:" text
-      const certIdY = height * 0.9282; // same line as "Certificate ID:" label
-      ctx.fillText(ksrctId, certIdX, certIdY);
-
-      // ---- Draw QR Code on certificate (bottom-left area) ----
-      const qrSize = Math.round(width * 0.10); // 10% of image width
-      const qrX = width * 0.05;  // left side
-      const qrY = height * 0.82; // bottom area
-      ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
-
-      // Download as PDF
-      const imgData = canvas.toDataURL('image/png');
-      const pdfWidth = canvas.width;
-      const pdfHeight = canvas.height;
-      // Use landscape if wider than tall, portrait otherwise
-      const orientation = pdfWidth > pdfHeight ? 'landscape' : 'portrait';
-      const doc = new jsPDF({
-        orientation,
-        unit: 'px',
-        format: [pdfWidth, pdfHeight],
-      });
-      doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       doc.save(`${eventName.replace(/[^a-zA-Z0-9]/g, '_')}_Certificate.pdf`);
-
-      toast.dismiss('cert-gen');
-      toast.success('Certificate downloaded successfully');
     } catch (err) {
-      console.error('Error generating certificate:', err);
-      toast.dismiss('cert-gen');
-      toast.error('Could not generate certificate. Please try again.');
+      console.error("Error generating certificate:", err);
+      alert("Could not generate certificate. Please try again.");
     }
   };
+
+  const filteredRegistrations = registrations.filter((reg) => {
+    const eventName = reg.event_name || reg.events?.name || "";
+    const matchesSearch = eventName
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesFilter =
+      filterStatus === "ALL" || reg.payment_status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
 
   const getStatusColor = (status) => {
-    const statusUpper = status?.toUpperCase();
-    switch (statusUpper) {
-      case 'PAID':
-      case 'COMPLETED': 
-        return 'bg-green-500/20 text-green-500 border-green-500/30';
-      case 'PENDING': 
-        return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30';
-      case 'CANCELLED':
-      case 'FAILED':
-        return 'bg-red-500/20 text-red-500 border-red-500/30';
-      default: 
-        return 'bg-gray-500/20 text-gray-500 border-gray-500/30';
+    switch (status?.toUpperCase()) {
+      case "PAID":
+      case "COMPLETED":
+        return "bg-green-500/20 text-green-400 border-green-500/30";
+      case "PENDING":
+        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+      case "CANCELLED":
+        return "bg-red-500/20 text-red-400 border-red-500/30";
+      default:
+        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
     }
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "TBA";
+    return new Date(dateString).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
-  if (loading) return <div className="text-center p-10">Loading your registrations...</div>;
+  const formatTime = (timeString) => {
+    if (!timeString) return "TBA";
+    return timeString;
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="text-center space-y-4">
+          <AlertCircle className="mx-auto text-yellow-500" size={64} />
+          <h2 className="text-2xl font-bold text-white">Please Login</h2>
+          <p className="text-gray-400">
+            You need to be logged in to view your registrations
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => (window.location.href = "/login")}
+            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full"
+          >
+            Login Now
+          </motion.button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-400">Loading your registrations...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold mb-6">My Registrations</h2>
-      
-      {registrations.length === 0 ? (
-        <div className="text-center py-12 bg-gray-800/50 rounded-xl border border-gray-700">
-          <p className="text-gray-400">You haven't registered for any events yet.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {registrations.map((reg) => (
-            <motion.div 
-              key={reg.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-gray-800 border border-gray-700 rounded-xl p-5 hover:border-blue-500/50 transition-all"
+    <div className="min-h-screen bg-gray-900 py-12 px-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header with Notifications */}
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text mb-2">
+              My Registrations
+            </h1>
+            <p className="text-gray-400">
+              View and manage all your event registrations
+            </p>
+          </div>
+
+          {/* Notifications Bell */}
+          <div className="relative">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="p-3 bg-gray-800 border border-gray-700 rounded-xl text-white hover:border-blue-500 transition-all relative"
             >
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border ${getStatusColor(reg.payment_status)}`}>
-                    {reg.payment_status}
-                  </span>
-                  <h3 className="text-lg font-bold mt-2">
-                    {reg.events?.name || reg.events?.title || 'Event'}
-                  </h3>
-                  {reg.event_name && (
-                    <p className="text-xs text-blue-400 mt-1 flex items-center gap-1">
-                      <Users size={12} /> Team: {reg.event_name}
-                    </p>
-                  )}
-                  <p className="text-sm text-gray-400 capitalize">
-                    {reg.events?.category || ''}
-                  </p>
-                </div>
-              </div>
+              <Bell size={24} />
+              {notifications.filter((n) => !n.is_read).length > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  {notifications.filter((n) => !n.is_read).length}
+                </span>
+              )}
+            </motion.button>
 
-              <div className="space-y-2 text-sm text-gray-400">
-                <div className="flex items-center gap-2">
-                  <Calendar size={14} />
-                  <span>
-                    {reg.events?.event_date 
-                      ? new Date(reg.events.event_date).toLocaleDateString('en-US', { 
-                          month: 'long', 
-                          day: 'numeric', 
-                          year: 'numeric' 
-                        })
-                      : 'March 12-14, 2026'}
-                  </span>
+            {/* Notifications Dropdown */}
+            {showNotifications && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-y-auto bg-gray-800 border border-gray-700 rounded-xl shadow-xl z-50"
+              >
+                <div className="p-4 border-b border-gray-700">
+                  <h3 className="text-white font-bold">Notifications</h3>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Clock size={14} />
-                  <span>{reg.events?.start_time || '09:00 AM onwards'}</span>
-                </div>
-              </div>
-
-              <div className="mt-6 flex flex-col gap-2">
-                <div className="flex gap-2">
-                  {'FAILED'?.toUpperCase() === 'PAID' ? (
-                    <button 
-                      onClick={() => downloadCertificate(reg)}
-                      className="flex-1 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-500 transition-colors"
+                {notifications.length === 0 ? (
+                  <div className="p-4 text-center text-gray-500">
+                    No notifications yet
+                  </div>
+                ) : (
+                  notifications.map((notif) => (
+                    <div
+                      key={notif.id}
+                      onClick={() => markNotificationRead(notif.id)}
+                      className={`p-4 border-b border-gray-700/50 cursor-pointer hover:bg-gray-700/50 ${
+                        !notif.is_read ? "bg-blue-500/10" : ""
+                      }`}
                     >
-                      <Download size={14} /> Download Certificate
-                    </button>
-                  ) : (
-                    <button 
-                      disabled
-                      className="flex-1 py-2 bg-gray-700 text-gray-400 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 cursor-not-allowed"
-                    >
-                      <Lock size={20} />The certificate will be available for download soon.
-                    </button>
-                  )}
-                </div>
-                {/* Show reason why certificate is locked */}
-
-              </div>
-            </motion.div>
-          ))}
+                      <div className="flex items-start gap-3">
+                        <div
+                          className={`p-2 rounded-lg ${
+                            !notif.is_read ? "bg-green-500/20" : "bg-gray-700"
+                          }`}
+                        >
+                          <CheckCircle
+                            className={`${
+                              !notif.is_read
+                                ? "text-green-400"
+                                : "text-gray-500"
+                            }`}
+                            size={16}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-white text-sm font-medium">
+                            {notif.title || "Registration Confirmed"}
+                          </p>
+                          <p className="text-gray-400 text-xs mt-1">
+                            {notif.message}
+                          </p>
+                          <p className="text-gray-500 text-xs mt-1">
+                            {new Date(notif.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        {!notif.is_read && (
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </motion.div>
+            )}
+          </div>
         </div>
-      )}
+
+        {/* Confirmation Banner */}
+        {registrations.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-xl flex items-center gap-4"
+          >
+            <div className="p-2 bg-green-500/20 rounded-lg">
+              <CheckCircle className="text-green-400" size={24} />
+            </div>
+            <div>
+              <p className="text-green-400 font-medium">
+                Registration Status: Confirmed
+              </p>
+              <p className="text-gray-400 text-sm">
+                All your registrations have been successfully recorded in our
+                system.
+              </p>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 p-6 rounded-2xl border border-blue-500/20"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-blue-500/20 rounded-xl">
+                <Ticket className="text-blue-400" size={24} />
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm">Total Registrations</p>
+                <p className="text-3xl font-bold text-white">
+                  {registrations.length}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 p-6 rounded-2xl border border-green-500/20"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-green-500/20 rounded-xl">
+                <Check className="text-green-400" size={24} />
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm">Confirmed</p>
+                <p className="text-3xl font-bold text-white">
+                  {
+                    registrations.filter(
+                      (r) => r.payment_status?.toUpperCase() === "PAID"
+                    ).length
+                  }
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 p-6 rounded-2xl border border-yellow-500/20"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-yellow-500/20 rounded-xl">
+                <Clock className="text-yellow-400" size={24} />
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm">Pending</p>
+                <p className="text-3xl font-bold text-white">
+                  {
+                    registrations.filter(
+                      (r) => r.payment_status?.toUpperCase() === "PENDING"
+                    ).length
+                  }
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Search and Filter */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="flex-1 relative">
+            <Search
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+              size={20}
+            />
+            <input
+              type="text"
+              placeholder="Search registrations..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+            />
+          </div>
+          <div className="relative">
+            <button
+              onClick={() => setShowFilter(!showFilter)}
+              className="flex items-center gap-2 px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white hover:border-gray-600"
+            >
+              <Filter size={20} />
+              <span>
+                {filterStatus === "ALL" ? "All Status" : filterStatus}
+              </span>
+              <ChevronDown size={16} />
+            </button>
+            {showFilter && (
+              <div className="absolute top-full mt-2 right-0 bg-gray-800 border border-gray-700 rounded-xl overflow-hidden z-10">
+                {["ALL", "PAID", "PENDING", "CANCELLED"].map((status) => (
+                  <button
+                    key={status}
+                    onClick={() => {
+                      setFilterStatus(status);
+                      setShowFilter(false);
+                    }}
+                    className="block w-full px-4 py-2 text-left text-white hover:bg-gray-700"
+                  >
+                    {status === "ALL" ? "All Status" : status}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => fetchRegistrations(user.id)}
+            className="flex items-center gap-2 px-4 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600"
+          >
+            <RefreshCw size={20} />
+            Refresh
+          </motion.button>
+        </div>
+
+        {/* Registrations List */}
+        {filteredRegistrations.length === 0 ? (
+          <div className="text-center py-16">
+            <Package className="mx-auto text-gray-600 mb-4" size={64} />
+            <h3 className="text-xl font-bold text-white mb-2">
+              No Registrations Found
+            </h3>
+            <p className="text-gray-400 mb-6">
+              {searchTerm || filterStatus !== "ALL"
+                ? "Try adjusting your search or filter"
+                : "You haven't registered for any events yet"}
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => (window.location.href = "/register")}
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-full"
+            >
+              Browse Events
+            </motion.button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredRegistrations.map((reg, index) => (
+              <motion.div
+                key={reg.id || index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="bg-gray-800/50 rounded-2xl p-6 border border-gray-700 hover:border-gray-600 transition-all"
+              >
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl">
+                        <Calendar className="text-white" size={24} />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold text-white mb-1">
+                          {reg.event_name || reg.events?.name ||
+                            `Event #${reg.event_id?.slice(0, 8)}`}
+                        </h3>
+                        <p className="text-gray-400 text-sm mb-3">
+                          {reg.events?.description ||
+                            "Event registration"}
+                        </p>
+                        <div className="flex flex-wrap gap-4 text-sm">
+                          {reg.events?.event_date && (
+                            <span className="flex items-center gap-1 text-gray-400">
+                              <Calendar size={14} />
+                              {formatDate(reg.events.event_date)}
+                            </span>
+                          )}
+                          {reg.events?.start_time && (
+                            <span className="flex items-center gap-1 text-gray-400">
+                              <Clock size={14} />
+                              {formatTime(reg.events.start_time)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-end gap-2">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
+                        reg.payment_status
+                      )}`}
+                    >
+                      {reg.payment_status || "CONFIRMED"}
+                    </span>
+                    <button
+                      onClick={() => downloadCertificate(reg)}
+                      disabled={reg.payment_status?.toUpperCase() !== 'PAID'}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded-lg transition-colors mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Download size={12} />
+                      Certificate
+                    </button>
+                    <span className="text-xs text-gray-500">
+                      Registered: {formatDate(reg.registered_at || reg.created_at)}
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
 export default MyRegistrations;
-
-
