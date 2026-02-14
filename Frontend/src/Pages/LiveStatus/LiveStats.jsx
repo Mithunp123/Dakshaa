@@ -4,6 +4,8 @@ import { Users, TicketCheck, TrendingUp, Radio, ArrowLeft } from "lucide-react";
 import { supabase } from "../../supabase";
 import CountUp from "react-countup";
 import { useNavigate } from "react-router-dom";
+import logo1 from "../../assets/logo1.webp";
+import collegeLogoWhite from "../../assets/collegeLogoWhite.webp";
 
 // Helper to extract conference name from event_id
 const getConferenceNameFromId = (rawId) => {
@@ -1540,13 +1542,18 @@ const LiveStats = () => {
   return (
     <div className="fixed inset-0 z-50 bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-hidden">
       {/* Back Button */}
-      <div className="absolute top-4 left-4 md:top-8 md:left-8 z-50 flex items-center gap-4 md:gap-8">
+            <div className="absolute top-4 left-4 md:top-8 md:left-8 z-50 flex items-center gap-4 md:gap-8">
         <button 
           onClick={() => navigate(-1)}
           className="text-gray-500 hover:text-white transition-colors p-2 rounded-full hover:bg-gray-800/20 w-fit"
         >
           <ArrowLeft size={24} className="md:w-8 md:h-8" />
         </button>
+                <img
+                    src={collegeLogoWhite}
+                    alt="College"
+                    className="h-[35px] md:h-[53px] w-auto"
+                />
       </div>
 
       {/* Animated Background Particles */}
@@ -1575,36 +1582,43 @@ const LiveStats = () => {
       </div>
 
       {/* Live Indicator */}
-      <motion.div 
-        className={`absolute top-4 right-4 md:top-8 md:right-8 flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 rounded-full z-10 ${
-          connectionStatus === 'subscribed' ? 'bg-green-500/20 border border-green-500/40' :
-          connectionStatus === 'error' || connectionStatus === 'timeout' ? 'bg-red-500/20 border border-red-500/40' :
-          connectionStatus === 'closed' ? 'bg-yellow-500/20 border border-yellow-500/40' :
-          'bg-blue-500/20 border border-blue-500/40'
-        }`}
-        animate={{ scale: isLive ? [1, 1.1, 1] : 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        <Radio className={`w-4 h-4 md:w-5 md:h-5 ${
-          connectionStatus === 'subscribed' ? 'text-green-500' :
-          connectionStatus === 'error' || connectionStatus === 'timeout' ? 'text-red-500' :
-          connectionStatus === 'closed' ? 'text-yellow-500' :
-          'text-blue-500'
-        } ${isLive || connectionStatus === 'connecting' ? 'animate-pulse' : ''}`} />
-        <span className={`font-bold uppercase tracking-wider text-xs md:text-sm ${
-          connectionStatus === 'subscribed' ? 'text-green-500' :
-          connectionStatus === 'error' || connectionStatus === 'timeout' ? 'text-red-500' :
-          connectionStatus === 'closed' ? 'text-yellow-500' :
-          'text-blue-500'
-        }`}>
-          {isLive ? 'UPDATING...' : 
-           connectionStatus === 'subscribed' ? 'LIVE' :
-           connectionStatus === 'error' ? 'ERROR' :
-           connectionStatus === 'timeout' ? 'TIMEOUT' :
-           connectionStatus === 'closed' ? 'RECONNECTING' :
-           'CONNECTING'}
-        </span>
-      </motion.div>
+            <div className="absolute top-4 right-4 md:top-8 md:right-8 z-10 flex flex-col items-end gap-3">
+                <img
+                    src={logo1}
+                    alt="Dakshaa"
+                    className="h-[35px] md:h-[53px] w-auto"
+                />
+                <motion.div 
+                    className={`flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 rounded-full ${
+                        connectionStatus === 'subscribed' ? 'bg-green-500/20 border border-green-500/40' :
+                        connectionStatus === 'error' || connectionStatus === 'timeout' ? 'bg-red-500/20 border border-red-500/40' :
+                        connectionStatus === 'closed' ? 'bg-yellow-500/20 border border-yellow-500/40' :
+                        'bg-blue-500/20 border border-blue-500/40'
+                    }`}
+                    animate={{ scale: isLive ? [1, 1.1, 1] : 1 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <Radio className={`w-4 h-4 md:w-5 md:h-5 ${
+                        connectionStatus === 'subscribed' ? 'text-green-500' :
+                        connectionStatus === 'error' || connectionStatus === 'timeout' ? 'text-red-500' :
+                        connectionStatus === 'closed' ? 'text-yellow-500' :
+                        'text-blue-500'
+                    } ${isLive || connectionStatus === 'connecting' ? 'animate-pulse' : ''}`} />
+                    <span className={`font-bold uppercase tracking-wider text-xs md:text-sm ${
+                        connectionStatus === 'subscribed' ? 'text-green-500' :
+                        connectionStatus === 'error' || connectionStatus === 'timeout' ? 'text-red-500' :
+                        connectionStatus === 'closed' ? 'text-yellow-500' :
+                        'text-blue-500'
+                    }`}>
+                        {isLive ? 'UPDATING...' : 
+                         connectionStatus === 'subscribed' ? 'LIVE' :
+                         connectionStatus === 'error' ? 'ERROR' :
+                         connectionStatus === 'timeout' ? 'TIMEOUT' :
+                         connectionStatus === 'closed' ? 'RECONNECTING' :
+                         'CONNECTING'}
+                    </span>
+                </motion.div>
+            </div>
 
       {/* Main Content */}
       <div className="relative z-10 w-full h-screen flex flex-col px-6 py-4 overflow-hidden">
