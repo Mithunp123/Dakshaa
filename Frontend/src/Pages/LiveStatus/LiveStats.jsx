@@ -1775,20 +1775,26 @@ const LiveStats = () => {
                     transition={{ delay: 0.5 }}
                     className="flex md:grid md:grid-cols-7 gap-2 md:gap-4 shrink-0 overflow-x-auto md:overflow-visible pb-3 md:pb-0 mb-4 md:mb-3"
                 >
-                    {categoryStats.filter(stat => stat.category !== 'Workshop').map((stat, index) => (
+                    {categoryStats.map((stat, index) => (
                     <motion.div 
                         key={stat.category}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.6 + (index * 0.1) }}
-                        className={`relative bg-gray-900 border border-gray-700/50 rounded-xl md:rounded-2xl p-2 md:p-3 hover:border-primary/30 transition-all group overflow-hidden cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-primary/20 shrink-0 w-20 md:w-auto`}
+                        className={`relative bg-gray-900 border border-gray-700/50 rounded-xl md:rounded-2xl p-2 md:p-3 hover:border-primary/30 transition-all group overflow-hidden cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-primary/20 shrink-0 ${
+                            stat.category === 'Workshop' ? 'w-32 md:w-auto md:col-span-2 md:scale-110 md:z-10' : 'w-20 md:w-auto'
+                        }`}
                         onClick={() => toggleCategoryExpansion(stat.category)}
                     >
                         <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-40 transition-opacity hidden md:block">
                         <TicketCheck className="w-6 h-6 rotate-[-15deg]" />
                         </div>
-                        <div className={`text-gray-400 font-bold uppercase tracking-widest mb-0.5 md:mb-1 h-3 md:h-4 flex items-end group-hover:text-primary transition-colors truncate text-[8px] md:text-[10px]`}>{stat.category}</div>
-                        <div className={`font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent font-mono text-base md:text-xl lg:text-3xl`}>
+                        <div className={`text-gray-400 font-bold uppercase tracking-widest mb-0.5 md:mb-1 h-3 md:h-4 flex items-end group-hover:text-primary transition-colors truncate ${
+                            stat.category === 'Workshop' ? 'text-[9px] md:text-xs' : 'text-[8px] md:text-[10px]'
+                        }`}>{stat.category}</div>
+                        <div className={`font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent font-mono ${
+                            stat.category === 'Workshop' ? 'text-lg md:text-2xl lg:text-4xl' : 'text-base md:text-xl lg:text-3xl'
+                        }`}>
                             <CountUp end={stat.count} duration={2} separator="," />
                         </div>
                     </motion.div>
