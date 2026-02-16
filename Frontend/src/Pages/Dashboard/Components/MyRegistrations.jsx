@@ -302,7 +302,7 @@ const MyRegistrations = () => {
 
   const downloadCertificate = async (reg) => {
     try {
-      toast.loading('Processing certificate...', { id: 'cert-gen' });
+      toast.loading('Processing certificate... 0%', { id: 'cert-gen' });
 
       // Fetch user profile from DB
       const { data: { session } } = await supabase.auth.getSession();
@@ -313,6 +313,7 @@ const MyRegistrations = () => {
         return;
       }
 
+      toast.loading('Fetching profile... 10%', { id: 'cert-gen' });
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('full_name, gender, college_name, department, year_of_study, user_code')
@@ -344,9 +345,10 @@ const MyRegistrations = () => {
       const eventDate = reg.events?.event_date
         ? new Date(reg.events.event_date)
         : new Date();
-      // Format: February-12-2026
-      const formattedDate = `${eventDate.toLocaleString('en-US', { month: 'long' })}-${String(eventDate.getDate()).padStart(2, '0')}-${eventDate.getFullYear()}`;
+      // Format: DD.MM.YYYY (e.g., 13.02.2026)
+      const formattedDate = `${String(eventDate.getDate()).padStart(2, '0')}.${String(eventDate.getMonth() + 1).padStart(2, '0')}.${eventDate.getFullYear()}`;
 
+      toast.loading('Preparing certificate data... 20%', { id: 'cert-gen' });
       // ---- Store / retrieve certificate from certificate_data table ----
       // Ensure data exists in certificate_data before download/generation
       let ksrctId = null;
@@ -412,16 +414,17 @@ const MyRegistrations = () => {
         return;
       }
 
-      toast.loading('Generating certificate...', { id: 'cert-gen' });
+      toast.loading('Generating QR code... 35%', { id: 'cert-gen' });
 
       // ---- Generate QR code as data URL ----
       const qrUrl = `https://authenticate.ksrctdigipro.in/?certid=${ksrctId}`;
       const qrDataUrl = await QRCode.toDataURL(qrUrl, {
         width: 200,
-        margin: 1,
+        margin: 3,
         color: { dark: '#000000', light: '#ffffff' },
       });
 
+      toast.loading('Loading QR image... 45%', { id: 'cert-gen' });
       // Load QR image
       const qrImg = new Image();
       qrImg.src = qrDataUrl;
@@ -430,6 +433,7 @@ const MyRegistrations = () => {
         qrImg.onerror = reject;
       });
 
+      toast.loading('Loading template... 55%', { id: 'cert-gen' });
       // ---- Load template image ----
       const img = new Image();
       img.crossOrigin = 'anonymous';
@@ -440,6 +444,7 @@ const MyRegistrations = () => {
         img.onerror = reject;
       });
 
+      toast.loading('Rendering certificate... 65%', { id: 'cert-gen' });
       const canvas = document.createElement('canvas');
       canvas.width = img.width;
       canvas.height = img.height;
@@ -537,27 +542,60 @@ const MyRegistrations = () => {
       ctx.fillText(ksrctId, certIdX, certIdY);
 
       // ---- Draw QR Code on certificate (bottom-left area) ----
-      const qrSize = Math.round(width * 0.10); // 10% of image width
+      const qrSize = Math.round(width * 0.09); // 10% of image width
       const qrX = width * 0.05;  // left side
-      const qrY = height * 0.82; // bottom area
+      const qrY = height * 0.85; // bottom area
       ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-      // Download as PDF
+      toast.loading('Creating PDF... 85%', { id: 'cert-gen' });
+      // Download as PDF in A4 size for printing
       const imgData = canvas.toDataURL('image/png');
-      const pdfWidth = canvas.width;
-      const pdfHeight = canvas.height;
-      // Use landscape if wider than tall, portrait otherwise
-      const orientation = pdfWidth > pdfHeight ? 'landscape' : 'portrait';
+      
+      // A4 dimensions in mm: 210 x 297
+      // Use landscape if image is wider than tall
+      const isLandscape = canvas.width > canvas.height;
+      const orientation = isLandscape ? 'landscape' : 'portrait';
+      
       const doc = new jsPDF({
         orientation,
-        unit: 'px',
-        format: [pdfWidth, pdfHeight],
+        unit: 'mm',
+        format: 'a4',
       });
-      doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      
+      // Get A4 page dimensions based on orientation
+      const pageWidth = isLandscape ? 297 : 210;
+      const pageHeight = isLandscape ? 210 : 297;
+      
+      // Calculate scaling to fit image within A4 with margins
+      const margin = 5; // 5mm margin for better printing
+      const availableWidth = pageWidth - (margin * 2);
+      const availableHeight = pageHeight - (margin * 2);
+      
+      const imgAspectRatio = canvas.width / canvas.height;
+      const pageAspectRatio = availableWidth / availableHeight;
+      
+      let imgWidth, imgHeight, imgX, imgY;
+      
+      if (imgAspectRatio > pageAspectRatio) {
+        // Image is wider - fit to width
+        imgWidth = availableWidth;
+        imgHeight = availableWidth / imgAspectRatio;
+      } else {
+        // Image is taller - fit to height
+        imgHeight = availableHeight;
+        imgWidth = availableHeight * imgAspectRatio;
+      }
+      
+      // Center the image on the page
+      imgX = margin + (availableWidth - imgWidth) / 2;
+      imgY = margin + (availableHeight - imgHeight) / 2;
+      
+      doc.addImage(imgData, 'PNG', imgX, imgY, imgWidth, imgHeight);
+      toast.loading('Downloading... 95%', { id: 'cert-gen' });
       doc.save(`${eventName.replace(/[^a-zA-Z0-9]/g, '_')}_Certificate.pdf`);
 
       toast.dismiss('cert-gen');
-      toast.success('Certificate downloaded successfully');
+      toast.success('Certificate downloaded successfully! 100%');
     } catch (err) {
       console.error('Error generating certificate:', err);
       toast.dismiss('cert-gen');
@@ -582,15 +620,15 @@ const MyRegistrations = () => {
   };
 
 
-  if (loading) return <div className="text-center p-10">Loading your registrations...</div>;
+  if (loading) return <div className="text-center p-10 text-gray-300">Loading your registrations...</div>;
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold mb-6">My Registrations</h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-200">My Registrations</h2>
       
       {registrations.length === 0 ? (
         <div className="text-center py-12 bg-gray-800/50 rounded-xl border border-gray-700">
-          <p className="text-gray-400">You haven't registered for any events yet.</p>
+          <p className="text-gray-300">You haven't registered for any events yet.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -606,7 +644,7 @@ const MyRegistrations = () => {
                   <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border ${getStatusColor(reg.payment_status)}`}>
                     {reg.payment_status}
                   </span>
-                  <h3 className="text-lg font-bold mt-2">
+                  <h3 className="text-lg font-bold mt-2 text-gray-100">
                     {reg.events?.name || reg.events?.title || 'Event'}
                   </h3>
                   {reg.event_name && (
@@ -614,13 +652,13 @@ const MyRegistrations = () => {
                       <Users size={12} /> Team: {reg.event_name}
                     </p>
                   )}
-                  <p className="text-sm text-gray-400 capitalize">
+                  <p className="text-sm text-gray-300 capitalize">
                     {reg.events?.category || ''}
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-2 text-sm text-gray-400">
+              <div className="space-y-2 text-sm text-gray-300">
                 <div className="flex items-center gap-2">
                   <Calendar size={14} />
                   <span>
@@ -641,7 +679,7 @@ const MyRegistrations = () => {
 
               <div className="mt-6 flex flex-col gap-2">
                 <div className="flex gap-2">
-                  {'FAILED'?.toUpperCase() === 'PAID' ? (
+                  {'PAID'?.toUpperCase() === 'PAID' ? (
                     <button 
                       onClick={() => downloadCertificate(reg)}
                       className="flex-1 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-500 transition-colors"
@@ -651,7 +689,7 @@ const MyRegistrations = () => {
                   ) : (
                     <button 
                       disabled
-                      className="flex-1 py-2 bg-gray-700 text-gray-400 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 cursor-not-allowed"
+                      className="flex-1 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 cursor-not-allowed"
                     >
                       <Lock size={20} />The certificate will be available for download soon.
                     </button>
@@ -669,5 +707,3 @@ const MyRegistrations = () => {
 };
 
 export default MyRegistrations;
-
-
