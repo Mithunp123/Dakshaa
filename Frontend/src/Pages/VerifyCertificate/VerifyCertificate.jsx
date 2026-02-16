@@ -51,7 +51,18 @@ const VerifyCertificate = () => {
         return;
       }
 
-      // Request camera permission
+      // On mobile, directly start with back camera using facingMode
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        // For mobile devices, use facingMode constraint directly
+        setCameraId('environment'); // Special value to indicate back camera
+        setScanning(true);
+        setCameraError(null);
+        return;
+      }
+
+      // Request camera permission for desktop
       try {
         await navigator.mediaDevices.getUserMedia({ video: true });
       } catch (permError) {
@@ -103,15 +114,45 @@ const VerifyCertificate = () => {
         aspectRatio: 1.0
       };
 
-      await html5QrCodeRef.current.start(
-        cameraId,
-        config,
-        onScanSuccess,
-        () => {} // Silent error handler
-      );
+      // Check if using facingMode for mobile
+      if (cameraId === 'environment') {
+        // Use facingMode constraint for mobile back camera
+        try {
+          await html5QrCodeRef.current.start(
+            { facingMode: "environment" },
+            config,
+            onScanSuccess,
+            () => {} // Silent error handler
+          );
+        } catch (backCamError) {
+          console.warn("Back camera failed, trying front camera:", backCamError);
+          // Fallback to front camera if back camera fails
+          try {
+            await html5QrCodeRef.current.start(
+              { facingMode: "user" },
+              config,
+              onScanSuccess,
+              () => {}
+            );
+          } catch (frontCamError) {
+            console.error("Both cameras failed:", frontCamError);
+            setCameraError('Could not start camera. Please check permissions.');
+            setScanning(false);
+          }
+        }
+      } else {
+        // Use camera ID for desktop
+        await html5QrCodeRef.current.start(
+          cameraId,
+          config,
+          onScanSuccess,
+          () => {} // Silent error handler
+        );
+      }
     } catch (error) {
       console.error("Error starting scanner:", error);
       setCameraError('Could not start camera: ' + error.message);
+      setScanning(false);
     }
   };
 
