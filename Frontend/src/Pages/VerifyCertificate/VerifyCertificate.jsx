@@ -55,6 +55,24 @@ const VerifyCertificate = () => {
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       
       if (isMobile) {
+        // Request camera permission first on mobile
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: { ideal: 'environment' } } 
+          });
+          // Stop the stream as Html5Qrcode will create its own
+          stream.getTracks().forEach(track => track.stop());
+        } catch (permError) {
+          if (permError.name === 'NotAllowedError') {
+            setCameraError('Camera permission denied. Please allow camera access in your browser settings.');
+          } else if (permError.name === 'NotFoundError') {
+            setCameraError('No camera found on this device.');
+          } else {
+            setCameraError('Could not access camera: ' + (permError.message || 'Permission denied'));
+          }
+          return;
+        }
+        
         // For mobile devices, use facingMode constraint directly
         setCameraId('environment'); // Special value to indicate back camera
         setScanning(true);
@@ -71,7 +89,7 @@ const VerifyCertificate = () => {
         } else if (permError.name === 'NotFoundError') {
           setCameraError('No camera found on this device.');
         } else {
-          setCameraError('Could not access camera: ' + permError.message);
+          setCameraError('Could not access camera: ' + (permError.message || 'Unknown error'));
         }
         return;
       }
@@ -94,13 +112,23 @@ const VerifyCertificate = () => {
       setCameraError(null);
     } catch (error) {
       console.error("Error getting cameras:", error);
-      setCameraError('Could not access camera: ' + error.message);
+      setCameraError('Could not access camera: ' + (error.message || 'Unknown error'));
     }
   };
 
   const startScanner = async () => {
     try {
       setCameraError(null);
+      
+      // Wait for DOM element to be ready
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const qrReaderElement = document.getElementById("qr-reader");
+      if (!qrReaderElement) {
+        setCameraError('Scanner container not ready. Please try again.');
+        setScanning(false);
+        return;
+      }
       
       if (!html5QrCodeRef.current) {
         html5QrCodeRef.current = new Html5Qrcode("qr-reader", {
@@ -136,7 +164,7 @@ const VerifyCertificate = () => {
             );
           } catch (frontCamError) {
             console.error("Both cameras failed:", frontCamError);
-            setCameraError('Could not start camera. Please check permissions.');
+            setCameraError('Could not start camera. Please ensure camera permissions are granted and try again.');
             setScanning(false);
           }
         }
@@ -151,7 +179,7 @@ const VerifyCertificate = () => {
       }
     } catch (error) {
       console.error("Error starting scanner:", error);
-      setCameraError('Could not start camera: ' + error.message);
+      setCameraError('Could not start camera: ' + (error.message || 'Please check camera permissions'));
       setScanning(false);
     }
   };
