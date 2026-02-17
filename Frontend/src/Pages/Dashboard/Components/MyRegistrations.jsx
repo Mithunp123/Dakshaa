@@ -552,7 +552,8 @@ const MyRegistrations = () => {
 
       toast.loading('Creating PDF... 85%', { id: 'cert-gen' });
       // Download as PDF in A4 size for printing
-      const imgData = canvas.toDataURL('image/png');
+      // Use JPEG with quality 0.75 to keep PDF under 5 MB
+      const imgData = canvas.toDataURL('image/jpeg', 0.75);
       
       // A4 dimensions in mm: 210 x 297
       // Use landscape if image is wider than tall
@@ -593,7 +594,7 @@ const MyRegistrations = () => {
       imgX = margin + (availableWidth - imgWidth) / 2;
       imgY = margin + (availableHeight - imgHeight) / 2;
       
-      doc.addImage(imgData, 'PNG', imgX, imgY, imgWidth, imgHeight);
+      doc.addImage(imgData, 'JPEG', imgX, imgY, imgWidth, imgHeight, undefined, 'FAST');
       toast.loading('Downloading... 95%', { id: 'cert-gen' });
       doc.save(`${eventName.replace(/[^a-zA-Z0-9]/g, '_')}_Certificate.pdf`);
 
@@ -709,7 +710,7 @@ const MyRegistrations = () => {
                       disabled
                       className="flex-1 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 cursor-not-allowed"
                     >
-                      <Lock size={20} />The certificate is not available for you.
+                      <Lock size={20} />The certificate will be available for download soon.
                     </button>
                   )}
                 </div>
