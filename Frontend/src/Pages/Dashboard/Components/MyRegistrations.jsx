@@ -685,7 +685,14 @@ const MyRegistrations = () => {
 
               <div className="mt-6 flex flex-col gap-2">
                 <div className="flex gap-2">
-                  {reg.payment_status?.toUpperCase() === 'PAID' ? (
+                  {(reg.events?.category || '').trim().toLowerCase() === 'cultural' || (reg.events?.category || '').trim().toLowerCase() === 'culturals' ? (
+                    <button 
+                      disabled
+                      className="flex-1 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 cursor-not-allowed"
+                    >
+                      <Lock size={20} /> Certificate will be available for download soon.
+                    </button>
+                  ) : reg.payment_status?.toUpperCase() === 'PAID' ? (
                     <button 
                       onClick={() => downloadCertificate(reg)}
                       disabled={generatingCertId === reg.id}
@@ -710,7 +717,7 @@ const MyRegistrations = () => {
                       disabled
                       className="flex-1 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 cursor-not-allowed"
                     >
-                      <Lock size={20} />The certificate will be available for download soon.
+                      <Lock size={20} />certificate not available
                     </button>
                   )}
                 </div>
