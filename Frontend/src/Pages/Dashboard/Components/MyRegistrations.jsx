@@ -9,7 +9,8 @@ import {
   RefreshCw,
   Users,
   Lock,
-  XCircle
+  XCircle,
+  Loader2
 } from 'lucide-react';
 import QRCode from 'qrcode/lib/browser';
 import { jsPDF } from 'jspdf';
@@ -24,6 +25,7 @@ const MyRegistrations = () => {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [generatingCertId, setGeneratingCertId] = useState(null);
   
   // Ref to track mounted state for async operations
   const mountedRef = useRef(true);
@@ -301,6 +303,7 @@ const MyRegistrations = () => {
   };
 
   const downloadCertificate = async (reg) => {
+    setGeneratingCertId(reg.id);
     try {
       toast.loading('Processing certificate... 0%', { id: 'cert-gen' });
 
@@ -600,6 +603,8 @@ const MyRegistrations = () => {
       console.error('Error generating certificate:', err);
       toast.dismiss('cert-gen');
       toast.error('Could not generate certificate. Please try again.');
+    } finally {
+      setGeneratingCertId(null);
     }
   };
 
@@ -679,12 +684,25 @@ const MyRegistrations = () => {
 
               <div className="mt-6 flex flex-col gap-2">
                 <div className="flex gap-2">
-                  {'FAILED'?.toUpperCase() === 'PAID' ? (
+                  {reg.payment_status?.toUpperCase() === 'PAID' ? (
                     <button 
                       onClick={() => downloadCertificate(reg)}
-                      className="flex-1 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-500 transition-colors"
+                      disabled={generatingCertId === reg.id}
+                      className={`flex-1 py-2 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${
+                        generatingCertId === reg.id 
+                          ? 'bg-emerald-700 cursor-wait' 
+                          : 'bg-emerald-600 hover:bg-emerald-500'
+                      }`}
                     >
-                      <Download size={14} /> Download Certificate
+                      {generatingCertId === reg.id ? (
+                        <>
+                          <Loader2 size={14} className="animate-spin" /> Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Download size={14} /> Download Certificate
+                        </>
+                      )}
                     </button>
                   ) : (
                     <button 
