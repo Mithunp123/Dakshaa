@@ -679,7 +679,7 @@ const MyRegistrations = () => {
 
               <div className="mt-6 flex flex-col gap-2">
                 <div className="flex gap-2">
-                  {'PAID'?.toUpperCase() === 'PAID' ? (
+                  {'FAILED'?.toUpperCase() === 'PAID' ? (
                     <button 
                       onClick={() => downloadCertificate(reg)}
                       className="flex-1 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-500 transition-colors"
