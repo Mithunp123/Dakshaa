@@ -133,8 +133,7 @@ const Navbar = () => {
           <div className="scroll-note bg-slate-950/90 border-b border-white/10">
             <div className="scroll-note-inner">
               <div className="scroll-note-track">
-                <span className="scroll-note-text">Food is available only for Neura-Hack 2.0,BioNexathon ,Vibe Code -26 </span>
-                <span className="scroll-note-text" aria-hidden="true">Food is available only for Neura-Hack 2.0,BioNexathon ,Vibe Code -26 </span>
+                <span className="scroll-note-text">Participation certificates are available for all events and can be downloaded from your dashboard under the My Registration tab.</span>
               </div>
             </div>
           </div>
