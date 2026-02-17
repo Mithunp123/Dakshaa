@@ -709,7 +709,7 @@ const MyRegistrations = () => {
                       disabled
                       className="flex-1 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 cursor-not-allowed"
                     >
-                      <Lock size={20} />The certificate will be available for download soon.
+                      <Lock size={20} />The certificate is not available for you.
                     </button>
                   )}
                 </div>
